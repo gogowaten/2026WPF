@@ -6,7 +6,42 @@
         xmlns:local="clr-namespace:_20260130_02"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="700">
-    <Grid>
-
-    </Grid>
+  <Grid>
+    <Grid.ColumnDefinitions>
+      <ColumnDefinition/>
+      <ColumnDefinition Width="200"/>
+    </Grid.ColumnDefinitions>
+    <Canvas x:Name="myCanvas" Background="AliceBlue">
+      <local:AutoSizingPanel x:Name="myAutoPanel">
+        <!-- 子要素は絶対座標を指定（親 Canvas の座標系のつもりで指定） -->
+        <Rectangle Fill="#2196F3" Width="120" Height="80"
+                       local:AutoSizingPanel.Left="50" local:AutoSizingPanel.Top="60" />
+        <Ellipse Fill="#FF9800" Width="160" Height="120"
+                     local:AutoSizingPanel.Left="140" local:AutoSizingPanel.Top="40" />
+        <Button Content="Click" Width="80" Height="32"
+                    local:AutoSizingPanel.Left="180" local:AutoSizingPanel.Top="220" Click="Button_Click"/>
+      </local:AutoSizingPanel>
+      <!-- AutoSizingPanel を Canvas 上に置くと、自動で自分を移動して子をラップします -->
+      <!--
+        <local:AutoSizingPanel>
+            -->
+      <!-- 子要素は絶対座標を指定（親 Canvas の座標系のつもりで指定） -->
+      <!--
+            <Rectangle Fill="#2196F3" Width="120" Height="80"
+                       local:AutoSizingPanel.Left="50" local:AutoSizingPanel.Top="60" />
+            <Ellipse Fill="#FF9800" Width="160" Height="120"
+                     local:AutoSizingPanel.Left="240" local:AutoSizingPanel.Top="40" />
+            <Button Content="Click" Width="80" Height="32"
+                    local:AutoSizingPanel.Left="180" local:AutoSizingPanel.Top="220" />
+        </local:AutoSizingPanel>-->
+    </Canvas>
+    <StackPanel Grid.Column="1" Margin="8">
+      <TextBlock Text="AutoSizingPanel Sample" FontWeight="Bold" FontSize="16" Margin="0,0,0,16"/>
+      <TextBlock Text="青い四角、オレンジの楕円、ボタンが AutoSizingPanel の子要素です。" TextWrapping="Wrap" Margin="0,0,0,8"/>
+      <TextBlock Text="AutoSizingPanel は Canvas 上に配置されており、子要素の絶対座標を基準に自動で自分の位置とサイズを調整します。" TextWrapping="Wrap" Margin="0,0,0,8"/>
+      <TextBlock Text="{Binding ElementName=myCanvas, Path=ActualHeight, StringFormat=height 0.0}"/>
+      <TextBlock Text="{Binding ElementName=myCanvas, Path=ActualWidth, StringFormat=width 0.0}"/>
+      <TextBlock Text="{Binding ElementName=myCanvas, Path=RenderSize, StringFormat=width 0.0}"/>
+    </StackPanel>
+  </Grid>
 </Window>

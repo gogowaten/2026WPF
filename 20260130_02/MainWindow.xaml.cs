@@ -20,5 +20,19 @@ namespace _20260130_02
         {
             InitializeComponent();
         }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            Rectangle rectangle = new Rectangle
+            {
+                Width = 50,
+                Height = 50,
+                Fill = Brushes.Salmon,
+                Stroke = Brushes.Black,
+                StrokeThickness = 1,
+            };
+            AutoSizingPanel.SetLeft(rectangle, 200 + myAutoPanel.Children.Count * 30);
+            myAutoPanel.Children.Add(rectangle);
+        }
     }
 }
