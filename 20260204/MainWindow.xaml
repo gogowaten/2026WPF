@@ -11,6 +11,7 @@
       <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="10">
         <Button Content="画像を開く" Click="OpenButton_Click" Padding="10,5"/>
         <Button Content="画像をグレースケールに" Click="GrayScaleButton_Click" Padding="10,5"/>
+        <Button Content="右に90度回転" Click="RotateButton_Click" Padding="10,5" Margin="5,0,0,0"/>
         <Button Content="もとに戻す" Click="ResetButton_Click" Padding="10,5"/>
         
       </StackPanel>
@@ -21,8 +22,17 @@
             ValueChanged="BrightnessSlider_ValueChanged"
             TickFrequency="1" IsSnapToTickEnabled="True"/>
       </StackPanel>
-      <Border BorderBrush="Gray" BorderThickness="1" Margin="10">
-        <Image x:Name="MainImage" Stretch="Uniform"/>
+      <StackPanel DockPanel.Dock="Top" Margin="10">
+        <Label Content="回転角度 (度)"/>
+        <DockPanel>
+          <Slider x:Name="RotationSlider" Minimum="0" Maximum="360" Value="0" 
+                TickFrequency="1" IsSnapToTickEnabled="True" Width="400"/>
+          <TextBlock Text="{Binding ElementName=RotationSlider, Path=Value}" VerticalAlignment="Center" Margin="10,0"/>
+          <Button Content="回転実行" Click="RotateFreeButton_Click" Padding="10,5"/>
+        </DockPanel>
+      </StackPanel>
+      <Border BorderBrush="Gray" BorderThickness="1" Margin="10" UseLayoutRounding="True">
+        <Image x:Name="MainImage" Stretch="None"/>
       </Border>
     </DockPanel>
   </Grid>
