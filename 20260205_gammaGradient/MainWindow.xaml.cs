@@ -20,7 +20,8 @@ namespace _20260205_gammaGradient
         {
             InitializeComponent();
 
-            MyImage.Source = CreateGammaCorrectedGradient(Colors.Red, Colors.Cyan, (int)MyImage.Width, (int)MyImage.Height);
+            MyImage.Source = CreateGammaCorrectedGradient(Color.FromRgb(200,0,0), Color.FromRgb(0,0,200), (int)MyImage.Width, (int)MyImage.Height);
+            //MyImage.Source = CreateGammaCorrectedGradient(Colors.Red, Colors.Cyan, (int)MyImage.Width, (int)MyImage.Height);
         }
 
         // sRGB → Linear ：値の2.2乗

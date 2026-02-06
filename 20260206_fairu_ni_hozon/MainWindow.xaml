@@ -1,9 +1,9 @@
-﻿<Window x:Class="_20260205_gammaGradient.MainWindow"
+﻿<Window x:Class="_20260206_fairu_ni_hozon.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:_20260205_gammaGradient"
+        xmlns:local="clr-namespace:_20260206_fairu_ni_hozon"
         mc:Ignorable="d"
         Title="MainWindow" Height="367" Width="654">
   <Grid>
@@ -13,12 +13,15 @@
     </Grid.ColumnDefinitions>
 
     <Canvas x:Name="MyCanvas">
-      <Image x:Name="MyImage" Width="256" Height="256"/>
+
     </Canvas>
 
     <StackPanel Grid.Column="1">
-      <Button x:Name="Gradient" Content="グラデーション" Click="Gradient_Click"/>
+      <TextBox x:Name="MyTextBox" Text="aaa" Margin="1" Foreground="Red" 
+               FontFamily="MigMix 1M" FontSize="30" FontWeight="Thin"/>
+      <Button x:Name="SaveButton" Content="save" Click="SaveButton_Click"/>
+      <Button x:Name="LoadButton" Content="load" Click="LoadButton_Click"/>
+      <TextBox x:Name="MyTextBox2" Text="bbb"/>
     </StackPanel>
   </Grid>
 </Window>
-
