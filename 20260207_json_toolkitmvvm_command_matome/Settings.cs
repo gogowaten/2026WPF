@@ -4,9 +4,9 @@ using System.Text;
 
 namespace _20260207_json_toolkitmvvm_command_matome
 {
-    internal class Settings
-    {
-    }
+    //internal class Settings
+    //{
+    //}
 
     public class TextBoxSettings
     {
