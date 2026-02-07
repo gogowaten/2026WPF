@@ -57,11 +57,13 @@ namespace _20260206_CommunityToolkit
         // [ObservableProperty] を付けると、大文字で始まる「Text」プロパティが自動生成される
         // [NotifyCanExecuteChangedFor] を使うと、
         // Textが変わった瞬間にコマンドの「押せる・押せない」を再判定してくれる
+        // 実行したいメソッド名にCommandを付け足したものを指定する
         [ObservableProperty]
-        [NotifyCanExecuteChangedFor(nameof(ResetTextCommand))]
+        [NotifyCanExecuteChangedFor(nameof(ComplexActionCommand))]
         public string _text = "";
 
         [ObservableProperty]
+        [NotifyCanExecuteChangedFor(nameof(ComplexActionCommand))]
         private double _fontSize = 12;
 
         [ObservableProperty]
@@ -69,6 +71,21 @@ namespace _20260206_CommunityToolkit
 
         [ObservableProperty]
         private string _foreground = Colors.Black.ToString();
+
+        [RelayCommand(CanExecute =nameof(CanExecuteComplexAction))]
+        private void ComplexAction()
+        {
+            Foreground = Colors.Magenta.ToString();
+        }
+        
+        // 複数条件での実行
+        // 
+        private bool CanExecuteComplexAction()
+        {
+            bool hasText = !string.IsNullOrWhiteSpace(Text);
+            bool isLargeFont = FontSize > 10;
+            return hasText && isLargeFont;
+        }
 
 
         // プロパティが変更された後に呼ばれるメソッド（命名規則：Onプロパティ名Changed）

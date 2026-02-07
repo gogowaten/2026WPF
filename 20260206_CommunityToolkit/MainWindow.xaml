@@ -19,7 +19,7 @@
 
     <StackPanel Grid.Column="1">
       <TextBox x:Name="MyTextBox" Text="{Binding Text, UpdateSourceTrigger=PropertyChanged}"
-               Margin="1" 
+               Margin="1"
                Foreground="{Binding Foreground, Mode=TwoWay}"
                FontFamily="MigMix 1M" FontSize="30" FontWeight="Thin">
         <TextBox.Background>
@@ -33,7 +33,7 @@
       <Button x:Name="LoadButton" Content="load" Click="LoadButton_Click"/>
       <TextBox x:Name="MyTextBox2" Text="bbb"/>
       <Button x:Name="ForegroundRed" Content="文字色" Click="ForegroundRed_Click"/>
-      <Button Content="文字のリセット" Command="{Binding ResetTextCommand}"/>
+      <Button Content="文字のリセット" Command="{Binding ComplexActionCommand}"/>
     </StackPanel>
   </Grid>
 </Window>
