@@ -32,7 +32,13 @@
       <ColumnDefinition Width="200"/>
     </Grid.ColumnDefinitions>
 
-    <Canvas x:Name="MyCanvas" Background="Transparent">
+    <Canvas x:Name="MainCanvas" Background="Transparent"
+            MouseDown="MainCanvas_MouseDown"
+            MouseMove="MainCanvas_MouseMove"
+            MouseUp="MainCanvas_MouseUp">
+      <Rectangle x:Name="selectionBox" Visibility="Collapsed"
+                 Stroke="DodgerBlue" StrokeThickness="1" StrokeDashArray="3 1"
+                 Fill="#331e90ff" Panel.ZIndex="999"/>
       <local:DraggableRectangle Canvas.Left="10" Canvas.Top="10" Width="150" Height="100"/>
       <local:DraggableRectangle Canvas.Left="100" Canvas.Top="100" Width="50" Height="100"/>
     </Canvas>
