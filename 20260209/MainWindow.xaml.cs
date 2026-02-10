@@ -112,5 +112,31 @@ namespace _20260209
 
         // パフォーマンスのヒント
         // 要素数が数百、数千と増える場合は、VisualTreeHelper.HitTest を使った空間分割的な判定が必要になりますが、数十個程度であれば上記の foreach ループで十分高速に動作します。
+
+        // 削除
+        private void RemoveItem_Click(object sender, RoutedEventArgs e)
+        {
+            // 選択されている要素をリストアップ
+            var selectedItems = MainCanvas.Children.OfType<DraggableRectangle>()
+                .Where(x => x.IsSelected)
+                .ToList();
+
+            // Canvasから削除
+            foreach (var item in selectedItems)
+            {
+                MainCanvas.Children.Remove(item);
+            }
+        }
+
+        // 追加
+        private void AddItem_Click(object sender, RoutedEventArgs e)
+        {
+            var newRect = new DraggableRectangle() { Width = 100, Height = 100 };
+
+            // 初期配置は、とりあえず左上に
+            Canvas.SetLeft(newRect, 50);
+            Canvas.SetTop(newRect, 50);
+            MainCanvas.Children.Add(newRect);
+        }
     }
 }

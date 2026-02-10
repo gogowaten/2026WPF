@@ -21,6 +21,8 @@ namespace _20260209
     // 2. ドラッグ移動可能なコントロール
     public class DraggableRectangle : Thumb
     {
+        #region プロパティ
+
         private ResizingAdorner? _resizer; // Adornerを保持
 
         public bool IsSelected
@@ -31,32 +33,51 @@ namespace _20260209
 
         // 選択状態を管理する依存関係プロパティ
         public static readonly DependencyProperty IsSelectedProperty =
-            DependencyProperty.Register(nameof(IsSelected), typeof(bool), typeof(DraggableRectangle), new PropertyMetadata(false,OnIsSelectedChanged));
+            DependencyProperty.Register(nameof(IsSelected), typeof(bool), typeof(DraggableRectangle), new PropertyMetadata(false, OnIsSelectedChanged));
 
-        private static void OnIsSelectedChanged(DependencyObject d,DependencyPropertyChangedEventArgs e)
+        private static void OnIsSelectedChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             var control = d as DraggableRectangle;
-            if(control?._resizer != null)
+            if (control?._resizer != null)
             {
                 control._resizer.Visibility = (bool)e.NewValue ? Visibility.Visible : Visibility.Collapsed;
             }
         }
+        #endregion プロパティ
 
         public DraggableRectangle()
         {
+            // ドラッグ移動、複数
             this.DragDelta += (s, e) =>
             {
-                double left = Canvas.GetLeft(this);
-                double top = Canvas.GetTop(this);
-                Canvas.SetLeft(this, (double.IsNaN(left) ? 0 : left) + e.HorizontalChange);
-                Canvas.SetTop(this, (double.IsNaN(top) ? 0 : top) + e.VerticalChange);
+                var canvas = VisualTreeHelper.GetParent(this) as Canvas;
+                if (canvas == null) { return; }
+
+                // 選択されているすべてのDraggableRectangleを対象にする
+                var selectedItems = canvas.Children.OfType<DraggableRectangle>().Where(x => x.IsSelected);
+                foreach (var item in selectedItems)
+                {
+                    double left = Canvas.GetLeft(item);
+                    double top = Canvas.GetTop(item);
+                    Canvas.SetLeft(item, (double.IsNaN(left) ? 0 : left) + e.HorizontalChange);
+                    Canvas.SetTop(item, (double.IsNaN(top) ? 0 : top) + e.VerticalChange);
+                }
             };
+
+            // ドラッグ移動、単騎
+            //this.DragDelta += (s, e) =>
+            //{
+            //    double left = Canvas.GetLeft(this);
+            //    double top = Canvas.GetTop(this);
+            //    Canvas.SetLeft(this, (double.IsNaN(left) ? 0 : left) + e.HorizontalChange);
+            //    Canvas.SetTop(this, (double.IsNaN(top) ? 0 : top) + e.VerticalChange);
+            //};
 
             // ロード時にAdorner(リサイズハンドル)を表示
             this.Loaded += (s, e) =>
             {
                 AdornerLayer layer = AdornerLayer.GetAdornerLayer(this);
-                if(layer != null)
+                if (layer != null)
                 {
                     _resizer = new ResizingAdorner(this)
                     {
@@ -69,22 +90,56 @@ namespace _20260209
             // 左クリックで選択状態にする
             this.PreviewMouseDown += (s, e) =>
             {
-                // 親（Canvasなど）から他のDraggableRectangleを探して非選択にする（簡易的な実装）
-                var canvas = VisualTreeHelper.GetParent(this) as Panel;
-                if(canvas != null)
+                // Keyboard.Modifiers 修飾キーの状態
+                // ModifierKeys.Control Ctrlキーの定数,内部的には特定のビットが 1 になっている数値
+                // この2つをビット演算、AND
+
+                // ?? はnull合体演算子
+                // ざっくり言うと、**「左側が null だったら、右側の値を使う」**という予備の値を指定するためのルールです。
+                // Enumerable.Empty<DraggableRectangle>()は空のリストのようなものを返します。
+
+                // Ctrlキーが押されていない場合、かつ自分がまだ選択されていない場合のみ他の選択を解除する
+                if ((Keyboard.Modifiers & ModifierKeys.Control) == 0 && !this.IsSelected)
                 {
-                    foreach (var child in canvas.Children.OfType<DraggableRectangle>())
+                    var canvas = GetParentCanvas(this);
+                    foreach (var child in canvas?.Children.OfType<DraggableRectangle>() ?? Enumerable.Empty<DraggableRectangle>())
                     {
                         child.IsSelected = false;
                     }
                 }
-                this.IsSelected = true;
+
+                //// 親（Canvasなど）から他のDraggableRectangleを探して非選択にする（簡易的な実装）
+                //if (VisualTreeHelper.GetParent(this) is Panel canvas)
+                //{
+                //    foreach (var child in canvas.Children.OfType<DraggableRectangle>())
+                //    {
+                //        child.IsSelected = false;
+                //    }
+                //    // クリックされたら最前面へ
+                //    Panel.SetZIndex(this, GetMaxZIndex(canvas) + 1);
+                //}
+
+                this.IsSelected = true; // 自分を選択状態にする
                 e.Handled = false; // ドラッグ移動（Thumbの標準挙動）も行いたいのでHandledはfalse
             };
 
+
         }
 
-        
+        private int GetMaxZIndex(Panel parent)
+        {
+            var zIndices = parent.Children.Cast<UIElement>().Select(Panel.GetZIndex);
+            return zIndices.Any() ? zIndices.Max() : 0;
+
+        }
+
+        // ヘルパーメソッド：VisualTreeを遡ってcanvasを探す
+        private Canvas GetParentCanvas(DependencyObject child)
+        {
+            DependencyObject parentObject = VisualTreeHelper.GetParent(child);
+            if (parentObject is Canvas canvas) { return canvas; }
+            else { return GetParentCanvas(parentObject); }
+        }
 
     }
 
@@ -119,6 +174,7 @@ namespace _20260209
             }
         }
 
+        // ドラッグ移動
         private void OnResizeDragDelta(object sender, DragDeltaEventArgs e)
         {
             var thumb = (Thumb)sender;
@@ -158,6 +214,7 @@ namespace _20260209
             if (dTop != 0) { Canvas.SetTop(el, Canvas.GetTop(el) - actualDHeight); }
         }
 
+        // 子要素の再配置
         protected override Size ArrangeOverride(Size finalSize)
         {
             double w = AdornedElement.RenderSize.Width;

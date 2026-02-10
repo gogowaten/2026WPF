@@ -44,7 +44,8 @@
     </Canvas>
 
     <StackPanel Grid.Column="1">
-
+      <Button x:Name="AddItem" Content="追加" Click="AddItem_Click"/>
+      <Button x:Name="RemoveItem" Content="削除" Click="RemoveItem_Click"/>
     </StackPanel>
   </Grid>
 </Window>
