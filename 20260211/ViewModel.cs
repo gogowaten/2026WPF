@@ -65,7 +65,7 @@ namespace _20260211
         [ObservableProperty]
         private PointCollection _points = [];
         public PointCollection MyPoints = [new Point(), new Point(100, 50)];
-
+        
         [ObservableProperty]
         private bool _isDrawing = false;
 

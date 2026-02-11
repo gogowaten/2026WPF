@@ -22,6 +22,7 @@ namespace _20260211
     {
         private PointCollection _points = [new Point(), new Point(100, 50)];
         private MainViewModel MyMainViewModel = new();
+        
         public MainWindow()
         {
             InitializeComponent();
