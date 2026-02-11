@@ -37,6 +37,7 @@ namespace _20260211_ocr
 
                 var decoder = await BitmapDecoder.CreateAsync(stream.AsRandomAccessStream());
                 using var softwareBitmap = await decoder.GetSoftwareBitmapAsync();
+                pictureBox1.Image = bmp;
 
                 var result = await engine.RecognizeAsync(softwareBitmap);
 
@@ -48,5 +49,6 @@ namespace _20260211_ocr
                 throw;
             }
         }
+
     }
 }

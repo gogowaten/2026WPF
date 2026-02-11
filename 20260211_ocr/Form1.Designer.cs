@@ -30,6 +30,8 @@
         {
             button1 = new Button();
             textBox1 = new TextBox();
+            pictureBox1 = new PictureBox();
+            ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
             SuspendLayout();
             // 
             // button1
@@ -44,21 +46,33 @@
             // 
             // textBox1
             // 
-            textBox1.Location = new Point(12, 41);
+            textBox1.Location = new Point(281, 12);
             textBox1.Multiline = true;
             textBox1.Name = "textBox1";
-            textBox1.Size = new Size(416, 397);
+            textBox1.ScrollBars = ScrollBars.Vertical;
+            textBox1.Size = new Size(416, 229);
             textBox1.TabIndex = 1;
+            // 
+            // pictureBox1
+            // 
+            pictureBox1.Location = new Point(12, 41);
+            pictureBox1.Name = "pictureBox1";
+            pictureBox1.Size = new Size(263, 200);
+            pictureBox1.SizeMode = PictureBoxSizeMode.Zoom;
+            pictureBox1.TabIndex = 2;
+            pictureBox1.TabStop = false;
             // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(439, 450);
+            ClientSize = new Size(709, 255);
+            Controls.Add(pictureBox1);
             Controls.Add(textBox1);
             Controls.Add(button1);
             Name = "Form1";
             Text = "Form1";
+            ((System.ComponentModel.ISupportInitialize)pictureBox1).EndInit();
             ResumeLayout(false);
             PerformLayout();
         }
@@ -67,5 +81,6 @@
 
         private Button button1;
         private TextBox textBox1;
+        private PictureBox pictureBox1;
     }
 }
