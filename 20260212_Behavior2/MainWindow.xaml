@@ -1,0 +1,46 @@
+﻿<Window x:Class="_20260212_Behavior2.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+        xmlns:local="clr-namespace:_20260212_Behavior2"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="350" Width="400">
+    <Grid>
+    <StackPanel>
+      <Button Content="これなら色が変わるボタン" Padding="20">
+        <Button.Template>
+          <ControlTemplate TargetType="Button">
+            <Border Background="{TemplateBinding Background}" Padding="10">
+              <ContentPresenter HorizontalAlignment="Center"/>
+            </Border>
+          </ControlTemplate>
+        </Button.Template>
+        <i:Interaction.Behaviors>
+          <local:ColorChangeBehavior MouseOverColor="Red"/>
+        </i:Interaction.Behaviors>
+      </Button>
+
+      <Button Content="マウスオーバーでもボタンはそのままでは指定色にならない" Padding="20">
+        <i:Interaction.Behaviors>
+          <local:ColorChangeBehavior MouseOverColor="Orange"/>
+        </i:Interaction.Behaviors>
+      </Button>
+      
+      <TextBox Text="マウスオーバーで橙色になるTextBox" Padding="20">
+        <i:Interaction.Behaviors>
+          <local:ColorChangeBehavior MouseOverColor="Orange"/>
+        </i:Interaction.Behaviors>
+      </TextBox>
+      <StackPanel Margin="20">
+        <Label Content="年齢を入力してください（数字のみ）:" />
+        <TextBox Width="200" HorizontalAlignment="Left">
+          <i:Interaction.Behaviors>
+            <local:NumericInputBehavior/>
+          </i:Interaction.Behaviors>
+        </TextBox>
+      </StackPanel>
+    </StackPanel>
+    </Grid>
+</Window>
