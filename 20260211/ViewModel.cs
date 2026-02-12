@@ -129,15 +129,13 @@ namespace _20260211
         {
             // param には MouseButtonEventArgs が入ってくる
             if (!IsDrawing || param is not MouseButtonEventArgs e) { return; }
+            //if (!IsDrawing || e == null) { return; }
 
             // イベントが発生した源 (Canvas) を取得
-            var canvas = e.Source as IInputElement;
-            if (canvas == null) { return; }
+            if (e.Source is not IInputElement canvas) { return; }
 
-            // Canvas内でのクリック座標取得
-            Point point = e.GetPosition(canvas);
-
-            Points.Add(point);
+            // Canvas内でのクリック座標取得して追加
+            Points.Add(e.GetPosition(canvas));
         }
 
         // 描画終了

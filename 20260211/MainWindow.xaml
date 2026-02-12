@@ -96,12 +96,19 @@
 
     <Border Grid.Row="1" BorderBrush="Gray" BorderThickness="1" Margin="5" Background="White">
       <Canvas x:Name="MainCanvas" Background="Transparent">
-        <i:Interaction.Triggers>
+        <!--<Canvas.InputBindings>
+          <MouseBinding MouseAction="LeftClick" Command="{Binding AddPointCommand}" CommandParameter="{Binding RelativeSource={RelativeSource Mode=Self}}"/>
+        </Canvas.InputBindings>-->
+        <i:Interaction.Behaviors>
+          <local:CanvasClickBehavior Command="{Binding AddPointCommand}"/>
+        </i:Interaction.Behaviors>
+        
+        <!--<i:Interaction.Triggers>
           <i:EventTrigger EventName="MouseLeftButtonDown">
             <i:InvokeCommandAction Command="{Binding AddPointCommand}" 
-                                               PassEventArgsToCommand="True" />
+                                   PassEventArgsToCommand="True" />
           </i:EventTrigger>
-        </i:Interaction.Triggers>
+        </i:Interaction.Triggers>-->
 
         <Path Stroke="{Binding SelectedBrush}" StrokeThickness="30" Opacity="0.5"
               ex:PathExtensions.ArrowPoints="{Binding Points}"
