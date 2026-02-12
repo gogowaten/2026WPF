@@ -20,17 +20,27 @@ namespace _20260211
     /// </summary>
     public partial class MainWindow : Window
     {
-        private PointCollection _points = [new Point(), new Point(100, 50)];
-        private MainViewModel MyMainViewModel = new();
         
         public MainWindow()
         {
             InitializeComponent();
 
-            this.DataContext = MyMainViewModel;
-            //this.DataContext = new MainViewModel();
+            this.DataContext = new MainViewModel();
 
-            MyPolyline.Points = MyMainViewModel.MyPoints;
+            double thickness = 4;
+            Point p1 = new();
+            Point p2 = new(100, 0);
+            Vector vec = p2 - p1;
+            Vector direction = p2 - p1;
+            direction.Normalize();
+            double arrowLength = thickness * 5; // 太さに応じたサイズ
+            double arrowWidth = thickness * 4;
+
+            Vector normal = new Vector(-direction.Y, direction.X);
+            Point basePoint = p2 - (direction * arrowLength);
+            Point left = basePoint + (normal * arrowWidth / 2);
+            Point right = basePoint - (normal * arrowWidth / 2);
+
         }
     }
 }

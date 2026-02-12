@@ -4,7 +4,9 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
-        xmlns:local="clr-namespace:_20260211" d:DataContext="{d:DesignInstance Type=local:MainViewModel}"
+        xmlns:local="clr-namespace:_20260211"
+        xmlns:ex="clr-namespace:_20260211.Extensions"
+        d:DataContext="{d:DesignInstance Type=local:MainViewModel}"
         mc:Ignorable="d"
         Title="MainWindow" Height="367" Width="654">
   <!--<Grid>
@@ -74,14 +76,26 @@
     </Grid.RowDefinitions>
 
     <StackPanel Orientation="Horizontal" Background="#F0F0F0" Margin="5">
+      <TextBlock Text="矢印サイズ:" VerticalAlignment="Center" Margin="10,0,5,0"/>
+      <Slider Minimum="5" Maximum="100" Width="150" VerticalAlignment="Center" Value="{Binding CurrentArrowSize}"/>
+      <TextBlock Text="{Binding CurrentArrowSize, StringFormat={}{0:F0}}" VerticalAlignment="Center" Margin="5,0"/>
       <Button Content="開始" Command="{Binding StartDrawingCommand}" Margin="5" Padding="10,5"/>
       <Button Content="終了" Command="{Binding StopDrawingCommand}" Margin="5" Padding="10,5"/>
       <Button Content="保存" Command="{Binding SavePointsCommand}" Margin="5" Padding="10,5"/>
       <TextBlock Text="{Binding IsDrawing, StringFormat='描画中: {0}'}" VerticalAlignment="Center" Margin="10,0"/>
+      <StackPanel Orientation="Horizontal" Background="#EEE">
+        <Separator Margin="10,5"/>
+        <TextBlock Text="色:" VerticalAlignment="Center" Margin="5,0"/>
+
+        <Button Width="20" Height="20" Background="Blue" Command="{Binding ChangeColorCommand}" CommandParameter="Blue" Margin="2"/>
+        <Button Width="20" Height="20" Background="Red" Command="{Binding ChangeColorCommand}" CommandParameter="Red" Margin="2"/>
+        <Button Width="20" Height="20" Background="Green" Command="{Binding ChangeColorCommand}" CommandParameter="Green" Margin="2"/>
+        <Button Width="20" Height="20" Background="Orange" Command="{Binding ChangeColorCommand}" CommandParameter="Orange" Margin="2"/>
+      </StackPanel>
     </StackPanel>
 
     <Border Grid.Row="1" BorderBrush="Gray" BorderThickness="1" Margin="5" Background="White">
-      <Canvas x:Name="DrawingCanvas" Background="Transparent">
+      <Canvas x:Name="MainCanvas" Background="Transparent">
         <i:Interaction.Triggers>
           <i:EventTrigger EventName="MouseLeftButtonDown">
             <i:InvokeCommandAction Command="{Binding AddPointCommand}" 
@@ -89,29 +103,42 @@
           </i:EventTrigger>
         </i:Interaction.Triggers>
 
-        <Polyline Points="{Binding Points}" 
+        <Path Stroke="{Binding SelectedBrush}" StrokeThickness="30" Opacity="0.5"
+              ex:PathExtensions.ArrowPoints="{Binding Points}"
+              ex:PathExtensions.ArrowSize="{Binding CurrentArrowSize}"
+              Fill="{Binding SelectedBrush}"/>
+        <!--<Polyline ex:PolylineExtensions.ItemsSource="{Binding Points}"
+                  Stroke="Blue" StrokeThickness="3"/>-->
+        <!--<Path ex:PathExtensions.ItemsSource="{Binding Points}" Stroke="Blue" StrokeThickness="3"/>-->
+        <!--<Polyline Points="{Binding Points}" 
                           Stroke="Blue" 
-                          StrokeThickness="2" Panel.ZIndex="99"/>
-        <Polygon Points="0,0 100,100" Stroke="Red" StrokeThickness="3"/>
+                          StrokeThickness="2" Panel.ZIndex="99"/>-->
+
+
         <ItemsControl ItemsSource="{Binding Points}">
           <ItemsControl.ItemsPanel>
             <ItemsPanelTemplate>
               <Canvas />
             </ItemsPanelTemplate>
           </ItemsControl.ItemsPanel>
+
           <ItemsControl.ItemTemplate>
             <DataTemplate>
-              <Ellipse Width="4" Height="4" Fill="Red">
-                <Ellipse.RenderTransform>
+              <Ellipse Width="10" Height="10" Fill="{Binding DataContext.SelectedBrush, RelativeSource={RelativeSource AncestorType=ItemsControl}}" Margin="-5,-5" Cursor="Hand">
+                <i:Interaction.Behaviors>
+                  <i:MouseDragElementBehavior ConstrainToParentBounds="True"/>
+                </i:Interaction.Behaviors>
+                <!--<Ellipse.RenderTransform>
                   <TranslateTransform X="-2" Y="-2"/>
-                </Ellipse.RenderTransform>
+                </Ellipse.RenderTransform>-->
               </Ellipse>
             </DataTemplate>
           </ItemsControl.ItemTemplate>
+
           <ItemsControl.ItemContainerStyle>
             <Style TargetType="ContentPresenter">
-              <Setter Property="Canvas.Left" Value="{Binding X}"/>
-              <Setter Property="Canvas.Top" Value="{Binding Y}"/>
+              <Setter Property="Canvas.Left" Value="{Binding X, Mode=TwoWay}"/>
+              <Setter Property="Canvas.Top" Value="{Binding Y, Mode=TwoWay}"/>
             </Style>
           </ItemsControl.ItemContainerStyle>
         </ItemsControl>
@@ -126,8 +153,6 @@
             </DataTemplate>
           </ListBox.ItemTemplate>
         </ListBox>
-        <Polyline x:Name="MyPolyline" Stroke="DodgerBlue" StrokeThickness="3"
-                  Canvas.Left="50" Canvas.Top="100"/>
       </Canvas>
     </Border>
   </Grid>

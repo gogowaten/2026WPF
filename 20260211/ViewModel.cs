@@ -62,10 +62,11 @@ namespace _20260211
 
     public partial class MainViewModel : ObservableObject
     {
+        [ObservableProperty] private Brush _selectedBrush = Brushes.Blue; // 塗りつぶし
+        [ObservableProperty] private double _currentArrowSize = 20.0; // 鏃サイズ
         [ObservableProperty]
-        private PointCollection _points = [];
-        public PointCollection MyPoints = [new Point(), new Point(100, 50)];
-        
+        private ObservableCollection<Point> _points = [];
+
         [ObservableProperty]
         private bool _isDrawing = false;
 
@@ -73,19 +74,54 @@ namespace _20260211
         [RelayCommand]
         private void StartDrawing()
         {
-            Points = new PointCollection();
+            //   Points = new ObservableCollection<Point>();
+            Points.Clear();
             IsDrawing = true;
         }
 
-        //// 頂点追加 (Canvasクリック時に呼び出す)
-        //[RelayCommand]
-        //private void AddPoint(Point point)
-        //{
-        //    if (!IsDrawing) return;
-        //    Points.Add(point);
-        //    // PointCollectionの変更を通知するために再代入
-        //    OnPropertyChanged(nameof(Points));
-        //}
+        /* // 矢印Geometry作成
+         public Geometry CreateArrowGeometry(Point start, Point end, double thickness)
+         {
+             var geometry = new StreamGeometry();
+             using (StreamGeometryContext ctx = geometry.Open())
+             {
+                 // 矢印のサイズ設定（太さに比例させるのがコツ）
+                 double arrowLength = thickness * 4;
+                 double arrowWidth = thickness * 3;
+
+                 Vector lineVec = end - start;
+                 lineVec.Normalize();
+
+                 // 垂直ベクトル
+                 Vector normalVec = new Vector(-lineVec.Y, lineVec.X);
+
+                 // 矢印の底辺の中心点
+                 Point basePoint = end - (lineVec * arrowLength);
+                 // 矢印の左右の角
+                 Point leftCorner = basePoint + (normalVec * arrowWidth / 2);
+                 Point rightCorner = basePoint - (normalVec * arrowWidth / 2);
+
+                 // 描画開始
+                 ctx.BeginFigure(start, true, false); // 線を描く
+                 ctx.LineTo(basePoint, true, false);  // 矢印の底まで
+
+                 // 矢印部分（二等辺三角形）
+                 ctx.LineTo(leftCorner, true, false);
+                 ctx.LineTo(end, true, false);        // 先端
+                 ctx.LineTo(rightCorner, true, false);
+                 ctx.LineTo(basePoint, true, false);
+             }
+             geometry.Freeze();
+             return geometry;
+         }*/
+
+
+        // 色変更
+        [RelayCommand]
+        private void ChangeColor(string colorName)
+        {   
+            SelectedBrush = (Brush)new BrushConverter().ConvertFromString(colorName)!;
+        }
 
         // 頂点追加 (Canvasクリック時に呼び出す)
         [RelayCommand]
@@ -101,24 +137,18 @@ namespace _20260211
             // Canvas内でのクリック座標取得
             Point point = e.GetPosition(canvas);
 
-            MyPoints.Add(point);
             Points.Add(point);
-            //OnPropertyChanged(nameof(Points));
-            Points = new PointCollection(Points);
         }
 
         // 描画終了
         [RelayCommand]
-        private void StopDrawing()
-        {
-            IsDrawing = false;
-        }
+        private void StopDrawing() { IsDrawing = false; }
 
         // JSON保存
         [RelayCommand]
         private void SavePoints()
         {
-            List<PointData> data = Points.Select(p => new PointData(p.X, p.Y)).ToList();
+            var data = Points.Select(p => new PointData(p.X, p.Y)).ToList();
             string json = JsonSerializer.Serialize(data, new JsonSerializerOptions { WriteIndented = true });
 
             File.WriteAllText("points.json", json);
