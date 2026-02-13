@@ -34,10 +34,17 @@
         </i:Interaction.Behaviors>
       </TextBox>
       <StackPanel Margin="20">
-        <Label Content="年齢を入力してください（数字のみ）:" />
-        <TextBox Width="200" HorizontalAlignment="Left">
+        <Label Content="郵便番号（5桁制限）:" />
+        <TextBox Width="150" HorizontalAlignment="Left">
           <i:Interaction.Behaviors>
-            <local:NumericInputBehavior/>
+            <local:NumericInputBehavior MaxLength="5" AllowDecimal="False"/>
+          </i:Interaction.Behaviors>
+        </TextBox>
+
+        <Label Content="金額 (小数点可 ＆ 10桁制限) ："/>
+        <TextBox Width="150" HorizontalAlignment="Left">
+          <i:Interaction.Behaviors>
+            <local:NumericInputBehavior AllowDecimal="True" MaxLength="10"/>
           </i:Interaction.Behaviors>
         </TextBox>
       </StackPanel>
