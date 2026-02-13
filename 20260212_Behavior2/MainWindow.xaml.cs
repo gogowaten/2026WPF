@@ -9,6 +9,9 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
+// Google Gemini
+// https://gemini.google.com/app/d738b9b2226ad853?hl=ja
+
 namespace _20260212_Behavior2
 {
     /// <summary>
