@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="../TestApp/TestApp.csproj" />
+  <Project Path="20260213_WpfControlLibrary1.csproj" />
+</Solution>
