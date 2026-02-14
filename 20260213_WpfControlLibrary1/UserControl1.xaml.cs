@@ -10,6 +10,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.ComponentModel;
 
 namespace _20260213_WpfControlLibrary1
 {
@@ -257,7 +258,7 @@ namespace _20260213_WpfControlLibrary1
             //// マイナス記号も受け付ける
             //e.Handled = !Regex.IsMatch(e.Text, "[0-9-]");
 
-            if(e.Text == "-")
+            if (e.Text == "-")
             {
                 e.Handled = txtValue.Text.Contains("-") || txtValue.CaretIndex != 0;
             }
