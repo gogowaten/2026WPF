@@ -8,8 +8,11 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="250" Width="300">
     <Grid UseLayoutRounding="True">
-    <ll:MyNumericUpDown Width="140" Height="24" Maximum="20" Padding="2"
+    <ll:MyNumericUpDown Width="140" Height="24" Minimum="-50" Maximum="20" Padding="2"
                         MyMarkerColor="Red"
-                        MyFontColor="Red"/>
+                        MyFontColor="Red"
+                        MyButtonWidth="30"
+                        ValueChanged="MyNumericUpDown_ValueChanged"
+                        />
   </Grid>
 </Window>

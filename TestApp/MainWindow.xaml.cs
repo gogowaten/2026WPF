@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Diagnostics;
+using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -19,6 +20,12 @@ namespace TestApp
         public MainWindow()
         {
             InitializeComponent();
+        }
+
+        private void MyNumericUpDown_ValueChanged(object sender, RoutedPropertyChangedEventArgs<int> e)
+        {
+            // e.OldValue と e.NewValue を使って、変更前後の値にアクセスできます
+            //Debug.WriteLine($"値が {e.OldValue} から {e.NewValue} に変わりました！");
         }
     }
 }

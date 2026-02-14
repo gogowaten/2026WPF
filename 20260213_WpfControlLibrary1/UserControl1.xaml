@@ -11,7 +11,7 @@
     <Grid>
       <Grid.ColumnDefinitions>
         <ColumnDefinition Width="*"/>
-        <ColumnDefinition Width="20"/>
+        <ColumnDefinition Width="{Binding RelativeSource={RelativeSource AncestorType=local:MyNumericUpDown}, Path=MyButtonWidth}"/>
       </Grid.ColumnDefinitions>
 
 
@@ -35,7 +35,7 @@
           <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <RepeatButton x:Name="btnUp" Grid.Row="0" FontSize="8" BorderThickness="1,0,0,0"
+        <RepeatButton x:Name="btnUp" Grid.Row="0"
                       Background="Transparent" BorderBrush="Transparent"
                       Click="btnUp_Click">
           <Viewbox Width="8" Height="8">
@@ -43,7 +43,7 @@
                   Fill="{Binding RelativeSource={RelativeSource AncestorType=local:MyNumericUpDown}, Path=MyMarkerColor}"/>
           </Viewbox>
         </RepeatButton>
-        <RepeatButton x:Name="btnDown" Grid.Row="1" FontSize="8" BorderThickness="1,1,0,0"
+        <RepeatButton x:Name="btnDown" Grid.Row="1"
                       Background="Transparent" BorderBrush="Transparent"
                       Click="btnDown_Click">
           <Viewbox Width="8" Height="8">

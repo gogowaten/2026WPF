@@ -33,8 +33,8 @@ namespace _20260213_WpfControlLibrary1
             if (e.DataObject.GetDataPresent(typeof(string)))
             {
                 string text = (string)e.DataObject.GetData(typeof(string));
-                // 貼り付けようとしている文字列が数字だけでなければ、貼り付けをキャンセル
-                if (!Regex.IsMatch(text, "^[0-9]+$"))
+                // 貼り付けようとしている文字列チェック、先頭にマイナス記号があってもokな正規表現
+                if (!Regex.IsMatch(text, "^-[0-9]+$"))
                 {
                     e.CancelCommand();
                 }
@@ -45,9 +45,20 @@ namespace _20260213_WpfControlLibrary1
         #region 依存関係プロパティ
 
 
+        // ボタンの幅
+        public double MyButtonWidth
+        {
+            get { return (double)GetValue(MyButtonWidthProperty); }
+            set { SetValue(MyButtonWidthProperty, value); }
+        }
+
+        public static readonly DependencyProperty MyButtonWidthProperty =
+                    DependencyProperty.Register(nameof(MyButtonWidth), typeof(double), typeof(MyNumericUpDown), new PropertyMetadata(20.0));
 
 
 
+
+        // 文字色
         public Brush MyFontColor
         {
             get { return (Brush)GetValue(MyFontColorProperty); }
@@ -58,7 +69,7 @@ namespace _20260213_WpfControlLibrary1
             DependencyProperty.Register(nameof(MyFontColor), typeof(Brush), typeof(MyNumericUpDown), new PropertyMetadata(Brushes.Black));
 
 
-
+        // ボタンの△の色
         public Brush MyMarkerColor
         {
             get { return (Brush)GetValue(MyMarkerColorProperty); }
@@ -69,7 +80,7 @@ namespace _20260213_WpfControlLibrary1
             DependencyProperty.Register(nameof(MyMarkerColor), typeof(Brush), typeof(MyNumericUpDown), new PropertyMetadata(Brushes.Black));
 
 
-
+        // 枠の色
         public Brush MyWakuColor
         {
             get { return (Brush)GetValue(MyWakuColorProperty); }
@@ -126,11 +137,18 @@ namespace _20260213_WpfControlLibrary1
         private static void OnValueChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             var control = (MyNumericUpDown)d;
+            int oldValue = (int)e.OldValue;
+            int newValue = (int)e.NewValue;
+
             control.txtValue.Text = e.NewValue.ToString();
 
             // 値変更ボタンの有効状態を切り替える
             control.btnUp.IsEnabled = (int)e.NewValue < control.Maximum;
             control.btnDown.IsEnabled = (int)e.NewValue > control.Minimum;
+
+            // 独自イベントのValueChandedを発生させる
+            control.RaiseValueChangedEvent(oldValue, newValue);
+
         }
 
         // 「強制（CoerceValueCallback）」
@@ -156,7 +174,7 @@ namespace _20260213_WpfControlLibrary1
         }
 
         public static readonly DependencyProperty MinimumProperty =
-            DependencyProperty.Register(nameof(Minimum), typeof(int), typeof(MyNumericUpDown), new PropertyMetadata(0));
+            DependencyProperty.Register(nameof(Minimum), typeof(int), typeof(MyNumericUpDown), new PropertyMetadata(-100));
 
 
         // 最大値
@@ -172,6 +190,37 @@ namespace _20260213_WpfControlLibrary1
         #endregion 依存関係プロパティ
 
 
+        // 独自のイベントを 「ルーティングイベント (RoutedEvent)」 として定義するのが標準的です。これにより、普通の Button の Click イベントと同じように、XAML上で ValueChanged="MyHandler" と書けるようになります。
+        #region 独自イベント
+
+        // Value変更時に発生させるイベント、これをOnValueChangedメソッドの中で発生させる
+        // イベントの登録
+        public static readonly RoutedEvent ValueChangedEvent = EventManager.RegisterRoutedEvent(
+            nameof(ValueChanged),
+            RoutingStrategy.Bubble,
+            typeof(RoutedPropertyChangedEventHandler<int>),
+            typeof(MyNumericUpDown));
+
+        // 外部からハンドラの登録と削除できるようにするプロパティ
+        public event RoutedPropertyChangedEventHandler<int> ValueChanged
+        {
+            add => AddHandler(ValueChangedEvent, value);
+            remove => RemoveHandler(ValueChangedEvent, value);
+        }
+
+        // イベントを発生させるための補助メソッド
+        private void RaiseValueChangedEvent(int oldValue, int newValue)
+        {
+            var args = new RoutedPropertyChangedEventArgs<int>(oldValue, newValue)
+            {
+                RoutedEvent = ValueChangedEvent
+            };
+            RaiseEvent(args);
+        }
+
+        #endregion 独自イベント
+
+
 
         private void btnUp_Click(object sender, RoutedEventArgs e)
         {
@@ -183,19 +232,39 @@ namespace _20260213_WpfControlLibrary1
             if (Value > Minimum) { Value--; }
         }
 
+        // ユーザーがキーボードで -10 と打とうとしたとき、最初に - を入力した瞬間、int.TryParse は失敗します。このままだと「不正な入力」として消されてしまう可能性があるため、TextChanged イベントを少し工夫します。
         private void txtValue_TextChanged(object sender, TextChangedEventArgs e)
         {
+            string text = txtValue.Text;
+
+            // [-]だけのときは、次に数字が来るのを待つために Value の更新をスキップする
+            if (text == "-") { return; }
+
             // 入力された文字列を数値に変換
-            if (int.TryParse(txtValue.Text, out int result)) { Value = result; }
+            if (int.TryParse(text, out int result)) { Value = result; }
         }
 
+        // PreviewTextInput は「これから入力される1文字」しか見ません。そのため、「1-2」のように数字の途中にマイナスを入れられるのを防ぎたい場合は、以下のように「現在のカーソル位置」をチェックします。
+        // TextBoxへの入力時
         private void txtValue_PreviewTextInput(object sender, TextCompositionEventArgs e)
         {
             //// 数値以外を入力できないように
             //e.Handled = !int.TryParse(e.Text, out _);
 
-            // 数字以外なら入力をキャンセル
-            e.Handled = !Regex.IsMatch(e.Text, "[0-9]");
+            //// 数字以外なら入力をキャンセル
+            //e.Handled = !Regex.IsMatch(e.Text, "[0-9]");
+
+            //// マイナス記号も受け付ける
+            //e.Handled = !Regex.IsMatch(e.Text, "[0-9-]");
+
+            if(e.Text == "-")
+            {
+                e.Handled = txtValue.Text.Contains("-") || txtValue.CaretIndex != 0;
+            }
+            else
+            {
+                e.Handled = !Regex.IsMatch(e.Text, "[0-9]");
+            }
         }
 
         // キー入力直前
