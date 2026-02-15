@@ -5,17 +5,23 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:_20260213_WpfControlLibrary1"
              mc:Ignorable="d" 
-             d:DesignHeight="50" d:DesignWidth="100">
-  <Border BorderThickness="1" Background="White" CornerRadius="0"
-          BorderBrush="{Binding RelativeSource={RelativeSource AncestorType=local:MyNumericUpDown}, Path=MyWakuColor}">
-    <Grid>
+             d:DesignHeight="50" d:DesignWidth="100" MinWidth="10">
+  <Border BorderThickness="{Binding RelativeSource={RelativeSource AncestorType=local:MyNumericUpDown}, Path=MyBorderThickness}"
+          Background="{Binding RelativeSource={RelativeSource AncestorType=local:MyNumericUpDown}, Path=Background}"
+          CornerRadius="0"
+          BorderBrush="{Binding RelativeSource={RelativeSource AncestorType=local:MyNumericUpDown}, Path=BorderBrush}">
+    <!--<Grid>
       <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="*"/>
+        <ColumnDefinition Width="*"/>
         <ColumnDefinition Width="*"/>
         <ColumnDefinition Width="{Binding RelativeSource={RelativeSource AncestorType=local:MyNumericUpDown}, Path=MyButtonWidth}"/>
       </Grid.ColumnDefinitions>
 
+      <TextBlock Grid.Column="0" Text="{Binding RelativeSource={RelativeSource AncestorType=local:MyNumericUpDown}, Path=Prefix}"
+           VerticalAlignment="Center" Margin="5,0,0,0"/>
 
-      <TextBox x:Name="txtValue" Grid.Column="0" BorderThickness="0"
+      <TextBox x:Name="txtValue" Grid.Column="1" BorderThickness="0"
                VerticalContentAlignment="Center"
                TextChanged="txtValue_TextChanged"
                PreviewTextInput="txtValue_PreviewTextInput"
@@ -26,10 +32,13 @@
                FontSize="{Binding RelativeSource={RelativeSource AncestorType=UserControl}, Path=FontSize}"
                TextAlignment="{Binding RelativeSource={RelativeSource AncestorType=local:MyNumericUpDown}, Path=MyTextAlignment}"
                Padding="{Binding RelativeSource={RelativeSource AncestorType=UserControl}, Path=Padding}"/>
-      <!--フォントサイズを外部から指定できるようにする-->
+      --><!--フォントサイズを外部から指定できるようにする--><!--
 
+      <TextBlock Grid.Column="2"
+                 Text="{Binding RelativeSource={RelativeSource AncestorType=local:MyNumericUpDown}, Path=Suffix}"
+                 VerticalAlignment="Center"/>
 
-      <Grid Grid.Column="1">
+      <Grid Grid.Column="3">
         <Grid.RowDefinitions>
           <RowDefinition Height="*"/>
           <RowDefinition Height="*"/>
@@ -52,6 +61,59 @@
           </Viewbox>
         </RepeatButton>
       </Grid>
-    </Grid>
+    </Grid>-->
+    
+    <DockPanel>
+      <TextBlock DockPanel.Dock="Left"
+                 Text="{Binding RelativeSource={RelativeSource AncestorType=local:MyNumericUpDown}, Path=Prefix}"
+                 VerticalAlignment="Center" Margin="5,0,0,0"
+                 PreviewMouseLeftButtonDown="TextBlock_PreviewMouseLeftButtonDown"/>
+      <Grid DockPanel.Dock="Right"
+            Width="{Binding RelativeSource={RelativeSource AncestorType=local:MyNumericUpDown}, Path=MyButtonWidth}">
+        <Grid.RowDefinitions>
+          <RowDefinition Height="*"/>
+          <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <RepeatButton x:Name="btnUp" Grid.Row="0"
+                      Background="Transparent" BorderBrush="Transparent"
+                      Click="btnUp_Click">
+          <Viewbox Width="8" Height="8">
+            <Path Data="M 0,5 L 5,0 L 10,5 Z"
+                  Fill="{Binding RelativeSource={RelativeSource AncestorType=local:MyNumericUpDown}, Path=MyMarkerColor}"/>
+          </Viewbox>
+        </RepeatButton>
+        <RepeatButton x:Name="btnDown" Grid.Row="1"
+                      Background="Transparent" BorderBrush="Transparent"
+                      Click="btnDown_Click">
+          <Viewbox Width="8" Height="8">
+            <Path Data="M 0,0 L 10,0 L 5,5 Z"
+                  Fill="{Binding RelativeSource={RelativeSource AncestorType=local:MyNumericUpDown}, Path=MyMarkerColor}"/>
+          </Viewbox>
+        </RepeatButton>
+      </Grid>
+      <TextBlock  DockPanel.Dock="Right"
+                 Text="{Binding RelativeSource={RelativeSource AncestorType=local:MyNumericUpDown}, Path=Suffix}"
+                 VerticalAlignment="Center"
+                  PreviewMouseLeftButtonDown="TextBlock_PreviewMouseLeftButtonDown"/>
+
+      <TextBox x:Name="txtValue" DockPanel.Dock="Right" BorderThickness="0"
+               Background="Transparent"
+               VerticalContentAlignment="Center"
+               TextChanged="txtValue_TextChanged"
+               PreviewTextInput="txtValue_PreviewTextInput"
+               PreviewKeyDown="txtValue_PreviewKeyDown"
+               LostFocus="txtValue_LostFocus"
+               PreviewMouseWheel="txtValue_PreviewMouseWheel"
+               Foreground="{Binding RelativeSource={RelativeSource AncestorType=local:MyNumericUpDown}, Path=MyFontColor}"
+               FontSize="{Binding RelativeSource={RelativeSource AncestorType=UserControl}, Path=FontSize}"
+               TextAlignment="{Binding RelativeSource={RelativeSource AncestorType=local:MyNumericUpDown}, Path=MyTextAlignment}"
+               Padding="{Binding RelativeSource={RelativeSource AncestorType=UserControl}, Path=Padding}"/>
+      <!--フォントサイズを外部から指定できるようにする-->
+
+
+      
+    </DockPanel>
+
   </Border>
 </UserControl>

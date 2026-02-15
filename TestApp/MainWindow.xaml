@@ -7,12 +7,34 @@
         xmlns:ll="clr-namespace:_20260213_WpfControlLibrary1;assembly=20260213_WpfControlLibrary1"
         mc:Ignorable="d"
         Title="MainWindow" Height="250" Width="300">
-    <Grid UseLayoutRounding="True">
-    <ll:MyNumericUpDown Width="140" Height="24" Minimum="-50" Maximum="20" Padding="2"
+  <Grid UseLayoutRounding="True">
+    <StackPanel>
+    <ll:MyNumericUpDown Width="150" Height="24" Minimum="-50" Maximum="10" Padding="2"
                         MyMarkerColor="Red"
                         MyFontColor="Red"
                         MyButtonWidth="30"
                         ValueChanged="MyNumericUpDown_ValueChanged"
+                        Step="3"
+                        Decimals="3"
+                        Prefix="設定温度：" Suffix="°C"
                         />
+      <ll:MyNumericUpDown Width="220"
+                          Padding="0" Margin="10"
+                          Background="MintCream"
+                          MyBorderThickness="1"
+                          BorderBrush="DodgerBlue"
+                          Maximum="100000"
+                          Decimals="1"
+                          Prefix="時速；"
+                          Suffix="km/h"
+                          />
+      
+      <DockPanel Width="210" MinWidth="100">
+        <TextBlock DockPanel.Dock="Left" Text="てすと" Background="Beige"/>
+        <TextBlock DockPanel.Dock="Right" Text="てすと" Background="Salmon" Width="20"/>
+        <TextBlock DockPanel.Dock="Right" Text="てすと" Background="DodgerBlue"/>
+        <TextBox DockPanel.Dock="Right" Text="てすと" Background="MediumAquamarine"/>
+      </DockPanel>
+    </StackPanel>
   </Grid>
 </Window>

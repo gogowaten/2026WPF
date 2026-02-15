@@ -22,10 +22,11 @@ namespace TestApp
             InitializeComponent();
         }
 
-        private void MyNumericUpDown_ValueChanged(object sender, RoutedPropertyChangedEventArgs<int> e)
+        private void MyNumericUpDown_ValueChanged(object sender, RoutedPropertyChangedEventArgs<decimal> e)
         {
             // e.OldValue と e.NewValue を使って、変更前後の値にアクセスできます
             //Debug.WriteLine($"値が {e.OldValue} から {e.NewValue} に変わりました！");
         }
+
     }
 }
