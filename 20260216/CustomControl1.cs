@@ -52,7 +52,7 @@ namespace _20260216
 
     public class NodeContainer : Control
     {
-        private NodePanel _panel;
+        private NodePanel? _panel;
 
         static NodeContainer()
         {
@@ -62,11 +62,11 @@ namespace _20260216
         public override void OnApplyTemplate()
         {
             base.OnApplyTemplate();
-            _panel = GetTemplateChild("PART_Panel") as NodePanel;
-            //if (GetTemplateChild("PART_Panel") is NodePanel panel)
-            //{
-            //    _panel = panel;
-            //}
+            //_panel = GetTemplateChild("PART_Panel") as NodePanel;
+            if (GetTemplateChild("PART_Panel") is NodePanel panel)
+            {
+                _panel = panel;
+            }
         }
 
         public void AddChild(UIElement child, Point position)
