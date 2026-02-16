@@ -3,6 +3,8 @@ using CommunityToolkit.Mvvm.Input;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Windows.Shapes;
+using System.Windows.Media;
 
 namespace _20260216_02
 {
@@ -21,6 +23,21 @@ namespace _20260216_02
             };
 
             Root.Children.Add(child);
+        }
+
+        // RelayCommandではオーバーロードはできない
+        //[RelayCommand]
+        //private void AddNode(double x, double y)
+        //{
+        //    NodeViewModel child = new() { X = x, Y = y };
+        //    Root.Children.Add(child);
+        //}
+
+        [RelayCommand]
+        private void AddRectangle()
+        {
+            System.Windows.Shapes.Rectangle r = new() { Height = 50, Width = 50, Fill = Brushes.Red };
+
         }
     }
 }

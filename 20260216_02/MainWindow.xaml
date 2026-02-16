@@ -17,6 +17,7 @@
 
     <StackPanel Grid.Column="1">
       <Button x:Name="Add" Content="add" Command="{Binding AddNodeCommand}"/>
+      <Button x:Name="Add2" Content="add" Command="{Binding AddNodeCommand}" CommandParameter="100,200"/>
     </StackPanel>
   </Grid>
 </Window>

@@ -132,6 +132,23 @@ namespace _20260216_02
 
         private NodeContainer CreateChildNode(NodeViewModel vm)
         {
+            if (!string.IsNullOrEmpty(vm.Text))
+            {
+                // TextBlockノードして表示
+                TextBlock tb = new()
+                {
+                    Text = vm.Text,
+                    Background = Brushes.LightYellow,
+                    Padding = new Thickness(4)
+                };
+
+                DragBehavior.SetIsEnabled(tb, true);
+                NodeProps.SetPosition(tb, new Point(vm.X, vm.Y));
+
+                return new NodeContainer() { ViewModel = vm };
+            }
+
+            // 通常のNodeContainer
             var child = new NodeContainer
             {
                 DataContext = vm,

@@ -11,6 +11,8 @@ namespace _20260216_02
     {
         [ObservableProperty] private double _x;
         [ObservableProperty] private double _y;
+        [ObservableProperty] private string? _text;
+
 
         public ObservableCollection<NodeViewModel> Children { get; } = [];
 

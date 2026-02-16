@@ -9,14 +9,14 @@
         Title="MainWindow" Height="250" Width="300">
   <Grid UseLayoutRounding="True">
     <StackPanel>
-    <ll:MyNumericUpDown Width="150" Height="24" Minimum="-50" Maximum="10" Padding="2"
-                        MyMarkerColor="Red"
-                        MyFontColor="Red"
-                        MyButtonWidth="30"
+    <ll:MyNumericUpDown Width="180" Height="24" Minimum="-50" Maximum="15000" Padding="0" Value="5000" FontSize="15"
+                        MyMarkerColor="Black" Margin="0,20,0,0"
+                        MyFontColor="Red" Foreground="Black"
+                        MyButtonWidth="30" MyBorderThickness="2" BorderBrush="Black"
                         ValueChanged="MyNumericUpDown_ValueChanged"
                         Step="3"
-                        Decimals="3"
-                        Prefix="設定温度：" Suffix="°C"
+                        Decimals="0"
+                        Prefix="" Suffix="兆円欲しい！"
                         />
       <ll:MyNumericUpDown Width="220"
                           Padding="0" Margin="10"
@@ -28,13 +28,15 @@
                           Prefix="時速；"
                           Suffix="km/h"
                           />
+      <ll:MyNumericUpDown Width="150" Decimals="5" Value="-1.23456"
+                          FontSize="30" MyMarkerColor="Magenta" MyFontColor="Magenta"/>
       
-      <DockPanel Width="210" MinWidth="100">
+      <!--<DockPanel Width="210" MinWidth="100">
         <TextBlock DockPanel.Dock="Left" Text="てすと" Background="Beige"/>
         <TextBlock DockPanel.Dock="Right" Text="てすと" Background="Salmon" Width="20"/>
         <TextBlock DockPanel.Dock="Right" Text="てすと" Background="DodgerBlue"/>
         <TextBox DockPanel.Dock="Right" Text="てすと" Background="MediumAquamarine"/>
-      </DockPanel>
+      </DockPanel>-->
     </StackPanel>
   </Grid>
 </Window>
