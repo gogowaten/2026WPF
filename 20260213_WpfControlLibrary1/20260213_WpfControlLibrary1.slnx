@@ -1,4 +1,5 @@
 <Solution>
+  <Project Path="../20260217/20260217.csproj" Id="7bb1e0c7-4b7d-45e0-9c84-0fe7bf9fe8d2" />
   <Project Path="../TestApp/TestApp.csproj" />
   <Project Path="20260213_WpfControlLibrary1.csproj" />
 </Solution>

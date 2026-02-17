@@ -178,6 +178,15 @@ namespace _20260213_WpfControlLibrary1
 
 
         // 表示する小数点以下の桁数
+        //public int Decimals
+        //{
+        //    get { return (int)GetValue(DecimalsProperty); }
+        //    set { SetValue(DecimalsProperty, value); }
+        //}
+
+        //public static readonly DependencyProperty DecimalsProperty =
+        //    DependencyProperty.Register(nameof(Decimals), typeof(int), typeof(MyNumericUpDown), new PropertyMetadata(1));
+
         public int Decimals
         {
             get { return (int)GetValue(DecimalsProperty); }
@@ -185,7 +194,15 @@ namespace _20260213_WpfControlLibrary1
         }
 
         public static readonly DependencyProperty DecimalsProperty =
-            DependencyProperty.Register(nameof(Decimals), typeof(int), typeof(MyNumericUpDown), new PropertyMetadata(1));
+            DependencyProperty.Register(nameof(Decimals), typeof(int), typeof(MyNumericUpDown), new FrameworkPropertyMetadata(1, OnDecimalChanged));
+
+        private static void OnDecimalChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            if (d is MyNumericUpDown nume)
+            {
+                nume.txtValue.Text = nume.Value.ToString("F" + e.NewValue);
+            }
+        }
 
         // 変化量
         public decimal Step
@@ -338,7 +355,7 @@ namespace _20260213_WpfControlLibrary1
         // TextBoxへの入力時
         private void txtValue_PreviewTextInput(object sender, TextCompositionEventArgs e)
         {
-            
+
             //// 入力を許可する文字は、数字、マイナス記号、ドット
             //// その内のマイナス記号とドットは、すでにある場合は許可しない
             //string cha = e.Text;
@@ -350,7 +367,7 @@ namespace _20260213_WpfControlLibrary1
             string cha = e.Text;
             string fullText = GetFullTextAfterInput(txtValue, cha);
             bool result = IsValid(fullText);
-            if(result)
+            if (result)
             {
                 e.Handled = false;
             }
@@ -372,6 +389,8 @@ namespace _20260213_WpfControlLibrary1
         {
             // 文字列
             if (string.IsNullOrEmpty(text)) { return true; }
+
+            if(text == "-") { return true; }    
 
             // "-" か "." が1個より多い場合は通さない
             if (text.Count('-') > 1 || text.Count('.') > 1) { return false; }

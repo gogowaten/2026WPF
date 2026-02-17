@@ -20,6 +20,10 @@ namespace TestApp
         public MainWindow()
         {
             InitializeComponent();
+
+           // decimal dd = 12-.3456m;
+           // string ss = "12.3456";
+           //var neko = ss.IndexOf('-');
         }
 
         private void MyNumericUpDown_ValueChanged(object sender, RoutedPropertyChangedEventArgs<decimal> e)

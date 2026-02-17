@@ -10,6 +10,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\20260213_WpfControlLibrary1\20260213_WpfControlLibrary1.csproj" />
+    <ProjectReference Include="..\20260217\20260217.csproj" />
   </ItemGroup>
 
 </Project>
