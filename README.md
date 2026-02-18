@@ -1,3 +1,30 @@
+# _20260212_Behavior2
+ビヘイビアの続き<br>
+マウスオーバーで色が変化するボタンと、数字入力しかできないTextBox<br>
+このコードを書くときにしたAIとの問答を、このプロジェクトにマークダウンファイルとして保存してみた、.md拡張子<br>
+<img width="386" height="343" alt="20260218_210036" src="https://github.com/user-attachments/assets/e3155244-995b-4c2d-9d1b-77c26cbe97b2" />
+<br><br><br>
+
+
+# _20260212_Behaviors
+ビヘイビアを使った簡単なテスト<br>
+```cs
+using Microsoft.Xaml.Behaviors;
+    public class MouseOverBehavior : Behavior<Border>
+```
+
+<img width="586" height="200" alt="20260218_205136" src="https://github.com/user-attachments/assets/c1e8b48e-8ea5-4380-b009-5d339095198e" />
+
+# _20260211_ocr
+クリップボード画像をOCR<br>
+ここのブログに合ったのをほぼそのままコピペ<br>
+Windowsに標準で搭載されているOCR機能を使ってC#で簡単なOCRアプリを作ってみる - パソコン関連もろもろ<br>
+https://touch-sp.hatenablog.com/entry/2026/02/09/182536<br>
+<img width="586" height="293" alt="20260218_204938" src="https://github.com/user-attachments/assets/961307d4-74bb-4dd9-b5a1-6ebeda6626d7" />
+<br><br><br>
+
+
+
 # _20260211
 AIに聞いて作ったから殆どわかっていない<br>
 Microsoft.Xaml.Behaviorsを使っている<br>
