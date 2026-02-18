@@ -1,3 +1,37 @@
+# 20260216_02
+https://github.com/gogowaten/2026WPF/tree/master/20260216_02<br>
+AIに書いてもらった、よくわからん<br>
+<img width="640" height="360" alt="20260218_214414" src="https://github.com/user-attachments/assets/51da1b51-bc8a-424f-935b-0e226663be2a" />
+<br><br><br>
+
+
+
+# 20260216
+カスタムコントロールでマウスドラッグ移動できるControl作成<br>
+入れ子構造にすることができる<br>
+動的追加できる<br>
+添付プロパティを使っている、PositionProperty、IsEnabledProperty
+https://github.com/gogowaten/2026WPF/tree/master/20260216<br>
+<img width="640" height="360" alt="20260218_212835" src="https://github.com/user-attachments/assets/908e2419-8727-4b14-9d20-63a2f71bc25d" />
+<br><br><br>
+
+
+
+# 20260213_WpfControlLibrary1
+2026WPF/20260213_WpfControlLibrary1 at master · gogowaten/2026WPF<br>
+https://github.com/gogowaten/2026WPF/tree/master/20260213_WpfControlLibrary1<br>
+今回はアプリじゃなくてライブラリ作成<br>
+ユーザーコントロールでNumericUpDownを作成<br>
+```cs
+// AIに相談しながら作ったのがこれ
+    public partial class MyNumericUpDown : UserControl
+// それを参考にあとから自分で書き直したのがこっち
+    public partial class MyNumeUD : UserControl
+```
+<img width="286" height="243" alt="20260218_212034" src="https://github.com/user-attachments/assets/fa550c4f-9ce6-478d-ac3f-cd07e5a785d9" />
+<br><br><br>
+
+
 # _20260212_Behavior2
 ビヘイビアの続き<br>
 マウスオーバーで色が変化するボタンと、数字入力しかできないTextBox<br>
