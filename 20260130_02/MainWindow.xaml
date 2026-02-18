@@ -12,7 +12,7 @@
       <ColumnDefinition Width="200"/>
     </Grid.ColumnDefinitions>
     <Canvas x:Name="myCanvas" Background="AliceBlue">
-      <local:AutoSizingPanel x:Name="myAutoPanel">
+      <local:AutoSizingPanel x:Name="myAutoPanel" Background="Snow">
         <!-- 子要素は絶対座標を指定（親 Canvas の座標系のつもりで指定） -->
         <Rectangle Fill="#2196F3" Width="120" Height="80"
                        local:AutoSizingPanel.Left="50" local:AutoSizingPanel.Top="60" />
