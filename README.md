@@ -7,6 +7,7 @@ AIに書いてもらった、よくわからん<br>
 
 
 # 20260216
+https://github.com/gogowaten/2026WPF/tree/master/20260216<br>
 カスタムコントロールでマウスドラッグ移動できるControl作成<br>
 入れ子構造にすることができる<br>
 動的追加できる<br>
@@ -33,6 +34,7 @@ https://github.com/gogowaten/2026WPF/tree/master/20260213_WpfControlLibrary1<br>
 
 
 # _20260212_Behavior2
+https://github.com/gogowaten/2026WPF/tree/master/20260212_Behavior2<br>
 ビヘイビアの続き<br>
 マウスオーバーで色が変化するボタンと、数字入力しかできないTextBox<br>
 このコードを書くときにしたAIとの問答を、このプロジェクトにマークダウンファイルとして保存してみた、.md拡張子<br>
@@ -41,6 +43,7 @@ https://github.com/gogowaten/2026WPF/tree/master/20260213_WpfControlLibrary1<br>
 
 
 # _20260212_Behaviors
+https://github.com/gogowaten/2026WPF/tree/master/20260212_Behaviors<br>
 ビヘイビアを使った簡単なテスト<br>
 ```cs
 using Microsoft.Xaml.Behaviors;
@@ -60,6 +63,7 @@ https://touch-sp.hatenablog.com/entry/2026/02/09/182536<br>
 
 
 # _20260211
+https://github.com/gogowaten/2026WPF/tree/master/20260211<br>
 AIに聞いて作ったから殆どわかっていない<br>
 Microsoft.Xaml.Behaviorsを使っている<br>
 using CommunityToolkit.Mvvm.ComponentModel<br>
@@ -71,6 +75,7 @@ JSON形式でファイル保存<br>
 
 
 # _20260210_tuduki_mvvm
+https://github.com/gogowaten/2026WPF/tree/master/20260210_tuduki_mvvm<br>
 いまいち<br>
 <img width="640" height="360" alt="20260218_182506" src="https://github.com/user-attachments/assets/380a6e5c-aa93-45a7-ae4c-a6ddf7cc899c" />
 <br><br><br>
@@ -85,6 +90,7 @@ Tesseractってのを使ったOCR<br>
 
 
 # _20260209
+https://github.com/gogowaten/2026WPF/tree/master/20260209<br>
 Thumb継承でマウスドラッグ移動、複数選択、追加、削除、ハンドル表示でサイズ変更<br>
 <img width="640" height="360" alt="20260218_181834" src="https://github.com/user-attachments/assets/1554b5cc-2521-4fca-acba-44e24fe98f24" />
 <br><br><br>
@@ -92,6 +98,7 @@ Thumb継承でマウスドラッグ移動、複数選択、追加、削除、ハ
 
 
 # _20260207_json_toolkitmvvm_command_matome
+https://github.com/gogowaten/2026WPF/tree/master/20260207_json_toolkitmvvm_command_matome<br>
 MVVMの練習<br>
 <img width="640" height="360" alt="20260218_181415" src="https://github.com/user-attachments/assets/e98ac4f4-97ea-454d-b5a4-1ba0a0faa139" />
 <br><br><br>
