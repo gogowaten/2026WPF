@@ -24,8 +24,8 @@
       </Canvas>
 
     <StackPanel Grid.Column="1" DataContext="{Binding ElementName=MyRoot}">
-      <TextBlock Text="{Binding ActualWidth, StringFormat='actualW = {0}'}"/>
-      <TextBlock Text="{Binding Width, StringFormat='W = {0}'}"/>
+      <TextBlock Text="{Binding ActualWidth, StringFormat='PanelActualW = {0}'}"/>
+      <TextBlock Text="{Binding Width, StringFormat='PanelWidth = {0}'}"/>
     </StackPanel>
   </Grid>
 </Window>
