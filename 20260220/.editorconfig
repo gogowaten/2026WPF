@@ -1,0 +1,4 @@
+﻿[*.cs]
+
+# CA2201: 予約された例外の種類を発生させません
+dotnet_diagnostic.CA2201.severity = error
