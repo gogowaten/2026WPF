@@ -13,15 +13,13 @@
     </Grid.ColumnDefinitions>
 
     <Grid x:Name="MyCanvas" HorizontalAlignment="Left" VerticalAlignment="Top">
-      <local:Node x:Name="MyRoot">
-        
-      </local:Node>
-      <!--<local:ResizePanel x:Name="MyPanel" Background="ForestGreen">
+ 
+      <local:ResizePanel x:Name="MyPanel" Background="ForestGreen">
         <Rectangle x:Name="MyRect1" Width="100" Height="100" Fill="Yellow" Opacity="0.5"
                    local:ResizePanel.X="10" local:ResizePanel.Y="20"/>
         <Rectangle x:Name="MyRect2" Width="100" Height="100" Fill="Yellow" Opacity="0.5"
                    local:ResizePanel.X="150" local:ResizePanel.Y="50"/>
-      </local:ResizePanel>-->
+      </local:ResizePanel>
     </Grid>
 
     <StackPanel Grid.Column="1">

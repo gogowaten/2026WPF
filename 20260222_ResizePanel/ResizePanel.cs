@@ -138,7 +138,7 @@ namespace _20260222_ResizePanel
                 SetY(child, GetY(child) - pos.Y);
             }
 
-            //InvalidateMeasure(); // これは実行しなくてもMeasureOverrideが実行される
+            InvalidateMeasure(); // これは実行しなくてもMeasureOverrideが実行されると思ったけど縮小時は実行されない
         }
     }
 }

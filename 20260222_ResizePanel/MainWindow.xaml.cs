@@ -20,43 +20,32 @@ namespace _20260222_ResizePanel
         {
             InitializeComponent();
 
-            NodeModel model = new()
-            {
-                NodeType = NodeType.Rectangle,
-                X = 0,
-                Y = 0,
-                Height = 100,
-                Width = 100
-            };
-
-            Node node = new();
-            
-            MyCanvas.Children.Add(node);
+           
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            //MyPanel.Resize();
+            MyPanel.Resize();
         }
 
         private void Button_Click_1(object sender, RoutedEventArgs e)
         {
-            //ResizePanel.SetX(MyRect1, ResizePanel.GetX(MyRect1) + 10);
+            ResizePanel.SetX(MyRect1, ResizePanel.GetX(MyRect1) + 10);
         }
 
         private void Button_Click_2(object sender, RoutedEventArgs e)
         {
-            //ResizePanel.SetX(MyRect1, ResizePanel.GetX(MyRect1) - 10);
+            ResizePanel.SetX(MyRect1, ResizePanel.GetX(MyRect1) - 10);
         }
 
         private void Button_Click_3(object sender, RoutedEventArgs e)
         {
-            //ResizePanel.SetX(MyRect2, ResizePanel.GetX(MyRect2) + 10);
+            ResizePanel.SetX(MyRect2, ResizePanel.GetX(MyRect2) + 10);
         }
 
         private void Button_Click_4(object sender, RoutedEventArgs e)
         {
-            //ResizePanel.SetX(MyRect2, ResizePanel.GetX(MyRect2) - 10);
+            ResizePanel.SetX(MyRect2, ResizePanel.GetX(MyRect2) - 10);
         }
     }
 }
