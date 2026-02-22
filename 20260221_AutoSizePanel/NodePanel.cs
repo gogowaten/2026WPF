@@ -45,7 +45,7 @@ namespace _20260221_AutoSizePanel
                 new FrameworkPropertyMetadata(0.0, FrameworkPropertyMetadataOptions.AffectsParentArrange));
         #endregion 添付プロパティ
 
-
+        
         // すべての子要素が収まるサイズを測定
         protected override Size MeasureOverride(Size availableSize)
         {
@@ -53,8 +53,10 @@ namespace _20260221_AutoSizePanel
             double maxY = 0;
             foreach (UIElement child in InternalChildren)
             {
+                // 子要素のサイズを測定、これで子要素のDesiredSizeが更新される
                 child.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
 
+                // 子要素に添付した添付プロパティから、XY座標取得
                 double posX = GetX(child);// Canvas.GetLeft(child);
                 double posY = GetY(child);
                 //if (double.IsNaN(posX)) { posX = 0; }
