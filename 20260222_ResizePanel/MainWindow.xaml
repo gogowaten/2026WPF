@@ -5,8 +5,23 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:_20260222_ResizePanel"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
-    <Grid>
+        Title="MainWindow" Height="367" Width="654">
+  <Grid>
+    <Grid.ColumnDefinitions>
+      <ColumnDefinition/>
+      <ColumnDefinition Width="200"/>
+    </Grid.ColumnDefinitions>
 
-    </Grid>
+    <Canvas x:Name="MyCanvas">
+      <local:ResizePanel Background="ForestGreen">
+        <Rectangle Width="100" Height="60" Fill="Yellow" Opacity="0.5"/>
+        <Rectangle Width="100" Height="60" Fill="Yellow" Opacity="0.5"
+                   local:ResizePanel.X="150" local:ResizePanel.Y="50"/>
+      </local:ResizePanel>
+    </Canvas>
+
+    <StackPanel Grid.Column="1">
+
+    </StackPanel>
+  </Grid>
 </Window>

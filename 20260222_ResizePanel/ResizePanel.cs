@@ -4,13 +4,12 @@ using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 
-namespace _20260221_AutoSizePanel
+namespace _20260222_ResizePanel
 {
-    // 自動リサイズパネル
-    public class NodePanel : Panel
+    public class ResizePanel : Panel
     {
         #region 添付プロパティ
-        
+
         // X座標
         public static double GetX(DependencyObject obj)
         {
@@ -23,9 +22,9 @@ namespace _20260221_AutoSizePanel
         }
 
         public static readonly DependencyProperty XProperty =
-                    DependencyProperty.RegisterAttached("X", typeof(double), typeof(NodePanel),
+                    DependencyProperty.RegisterAttached("X", typeof(double), typeof(ResizePanel),
                         new FrameworkPropertyMetadata(0.0,
-                            FrameworkPropertyMetadataOptions.AffectsParentMeasure));
+                             FrameworkPropertyMetadataOptions.AffectsParentMeasure));
         // FrameworkPropertyMetadataOptions.AffectsParentMeasure
         // 値の変更があったときに親要素のinvalidMeasureを実行する
 
@@ -41,12 +40,11 @@ namespace _20260221_AutoSizePanel
         }
 
         public static readonly DependencyProperty YProperty =
-            DependencyProperty.RegisterAttached("Y", typeof(double), typeof(NodePanel),
-                new FrameworkPropertyMetadata(0.0, 
-                    FrameworkPropertyMetadataOptions.AffectsParentMeasure));
+            DependencyProperty.RegisterAttached("Y", typeof(double), typeof(ResizePanel),
+                new FrameworkPropertyMetadata(0.0, FrameworkPropertyMetadataOptions.AffectsParentArrange));
         #endregion 添付プロパティ
 
-        
+
         // すべての子要素が収まるサイズを測定
         protected override Size MeasureOverride(Size availableSize)
         {
@@ -79,5 +77,4 @@ namespace _20260221_AutoSizePanel
             return finalSize;
         }
     }
-
 }

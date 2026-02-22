@@ -20,5 +20,6 @@ namespace _20260222_ResizePanel
         {
             InitializeComponent();
         }
+        
     }
 }

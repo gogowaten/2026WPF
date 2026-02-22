@@ -17,7 +17,8 @@
         <Rectangle x:Name="MyRect1" Fill="Orange" Width="100" Height="100"
                  local:NodePanel.X="10" local:NodePanel.Y="10"
                  Opacity="0.5"/>
-        <Rectangle x:Name="MyRect2" Fill="DodgerBlue" Width="100" Height="100"
+        <Rectangle x:Name="MyRect2" Fill="DodgerBlue"
+                   Width="100" Height="100"
                  local:NodePanel.X="200" local:NodePanel.Y="50"
                  Opacity="0.5"/>
         </local:NodePanel>
