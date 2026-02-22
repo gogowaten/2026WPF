@@ -4,6 +4,12 @@ using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 
+// 自動リサイズだけど、ActualWidthとActualHeightが自動なだけで
+// WidthとHeightはNaNのままなので
+// GridやScrollViewerに配置する場合は、
+// HorizontalAlignmentとVerticalAlignmentをStretch以外に指定する必要がある、
+// もししなかった場合は全体に広がる
+// Canvasに配置した場合は普通に表示される
 namespace _20260221_AutoSizePanel
 {
     // 自動リサイズパネル

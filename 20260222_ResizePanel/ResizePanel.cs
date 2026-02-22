@@ -41,7 +41,7 @@ namespace _20260222_ResizePanel
 
         public static readonly DependencyProperty YProperty =
             DependencyProperty.RegisterAttached("Y", typeof(double), typeof(ResizePanel),
-                new FrameworkPropertyMetadata(0.0, FrameworkPropertyMetadataOptions.AffectsParentArrange));
+                new FrameworkPropertyMetadata(0.0, FrameworkPropertyMetadataOptions.AffectsParentMeasure));
         #endregion 添付プロパティ
 
 
@@ -62,7 +62,7 @@ namespace _20260222_ResizePanel
                 maxX = Math.Max(maxX, posX + child.DesiredSize.Width);
                 maxY = Math.Max(maxY, posY + child.DesiredSize.Height);
             }
-            return new Size(maxX, maxY);
+            return new Size(maxX, maxY);// このSizeはDesiredSizeに適用される
         }
 
         // すべての子要素を再配置する

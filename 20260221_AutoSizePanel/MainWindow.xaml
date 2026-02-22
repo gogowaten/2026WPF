@@ -12,7 +12,7 @@
       <ColumnDefinition Width="200"/>
     </Grid.ColumnDefinitions>
 
-      <Canvas>
+    <Grid HorizontalAlignment="Left" VerticalAlignment="Top">
       <local:NodePanel x:Name="MyRoot" Background="AliceBlue" Margin="0" DockPanel.Dock="Left">
         <Rectangle x:Name="MyRect1" Fill="Orange" Width="100" Height="100"
                  local:NodePanel.X="10" local:NodePanel.Y="10"
@@ -21,8 +21,8 @@
                    Width="100" Height="100"
                  local:NodePanel.X="200" local:NodePanel.Y="50"
                  Opacity="0.5"/>
-        </local:NodePanel>
-      </Canvas>
+      </local:NodePanel>
+    </Grid>
 
     <StackPanel Grid.Column="1" DataContext="{Binding ElementName=MyRoot}">
       <TextBlock Text="{Binding ActualWidth, StringFormat='PanelActualW = {0}'}"/>
