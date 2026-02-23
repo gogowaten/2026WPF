@@ -410,3 +410,148 @@ namespace MvvmMindMap.ViewModels
 ---
 
 
+
+# 以下のコードのMainViewModelのRootItemsをバインドしてTextBlockやRectangleなどを自動判別して表示するには？
+
+```cs
+    public partial class MainViewModel : ObservableObject
+    {
+        public ObservableCollection<Item> RootItems { get; } = [];
+        
+
+        public MainViewModel()
+        {
+            Items items = new(0, 0);
+            TextBlockItem text = new(10, 20, "Text A");
+            items.Children.Add(text);
+            items.Children.Add(new TextBlockItem(10, 50, "Text B"));
+            RootItems.Add(text);
+            RectangleItem rect = new(100, 50, Brushes.Yellow, 100, 40);
+            RootItems.Add(rect);
+        }
+
+    }
+
+    public enum ItemType { Items, TextBlock, Rectangle }
+
+
+    public partial class Item : ObservableObject
+    {
+        public ItemType Type { get; private set; }
+
+        [ObservableProperty] private double _x;
+        [ObservableProperty] private double _y;
+        public Item(ItemType itemType) { this.Type = itemType; }
+    }
+
+    public partial class Items : Item
+    {
+        public ObservableCollection<Item> Children { get; private set; } = [];
+        public Items(double x, double y) : base(ItemType.Items)
+        {
+            this.X = x;
+            this.Y = y;
+        }
+    }
+
+
+    public partial class TextBlockItem : Item
+    {
+        [ObservableProperty] private string _text = string.Empty;
+        public TextBlockItem(double x, double y, string text) : base(ItemType.TextBlock)
+        {
+            this.X = x;
+            this.Y = y;
+            _text = text;
+        }
+    }
+
+    public partial class RectangleItem : Item
+    {
+        [ObservableProperty] private Brush _fill = Brushes.Yellow;
+        [ObservableProperty] private double _width;
+        [ObservableProperty] private double _height;
+
+        public RectangleItem(double x, double y, Brush fill, double w, double h) : base(ItemType.Rectangle)
+        {
+            this.X = x;
+            this.Y = y;
+            _fill = fill;
+            _width = w;
+            _height = h;
+        }
+    }
+```
+
+
+---
+
+
+ご提示いただいたコードのように、基底クラス（`Item`）を継承した複数のクラスを一つのリスト（`RootItems`）にまとめている場合、**「型指定（DataType）による暗黙的な DataTemplate」** を使うのが WPF の最もスマートな解決策です。
+
+WPF は、表示しようとしているオブジェクトの型を見て、対応する `DataTemplate` を自動的に選んで適用してくれます。
+
+---
+
+## 1. XAML での定義方法
+
+`Resources` セクションに、それぞれのクラスに対応する `DataTemplate` を記述します。ポイントは **`x:Key` を書かず、`DataType` だけを指定する** ことです。
+
+```xml
+<Window ... xmlns:local="clr-namespace:あなたのプロジェクトの名前空間">
+    <Window.Resources>
+        <DataTemplate DataType="{x:Type local:TextBlockItem}">
+            <TextBlock Text="{Binding Text}" Foreground="Black" />
+        </DataTemplate>
+
+        <DataTemplate DataType="{x:Type local:RectangleItem}">
+            <Rectangle Width="{Binding Width}" 
+                       Height="{Binding Height}" 
+                       Fill="{Binding Fill}" />
+        </DataTemplate>
+
+        <DataTemplate DataType="{x:Type local:Items}">
+            <ItemsControl ItemsSource="{Binding Children}">
+                </ItemsControl>
+        </DataTemplate>
+    </Window.Resources>
+
+    <Grid>
+        <ItemsControl ItemsSource="{Binding RootItems}">
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <Canvas />
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            <ItemsControl.ItemContainerStyle>
+                <Style TargetType="ContentPresenter">
+                    <Setter Property="Canvas.Left" Value="{Binding X}" />
+                    <Setter Property="Canvas.Top" Value="{Binding Y}" />
+                </Style>
+            </ItemsControl.ItemContainerStyle>
+        </ItemsControl>
+    </Grid>
+</Window>
+
+```
+
+---
+
+## 2. 解説：なぜこれで動くのか？
+
+1. **自動判別 (Implicit DataTemplate):**
+`ItemsControl` が `RootItems` の中身を一つずつ取り出すとき、そのインスタンスの型（`TextBlockItem` か `RectangleItem` か）を確認します。そして、リソース内にある「その型に合致する `DataType`」を持った `DataTemplate` を自動的に適用します。
+2. **座標の反映:**
+`Item` クラスにある `X`, `Y` プロパティを画面上の位置に反映させるため、`ItemsControl` のパネルに `Canvas` を使い、`ItemContainerStyle` で `Canvas.Left` と `Canvas.Top` にバインドしています。
+3. **再帰的な表示:**
+もし `Items` クラスのように `Children` を持つ場合、そのテンプレート内でさらに `ItemsControl` を使うことで、階層構造を維持したまま表示できます。
+
+---
+
+## 3. さらにブラッシュアップするためのヒント
+
+* **型安全なバインディング:** `DataType` を指定することで、Visual Studio の IntelliSense が効くようになり、`{Binding Text}` などのプロパティ名が正しいかどうかをコンパイル時にチェックしやすくなります。
+* **ItemType Enum の使い道:** 実は WPF の自動判別機能を使う場合、今回クラスに定義した `ItemType Type` プロパティは XAML 側では使いません。もし「型」ではなく「Enumの値」でテンプレートを切り替えたい場合は `DataTemplateSelector` というクラスを自作する必要がありますが、今回のようなクラス構成なら **DataType 指定が最も簡単で推奨される方法** です。
+
+次は、この配置した要素を「マウスでドラッグして動かせるようにしたい」といった要望はありますか？（その場合は `Interaction.Behaviors` などの話に繋がります！）
+

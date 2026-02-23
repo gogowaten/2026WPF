@@ -1,12 +1,11 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Windows.Media;
-using System.Runtime.CompilerServices;
 using System.Text;
+using CommunityToolkit.Mvvm.ComponentModel;
+using System.Windows.Media;
 
-namespace _20260223
+namespace _20260223_DataTemplate2
 {
     public enum ItemType { Items, TextBlock, Rectangle }
 
@@ -45,11 +44,4 @@ namespace _20260223
         [ObservableProperty] private double _width = w;
         [ObservableProperty] private double _height = h;
     }
-
-
-
-
-
-
-
 }
