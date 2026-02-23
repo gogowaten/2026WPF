@@ -10,13 +10,10 @@
   <Window.DataContext>
     <local:MainViewModel/>
   </Window.DataContext>
+  
   <Window.Resources>
-    <DataTemplate DataType="{x:Type local:Item}">
+    <DataTemplate DataType="{x:Type local:Items}">
       <Canvas>
-        <Border Background="Snow" BorderBrush="DeepSkyBlue" BorderThickness="1" CornerRadius="5" Padding="10,5">
-          <TextBlock Text="{Binding Text}" FontWeight="Bold"/>
-        </Border>
-
         <ItemsControl ItemsSource="{Binding Children}">
           <ItemsControl.ItemsPanel>
             <ItemsPanelTemplate>
@@ -32,15 +29,25 @@
         </ItemsControl>
       </Canvas>
     </DataTemplate>
+
+    <DataTemplate DataType="{x:Type local:TextBlockItem}">
+      <Border Background="Snow" BorderBrush="DarkGreen" BorderThickness="2" CornerRadius="5" Padding="10,5">
+        <TextBlock Text="{Binding Text}" Foreground="Red" FontWeight="Bold"/>
+      </Border>
+    </DataTemplate>
+    
+    <DataTemplate DataType="{x:Type local:RectangleItem}">
+      <Rectangle Width="{Binding Width}" Height="{Binding Height}" Fill="{Binding Fill}"/>
+    </DataTemplate>
   </Window.Resources>
-  
+
   <Grid>
     <Grid.ColumnDefinitions>
       <ColumnDefinition/>
       <ColumnDefinition Width="200"/>
     </Grid.ColumnDefinitions>
 
-    <Grid Background="AliceBlue">
+    <Grid Background="YellowGreen">
       <ItemsControl ItemsSource="{Binding RootItems}">
         <ItemsControl.ItemsPanel>
           <ItemsPanelTemplate>

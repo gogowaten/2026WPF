@@ -18,7 +18,7 @@ namespace _20260223
     public partial class MainWindow : Window
     {
         //public ObservableCollection<Item> ItemData { get; set; } = [];
-        public Item MyItem { get; set; }
+        //public Item MyItem { get; set; }
         public MainWindow()
         {
             InitializeComponent();

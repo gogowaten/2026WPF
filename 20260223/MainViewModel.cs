@@ -2,28 +2,29 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Windows.Media;
 using System.Text;
+using System.Windows.Shapes;
 
 namespace _20260223
 {
     public partial class MainViewModel : ObservableObject
     {
         public ObservableCollection<Item> RootItems { get; } = [];
+        
 
         public MainViewModel()
         {
-            var root = new Item("メインテーマ", 100, 100);
+            Items items = new(10, 0);
+            items.Children.Add(new TextBlockItem(10, 20, "Text A"));
+            items.Children.Add(new TextBlockItem(20, 50, "Text B"));
+            RootItems.Add(items);
 
-            var child1 = new Item("アイデア A", 150, -50);
-            child1.Children.Add(new Item("詳細 A-1", 100, 0));
+            RootItems.Add(new TextBlockItem(100, 110, "Text C"));
+            RootItems.Add(new RectangleItem(100, 150, Brushes.Yellow, 100, 40));
 
-            var child2 = new Item("アイデア B", 150, 90);
-
-            root.Children.Add(child1);
-            root.Children.Add(child2);
-
-            RootItems.Add(root);
         }
+
     }
 
 }
