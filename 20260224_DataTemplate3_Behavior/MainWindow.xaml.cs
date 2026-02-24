@@ -1,5 +1,4 @@
-﻿using System.Collections.ObjectModel;
-using System.Text;
+﻿using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -10,26 +9,16 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace _20260223
+namespace _20260224_DataTemplate3_Behavior
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
     public partial class MainWindow : Window
     {
-        //public MainViewModel VM { get; set; }
         public MainWindow()
         {
             InitializeComponent();
-
-            //this.VM = new();
-            //VM.RootItems.Add(new TextBlockItem(10, 10, "test"));
-            //DataContext = VM;
-        }
-
-        private void Button_Click(object sender, RoutedEventArgs e)
-        {
-            //VM.RootItems.Add(new TextBlockItem(20, 50, "TextAdd"));
         }
     }
 }

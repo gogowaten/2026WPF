@@ -2,16 +2,15 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Windows.Media;
 using System.Text;
-using System.Windows.Shapes;
+using System.Windows.Media;
 
-namespace _20260223
+
+namespace _20260224_DataTemplate3_Behavior
 {
     public partial class MainViewModel : ObservableObject
     {
         public ObservableCollection<Item> RootItems { get; } = [];
-        [ObservableProperty] private bool _canDrag = true; // ドラッグ移動の可否判定用
 
         public MainViewModel()
         {
@@ -26,5 +25,4 @@ namespace _20260223
         }
 
     }
-
 }

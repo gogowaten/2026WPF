@@ -2,12 +2,13 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Windows.Media;
-using System.Runtime.CompilerServices;
 using System.Text;
+using System.Windows.Media;
 
-namespace _20260223
+
+namespace _20260224_DataTemplate3_Behavior
 {
+    // 実質未使用
     public enum ItemType { Items, TextBlock, Rectangle }
 
 
@@ -36,7 +37,5 @@ namespace _20260223
         [ObservableProperty] private double _width = w;
         [ObservableProperty] private double _height = h;
     }
-
-
 
 }
