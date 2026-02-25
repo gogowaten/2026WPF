@@ -5,8 +5,69 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:_20260224"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
-    <Grid>
+        Title="MainWindow" Height="367" Width="654">
+  <!--<Window.Resources>
+    <DataTemplate DataType="{x:Type local:TextBlockItem}">
+      <TextBlock Text="{Binding Text}" FontSize="16" Foreground="Black"/>
+    </DataTemplate>
 
-    </Grid>
+    <DataTemplate DataType="{x:Type local:RectangleItem}">
+      <Rectangle Width="{Binding Width}" 
+                       Height="{Binding Height}" 
+                       Fill="{Binding FillBrush}" 
+                       Stroke="Black" StrokeThickness="1"/>
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type local:Items}">
+      <ItemsControl ItemsSource="{Binding Children}">
+        <ItemsControl.ItemsPanel>
+          <ItemsPanelTemplate>
+            <Canvas />
+          </ItemsPanelTemplate>
+        </ItemsControl.ItemsPanel>
+        <ItemsControl.ItemContainerStyle>
+          <Style TargetType="ContentPresenter">
+            <Setter Property="Canvas.Left" Value="{Binding X}"/>
+            <Setter Property="Canvas.Top" Value="{Binding Y}"/>
+          </Style>
+        </ItemsControl.ItemContainerStyle>
+      </ItemsControl>
+    </DataTemplate>
+  </Window.Resources>-->
+
+  <Grid>
+    <Grid.ColumnDefinitions>
+      <ColumnDefinition/>
+      <ColumnDefinition Width="200"/>
+    </Grid.ColumnDefinitions>
+
+    <!--<Grid Background="#F0F0F0">
+      <ItemsControl DataContext="{Binding
+        RelativeSource={RelativeSource AncestorType=local:MainWindow}}" ItemsSource="{Binding ItemsList}">
+        <ItemsControl.ItemsPanel>
+          <ItemsPanelTemplate>
+            <Canvas Background="White" Margin="10">
+              <Canvas.Effect>
+                <DropShadowEffect BlurRadius="10" ShadowDepth="2" Opacity="0.2"/>
+              </Canvas.Effect>
+            </Canvas>
+          </ItemsPanelTemplate>
+        </ItemsControl.ItemsPanel>
+
+        <ItemsControl.ItemContainerStyle>
+          <Style TargetType="ContentPresenter">
+            <Setter Property="Canvas.Left" Value="{Binding X, Mode=TwoWay}"/>
+            <Setter Property="Canvas.Top" Value="{Binding Y, Mode=TwoWay}"/>
+          </Style>
+        </ItemsControl.ItemContainerStyle>
+      </ItemsControl>
+    </Grid>-->
+    <local:DiagramCanvas DataContext="{Binding RelativeSource={RelativeSource AncestorType=local:MainWindow}}" ItemsSource="{Binding ItemsList}"/>
+    <Canvas x:Name="MyCanvas">
+    </Canvas>
+
+    <StackPanel Grid.Column="1">
+
+    </StackPanel>
+  </Grid>
 </Window>

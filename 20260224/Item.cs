@@ -14,21 +14,21 @@ namespace _20260224
 {
     [JsonDerivedType(typeof(TextBlockItem), nameof(TextBlockItem))]
     [JsonDerivedType(typeof(RectangleItem), nameof(RectangleItem))]
-    [JsonDerivedType(typeof(GroupItem), nameof(GroupItem))]
+    [JsonDerivedType(typeof(Items), nameof(Items))]
     public abstract partial class Item(double x, double y) : ObservableObject
     {
         [ObservableProperty] private double _x = x;
         [ObservableProperty] private double _y = y;
-        internal GroupItem? Parent { get; set; }
+        internal Items? Parent { get; set; }
     }
 
 
-    public partial class GroupItem : Item
+    public partial class Items : Item
     {
         public ObservableCollection<Item> Children { get; set; } = [];
 
 
-        public GroupItem(double x, double y) : base(x, y)
+        public Items(double x, double y) : base(x, y)
         {
             Children.CollectionChanged += Children_CollectionChanged;
         }
@@ -52,7 +52,7 @@ namespace _20260224
             if (CanAddChild(this, item)) { Children.Add(item); }
         }
 
-        private bool CanAddChild(GroupItem potentialParent, Item targetItem)
+        private bool CanAddChild(Items potentialParent, Item targetItem)
         {
             // 1. 直近の自分自身チェック
             if (ReferenceEquals(potentialParent, targetItem)) return false;
@@ -91,14 +91,34 @@ namespace _20260224
             _width = width;
             _height = height;
             //Fill.Freeze();
+
         }
 
+        // [ObservableProperty]が必要なければ以下で良い
         //[JsonConverter(typeof(SolidColorBrushConverter))] // Brushとstringの自作変換クラスを指定
         //public SolidColorBrush Fill { get; set; } = Brushes.Maroon;
 
         [ObservableProperty]
         [property: JsonConverter(typeof(SolidColorBrushConverter))]// Brushとstringの自作変換クラスを指定
         private SolidColorBrush _fill = Brushes.Maroon;
+
+        // BrushそのものじゃなくてARGBに分ける場合
+        // [NotifyPropertyChangedFor(nameof(FillBrush))]は変更通知
+        [ObservableProperty][NotifyPropertyChangedFor(nameof(FillBrush))] private byte _a = 255;
+        [ObservableProperty][NotifyPropertyChangedFor(nameof(FillBrush))] private byte _r = 128;
+        [ObservableProperty][NotifyPropertyChangedFor(nameof(FillBrush))] private byte _g = 255;
+        [ObservableProperty][NotifyPropertyChangedFor(nameof(FillBrush))] private byte _b = 0;
+
+        // View用のBrushをARGBから生成
+        [JsonIgnore]
+        public SolidColorBrush FillBrush => new(Color.FromArgb(A, R, G, B));
+
+        // 下記は各プロパティに[NotifyPropertyChangedFor(nameof(FillBrush))]をつければ必要ない
+        // ARGBいずれかの値が変化したときは、Brushの変更をViewに通知する
+        //partial void OnAChanged(byte value) => OnPropertyChanged(nameof(A));
+        //partial void OnRChanged(byte value) => OnPropertyChanged(nameof(R));
+        //partial void OnGChanged(byte value) => OnPropertyChanged(nameof(G));
+        //partial void OnBChanged(byte value) => OnPropertyChanged(nameof(B));
     }
 
 }
