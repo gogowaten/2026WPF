@@ -1,11 +1,9 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:local="clr-namespace:_20260224">
-<!--このリーソスディクショナリファイルItemTemplates.xamlはApp.xamlでマージする設定を記述することで有効になる-->
-  
+  <!--このリーソスディクショナリファイルItemTemplates.xamlはApp.xamlでマージする設定を記述することで有効になる-->
+
   <DataTemplate DataType="{x:Type local:TextBlockItem}">
-  <!--上記がx:Type省略なしでこれは古い書き方、下記が今どきの省略版-->
-  <!--<DataTemplate DataType="local:TextBlockItem">-->
     <TextBlock Text="{Binding Text}" FontSize="16" Foreground="Black"/>
   </DataTemplate>
 
