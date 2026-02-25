@@ -5,36 +5,6 @@
 
 
   <Style TargetType="{x:Type local:DiagramCanvas}">
-    <!--<Style.Resources>
-      <DataTemplate DataType="{x:Type local:TextBlockItem}">
-        <TextBlock Text="{Binding Text}" FontSize="16" Foreground="Black"/>
-      </DataTemplate>
-
-      <DataTemplate DataType="{x:Type local:RectangleItem}">
-        <Rectangle Width="{Binding Width}" 
-                       Height="{Binding Height}" 
-                       Fill="{Binding FillBrush}" 
-                       Stroke="Black" StrokeThickness="1"/>
-      </DataTemplate>
-
-      <DataTemplate DataType="{x:Type local:Items}">
-        <ItemsControl ItemsSource="{Binding Children}">
-          <ItemsControl.ItemsPanel>
-            <ItemsPanelTemplate>
-              <Canvas />
-            </ItemsPanelTemplate>
-          </ItemsControl.ItemsPanel>
-          <ItemsControl.ItemContainerStyle>
-            <Style TargetType="ContentPresenter">
-              <Setter Property="Canvas.Left" Value="{Binding X}"/>
-              <Setter Property="Canvas.Top" Value="{Binding Y}"/>
-            </Style>
-          </ItemsControl.ItemContainerStyle>
-        </ItemsControl>
-      </DataTemplate>
-
-    </Style.Resources>-->
-    
     
     <Setter Property="Template">
       <Setter.Value>
