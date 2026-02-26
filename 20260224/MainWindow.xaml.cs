@@ -1,4 +1,8 @@
-﻿using System.Collections.ObjectModel;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using Microsoft.Win32;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.IO;
 using System.Text;
 using System.Text.Json;
 using System.Windows;
@@ -18,16 +22,27 @@ namespace _20260224
     /// </summary>
     public partial class MainWindow : Window
     {
+        public Items RootItem { get; set; } = new(0, 0);
         public ObservableCollection<Item> ItemsList { get; set; } = [];
-        //public Items ItemsList { get; set; }
+
+
         public MainWindow()
         {
             InitializeComponent();
-            //AddRectangle();
-            //ItemsList = new(0, 0);
-            PrepareData();
+
+            //PrepareData();
+
+            //this.DataContext = this;
+
+            PrepareDataItems();
             this.DataContext = this;
 
+            // RootItem の子供たちの中で何かが起きたら、RootItem 自身を再計算させる
+            RootItem.Children.CollectionChanged += (s, e) => RootItem.UpdateBounds();
+
+            // RootItem 自体のプロパティ（子供の X, Y, Width, Height）の変化を監視
+            // これをしないと、子供が移動したときに Root のサイズが変わらない
+            RootItem.UpdateBounds();
 
             //JsonSerializerOptions options = new() { WriteIndented = true };
             //RectangleItem rectangleItem = new(10, 20, 40, 50);
@@ -48,38 +63,60 @@ namespace _20260224
             //root.AddChild(new TextBlockItem(100, 20, "TestBBB"));
             //root.AddChild(root);
 
-            
+
 
             //var json = JsonSerializer.Serialize(root, options);
             //Items? result = JsonSerializer.Deserialize<Items>(json, options);
 
         }
 
-        //private void PrepareData()
-        //{
 
-        //    ItemsList.Children.Add(new TextBlockItem(10, 10, "ゆっくりしていってね！！！"));
-        //    ItemsList.Children.Add(new RectangleItem(150, 50, 100, 50) { R = 255, G = 0, B = 0 });
 
-        //    var group = new Items(60, 150);
-        //    group.Children.Add(new RectangleItem(0, 0, 89, 90) { R = 0, G = 0, B = 255 });
-        //    group.Children.Add(new TextBlockItem(10, 90, "これはグループ内です"));
-        //    ItemsList.Children.Add(group);
+        private void PrepareDataItems()
+        {
+            RootItem.Background = Brushes.Black;
 
-        //}
+            //RootItem.Children.Add(new TextBlockItem(10, 10, "ゆっくりしていってね！！！") { Background = Brushes.Gold });
+            //RootItem.Children.Add(new RectangleItem(150, 50, 100, 50) {Background = Brushes.Cyan });
+
+            var group = new Items(60, 150);
+            group.Children.Add(new RectangleItem(0, 0, 89, 90) { Background = Brushes.Maroon });
+            group.Children.Add(new TextBlockItem(50, 90, "これはグループ内です！！！！") { Background = Brushes.YellowGreen });
+            group.Background = Brushes.LightGray;
+
+            RootItem.Children.Add(group);
+        }
 
         private void PrepareData()
         {
+            Items root = new(0, 0);
+            ItemsList.Add(root);
 
-            ItemsList.Add(new TextBlockItem(10, 10, "ゆっくりしていってね！！！"));
-            ItemsList.Add(new RectangleItem(150, 50, 100, 50) { R = 255, G = 0, B = 0 });
+            root.Children.Add(new TextBlockItem(10, 10, "ゆっくりしていってね！！！") { Background = Brushes.Gold });
+            root.Children.Add(new RectangleItem(150, 50, 100, 50) { BackgroundR = 255, BackgroundG = 0, BackgroundB = 0 });
 
-            var group = new Items(60, 150);
-            group.Children.Add(new RectangleItem(0, 0, 89, 90) { R = 0, G = 0, B = 255 });
-            group.Children.Add(new TextBlockItem(10, 90, "これはグループ内です"));
-            ItemsList.Add(group);
+            var group = new Items(60, 250);
+            group.Children.Add(new RectangleItem(70, 0, 89, 90) { Background = Brushes.Maroon });
+            group.Children.Add(new TextBlockItem(50, 90, "これはグループ内です！！！！") { Background=Brushes.YellowGreen});
+            group.Background = Brushes.LightGray;
+            root.Children.Add(group);
+
 
         }
+
+
+        //private void PrepareData()
+        //{
+        //    ItemsList.Add(new TextBlockItem(10, 10, "ゆっくりしていってね！！！") { Background = Brushes.Gold });
+        //    ItemsList.Add(new RectangleItem(150, 50, 100, 50) { BackgroundR = 255, BackgroundG = 0, BackgroundB = 0 });
+
+        //    var group = new Items(60, 150);
+        //    group.Children.Add(new RectangleItem(70, 0, 89, 90) { Background = Brushes.Maroon });
+        //    group.Children.Add(new TextBlockItem(50, 90, "これはグループ内です！！！！"));
+        //    group.Background = Brushes.LightGray;
+        //    ItemsList.Add(group);
+
+        //}
 
 
         private void AddRectangle()
@@ -95,6 +132,77 @@ namespace _20260224
             liniar.GradientStops.Add(new GradientStop(Colors.Cyan, 1.0));
             rectangle.Fill = liniar;
             MyCanvas.Children.Add(rectangle);
+        }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            //ItemsList[1].Background = Brushes.Black;
+            //if (ItemsList[2] is Items ii)
+            //{
+            //    ii.Children[0].Background = Brushes.Cyan;
+            //}
+        }
+
+        private void TextBlock_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            if (sender is TextBlock tb && tb.DataContext is TextBlockItem item)
+            {
+                item.Width = e.NewSize.Width;
+                item.Height = e.NewSize.Height;
+
+                // 親サイズの再計算
+                item.Parent?.UpdateBounds();
+            }
+        }
+
+        public static void SaveToImage(FrameworkElement element, string filePath)
+        {
+            int width = (int)element.ActualWidth;
+            int height = (int)element.ActualHeight;
+            if (width <= 0 || height <= 0) { return; }
+
+            /*⚠️ 注意点：DPIスケーリング
+            Windowsの設定で「テキストの拡大（125 % など）」にしている場合、そのまま保存すると画像がボケたり、サイズがズレたりすることがあります。
+            完璧な解像度を保つには、以下のようにシステムのDPIを取得して RenderTargetBitmap に渡すのがプロの技です。*/
+            Visual visual = element;
+            var source = PresentationSource.FromVisual(visual);
+            double dpiX = 96.0 * source.CompositionTarget.TransformFromDevice.M11;
+            double dpiY = 96.0 * source.CompositionTarget.TransformFromDevice.M22;
+
+            RenderTargetBitmap rtb = new(width, height, dpiX, dpiY, PixelFormats.Pbgra32);
+
+            rtb.Render(element);
+
+            PngBitmapEncoder encoder = new();
+            encoder.Frames.Add(BitmapFrame.Create(rtb));
+
+            using FileStream fs = File.OpenWrite(filePath);
+            encoder.Save(fs);
+        }
+
+        private void SaveButton_Click(object sender, RoutedEventArgs e)
+        {
+            SaveFileDialog saveFileDialog = new SaveFileDialog()
+            {
+                Filter = "PNG Image (*.png)|*.png|JPEG Image (*.jpg)|*.jpg",
+                Title = "全体を画像として保存",
+                FileName = "MyDiagram.png"
+            };
+
+            if (saveFileDialog.ShowDialog() == true)
+            {
+                try
+                {
+                    SaveToImage(MyDiagramCanvas, saveFileDialog.FileName);
+                    MessageBox.Show("保存した");
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"保存中にエラーが発生しました: {ex.Message}");
+                    throw;
+                }
+            }
+
         }
     }
 }

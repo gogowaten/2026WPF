@@ -6,34 +6,6 @@
         xmlns:local="clr-namespace:_20260224"
         mc:Ignorable="d"
         Title="MainWindow" Height="367" Width="654">
-  <!--<Window.Resources>
-    <DataTemplate DataType="{x:Type local:TextBlockItem}">
-      <TextBlock Text="{Binding Text}" FontSize="16" Foreground="Black"/>
-    </DataTemplate>
-
-    <DataTemplate DataType="{x:Type local:RectangleItem}">
-      <Rectangle Width="{Binding Width}" 
-                       Height="{Binding Height}" 
-                       Fill="{Binding FillBrush}" 
-                       Stroke="Black" StrokeThickness="1"/>
-    </DataTemplate>
-
-    <DataTemplate DataType="{x:Type local:Items}">
-      <ItemsControl ItemsSource="{Binding Children}">
-        <ItemsControl.ItemsPanel>
-          <ItemsPanelTemplate>
-            <Canvas />
-          </ItemsPanelTemplate>
-        </ItemsControl.ItemsPanel>
-        <ItemsControl.ItemContainerStyle>
-          <Style TargetType="ContentPresenter">
-            <Setter Property="Canvas.Left" Value="{Binding X}"/>
-            <Setter Property="Canvas.Top" Value="{Binding Y}"/>
-          </Style>
-        </ItemsControl.ItemContainerStyle>
-      </ItemsControl>
-    </DataTemplate>
-  </Window.Resources>-->
 
   <Grid>
     <Grid.ColumnDefinitions>
@@ -41,33 +13,24 @@
       <ColumnDefinition Width="200"/>
     </Grid.ColumnDefinitions>
 
-    <!--<Grid Background="#F0F0F0">
-      <ItemsControl DataContext="{Binding
-        RelativeSource={RelativeSource AncestorType=local:MainWindow}}" ItemsSource="{Binding ItemsList}">
-        <ItemsControl.ItemsPanel>
-          <ItemsPanelTemplate>
-            <Canvas Background="White" Margin="10">
-              <Canvas.Effect>
-                <DropShadowEffect BlurRadius="10" ShadowDepth="2" Opacity="0.2"/>
-              </Canvas.Effect>
-            </Canvas>
-          </ItemsPanelTemplate>
-        </ItemsControl.ItemsPanel>
+    <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
+      <local:DiagramBoard x:Name="MyDiagramCanvas"
+                           DataContext="{Binding RelativeSource={RelativeSource AncestorType=local:MainWindow}}" Background="Salmon"
+                           TargetItems="{Binding RootItem}"
+                           HorizontalAlignment="Left"
+                           VerticalAlignment="Top"
+                           />
+    </ScrollViewer>
+    <!--<local:DiagramCanvas DataContext="{Binding RelativeSource={RelativeSource AncestorType=local:MainWindow}}" ItemsSource="{Binding RootItem}"/>-->
 
-        <ItemsControl.ItemContainerStyle>
-          <Style TargetType="ContentPresenter">
-            <Setter Property="Canvas.Left" Value="{Binding X, Mode=TwoWay}"/>
-            <Setter Property="Canvas.Top" Value="{Binding Y, Mode=TwoWay}"/>
-          </Style>
-        </ItemsControl.ItemContainerStyle>
-      </ItemsControl>
-    </Grid>-->
-    <local:DiagramCanvas DataContext="{Binding RelativeSource={RelativeSource AncestorType=local:MainWindow}}" ItemsSource="{Binding ItemsList}"/>
-    <Canvas x:Name="MyCanvas">
-    </Canvas>
-
+    <Canvas x:Name="MyCanvas"/>
     <StackPanel Grid.Column="1">
-
+      <Button Content="test" Click="Button_Click"/>
+      <Button x:Name="SaveButton" Content="画像として保存" Click="SaveButton_Click" Margin="10" Padding="10,5"/>
+      <TextBlock Text="AAAAAAAA" Background="Red"/>
+      <TextBox Text="BBBBBBB" Background="Gold"/>
+      <Polyline Points="0,0 100, 20" Stroke="Blue" Fill="Cyan" StrokeThickness="20"/>
+      <TextBlock Text="{Binding ElementName=MyDiagramCanvas, Path=Width}"/>
     </StackPanel>
   </Grid>
 </Window>

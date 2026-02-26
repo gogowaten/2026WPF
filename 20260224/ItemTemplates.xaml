@@ -1,21 +1,28 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                    xmlns:local="clr-namespace:_20260224">
+                    xmlns:local="clr-namespace:_20260224"
+                    >
   <!--このリーソスディクショナリファイルItemTemplates.xamlはApp.xamlでマージする設定を記述することで有効になる-->
 
   <DataTemplate DataType="{x:Type local:TextBlockItem}">
-    <TextBlock Text="{Binding Text}" FontSize="16" Foreground="Black"/>
+    <TextBlock Text="{Binding Text}" FontSize="16" Foreground="Black"
+               Background="{Binding Background}"
+               local:SizeObserver.Observe="True"/>
   </DataTemplate>
 
   <DataTemplate DataType="{x:Type local:RectangleItem}">
     <Rectangle Width="{Binding Width}" 
                Height="{Binding Height}" 
-               Fill="{Binding FillBrush}" 
-               Stroke="Black" StrokeThickness="1"/>
+               Fill="{Binding Background}" 
+               Stroke="Black" StrokeThickness="0"/>
   </DataTemplate>
 
   <DataTemplate DataType="{x:Type local:Items}">
-    <local:DiagramCanvas ItemsSource="{Binding Children}"/>
+    <Border Background="{Binding Background}"
+            BorderBrush="Gray" BorderThickness="0" CornerRadius="0">
+      <local:DiagramBoard TargetItems="{Binding}"
+                           />
+    </Border>
   </DataTemplate>
   <!--※ Items のテンプレート内で、作成した local:DiagramCanvas を使うように書き換えると、入れ子構造が非常にスッキリします。-->
 </ResourceDictionary>
