@@ -7,24 +7,6 @@
 
   <Style TargetType="{x:Type local:NodeContainer}">
     
-    <Style.Resources>
-      
-      <!--<DataTemplate DataType="{x:Type local:RectangleData}">
-        <Rectangle Width="{Binding Width}"
-                   Height="{Binding Height}"
-                   Fill="DodgerBlue"/>
-      </DataTemplate>
-
-      <DataTemplate DataType="{x:Type local:Datas}">
-        <local:NodeContainer ItemsSource="{Binding Nodes}"/>
-      </DataTemplate>
-
-      <DataTemplate DataType="{x:Type local:TextBlockData}">
-        <TextBlock Text="{Binding Text}"
-                   Background="Transparent"/>
-      </DataTemplate>-->
-
-    </Style.Resources>
     
     <Setter Property="Background" Value="Transparent"/>
     <Setter Property="BorderThickness" Value="0"/>

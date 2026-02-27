@@ -7,7 +7,7 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="367" Width="654">
   <Window.Resources>
-    <DataTemplate DataType="{x:Type local:RectangleData}">
+    <!--<DataTemplate DataType="{x:Type local:RectangleData}">
       <Rectangle Width="{Binding Width}"
                  Height="{Binding Height}"
                  Fill="DodgerBlue"/>
@@ -20,7 +20,7 @@
     <DataTemplate DataType="{x:Type local:TextBlockData}">
       <TextBlock Text="{Binding Text}"
                  Background="Transparent"/>
-    </DataTemplate>
+    </DataTemplate>-->
 
   </Window.Resources>
   <Grid>
@@ -30,7 +30,7 @@
     </Grid.ColumnDefinitions>
 
     <ScrollViewer>
-      <local:NodeContainer ItemsSource="{Binding  RootData.Nodes}">
+      <local:NodeContainer ItemsSource="{Binding RootData.Nodes}">
       </local:NodeContainer>
     </ScrollViewer>
 
