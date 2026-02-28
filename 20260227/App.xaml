@@ -4,16 +4,16 @@
              xmlns:local="clr-namespace:_20260227"
              StartupUri="MainWindow.xaml">
   <Application.Resources>
-    <ResourceDictionary>
+    <!--<ResourceDictionary>
       <ResourceDictionary.MergedDictionaries>
-        <!--<ResourceDictionary Source="/Themes/NodeTemplate.xaml"/>-->
+        --><!--<ResourceDictionary Source="/Themes/NodeTemplate.xaml"/>-->
         
         <!--上記でもいいけど、下記のほうがより良い、パックURI(pack URI)形式
         これだと将来的にプロジェクト名が変わったり、クラスライブラリに切り出したときでも、
-        エラーにならないでそのまま使える-->
+        エラーにならないでそのまま使える--><!--
         
         <ResourceDictionary Source="pack://application:,,,/20260227;component/Themes/NodeTemplate.xaml"/>
       </ResourceDictionary.MergedDictionaries>
-    </ResourceDictionary>
+    </ResourceDictionary>-->
   </Application.Resources>
 </Application>

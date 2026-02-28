@@ -28,11 +28,21 @@
       <ColumnDefinition/>
       <ColumnDefinition Width="200"/>
     </Grid.ColumnDefinitions>
+    
+    <Canvas>
+      <ContentControl Content="{Binding RootData}" 
+                        Canvas.Left="{Binding RootData.X}"
+                        Canvas.Top="{Binding RootData.Y}" />
+    </Canvas>
+    
+    <!--<ScrollViewer>
+      <ContentControl Content="{Binding RootData}"/>
+    </ScrollViewer>-->
 
-    <ScrollViewer>
+    <!--<ScrollViewer>
       <local:NodeContainer ItemsSource="{Binding RootData.Nodes}">
       </local:NodeContainer>
-    </ScrollViewer>
+    </ScrollViewer>-->
 
     <StackPanel Grid.Column="1">
       <Button x:Name="Test" Content="Test" Click="Test_Click"/>
