@@ -7,12 +7,12 @@
   <DataTemplate DataType="{x:Type local:Datas}">
     <Canvas Width="{Binding Width}" 
             Height="{Binding Height}"
-            Background="Red">
+            Background="#55FF0000">
 
-      <Canvas.RenderTransform>
+      <!--<Canvas.RenderTransform>
         <TranslateTransform X="{Binding ContentBounds.X, Converter={StaticResource NegativeConverter}}" 
                                 Y="{Binding ContentBounds.Y, Converter={StaticResource NegativeConverter}}"/>
-      </Canvas.RenderTransform>
+      </Canvas.RenderTransform>-->
 
       <local:NodeContainer ItemsSource="{Binding Nodes}" 
                            Width="{Binding Width}"

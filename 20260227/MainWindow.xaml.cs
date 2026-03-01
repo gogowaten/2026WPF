@@ -42,7 +42,7 @@ namespace _20260227
         private void CreateData()
         {
             // 1. まず RootData を作る（この時点で CollectionChanged の監視が始まる）
-            RootData = new Datas(0, 0);
+            RootData = new Datas(30, 10);
 
             // 2. group を作る
             Datas group = new Datas(100, 100);
