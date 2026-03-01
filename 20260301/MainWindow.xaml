@@ -1,0 +1,66 @@
+﻿<Window x:Class="_20260301.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:_20260301"
+        mc:Ignorable="d"
+        d:DataContext="{d:DesignInstance Type=local:MainWindow}"
+        Title="MainWindow" Height="367" Width="654">
+  <Window.DataContext>
+    <local:MainViewModel/>
+  </Window.DataContext>
+  
+  <Grid>
+    <Grid.ColumnDefinitions>
+      <ColumnDefinition/>
+      <ColumnDefinition Width="200"/>
+    </Grid.ColumnDefinitions>
+
+    <!--<ScrollViewer HorizontalScrollBarVisibility="Auto" HorizontalAlignment="Left"
+                  VerticalAlignment="Top" VerticalScrollBarVisibility="Auto">
+    </ScrollViewer>
+      <local:GroupItemsControl x:Name="MyRootNode" ItemsSource="{Binding MyRootGroupData.Children}"/>-->
+
+    <ItemsControl Grid.Column="0" ItemsSource="{Binding Items}">
+      <ItemsControl.ItemsPanel>
+        <ItemsPanelTemplate>
+          <Canvas Background="White" IsItemsHost="True" />
+        </ItemsPanelTemplate>
+      </ItemsControl.ItemsPanel>
+      <ItemsControl.ItemContainerStyle>
+        <Style TargetType="ContentPresenter">
+          <Setter Property="Canvas.Left" Value="{Binding X}" />
+          <Setter Property="Canvas.Top" Value="{Binding Y}" />
+          <Setter Property="Panel.ZIndex" Value="{Binding Z}" />
+        </Style>
+      </ItemsControl.ItemContainerStyle>
+      <ItemsControl.ItemTemplate>
+        <DataTemplate>
+          <local:CanvasElementControl Content="{Binding}" />
+        </DataTemplate>
+      </ItemsControl.ItemTemplate>
+    </ItemsControl>
+
+    
+    <!--<Canvas x:Name="MyCanvas">
+      <local:Node x:Name="MyRootNode" ItemsSource="{Binding MyRootData.Layers}"/>
+    </Canvas>-->
+
+    <!--<Canvas x:Name="MyCanvas2">
+      <local:NodeThumb x:Name="MyRootNodeThumb" Canvas.Left="200"/>
+    </Canvas>-->
+
+    <StackPanel Grid.Column="1">
+      <TextBlock Text="{Binding ElementName=MyRootNode, Path=ActualWidth, StringFormat='actuclWidth {0}'}"/>
+      <Button Content="矩形を追加" Command="{Binding AddRectangleCommand}" Margin="5"/>
+      <Button Content="テキストを追加" Command="{Binding AddTextCommand}" Margin="5"/>
+      <Button Content="Groupを追加" Command="{Binding AddGroupCommand}" Margin="5"/>
+
+      <TextBlock Text="要素リスト" Margin="5,15,5,5" FontWeight="Bold"/>
+      <ListBox ItemsSource="{Binding Items}" DisplayMemberPath="Name" Height="200"/>
+
+    </StackPanel>
+  </Grid>
+</Window>
+

@@ -1,0 +1,162 @@
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="clr-namespace:_20260301">
+
+
+  <Style TargetType="{x:Type local:CanvasElementControl}">
+    <Style.Resources>
+      <DataTemplate DataType="{x:Type local:RectangleData}">
+        <Rectangle Width="{Binding Width}" Height="{Binding Height}" 
+                   Fill="SkyBlue" Stroke="DodgerBlue" StrokeThickness="2" Opacity="0.7"/>
+      </DataTemplate>
+
+      <DataTemplate DataType="{x:Type local:TextBlockData}">
+        <TextBlock Text="{Binding Text}" Foreground="Black" FontSize="16" FontWeight="Normal"/>
+      </DataTemplate>
+
+      <DataTemplate DataType="{x:Type local:GroupData}">
+        <Grid Background="#330000FF"
+              Width="{Binding Width}"
+              Height="{Binding Height}">
+          <Border BorderBrush="Gray" BorderThickness="1" />
+
+          <ItemsControl ItemsSource="{Binding Children}">
+            <ItemsControl.ItemsPanel>
+              <ItemsPanelTemplate>
+                <Canvas IsItemsHost="True" />
+              </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            <ItemsControl.ItemContainerStyle>
+              <Style TargetType="ContentPresenter">
+                <Setter Property="Canvas.Left" Value="{Binding X}" />
+                <Setter Property="Canvas.Top" Value="{Binding Y}" />
+                <Setter Property="Panel.ZIndex" Value="{Binding Z}" />
+              </Style>
+            </ItemsControl.ItemContainerStyle>
+            <ItemsControl.ItemTemplate>
+              <DataTemplate>
+                <local:CanvasElementControl Content="{Binding}" />
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+        </Grid>
+      </DataTemplate>
+
+    </Style.Resources>
+    <Setter Property="Template">
+      <Setter.Value>
+        <ControlTemplate TargetType="{x:Type local:CanvasElementControl}">
+          <ContentPresenter/>
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+  </Style>
+
+  
+  
+  <Style TargetType="{x:Type local:GroupItemsControl}">
+    
+    <Style.Resources>
+      <DataTemplate DataType="{x:Type local:RectangleData}">
+        <Rectangle Width="{Binding Width}" Height="{Binding Height}" Fill="#33ff0000"/>
+      </DataTemplate>
+      <DataTemplate DataType="{x:Type local:GroupData}">
+        <local:GroupItemsControl ItemsSource="{Binding Children}"/>
+      </DataTemplate>
+    </Style.Resources>
+    
+    <Setter Property="Template">
+      <Setter.Value>
+        <ControlTemplate TargetType="{x:Type local:GroupItemsControl}">
+          <ItemsPresenter/>
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+
+    <Setter Property="ItemsPanel">
+      <Setter.Value>
+        <ItemsPanelTemplate>
+          <local:ReCanvas Background="#33005599"/>
+        </ItemsPanelTemplate>
+      </Setter.Value>
+    </Setter>
+    
+    <Setter Property="ItemContainerStyle">
+      <Setter.Value>
+        <Style TargetType="{x:Type ContentPresenter}">
+          <Setter Property="Canvas.Left" Value="{Binding X, Mode=TwoWay}"/>
+          <Setter Property="Canvas.Top" Value="{Binding Y, Mode=TwoWay}"/>
+          <!--<Setter Property="local:ReCanvas.Left" Value="{Binding X}"/>
+          <Setter Property="local:ReCanvas.Top" Value="{Binding Y}"/>-->
+        </Style>
+      </Setter.Value>
+      
+    </Setter>
+    
+    
+  </Style>
+
+
+  <Style TargetType="{x:Type local:Node}">
+    <Style.Resources>
+      <DataTemplate DataType="{x:Type local:GroupData}">
+        <local:Node ItemsSource="{Binding Children}"/>
+      </DataTemplate>
+
+      <DataTemplate DataType="{x:Type local:TextBlockData}">
+        <TextBlock Text="{Binding Text}"/>
+      </DataTemplate>
+    </Style.Resources>
+
+    <Setter Property="Template">
+      <Setter.Value>
+        <ControlTemplate TargetType="{x:Type local:Node}">
+          <ItemsPresenter/>
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+
+    <Setter Property="ItemsPanel">
+      <Setter.Value>
+        <ItemsPanelTemplate>
+          <local:ReCanvas IsItemsHost="True" Background="#55009999"
+                          />
+        </ItemsPanelTemplate>
+      </Setter.Value>
+    </Setter>
+
+    <Setter Property="ItemContainerStyle">
+      <Setter.Value>
+        <Style TargetType="{x:Type ContentPresenter}">
+          <Setter Property="Canvas.Left" Value="{Binding X}"/>
+          <Setter Property="Canvas.Top" Value="{Binding Y}"/>
+        </Style>
+      </Setter.Value>
+
+    </Setter>
+  </Style>
+
+
+  <Style TargetType="{x:Type local:NodeReCanvas}">
+    <Style.Resources>
+      <DataTemplate DataType="{x:Type local:GroupData}">
+        
+      </DataTemplate>
+    </Style.Resources>
+    <Setter Property="Template">
+      <Setter.Value>
+        <ControlTemplate TargetType="{x:Type local:NodeReCanvas}">
+          <local:ReCanvas>
+            <ItemsControl ItemsSource="{Binding RelativeSource={RelativeSource AncestorType=local:NodeReCanvas}, Path=MyRootData.Layers}">
+              
+            </ItemsControl>
+          </local:ReCanvas>
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+    
+    
+  </Style>
+
+</ResourceDictionary>
