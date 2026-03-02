@@ -3,10 +3,89 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="clr-namespace:_20260301">
 
+  <Style x:Key="CanvasItemContainerStyle" TargetType="ContentPresenter">
+    <Setter Property="Canvas.Left" Value="{Binding X}" />
+    <Setter Property="Canvas.Top" Value="{Binding Y}" />
+    <Setter Property="Panel.ZIndex" Value="{Binding Z}" />
+  </Style>
+  
+  <DataTemplate DataType="{x:Type local:RectangleData}">
+    <Rectangle Width="{Binding Width}" Height="{Binding Height}" 
+                   Fill="SkyBlue" Stroke="DodgerBlue" StrokeThickness="2" Opacity="0.7"/>
+  </DataTemplate>
+
+  <DataTemplate DataType="{x:Type local:TextBlockData}">
+    <TextBlock Text="{Binding Text}" Foreground="Black" FontSize="16" FontWeight="Normal"
+               Background="#55cccc00"/>
+  </DataTemplate>
+
+  <DataTemplate DataType="{x:Type local:GroupData}">
+    <Grid Background="#330000FF"
+              Width="{Binding Width}"
+              Height="{Binding Height}">
+      <Border BorderBrush="Gray" BorderThickness="1" />
+
+      <ItemsControl ItemsSource="{Binding Children}"
+                    ItemContainerStyle="{StaticResource CanvasItemContainerStyle}">
+        <ItemsControl.ItemsPanel>
+          <ItemsPanelTemplate>
+            <Canvas IsItemsHost="True" />
+          </ItemsPanelTemplate>
+        </ItemsControl.ItemsPanel>
+        <!--<ItemsControl.ItemContainerStyle>
+          <Style TargetType="ContentPresenter">
+            <Setter Property="Canvas.Left" Value="{Binding X}" />
+            <Setter Property="Canvas.Top" Value="{Binding Y}" />
+            <Setter Property="Panel.ZIndex" Value="{Binding Z}" />
+          </Style>
+        </ItemsControl.ItemContainerStyle>-->
+        <ItemsControl.ItemTemplate>
+          <DataTemplate>
+            <local:CanvasElementControl Content="{Binding}" />
+          </DataTemplate>
+        </ItemsControl.ItemTemplate>
+      </ItemsControl>
+    </Grid>
+  </DataTemplate>
+
+  <Style TargetType="{x:Type local:CanvasEditor}">
+    <Setter Property="Template">
+      <Setter.Value>
+        <ControlTemplate TargetType="{x:Type local:CanvasEditor}">
+          <Border Background="{TemplateBinding Background}">
+            <ItemsPresenter/>
+          </Border>
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+    <Setter Property="ItemsPanel">
+      <Setter.Value>
+        <ItemsPanelTemplate>
+          <Canvas IsItemsHost="True" Background="Snow"/>
+        </ItemsPanelTemplate>
+      </Setter.Value>
+    </Setter>
+    <Setter Property="ItemContainerStyle" Value="{StaticResource CanvasItemContainerStyle}">
+      <!--<Setter.Value>
+        <Style TargetType="ContentPresenter">
+          <Setter Property="Canvas.Left" Value="{Binding X}"/>
+          <Setter Property="Canvas.Top" Value="{Binding Y}"/>
+          <Setter Property="Panel.ZIndex" Value="{Binding Z}"/>
+        </Style>
+      </Setter.Value>-->
+    </Setter>
+    <Setter Property="ItemTemplate">
+      <Setter.Value>
+        <DataTemplate>
+          <local:CanvasElementControl Content="{Binding}"/>
+        </DataTemplate>
+      </Setter.Value>
+    </Setter>
+  </Style>
 
   <Style TargetType="{x:Type local:CanvasElementControl}">
     <Style.Resources>
-      <DataTemplate DataType="{x:Type local:RectangleData}">
+      <!--<DataTemplate DataType="{x:Type local:RectangleData}">
         <Rectangle Width="{Binding Width}" Height="{Binding Height}" 
                    Fill="SkyBlue" Stroke="DodgerBlue" StrokeThickness="2" Opacity="0.7"/>
       </DataTemplate>
@@ -41,9 +120,10 @@
             </ItemsControl.ItemTemplate>
           </ItemsControl>
         </Grid>
-      </DataTemplate>
+      </DataTemplate>-->
 
     </Style.Resources>
+    
     <Setter Property="Template">
       <Setter.Value>
         <ControlTemplate TargetType="{x:Type local:CanvasElementControl}">

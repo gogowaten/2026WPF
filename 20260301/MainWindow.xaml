@@ -22,7 +22,9 @@
     </ScrollViewer>
       <local:GroupItemsControl x:Name="MyRootNode" ItemsSource="{Binding MyRootGroupData.Children}"/>-->
 
-    <ItemsControl Grid.Column="0" ItemsSource="{Binding Items}">
+    <local:CanvasEditor ItemsSource="{Binding Items}"/>
+
+    <!--<ItemsControl Grid.Column="0" ItemsSource="{Binding Items}">
       <ItemsControl.ItemsPanel>
         <ItemsPanelTemplate>
           <Canvas Background="White" IsItemsHost="True" />
@@ -40,7 +42,7 @@
           <local:CanvasElementControl Content="{Binding}" />
         </DataTemplate>
       </ItemsControl.ItemTemplate>
-    </ItemsControl>
+    </ItemsControl>-->
 
     
     <!--<Canvas x:Name="MyCanvas">
@@ -52,7 +54,7 @@
     </Canvas>-->
 
     <StackPanel Grid.Column="1">
-      <TextBlock Text="{Binding ElementName=MyRootNode, Path=ActualWidth, StringFormat='actuclWidth {0}'}"/>
+      <!--<TextBlock Text="{Binding ElementName=MyRootNode, Path=ActualWidth, StringFormat='actuclWidth {0}'}"/>-->
       <Button Content="矩形を追加" Command="{Binding AddRectangleCommand}" Margin="5"/>
       <Button Content="テキストを追加" Command="{Binding AddTextCommand}" Margin="5"/>
       <Button Content="Groupを追加" Command="{Binding AddGroupCommand}" Margin="5"/>

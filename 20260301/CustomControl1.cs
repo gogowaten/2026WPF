@@ -15,6 +15,19 @@ using System.Windows.Shapes;
 
 namespace _20260301
 {
+
+    public class CanvasEditor : ItemsControl
+    {
+        static CanvasEditor()
+        {
+            DefaultStyleKeyProperty.OverrideMetadata(typeof(CanvasEditor), new FrameworkPropertyMetadata(typeof(CanvasEditor)));
+        }
+        public CanvasEditor()
+        {
+
+        }
+    }
+
     public class CanvasElementControl : ContentControl
     {
         static CanvasElementControl()
@@ -23,7 +36,7 @@ namespace _20260301
         }
         public CanvasElementControl()
         {
-            
+
         }
     }
 
