@@ -1240,3 +1240,291 @@ public void TrySelect(Data target, bool isControlPressed)
 
 まずは、**`Data` クラスに `IsSelected` プロパティを追加し、`Generic.xaml` で「選択されたら枠の色が変わる」という視覚効果**を実装してみませんか？
 その後、実際にマウスでクリックして選択を切り替えるロジック（EditorService）を作り込んでいきましょう。
+
+
+
+
+---
+
+
+
+# Data クラスに IsSelected プロパティを追加し、Generic.xaml で「選択されたら枠の色が変わる」という視覚効果を実装して
+
+
+---
+
+
+`Data` クラスへのプロパティ追加と、それに応じた `Generic.xaml` の視覚効果（スタイル）の実装を行います。
+
+大規模化を見据え、**「選択された時の枠線」は個別のデータテンプレート（RectangleやText）に書くのではなく、それらを包む `CanvasElementControl` のスタイルで一括定義する**のが効率的です。
+
+---
+
+### 1. Data クラスの修正
+
+基底クラスである `Data` に `IsSelected` を追加します。
+
+**Data.cs**
+
+```csharp
+public abstract partial class Data : ObservableObject
+{
+    [ObservableProperty] private double _x;
+    [ObservableProperty] private double _y;
+    [ObservableProperty] private double _z;
+    [ObservableProperty] private double _width;
+    [ObservableProperty] private double _height;
+    [ObservableProperty] private string _name = string.Empty;
+
+    // 選択状態プロパティを追加
+    [ObservableProperty] private bool _isSelected;
+
+    public Data? Parent;
+}
+
+```
+
+---
+
+### 2. Generic.xaml の修正
+
+`CanvasElementControl` の `ControlTemplate` を拡張し、`IsSelected` が `True` の時に強調表示される「選択枠」用の `Border` を追加します。
+
+**Generic.xaml**
+
+```xml
+<ResourceDictionary ...>
+    <Style TargetType="{x:Type local:CanvasElementControl}">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type local:CanvasElementControl}">
+                    <Grid>
+                        <ContentPresenter x:Name="PART_Content"/>
+
+                        <Border x:Name="SelectionBorder"
+                                BorderBrush="Orange"
+                                BorderThickness="2"
+                                Margin="-2"
+                                Visibility="Collapsed"
+                                IsHitTestVisible="False"/>
+                    </Grid>
+
+                    <ControlTemplate.Triggers>
+                        <DataTrigger Binding="{Binding IsSelected}" Value="True">
+                            <Setter TargetName="SelectionBorder" Property="Visibility" Value="Visible"/>
+                        </DataTrigger>
+                        
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="SelectionBorder" Property="BorderBrush" Value="LightBlue"/>
+                            <Setter TargetName="SelectionBorder" Property="Visibility" Value="Visible"/>
+                            <Setter TargetName="SelectionBorder" Property="Opacity" Value="0.5"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+</ResourceDictionary>
+
+```
+
+---
+
+### 3. この実装のメリット
+
+* **デザインの一貫性**: 四角形でもテキストでもグループでも、共通して「オレンジ色の枠」で選択状態が示されます。
+* **ヒットテストの分離**: `SelectionBorder` に `IsHitTestVisible="False"` を設定しているため、枠自体がマウス操作を邪魔することはありません。
+* **マージンの工夫**: `Margin="-2"` とすることで、コンテンツの真上ではなく、わずかに外側に枠を表示し、元の図形を隠さないようにしています。
+
+---
+
+### 動作確認のヒント
+
+今の段階ではまだマウスによる選択ロジックがありませんが、`MainViewModel` のコンストラクタで初期データの `IsSelected = true;` をセットして起動すれば、オレンジ色の枠が表示されることが確認できます。
+
+```csharp
+public MainViewModel()
+{
+    var rect = new RectangleData(10, 10, 80, 40) { Name = "初期矩形", IsSelected = true };
+    Items.Add(rect);
+}
+
+```
+
+次は、いよいよ **`CanvasEditor` でクリックされた要素を特定し、`IsSelected` を切り替える（Ctrlキー併用対応）ロジック**を `EditorService` として実装しましょうか？
+
+なお、各種アプリのすべての機能を使用するには、[Gemini アプリ アクティビティ](https://myactivity.google.com/product/gemini)を有効にする必要があります。
+
+
+
+---
+
+
+# CanvasEditor でクリックされた要素を特定し、IsSelected を切り替える（Ctrlキー併用対応）ロジックを EditorService として実装して
+
+
+
+---
+
+
+本格的な「エディタ機能」の第一歩として、要素の選択を管理する `EditorService` の作成と、それを `CanvasEditor` から呼び出す実装を行いましょう。
+
+WPFの `ItemsControl`（継承した `CanvasEditor`）から「どの子要素がクリックされたか」を特定するには、`InputHitTest` や `OriginalSource` を活用します。
+
+---
+
+## 1. EditorService の実装
+
+選択状態を中央集権的に管理するクラスです。ここに「Ctrlキーが押されているか」などの判断ロジックを集約します。
+
+**EditorService.cs**
+
+```csharp
+using System.Collections.Generic;
+using System.Linq;
+
+namespace _20260301
+{
+    public class EditorService
+    {
+        // 現在選択されている全要素
+        public List<Data> SelectedItems { get; } = new();
+
+        // アクティブ（最後に選択された）要素
+        public Data? ActiveItem { get; private set; }
+
+        public void Select(Data target, bool isControlPressed)
+        {
+            if (!isControlPressed)
+            {
+                // Ctrlが押されていなければ、現在の選択をすべて解除
+                ClearSelection();
+                
+                target.IsSelected = true;
+                SelectedItems.Add(target);
+            }
+            else
+            {
+                // Ctrlが押されていれば、トグル切り替え
+                target.IsSelected = !target.IsSelected;
+                
+                if (target.IsSelected)
+                    SelectedItems.Add(target);
+                else
+                    SelectedItems.Remove(target);
+            }
+
+            ActiveItem = target.IsSelected ? target : SelectedItems.LastOrDefault();
+        }
+
+        public void ClearSelection()
+        {
+            foreach (var item in SelectedItems)
+            {
+                item.IsSelected = false;
+            }
+            SelectedItems.Clear();
+            ActiveItem = null;
+        }
+    }
+}
+
+```
+
+---
+
+## 2. CanvasEditor のマウス制御
+
+`CanvasEditor` 自体が「誰がクリックされたか」を検知し、`EditorService` に伝えます。
+
+**CanvasEditor.cs**
+
+```csharp
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Input;
+using System.Windows.Media;
+
+namespace _20260301
+{
+    public class CanvasEditor : ItemsControl
+    {
+        // 本来はDIやViewModel経由が望ましいが、簡略化のため一旦保持
+        public EditorService Service { get; } = new();
+
+        static CanvasEditor()
+        {
+            DefaultStyleKeyProperty.OverrideMetadata(typeof(CanvasEditor), 
+                new FrameworkPropertyMetadata(typeof(CanvasEditor)));
+        }
+
+        protected override void OnMouseDown(MouseButtonEventArgs e)
+        {
+            base.OnMouseDown(e);
+
+            // 1. クリックされた要素を特定する
+            // VisualTreeを遡って、Dataオブジェクトを持っているFrameworkElementを探す
+            var hitResult = VisualTreeHelper.HitTest(this, e.GetPosition(this));
+            var element = hitResult?.VisualHit as FrameworkElement;
+
+            // CanvasElementControl または DataContextにData型を持つ要素を探す
+            while (element != null && !(element.DataContext is Data))
+            {
+                element = VisualTreeHelper.GetParent(element) as FrameworkElement;
+            }
+
+            if (element != null && element.DataContext is Data clickedData)
+            {
+                // 2. EditorService に選択を依頼
+                bool isCtrl = Keyboard.Modifiers.HasFlag(ModifierKeys.Control);
+                Service.Select(clickedData, isCtrl);
+                
+                // クリックされたことを他の要素に伝えない（バブリング停止）
+                e.Handled = true;
+                
+                // フォーカスを当ててキーボード入力を受け取れるようにする
+                this.Focus();
+            }
+            else
+            {
+                // 背景をクリックした場合は選択解除
+                Service.ClearSelection();
+            }
+        }
+    }
+}
+
+```
+
+---
+
+## 3. 解説とポイント
+
+1. **VisualTreeHelper.HitTest**: `Canvas` の上のどこがクリックされたかを取得します。
+2. **VisualTreeの遡上 (While文)**: クリックされたのは `Rectangle` かもしれませんし、`TextBlock` かもしれません。それらが属している「データコンテキスト（`Data` クラス）」を持つ親（`CanvasElementControl`）が見つかるまでツリーを上に辿ります。
+3. **Keyboard.Modifiers**: WPF標準の機能で、Ctrlキーの状態をリアルタイムに取得します。
+4. **e.Handled = true**: これをしないと、グループ化された要素の場合、親と子の両方でクリック判定が出てしまうなどの誤動作を防げます。
+
+---
+
+## 4. 動作イメージ
+
+* **単体クリック**: 他の選択が消え、クリックした要素にオレンジ枠が出ます。
+* **Ctrl + クリック**: 複数の要素にオレンジ枠をつけたり、消したりできます。
+* **背景クリック**: 全要素の選択が外れます。
+
+---
+
+## 次のステップへの提案
+
+これで「誰を選択しているか」がコードで把握できるようになりました。
+次は、ご提示の条件にあった **「Active状態」と「グループ編集状態」** のルールを追加してみましょうか？
+
+特に **「編集状態のグループの子要素だけが選択できる」** というルールを `EditorService` に組み込むと、一気にプロフェッショナルなツールらしくなります。実装を進めますか？
+
+なお、各種アプリのすべての機能を使用するには、[Gemini アプリ アクティビティ](https://myactivity.google.com/product/gemini)を有効にする必要があります。
+
+
+---
+
+
