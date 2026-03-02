@@ -16,6 +16,9 @@ namespace _20260301
         [ObservableProperty] private double _width;
         [ObservableProperty] private double _height;
         [ObservableProperty] private string _name = string.Empty;
+        [ObservableProperty] private bool _isSelected;
+        [ObservableProperty] private bool _isActive;
+
 
         //[ObservableProperty] private Rect _externalBounds;
         //[ObservableProperty] private Rect _contentBounds;
@@ -27,7 +30,9 @@ namespace _20260301
 
     public partial class GroupData : Data
     {
+        [ObservableProperty] private bool _isEditing;
         [ObservableProperty] private ObservableCollection<Data> _children = [];
+        
 
         public GroupData()
         {
