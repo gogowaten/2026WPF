@@ -15,6 +15,8 @@ namespace _20260301
         [ObservableProperty]
         private ObservableCollection<Data> _items = new();
 
+        #region コマンド
+        
         [RelayCommand]
         private void AddRectangle()
         {
@@ -39,6 +41,7 @@ namespace _20260301
 
             Items.Add(group);
         }
+        #endregion コマンド
 
         public MainViewModel()
         {

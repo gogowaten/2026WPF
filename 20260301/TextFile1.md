@@ -1641,3 +1641,673 @@ protected override void OnMouseDown(MouseButtonEventArgs e)
 
 
 
+---
+
+
+
+# 大規模化・スッキリ化を追求したい、Behaviorを使った方法に変えて
+
+
+---
+
+
+大規模化・スッキリ化を追求するなら、**Behavior（相互作用）** の導入は素晴らしい選択です。これによって `CanvasEditor` クラスの中身をさらに空にし、マウス操作のロジックを再利用可能な「部品」として切り出すことができます。
+
+WPFでこれを行うには、`Microsoft.Xaml.Behaviors.Wpf`（旧 System.Windows.Interactivity）パッケージを使用するのが標準的です。
+
+---
+
+### 1. 準備：NuGet パッケージの追加
+
+プロジェクトに以下のパッケージをインストールしてください。
+
+* `Microsoft.Xaml.Behaviors.Wpf`
+
+---
+
+### 2. CanvasSelectionBehavior の作成
+
+マウス操作のロジックを `Behavior` に封じ込めます。ここでは「添付プロパティ `IsSelectable`」を探すロジックをここへ移動します。
+
+**CanvasSelectionBehavior.cs**
+
+```csharp
+using Microsoft.Xaml.Behaviors;
+using System.Windows;
+using System.Windows.Input;
+using System.Windows.Media;
+
+namespace _20260301.Behaviors
+{
+    // ItemsControl (CanvasEditor) にアタッチする Behavior
+    public class CanvasSelectionBehavior : Behavior<ItemsControl>
+    {
+        // 外部から EditorService を注入できるように依存関係プロパティとして定義
+        public static readonly DependencyProperty ServiceProperty =
+            DependencyProperty.Register(nameof(Service), typeof(EditorService), typeof(CanvasSelectionBehavior));
+
+        public EditorService Service
+        {
+            get => (EditorService)GetValue(ServiceProperty);
+            set => SetValue(ServiceProperty, value);
+        }
+
+        protected override void OnAttached()
+        {
+            base.OnAttached();
+            // アタッチされた対象（AssociatedObject）のイベントを購読
+            AssociatedObject.MouseDown += OnMouseDown;
+        }
+
+        protected override void OnDetaching()
+        {
+            base.OnDetaching();
+            AssociatedObject.MouseDown -= OnMouseDown;
+        }
+
+        private void OnMouseDown(object sender, MouseButtonEventArgs e)
+        {
+            if (Service == null) return;
+
+            // 添付プロパティ IsSelectable を持つ要素を親方向に辿って探す
+            DependencyObject d = e.OriginalSource as DependencyObject;
+            FrameworkElement selectableElement = null;
+
+            while (d != null && d != AssociatedObject)
+            {
+                if (d is FrameworkElement fe && EditorBehavior.GetIsSelectable(fe))
+                {
+                    selectableElement = fe;
+                    break;
+                }
+                d = VisualTreeHelper.GetParent(d);
+            }
+
+            if (selectableElement != null && selectableElement.DataContext is Data clickedData)
+            {
+                bool isCtrl = Keyboard.Modifiers.HasFlag(ModifierKeys.Control);
+                Service.Select(clickedData, isCtrl);
+                e.Handled = true;
+                AssociatedObject.Focus();
+            }
+            else
+            {
+                Service.ClearSelection();
+            }
+        }
+    }
+}
+
+```
+
+---
+
+### 3. Generic.xaml の整理
+
+`CanvasEditor` のコードビハインドに書いていたロジックが不要になるため、`CanvasEditor` クラスは最小限（メタデータの登録のみ）になります。
+
+**CanvasEditor.cs**
+
+```csharp
+public class CanvasEditor : ItemsControl
+{
+    static CanvasEditor()
+    {
+        DefaultStyleKeyProperty.OverrideMetadata(typeof(CanvasEditor), 
+            new FrameworkPropertyMetadata(typeof(CanvasEditor)));
+    }
+    // プロパティやメソッドが消えてスッキリ！
+}
+
+```
+
+---
+
+### 4. MainWindow.xaml での適用
+
+最後に、XAML上で `CanvasEditor` にこの `Behavior` を装着します。
+
+```xml
+<Window ...
+        xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+        xmlns:beh="clr-namespace:_20260301.Behaviors">
+
+    <local:CanvasEditor ItemsSource="{Binding Items}" Grid.Column="1">
+        <i:Interaction.Behaviors>
+            <beh:CanvasSelectionBehavior Service="{Binding EditorService}" />
+        </i:Interaction.Behaviors>
+    </local:CanvasEditor>
+</Window>
+
+```
+
+---
+
+### この構成のメリット
+
+1. **疎結合**: `CanvasEditor` 自体は「何が選択されるか」を知りません。Behaviorがその役割を担います。
+2. **拡張性**: 「ドラッグ移動Behavior」や「ズームBehavior」など、機能ごとにBehaviorを分けて追加できるため、1つのクラスが肥大化しません。
+3. **可読性**: XAMLを見るだけで「このキャンバスは選択機能(CanvasSelectionBehavior)を持っているんだな」と直感的に理解できます。
+
+### 次のステップへの提案
+
+「スッキリ化」が完了しました！次は、ご提示されていた **「Active状態」と「グループ編集状態」** を `EditorService` に追加しましょう。
+
+特に **「編集状態のグループにいる子要素しかクリックできない」** というルールを `CanvasSelectionBehavior` 内の `while` ループ判定に追加する実装を進めますか？
+
+
+---
+
+
+# 選択状態の枠が表示されない。
+試しにCanvasSelectionBehaviorの依存関係プロパティの
+”        public EditorService Service
+        {
+            get { return (EditorService)GetValue(ServiceProperty); }
+            set { SetValue(ServiceProperty, value); }
+        }
+        public static readonly DependencyProperty ServiceProperty =
+            DependencyProperty.Register(nameof(Service), typeof(EditorService), typeof(CanvasSelectionBehavior));
+”
+これを
+”
+        public EditorService Service
+        {
+            get { return (EditorService)GetValue(ServiceProperty); }
+            set { SetValue(ServiceProperty, value); }
+        }
+        public static readonly DependencyProperty ServiceProperty =
+            DependencyProperty.Register(nameof(Service), typeof(EditorService), typeof(CanvasSelectionBehavior), new PropertyMetadata(new EditorService()));
+”
+こう書き換えたら選択状態の枠が表示されるようになった
+理由は何が考えられる？また、別の良い方法があったら書いて
+
+
+---
+
+
+「選択状態の枠が表示されるようになった」とのこと、一歩前進ですね！
+
+なぜ `new PropertyMetadata(new EditorService())` と書くことで動くようになったのか、その理由には**WPFのデータバインディングのタイミングとスコープ**が深く関わっています。
+
+---
+
+### 1. 理由：なぜ書き換えるまで動かなかったのか？
+
+元のコードで動かなかった最大の理由は、**「Behaviorの `Service` プロパティが `null` のままだったから」** です。
+
+1. **バインディングの失敗**: `<beh:CanvasSelectionBehavior Service="{Binding EditorService}" />` と書いた際、`MainViewModel` 側に `EditorService` という名前の **公開プロパティ（Property）** が定義されていなかったか、初期化されていなかった可能性があります。
+2. **デフォルト値の注入**: `new PropertyMetadata(new EditorService())` と書くことで、バインディングが失敗しても Behavior 内部で新しい `EditorService` インスタンスが作られ、それを使って `Select` メソッドが実行されたため、動作するようになりました。
+
+> [!WARNING]
+> **この方法の落とし穴**
+> `PropertyMetadata` で `new` してしまうと、**すべての `CanvasEditor` で同じ `EditorService` インスタンスを共有してしまう** 恐れがあります（DependencyPropertyのデフォルト値はスタティックに保持されるため）。また、ViewModel側のServiceと同期しなくなるため、後々「ViewModelから全選択解除」などができなくなります。
+
+---
+
+### 2. もっと良い解決策：ViewModelとの正しい接続
+
+大規模化を考えるなら、**「EditorServiceはViewModelが持ち、XAMLで正しくバインドする」** のが正攻法です。
+
+#### 手順 A：MainViewModel を修正する
+
+CommunityToolkit.Mvvm を使っているので、`EditorService` をプロパティとして公開します。
+
+```csharp
+public partial class MainViewModel : ObservableObject
+{
+    // プロパティとして公開（これでバインディングが見つけられるようになる）
+    public EditorService EditorService { get; } = new();
+
+    [ObservableProperty]
+    private ObservableCollection<Data> _items = new();
+
+    // ... その他のコマンド ...
+}
+
+```
+
+#### 手順 B：XAMLのバインディングを確認する
+
+`CanvasSelectionBehavior` へのバインディングが正しいか確認します。Visual Studioの「出力」ウィンドウに `BindingExpression path error` が出ていないか見るのがコツです。
+
+```xml
+<local:CanvasEditor ItemsSource="{Binding Items}">
+    <i:Interaction.Behaviors>
+        <beh:CanvasSelectionBehavior Service="{Binding EditorService}" />
+    </i:Interaction.Behaviors>
+</local:CanvasEditor>
+
+```
+
+---
+
+### 3. さらにスッキリさせる方法：ServiceLocator的なアプローチ
+
+もし毎回バインドするのが面倒なほど大規模になるなら、**「Behaviorが自力で親のEditorServiceを見つける」** ように改良する手もあります。
+
+**CanvasSelectionBehavior.cs の改良案**
+
+```csharp
+private void OnMouseDown(object sender, MouseButtonEventArgs e)
+{
+    // もしバインドされていなければ、DataContextから直接探してみる
+    var service = Service ?? (AssociatedObject.DataContext as dynamic)?.EditorService as EditorService;
+    if (service == null) return;
+
+    // ... 以下、service を使って判定ロジック ...
+}
+
+```
+
+### まとめ
+
+* **現状の原因**: バインディングがうまく繋がっておらず、`Service` が `null` だった。
+* **修正案**: `MainViewModel` に `public EditorService EditorService { get; } = new();` を追加し、Behaviorのデフォルト値（`new PropertyMetadata`）は削除する。
+
+これで、ViewModel側からも「現在何が選択されているか」を `EditorService` を通じて把握できるようになります。
+
+次は、当初の目的である **「Active状態」と「グループ編集モード（特定の階層だけ選択可能）」** のロジックを `EditorService` に実装してみますか？
+
+
+---
+
+
+# 直った。原因はMainViewModelに”public EditorService EditorService { get; } = new();"が無かったからだった。ServicePropertyは元の形の”        public static readonly DependencyProperty ServiceProperty =
+            DependencyProperty.Register(nameof(Service), typeof(EditorService), typeof(CanvasSelectionBehavior));”に戻した。
+これまでのところの問題点や、こうした方が良いというのがあったら指摘して
+
+
+---
+
+
+バインディングの問題が解決して良かったです！`PropertyMetadata` での `new` は、WPFの落とし穴（静的共有）になりやすいので、正攻法に戻した判断は非常に賢明です。
+
+現在の構成は非常にきれいに整理されていますが、**「大規模化・多階層化」** を見据えた際、次に直面するであろう「設計の火種」と改善案をいくつか指摘します。
+
+---
+
+## 1. 指摘：マウスイベントの「奪い合い」問題（トンネリング vs バブリング）
+
+現在の `CanvasSelectionBehavior` は `MouseDown`（バブリング）を使っていますが、多階層（GroupDataの中にGroupDataがある状態）になると、**「子要素をクリックしたのに、親のグループも反応してしまう」** という問題が起きやすくなります。
+
+* **改善案**: `PreviewMouseDown`（トンネリング）の使用を検討してください。
+* **理由**: 「外側から内側へ」イベントが流れる段階で判定を行い、`e.Handled = true` にすることで、不要な親要素へのイベント伝播を確実にコントロールできます。
+
+---
+
+## 2. 指摘：`EditorService` の「状態」と「操作」の分離
+
+現在 `EditorService` は `Data` オブジェクトを直接操作（`item.IsSelected = true`）していますが、大規模になると「選択のルール」が複雑化します。
+
+* **改善案**: **「選択可能かどうかの判定」** を `EditorService` に集約し、`Data` クラス自身は「自分が誰の管理下にあるか」を意識させないようにします。
+* **懸念点**: 現状の `Data.Parent` は `Data?` 型ですが、`EditorService` が「今どの階層（EditingGroup）を編集しているか」を知っている必要があります。
+
+---
+
+## 3. 指摘：座標変換の罠（ローカル vs スクリーン）
+
+`GroupData` を使った多階層キャンバスでは、一番の難所は **「マウス座標」** です。
+
+* **現状**: `Canvas.Left` 等にバインドした相対座標で表示しています。
+* **問題**: ドラッグ移動を実装する際、`e.GetPosition(this)` で得られる座標は「キャンバス全体」の座標です。しかし、`GroupData` 内の要素を動かすには、「そのグループ内での相対座標」に変換して `X, Y` を更新しなければなりません。
+* **改善案**: `Visual.TransformToVisual` メソッドを使って、座標系を変換するユーティリティを用意しておくと、大規模化しても計算が狂いません。
+
+---
+
+## 4. 指摘：Active状態と編集状態の管理（ご提示の要件への最適化）
+
+今の `EditorService` に、ご提示の「Active」と「EditingGroup」の概念を整理して組み込むなら、以下のようなインターフェースが理想的です。
+
+```csharp
+public class EditorService : ObservableObject
+{
+    // 選択されている全要素（複数）
+    public ObservableCollection<Data> SelectedItems { get; } = new();
+
+    // 現在フォーカスされている「主」要素（1つ）
+    [ObservableProperty] private Data? _activeItem;
+
+    // 現在「潜り込んで」編集しているグループ（nullならルート）
+    [ObservableProperty] private GroupData? _editingGroup;
+
+    public void Select(Data target, bool isControl)
+    {
+        // ここに「EditingGroupの子要素しか選べない」ロジックを挟む
+        if (target.Parent != EditingGroup) return; 
+        
+        // ... 選択ロジック
+    }
+}
+
+```
+
+---
+
+## 今後の推奨ステップ：階層移動の実装
+
+今の構成で最も「エディタらしくなる」機能は、**「グループのダブルクリックで、そのグループの編集モードに入る」** ことです。
+
+1. `GroupData` をダブルクリックする。
+2. `EditorService.EditingGroup` にそのグループがセットされる。
+3. `CanvasSelectionBehavior` が、そのグループ内の子要素しか選べないように制限をかける。
+4. （視覚効果）編集中のグループ以外をグレーアウトさせる。
+
+これらが実装されると、一気に商用ツールのような操作感になります。
+
+次は、この **「EditingGroup（編集中の階層）」による選択制限** を `EditorService` に実装してみますか？
+
+
+---
+
+
+# CanvasSelectionBehaviorを書き換えた。MouseDownを使うのをやめて、PreviewMouseLeftButtonDownに変えた。これで問題ない？
+”
+namespace _20260301.Behaviors
+{
+
+    public class CanvasSelectionBehavior : Behavior<ItemsControl>
+    {
+        // 外部から EditorServiceを注入できるように依存関係プロパティとして定義
+        public EditorService Service
+        {
+            get { return (EditorService)GetValue(ServiceProperty); }
+            set { SetValue(ServiceProperty, value); }
+        }
+        public static readonly DependencyProperty ServiceProperty =
+            DependencyProperty.Register(nameof(Service), typeof(EditorService), typeof(CanvasSelectionBehavior));
+
+
+        protected override void OnAttached()
+        {
+            base.OnAttached();
+            AssociatedObject.PreviewMouseLeftButtonDown += OnPreviewMouseLeftButtonDown;
+        }
+
+        protected override void OnDetaching()
+        {
+            base.OnDetaching();
+            AssociatedObject.PreviewMouseLeftButtonDown -= OnPreviewMouseLeftButtonDown;
+        }
+
+        private void OnPreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            if (Service == null) { return; }
+
+            // 添付プロパティのIsSelectableを持つ要素を親方向に遡って探す
+            DependencyObject? d = e.OriginalSource as DependencyObject;
+            FrameworkElement? selectableElement = null;
+
+            while (d != null && d != AssociatedObject)
+            {
+                if (d is FrameworkElement fe && EditorBehavior.GetIsSelectable(fe))
+                {
+                    selectableElement = fe;
+                    break;
+                }
+                d = VisualTreeHelper.GetParent(d);
+            }
+
+            if (selectableElement != null && selectableElement.DataContext is Data clickedData)
+            {
+                bool isCtrl = Keyboard.Modifiers.HasFlag(ModifierKeys.Control);
+                Service.Select(clickedData, isCtrl);
+                e.Handled = true;
+                AssociatedObject.Focus();
+            }
+            else { Service.ClearSelection(); }
+        }
+    }
+
+}
+”
+
+
+---
+
+
+はい、**`PreviewMouseLeftButtonDown` に変更したのは非常に賢明な判断**です。
+
+WPFのルーティングイベントには「トンネリング（Preview）」と「バブリング（無印）」がありますが、エディタのような複雑なUIではトンネリングを使うべき明確な理由があります。
+
+---
+
+### 1. なぜ PreviewMouseLeftButtonDown が正解なのか？
+
+WPFの標準的なコントロール（例えば `Button` や今後の拡張で追加するかもしれない `TextBox` など）は、内部で `MouseLeftButtonDown` をハンドル（`e.Handled = true`）してしまい、親方向（`CanvasEditor`）までイベントが届かないことがよくあります。
+
+* **MouseDown (バブリング)**: 子要素が「これは僕が処理したよ！」と言ってしまうと、親である Behavior まで通知が来ません。
+* **PreviewMouseDown (トンネリング)**: 親から順にイベントが降りていくため、**子要素が何であれ、まず Behavior が「誰がクリックされたか」を検知・横取り**できます。
+
+---
+
+### 2. 今後の拡張を見据えたアドバイス
+
+コード自体は非常にきれいにまとまっています。一点だけ、大規模化の際に役立つ「考慮事項」を挙げておきます。
+
+#### ダブルクリックへの配慮
+
+もし将来的に「グループのダブルクリックで階層に潜る」機能を実装する場合、`PreviewMouseLeftButtonDown` は1回目のクリックでも2回目のクリックでも発生します。
+`e.ClickCount == 2` を判定することで、シングルクリック（選択）とダブルクリック（潜り込み）をきれいに分けることができます。
+
+#### 背景クリックの判定
+
+現在のコードでは、要素が見つからない場合に `Service.ClearSelection()` を呼んでいます。
+
+```csharp
+else { Service.ClearSelection(); }
+
+```
+
+これは基本的には問題ありませんが、例えば「キャンバスのスクロールバー」をクリックした際にも `ClearSelection` が走ってしまう可能性があります。`e.OriginalSource` が `Canvas` (ItemsHost) 自体であるかどうかを確認するチェックを入れると、よりプロフェッショナルな挙動になります。
+
+---
+
+### 3. 次のステップ：Active と 編集モード の実装
+
+いよいよご提示の「Active状態」と「グループ編集状態」のロジックを `EditorService` に統合する準備が整いました。
+
+特に重要なのはこのルールですね：
+
+> **「親要素が編集状態の子要素だけが選択状態にすることができる」**
+
+これを実現するために、`EditorService` に **`EditingGroup` (現在潜っているグループ)** プロパティを追加し、`Select` メソッドを以下のように拡張してみませんか？
+
+**EditorService.cs の拡張案**
+
+```csharp
+public void Select(Data target, bool isControl)
+{
+    // ルール：現在編集中のグループ（nullならルート）の直属の子以外は無視
+    if (target.Parent != EditingGroup) return;
+
+    // ... 選択ロジック
+    // ... ActiveItem = target; の更新など
+}
+
+```
+
+この「潜り込み」の状態管理を `EditorService` に持たせることで、UI（Behavior）側は今のスッキリしたコードのまま、複雑な階層ルールを適用できるようになります。実装を進めますか？
+
+
+---
+
+
+# 階層移動の実装
+階層移動(ぐるーぷの編集モードに入る)の操作にはダブルクリックの他に、F2キー、右クリックメニューからの選択、ツールバーボタンなどを考えている
+GroupData をダブルクリックする。
+EditorService.EditingGroup にそのグループがセットされる。
+CanvasSelectionBehavior が、そのグループ内の子要素しか選べないように制限をかける。
+（視覚効果）編集中のグループ以外をグレーアウトさせる。
+
+次は、この 「EditingGroup（編集中の階層）」による選択制限 を EditorService に実装して
+
+
+
+---
+
+
+「編集モード」の導入ですね。これは大規模なエディタ制作において、操作ミスを防ぎ、現在の作業レイヤーを明確にする非常に重要なステップです。
+
+`EditorService` でルールを一括管理し、UI側（BehaviorやStyle）がその状態を参照する形に整理しましょう。
+
+---
+
+## 1. EditorService の拡張
+
+「どの階層を編集しているか」と「ActiveItem」の管理ロジックを追加します。
+
+**EditorService.cs**
+
+```csharp
+using CommunityToolkit.Mvvm.ComponentModel;
+using System.Collections.ObjectModel;
+using System.Linq;
+
+namespace _20260301
+{
+    public partial class EditorService : ObservableObject
+    {
+        public ObservableCollection<Data> SelectedItems { get; } = new();
+
+        [ObservableProperty] private Data? _activeItem;
+
+        // 現在潜り込んで編集しているグループ（nullならルート）
+        [ObservableProperty] private GroupData? _editingGroup;
+
+        public void Select(Data target, bool isControl)
+        {
+            // 【ルール】編集中のグループの直属の子以外は選択させない
+            if (target.Parent != EditingGroup) return;
+
+            if (!isControl)
+            {
+                ClearSelection();
+                target.IsSelected = true;
+                SelectedItems.Add(target);
+            }
+            else
+            {
+                target.IsSelected = !target.IsSelected;
+                if (target.IsSelected) SelectedItems.Add(target);
+                else SelectedItems.Remove(target);
+            }
+
+            // ActiveItemの更新（最後に触ったもの、または選択中の最後の1つ）
+            ActiveItem = target.IsSelected ? target : SelectedItems.LastOrDefault();
+        }
+
+        public void ClearSelection()
+        {
+            foreach (var item in SelectedItems) item.IsSelected = false;
+            SelectedItems.Clear();
+            ActiveItem = null;
+        }
+
+        // 階層を潜る（編集モード開始）
+        public void EnterGroup(GroupData group)
+        {
+            ClearSelection();
+            EditingGroup = group;
+        }
+
+        // 階層を抜ける（親の階層へ）
+        public void EscapeGroup()
+        {
+            ClearSelection();
+            EditingGroup = EditingGroup?.Parent as GroupData;
+        }
+    }
+}
+
+```
+
+---
+
+## 2. CanvasSelectionBehavior のダブルクリック対応
+
+ダブルクリックされた要素が `GroupData` だった場合に、編集モードへ移行するようにします。
+
+**CanvasSelectionBehavior.cs (OnPreviewMouseLeftButtonDown内)**
+
+```csharp
+private void OnPreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+{
+    if (Service == null) return;
+
+    // ... (前回の要素特定ロジック) ...
+    if (selectableElement != null && selectableElement.DataContext is Data clickedData)
+    {
+        // ダブルクリック判定
+        if (e.ClickCount == 2 && clickedData is GroupData group)
+        {
+            Service.EnterGroup(group);
+            e.Handled = true;
+            return;
+        }
+
+        // 通常の選択ロジック
+        bool isCtrl = Keyboard.Modifiers.HasFlag(ModifierKeys.Control);
+        Service.Select(clickedData, isCtrl);
+        e.Handled = true;
+        AssociatedObject.Focus();
+    }
+    else
+    {
+        // 背景クリックで選択解除、またはダブルクリックで上の階層へ
+        if (e.ClickCount == 2) Service.EscapeGroup();
+        else Service.ClearSelection();
+    }
+}
+
+```
+
+---
+
+## 3. 視覚効果：編集外グループのグレーアウト
+
+`Generic.xaml` を修正し、`GroupData` の外側にいる要素や、現在の `EditingGroup` ではない要素を視覚的に暗くします。
+
+**Generic.xaml (CanvasElementControlのスタイル)**
+
+```xml
+<Style TargetType="{x:Type local:CanvasElementControl}">
+    <Setter Property="local:EditorBehavior.IsSelectable" Value="True"/>
+    <Setter Property="Template">
+        <Setter.Value>
+            <ControlTemplate TargetType="{x:Type local:CanvasElementControl}">
+                <Grid x:Name="RootGrid">
+                    <ContentPresenter x:Name="ContentHost" />
+                    <Border x:Name="SelectionBorder" BorderBrush="Orange" BorderThickness="2" 
+                            Visibility="Collapsed" IsHitTestVisible="False" Margin="-2"/>
+                </Grid>
+
+                <ControlTemplate.Triggers>
+                    <DataTrigger Binding="{Binding IsSelected}" Value="True">
+                        <Setter TargetName="SelectionBorder" Property="Visibility" Value="Visible"/>
+                    </DataTrigger>
+
+                    </ControlTemplate.Triggers>
+            </ControlTemplate>
+        </Setter.Value>
+    </Setter>
+</Style>
+
+```
+
+---
+
+## 4. 設計上のポイント
+
+1. **ルールの集約**: `Select` メソッドの冒頭で `target.Parent != EditingGroup` を判定することで、UI側でどんな複雑な操作（ドラッグなど）が起きても、データの一貫性が守られます。
+2. **拡張性**: F2キーや右クリックメニューを実装する場合も、単純に `Service.EnterGroup(ActiveItem as GroupData)` を呼ぶだけで済むようになりました。
+3. **ActiveItem の役割**: ActiveItem は「選択されているものの中で、今まさにプロパティパネル等で編集対象になっている代表者」として機能します。
+
+### 次のステップへの提案
+
+「階層」の概念ができたので、次は **「エスケープキー（Esc）で上の階層に戻る」** 機能や、**「F2キーで選択中のグループに入る」** といったキーボードショートカットを `CanvasEditor` もしくは `Behavior` に追加してみるのはいかがでしょうか？
+
+
+---
+
+

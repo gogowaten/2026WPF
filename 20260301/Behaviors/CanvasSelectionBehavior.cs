@@ -25,15 +25,16 @@ namespace _20260301.Behaviors
         protected override void OnAttached()
         {
             base.OnAttached();
-            AssociatedObject.MouseDown += OnMouseDown;
+            AssociatedObject.PreviewMouseLeftButtonDown += OnPreviewMouseLeftButtonDown;
         }
+
         protected override void OnDetaching()
         {
             base.OnDetaching();
-            AssociatedObject.MouseDown -= OnMouseDown;
+            AssociatedObject.PreviewMouseLeftButtonDown -= OnPreviewMouseLeftButtonDown;
         }
 
-        private void OnMouseDown(object sender, MouseButtonEventArgs e)
+        private void OnPreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             if (Service == null) { return; }
 
@@ -58,8 +59,43 @@ namespace _20260301.Behaviors
                 e.Handled = true;
                 AssociatedObject.Focus();
             }
-            else { Service.ClearSelection(); }
+            else
+            {  
+                Service.ClearSelection();
+            }
         }
+
+
+        //private void OnMouseDown(object sender, MouseButtonEventArgs e)
+        //{
+        //    if (Service == null) { return; }
+
+        //    // 添付プロパティのIsSelectableを持つ要素を親方向に遡って探す
+        //    DependencyObject? d = e.OriginalSource as DependencyObject;
+        //    FrameworkElement? selectableElement = null;
+
+        //    while (d != null && d != AssociatedObject)
+        //    {
+        //        if (d is FrameworkElement fe && EditorBehavior.GetIsSelectable(fe))
+        //        {
+        //            selectableElement = fe;
+        //            break;
+        //        }
+        //        d = VisualTreeHelper.GetParent(d);
+        //    }
+
+        //    if (selectableElement != null && selectableElement.DataContext is Data clickedData)
+        //    {
+        //        bool isCtrl = Keyboard.Modifiers.HasFlag(ModifierKeys.Control);
+        //        Service.Select(clickedData, isCtrl);
+        //        e.Handled = true;
+        //        AssociatedObject.Focus();
+        //    }
+        //    else { Service.ClearSelection(); }
+        //}
+
+
+
     }
 
 }

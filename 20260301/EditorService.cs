@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Windows;
@@ -6,27 +7,27 @@ using System.Windows;
 
 namespace _20260301
 {
-    public static class EditorBehavior
+
+
+
+    public partial class EditorService : ObservableObject
     {
-        // CanvasElementControlなど、クリック対象にセットする添付プロパティ
-        public static readonly DependencyProperty IsSelectableProperty =
-            DependencyProperty.RegisterAttached("IsSelectable", typeof(bool), typeof(EditorBehavior), new PropertyMetadata(false));
+        // 最後に選択された要素
+        [ObservableProperty] private Data? _clickedItem;
 
-        public static bool GetIsSelectable(DependencyObject obj) => (bool)obj.GetValue(IsSelectableProperty);
+        // 現在フォーカスされている「主」要素（1つ）
+        [ObservableProperty] private Data? _activeItem;
 
-        public static void SetIsSelectable(DependencyObject obj, bool value) => obj.SetValue(IsSelectableProperty, value);
+        // 現在「潜り込んで」編集しているグループ（nullならルート）
+        [ObservableProperty] private GroupData? _editingGroup;
 
-    }
-
-
-
-    public class EditorService
-    {
         // 選択要素のCollection
         public List<Data> SelectedItems { get; } = [];
 
         // アクティブ(最後に選択された)要素
-        public Data? ActiveItem { get; private set; }
+        //public Data? ClickedItem { get; private set; }
+        
+
 
         public void Select(Data target, bool isControlPressed)
         {
@@ -60,7 +61,7 @@ namespace _20260301
                 item.IsSelected = false;
             }
             SelectedItems.Clear();
-            ActiveItem = null;
+            ClickedItem = null;
         }
     }
 }
