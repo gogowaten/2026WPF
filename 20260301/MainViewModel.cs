@@ -9,6 +9,9 @@ namespace _20260301
 {
     public partial class MainViewModel : ObservableObject
     {
+        public EditorService EditorService { get; } = new();
+
+
         [ObservableProperty]
         private ObservableCollection<Data> _items = new();
 

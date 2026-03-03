@@ -36,6 +36,8 @@ namespace _20260301
 
         private void InitRootData()
         {
+           
+
             GroupDataA.Children.Add(RectangleData1);
             GroupDataA.Children.Add(RectangleData2);
 

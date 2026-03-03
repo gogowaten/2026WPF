@@ -19,7 +19,7 @@ namespace _20260301
     public class CanvasEditor : ItemsControl
     {
         // 本来はDIやViewModel経由が望ましいが、簡略化のため一旦保持
-        public EditorService Service { get; } = new();
+        //public EditorService Service { get; } = new();
 
         static CanvasEditor()
         {
@@ -30,51 +30,73 @@ namespace _20260301
 
         }
 
-        protected override void OnMouseDown(MouseButtonEventArgs e)
-        {
-            base.OnMouseDown(e);
+        #region 旧式OnMouseDown
 
-            // 1. クリックされた要素を特定する
-            // VisualTreeを遡って、Dataオブジェクトを持っているFrameworkElementを探す
-            var hitResult = VisualTreeHelper.HitTest(this, e.GetPosition(this));
-            var element = hitResult?.VisualHit as FrameworkElement;
 
-            // CanvasElementControl または DataContextにData型を持つ要素を探す
-            while (element != null && element.DataContext is not Data)
-            {
-                element = VisualTreeHelper.GetParent(element) as FrameworkElement;
-            }
+        //protected override void OnMouseDown(MouseButtonEventArgs e)
+        //{
+        //    base.OnMouseDown(e);
 
-            if (element != null && element.DataContext is Data clickedData)
-            {
-                bool isCtrl = Keyboard.Modifiers.HasFlag(ModifierKeys.Control);
-                Service.Select(clickedData, isCtrl);
+        //    // 1. クリックされた要素を特定する
+        //    // VisualTreeを遡って、Dataオブジェクトを持っているFrameworkElementを探す
+        //    var hitResult = VisualTreeHelper.HitTest(this, e.GetPosition(this));
+        //    var element = hitResult?.VisualHit as FrameworkElement;
 
-                e.Handled = true;
+        //    // CanvasElementControl または DataContextにData型を持つ要素を探す
+        //    while (element != null && element.DataContext is not Data)
+        //    {
+        //        element = VisualTreeHelper.GetParent(element) as FrameworkElement;
+        //    }
 
-                this.Focus();
-            }
-            else { Service.ClearSelection(); }
 
-            //if (element != null && element.DataContext is Data clickedData)
-            //{
-            //    // 2. EditorService に選択を依頼
-            //    bool isCtrl = Keyboard.Modifiers.HasFlag(ModifierKeys.Control);
-            //    Service.Select(clickedData, isCtrl);
+        //    if (element != null && element.DataContext is Data clickedData)
+        //    {
+        //        // 2. EditorService に選択を依頼
+        //        bool isCtrl = Keyboard.Modifiers.HasFlag(ModifierKeys.Control);
+        //        Service.Select(clickedData, isCtrl);
 
-            //    // クリックされたことを他の要素に伝えない（バブリング停止）
-            //    e.Handled = true;
+        //        // クリックされたことを他の要素に伝えない（バブリング停止）
+        //        e.Handled = true;
 
-            //    // フォーカスを当ててキーボード入力を受け取れるようにする
-            //    this.Focus();
-            //}
-            //else
-            //{
-            //    // 背景をクリックした場合は選択解除
-            //    Service.ClearSelection();
-            //}
+        //        // フォーカスを当ててキーボード入力を受け取れるようにする
+        //        this.Focus();
+        //    }
+        //    else
+        //    {
+        //        // 背景をクリックした場合は選択解除
+        //        Service.ClearSelection();
+        //    }
 
-        }
+        //}
+        #endregion 旧式
+
+        //protected override void OnMouseDown(MouseButtonEventArgs e)
+        //{
+        //    base.OnMouseDown(e);
+
+        //    // OriginalSource（クリックされた実体）から親へ辿り、IsSelectableがTrueのものを探す
+        //    DependencyObject? d = e.OriginalSource as DependencyObject;
+        //    FrameworkElement? selectableElement = null;
+
+        //    while (d != null && d != this)
+        //    {
+               
+        //        if (d is FrameworkElement fe && EditorBehavior.GetIsSelectable(fe))
+        //        {   
+        //            selectableElement = fe;
+        //            break;
+        //        }
+        //        d = VisualTreeHelper.GetParent(d);
+        //    }
+
+        //    if (selectableElement != null && selectableElement.DataContext is Data clickedData)
+        //    {
+        //        bool isCtrl = Keyboard.Modifiers.HasFlag(ModifierKeys.Control);
+        //        Service.Select(clickedData, isCtrl);
+        //        e.Handled = true;
+        //    }
+        //    else { Service.ClearSelection(); }
+        //}
     }
 
     public class CanvasElementControl : ContentControl

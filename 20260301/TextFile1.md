@@ -1353,7 +1353,6 @@ public MainViewModel()
 
 次は、いよいよ **`CanvasEditor` でクリックされた要素を特定し、`IsSelected` を切り替える（Ctrlキー併用対応）ロジック**を `EditorService` として実装しましょうか？
 
-なお、各種アプリのすべての機能を使用するには、[Gemini アプリ アクティビティ](https://myactivity.google.com/product/gemini)を有効にする必要があります。
 
 
 
@@ -1522,9 +1521,123 @@ namespace _20260301
 
 特に **「編集状態のグループの子要素だけが選択できる」** というルールを `EditorService` に組み込むと、一気にプロフェッショナルなツールらしくなります。実装を進めますか？
 
-なお、各種アプリのすべての機能を使用するには、[Gemini アプリ アクティビティ](https://myactivity.google.com/product/gemini)を有効にする必要があります。
 
 
 ---
+
+
+# クリックされた要素を取得するためにCanvasEditorのprotected override void OnMouseDown(MouseButtonEventArgs e)でVisualTreeを遡って探しているけど、もっといい方法はない？添付プロパティを使うのはどう？
+
+
+---
+
+
+添付プロパティ（Attached Property）を利用するのは、非常に賢い選択です。`VisualTreeHelper` でループを回すよりも宣言的で、WPFらしい「疎結合」な設計になります。
+
+さらに、`OnMouseDown` をオーバーライドする代わりに、**「トンネリングイベント（PreviewMouseDown）」** と **「添付プロパティ」** を組み合わせることで、ロジックをより堅牢にできます。
+
+### 1. 添付プロパティの定義
+
+「この要素はエディタの操作対象である」ことを示すプロパティを作成します。
+
+```csharp
+public static class EditorBehavior
+{
+    // CanvasElementControlなど、クリック対象にセットする添付プロパティ
+    public static readonly DependencyProperty IsSelectableProperty =
+        DependencyProperty.RegisterAttached(
+            "IsSelectable", 
+            typeof(bool), 
+            typeof(EditorBehavior), 
+            new PropertyMetadata(false));
+
+    public static void SetIsSelectable(DependencyProperty element, bool value) 
+        => element.SetValue(IsSelectableProperty, value);
+
+    public static bool GetIsSelectable(DependencyProperty element) 
+        => (bool)element.GetValue(IsSelectableProperty);
+}
+
+```
+
+---
+
+### 2. Generic.xaml でプロパティをセット
+
+`CanvasElementControl` のスタイルで、このプロパティを常に `true` にしておきます。これで、このコントロールがクリックされた際に「これは操作対象だ」と判定できるようになります。
+
+```xml
+<Style TargetType="{x:Type local:CanvasElementControl}">
+    <Setter Property="local:EditorBehavior.IsSelectable" Value="True"/>
+    
+    <Setter Property="Template">
+        <Setter.Value>
+            <ControlTemplate TargetType="{x:Type local:CanvasElementControl}">
+                <Grid Background="Transparent"> <ContentPresenter />
+                    <Border x:Name="SelectionBorder" BorderBrush="Orange" BorderThickness="2" 
+                            Visibility="Collapsed" IsHitTestVisible="False" Margin="-2"/>
+                </Grid>
+                </ControlTemplate>
+        </Setter.Value>
+    </Setter>
+</Style>
+
+```
+
+---
+
+### 3. CanvasEditor での判定（洗練された方法）
+
+`OnMouseDown` 内で、`e.OriginalSource`（実際にクリックされた最小単位の要素）から遡る際、この添付プロパティをキーにします。
+
+```csharp
+protected override void OnMouseDown(MouseButtonEventArgs e)
+{
+    base.OnMouseDown(e);
+
+    // OriginalSource（クリックされた実体）から親へ辿り、IsSelectableがTrueのものを探す
+    DependencyObject d = e.OriginalSource as DependencyObject;
+    FrameworkElement selectableElement = null;
+
+    while (d != null && d != this)
+    {
+        if (d is FrameworkElement fe && EditorBehavior.GetIsSelectable(fe))
+        {
+            selectableElement = fe;
+            break;
+        }
+        d = VisualTreeHelper.GetParent(d);
+    }
+
+    if (selectableElement != null && selectableElement.DataContext is Data clickedData)
+    {
+        bool isCtrl = Keyboard.Modifiers.HasFlag(ModifierKeys.Control);
+        Service.Select(clickedData, isCtrl);
+        e.Handled = true;
+    }
+    else
+    {
+        Service.ClearSelection();
+    }
+}
+
+```
+
+---
+
+### 4. なぜこれが「より良い方法」なのか？
+
+1. **柔軟性**: もし「特定の図形だけクリックを無効にしたい」場合、その図形の `CanvasElementControl` の `IsSelectable` を `False` にするだけで済み、C#側のロジックを弄る必要がありません。
+2. **型への依存の排除**: `while` 文の中で `CanvasElementControl` という具体的なクラス名を確認する必要がなくなります。
+3. **パフォーマンス**: `VisualTreeHelper.HitTest` を明示的に呼ぶよりも、WPFのイベントルーティング（`OriginalSource`）に乗っかる方が効率的です。
+
+---
+
+### さらに発展させるなら：Behavior (System.Windows.Interactivity)
+
+さらに大規模化・スッキリ化を追求するなら、このマウス操作ロジック自体を **Behavior** として切り出し、`CanvasEditor` の XAML 上で `<i:Interaction.Behaviors>` として定義することも可能です。そうすれば `CanvasEditor` クラス自体のコードビハインドもほぼ空にできます。
+
+次は、この添付プロパティ方式を使って、**「EditingGroup（編集中のグループ）以外の子要素はクリックしても反応しない（IsSelectableを動的に制御する）」** ロジックを追加してみましょうか？
+
 
 

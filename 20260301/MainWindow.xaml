@@ -4,6 +4,8 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:_20260301"
+        xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+        xmlns:beh="clr-namespace:_20260301.Behaviors"
         mc:Ignorable="d"
         d:DataContext="{d:DesignInstance Type=local:MainWindow}"
         Title="MainWindow" Height="367" Width="654">
@@ -22,7 +24,11 @@
     </ScrollViewer>
       <local:GroupItemsControl x:Name="MyRootNode" ItemsSource="{Binding MyRootGroupData.Children}"/>-->
 
-    <local:CanvasEditor ItemsSource="{Binding Items}"/>
+    <local:CanvasEditor ItemsSource="{Binding Items}">
+      <i:Interaction.Behaviors>
+        <beh:CanvasSelectionBehavior Service="{Binding EditorService}"/>
+      </i:Interaction.Behaviors>
+    </local:CanvasEditor>
 
     <!--<ItemsControl Grid.Column="0" ItemsSource="{Binding Items}">
       <ItemsControl.ItemsPanel>
