@@ -44,5 +44,10 @@ namespace _20260301
             MyRootGroupData.Children.Add(RectangleData3);
             MyRootGroupData.Children.Add(GroupDataA);
         }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            var neko = MyRoot.Service.EditingGroup;
+        }
     }
 }

@@ -23,7 +23,7 @@ namespace _20260301
         //[ObservableProperty] private Rect _externalBounds;
         //[ObservableProperty] private Rect _contentBounds;
 
-        public GroupData? Parent;
+        [ObservableProperty] private GroupData? _parent;
 
     }
 
@@ -32,7 +32,7 @@ namespace _20260301
     {
         [ObservableProperty] private bool _isEditing;
         [ObservableProperty] private ObservableCollection<Data> _children = [];
-        
+
 
         public GroupData()
         {
@@ -60,7 +60,7 @@ namespace _20260301
 
         public void UpdateBounds()
         {
-            if(Children.Count == 0)
+            if (Children.Count == 0)
             {
                 Width = 0;
                 Height = 0;

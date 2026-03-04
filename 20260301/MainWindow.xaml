@@ -19,38 +19,23 @@
       <ColumnDefinition Width="200"/>
     </Grid.ColumnDefinitions>
 
-    <!--<ScrollViewer HorizontalScrollBarVisibility="Auto" HorizontalAlignment="Left"
-                  VerticalAlignment="Top" VerticalScrollBarVisibility="Auto">
-    </ScrollViewer>
-      <local:GroupItemsControl x:Name="MyRootNode" ItemsSource="{Binding MyRootGroupData.Children}"/>-->
-
-    <local:CanvasEditor ItemsSource="{Binding Items}">
+  
+    <!--<local:CanvasEditor ItemsSource="{Binding Items}">
       <i:Interaction.Behaviors>
         <beh:CanvasSelectionBehavior Service="{Binding EditorService}"/>
       </i:Interaction.Behaviors>
+    </local:CanvasEditor>-->
+
+    <local:CanvasEditor x:Name="MyRoot"
+                        ItemsSource="{Binding Items}" Service="{Binding EditorService}">
+      <i:Interaction.Behaviors>
+        <beh:CanvasSelectionBehavior 
+          Service="{Binding Service, RelativeSource={RelativeSource AncestorType=local:CanvasEditor}}" />
+      </i:Interaction.Behaviors>
     </local:CanvasEditor>
 
-    <!--<ItemsControl Grid.Column="0" ItemsSource="{Binding Items}">
-      <ItemsControl.ItemsPanel>
-        <ItemsPanelTemplate>
-          <Canvas Background="White" IsItemsHost="True" />
-        </ItemsPanelTemplate>
-      </ItemsControl.ItemsPanel>
-      <ItemsControl.ItemContainerStyle>
-        <Style TargetType="ContentPresenter">
-          <Setter Property="Canvas.Left" Value="{Binding X}" />
-          <Setter Property="Canvas.Top" Value="{Binding Y}" />
-          <Setter Property="Panel.ZIndex" Value="{Binding Z}" />
-        </Style>
-      </ItemsControl.ItemContainerStyle>
-      <ItemsControl.ItemTemplate>
-        <DataTemplate>
-          <local:CanvasElementControl Content="{Binding}" />
-        </DataTemplate>
-      </ItemsControl.ItemTemplate>
-    </ItemsControl>-->
 
-    
+
     <!--<Canvas x:Name="MyCanvas">
       <local:Node x:Name="MyRootNode" ItemsSource="{Binding MyRootData.Layers}"/>
     </Canvas>-->
@@ -67,7 +52,8 @@
 
       <TextBlock Text="要素リスト" Margin="5,15,5,5" FontWeight="Bold"/>
       <ListBox ItemsSource="{Binding Items}" DisplayMemberPath="Name" Height="200"/>
-
+      <TextBlock Text="{Binding ElementName=MyRoot, Path=Service.EditingGroup.Name, StringFormat='EditGroup {0}'}"/>
+      <Button Content="test" Click="Button_Click"/>
     </StackPanel>
   </Grid>
 </Window>

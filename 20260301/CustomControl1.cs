@@ -18,8 +18,15 @@ namespace _20260301
 
     public class CanvasEditor : ItemsControl
     {
-        // 本来はDIやViewModel経由が望ましいが、簡略化のため一旦保持
-        //public EditorService Service { get; } = new();
+
+        public EditorService Service
+        {
+            get { return (EditorService)GetValue(ServiceProperty); }
+            set { SetValue(ServiceProperty, value); }
+        }
+        public static readonly DependencyProperty ServiceProperty =
+            DependencyProperty.Register(nameof(Service), typeof(EditorService), typeof(CanvasEditor));
+
 
         static CanvasEditor()
         {
@@ -70,33 +77,6 @@ namespace _20260301
         //}
         #endregion 旧式
 
-        //protected override void OnMouseDown(MouseButtonEventArgs e)
-        //{
-        //    base.OnMouseDown(e);
-
-        //    // OriginalSource（クリックされた実体）から親へ辿り、IsSelectableがTrueのものを探す
-        //    DependencyObject? d = e.OriginalSource as DependencyObject;
-        //    FrameworkElement? selectableElement = null;
-
-        //    while (d != null && d != this)
-        //    {
-               
-        //        if (d is FrameworkElement fe && EditorBehavior.GetIsSelectable(fe))
-        //        {   
-        //            selectableElement = fe;
-        //            break;
-        //        }
-        //        d = VisualTreeHelper.GetParent(d);
-        //    }
-
-        //    if (selectableElement != null && selectableElement.DataContext is Data clickedData)
-        //    {
-        //        bool isCtrl = Keyboard.Modifiers.HasFlag(ModifierKeys.Control);
-        //        Service.Select(clickedData, isCtrl);
-        //        e.Handled = true;
-        //    }
-        //    else { Service.ClearSelection(); }
-        //}
     }
 
     public class CanvasElementControl : ContentControl

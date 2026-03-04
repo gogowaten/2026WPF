@@ -9,6 +9,7 @@ using System.Windows.Media;
 
 namespace _20260301.Behaviors
 {
+    // ItemsControl専用のBehavior
 
     public class CanvasSelectionBehavior : Behavior<ItemsControl>
     {
@@ -26,13 +27,57 @@ namespace _20260301.Behaviors
         {
             base.OnAttached();
             AssociatedObject.PreviewMouseLeftButtonDown += OnPreviewMouseLeftButtonDown;
+            AssociatedObject.KeyDown += OnKeyDown;
         }
 
         protected override void OnDetaching()
         {
             base.OnDetaching();
             AssociatedObject.PreviewMouseLeftButtonDown -= OnPreviewMouseLeftButtonDown;
+            AssociatedObject.KeyDown -= OnKeyDown;
         }
+
+
+
+        private void OnKeyDown(object sender, KeyEventArgs e)
+        {
+            if (Service is null) { return; }
+
+            switch (e.Key)
+            {
+                case Key.F2:
+                    if (Service.ActiveItem is GroupData group)
+                    {
+                        Service.EnterGroup(group);
+                        e.Handled = true;
+                    }
+                    break;
+                case Key.Escape:
+                    if (Service.SelectedItems.Any())
+                    {
+                        Service.ClearSelection();
+                    }
+                    else { Service.EscapeGroup(); }
+                    e.Handled = true;
+                    break;
+                case Key.A:
+                    // Ctrl + A ：現在の階層の全選択
+                    if (Keyboard.Modifiers == ModifierKeys.Control)
+                    {
+                        SelectAllCurrentLayer();
+                        e.Handled = true;
+                    }
+                    break;
+            }
+        }
+
+        private void SelectAllCurrentLayer()
+        {
+            // 現在のEditingGroupに属する要素をすべて選択
+            // ※ItemsControlのItemsSourceから現在の階層のDataを抽出してService経由で選択
+
+        }
+
 
         private void OnPreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
@@ -52,16 +97,29 @@ namespace _20260301.Behaviors
                 d = VisualTreeHelper.GetParent(d);
             }
 
+            // 要素が見つかった場合
             if (selectableElement != null && selectableElement.DataContext is Data clickedData)
             {
+                // ダブルクリック判定
+                if (e.ClickCount == 2 && clickedData is GroupData group)
+                {
+                    Service.EnterGroup(group);
+                    e.Handled = true;
+                    return;
+                }
+
+                // 選択状態を更新
                 bool isCtrl = Keyboard.Modifiers.HasFlag(ModifierKeys.Control);
                 Service.Select(clickedData, isCtrl);
                 e.Handled = true;
                 AssociatedObject.Focus();
             }
             else
-            {  
-                Service.ClearSelection();
+            {
+                // 背景クリックで選択解除、ダブルクリックで上の階層へ
+                if (e.ClickCount == 2) { Service.EscapeGroup(); }
+                else { Service.ClearSelection(); }
+
             }
         }
 
