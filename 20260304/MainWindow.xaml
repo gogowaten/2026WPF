@@ -4,20 +4,46 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:_20260304"
+        xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+        xmlns:beha="clr-namespace:_20260304.Behaviors"
         mc:Ignorable="d"
         Title="MainWindow" Height="367" Width="654">
+  <Window.DataContext>
+    <local:MainViewModel/>
+  </Window.DataContext>
+  
   <Grid>
     <Grid.ColumnDefinitions>
       <ColumnDefinition/>
       <ColumnDefinition Width="200"/>
     </Grid.ColumnDefinitions>
 
+    <local:CanvasEditor x:Name="MyRoot"
+                        ItemsSource="{Binding Items}" Service="{Binding EditorService}">
+      <!--<i:Interaction.Behaviors>
+        <beha:CanvasSelectionBehavior 
+          Service="{Binding Service, RelativeSource={RelativeSource AncestorType=local:CanvasEditor}}" />
+      </i:Interaction.Behaviors>-->
+    </local:CanvasEditor>
+    
     <Canvas x:Name="MyCanvas">
 
     </Canvas>
 
-    <StackPanel Grid.Column="1">
+    
+    
+    <StackPanel Grid.Column="1" DataContext="{Binding}">
+      <Button Content="矩形を追加" Command="{Binding AddRectangleCommand}" Margin="5"/>
+      <!--<Button Content="テキストを追加" Command="{Binding AddTextCommand}" Margin="5"/>-->
+      <Button Content="Groupを追加" Command="{Binding AddGroupCommand}" Margin="5"/>
 
+      <TextBlock Text="要素リスト" Margin="5,15,5,5" FontWeight="Bold"/>
+      <ListBox ItemsSource="{Binding Items}" DisplayMemberPath="Name" Height="150"/>
+      <TextBlock Text="{Binding ElementName=MyRoot, Path=Service.EditingGroup.Name, StringFormat='EditGroup {0}'}"/>
+      <TextBlock Text="{Binding EditorService.SelectedItems, StringFormat='clickd = {0}'}"/>
+      <Button Content="test" Click="Button_Click"/>
+      
     </StackPanel>
+    
   </Grid>
 </Window>

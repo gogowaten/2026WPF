@@ -20,5 +20,10 @@ namespace _20260304
         {
             InitializeComponent();
         }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            var neko = MyRoot.Service.EditingGroup;
+        }
     }
 }

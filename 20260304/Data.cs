@@ -23,7 +23,7 @@ namespace _20260304
         //[ObservableProperty] private Rect _externalBounds;
         //[ObservableProperty] private Rect _contentBounds;
 
-        public GroupData? Parent;
+        [ObservableProperty] private GroupData? _parent;
 
     }
 
@@ -83,37 +83,38 @@ namespace _20260304
     }
 
 
-    public partial class RootData : Data
-    {
-        [ObservableProperty] private ObservableCollection<GroupData> _layers = [];
-        [ObservableProperty] private Data? _active;
+    //public partial class RootData : Data
+    //{
+    //    [ObservableProperty] private ObservableCollection<GroupData> _layers = [];
+    //    [ObservableProperty] private Data? _active;
 
-        public RootData()
-        {
+        
+    //    public RootData()
+    //    {
 
-        }
-        public void AddLayer(GroupData layer)
-        {
-            Layers.Add(layer);
-        }
+    //    }
+    //    public void AddLayer(GroupData layer)
+    //    {
+    //        Layers.Add(layer);
+    //    }
 
-        public void RemoveLayer(GroupData layer)
-        {
-            Layers.Remove(layer);
-        }
-    }
+    //    public void RemoveLayer(GroupData layer)
+    //    {
+    //        Layers.Remove(layer);
+    //    }
+    //}
 
-    public partial class TextBlockData : Data
-    {
-        [ObservableProperty] private string _text = string.Empty;
-        public TextBlockData(double x, double y, string text)
-        {
-            this.X = x;
-            this.Y = y;
-            this.Text = text;
+    //public partial class TextBlockData : Data
+    //{
+    //    [ObservableProperty] private string _text = string.Empty;
+    //    public TextBlockData(double x, double y, string text)
+    //    {
+    //        this.X = x;
+    //        this.Y = y;
+    //        this.Text = text;
 
-        }
-    }
+    //    }
+    //}
 
     public partial class RectangleData : Data
     {
@@ -125,4 +126,7 @@ namespace _20260304
             this.Height = height;
         }
     }
+
+
+
 }

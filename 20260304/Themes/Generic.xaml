@@ -1,19 +1,156 @@
 <ResourceDictionary
-    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:local="clr-namespace:_20260304">
+  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:local="clr-namespace:_20260304"
+  xmlns:beha="clr-namespace:_20260304.Behaviors"
+  xmlns:conv="clr-namespace:_20260304.Converters"
+  xmlns:i="http://schemas.microsoft.com/xaml/behaviors">
 
 
-    <Style TargetType="{x:Type local:CustomControl1}">
-        <Setter Property="Template">
-            <Setter.Value>
-                <ControlTemplate TargetType="{x:Type local:CustomControl1}">
-                    <Border Background="{TemplateBinding Background}"
-                            BorderBrush="{TemplateBinding BorderBrush}"
-                            BorderThickness="{TemplateBinding BorderThickness}">
-                    </Border>
-                </ControlTemplate>
-            </Setter.Value>
-        </Setter>
-    </Style>
+  <Style x:Key="CanvasItemContainerStyle" TargetType="ContentPresenter">
+    <Setter Property="Canvas.Left" Value="{Binding X}" />
+    <Setter Property="Canvas.Top" Value="{Binding Y}" />
+    <Setter Property="Panel.ZIndex" Value="{Binding Z}" />
+  </Style>
+
+
+  <!--#region DataTemplate-->
+  
+  <DataTemplate DataType="{x:Type local:RectangleData}">
+    <Rectangle Width="{Binding Width}" Height="{Binding Height}" 
+                   Fill="SkyBlue" Stroke="DodgerBlue" StrokeThickness="2" Opacity="0.7"/>
+  </DataTemplate>
+
+  <!--<DataTemplate DataType="{x:Type local:TextBlockData}">
+    <TextBlock Text="{Binding Text}" Foreground="Black" FontSize="16" FontWeight="Normal"
+               Background="#55cccc00"/>
+  </DataTemplate>-->
+
+  <DataTemplate DataType="{x:Type local:GroupData}">
+    <Grid Background="#330000FF"
+              Width="{Binding Width}"
+              Height="{Binding Height}">
+      <Border BorderBrush="Gray" BorderThickness="1" />
+
+      <ItemsControl ItemsSource="{Binding Children}"
+                    ItemContainerStyle="{StaticResource CanvasItemContainerStyle}">
+        <ItemsControl.ItemsPanel>
+          <ItemsPanelTemplate>
+            <Canvas IsItemsHost="True" />
+          </ItemsPanelTemplate>
+        </ItemsControl.ItemsPanel>
+        <!--<ItemsControl.ItemContainerStyle>
+          <Style TargetType="ContentPresenter">
+            <Setter Property="Canvas.Left" Value="{Binding X}" />
+            <Setter Property="Canvas.Top" Value="{Binding Y}" />
+            <Setter Property="Panel.ZIndex" Value="{Binding Z}" />
+          </Style>
+        </ItemsControl.ItemContainerStyle>-->
+        <ItemsControl.ItemTemplate>
+          <DataTemplate>
+            <local:CanvasElementControl Content="{Binding}" />
+          </DataTemplate>
+        </ItemsControl.ItemTemplate>
+      </ItemsControl>
+    </Grid>
+  </DataTemplate>
+  
+  <!--#endregion DataTemplate-->
+
+
+  <Style TargetType="{x:Type local:CanvasEditor}">
+    <Setter Property="Template">
+      <Setter.Value>
+        <ControlTemplate TargetType="{x:Type local:CanvasEditor}">
+          <Border Background="{TemplateBinding Background}">
+            <ItemsPresenter/>
+          </Border>
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+    <Setter Property="ItemsPanel">
+      <Setter.Value>
+        <ItemsPanelTemplate>
+          <Canvas IsItemsHost="True" Background="Snow"/>
+        </ItemsPanelTemplate>
+      </Setter.Value>
+    </Setter>
+    <Setter Property="ItemContainerStyle" Value="{StaticResource CanvasItemContainerStyle}"/>
+    <Setter Property="ItemTemplate">
+      <Setter.Value>
+        <DataTemplate>
+          <local:CanvasElementControl Content="{Binding}">
+            <i:Interaction.Behaviors>
+              <beha:TestBehavior/>
+            </i:Interaction.Behaviors>
+          </local:CanvasElementControl>
+        </DataTemplate>
+      </Setter.Value>
+    </Setter>
+  </Style>
+
+
+
+  <Style TargetType="{x:Type local:CanvasElementControl}">
+    <Style.Resources>
+      <conv:EditingLayerConverter x:Key="EditingLayerConverter"/>
+    </Style.Resources>
+    <Setter Property="Opacity">
+      <Setter.Value>
+        <MultiBinding Converter="{StaticResource EditingLayerConverter}">
+          <Binding Path="DataContext.Parent" RelativeSource="{RelativeSource Self}"/>
+          <Binding Path="Service.EditingGroup" RelativeSource="{RelativeSource AncestorType=local:CanvasEditor}"/>
+        </MultiBinding>
+      </Setter.Value>
+    </Setter>
+    <Setter Property="beha:EditorBehavior.IsSelectable" Value="True"/>
+    <Setter Property="Template">
+      <Setter.Value>
+        <ControlTemplate TargetType="{x:Type local:CanvasElementControl}">
+          <Grid x:Name="RootGrid">
+            <ContentPresenter x:Name="PART_Content"/>
+            <Border x:Name="SelectionBorder"
+                    BorderBrush="Orange"
+                    BorderThickness="2"
+                    Margin="-2"
+                    Visibility="Collapsed"
+                    IsHitTestVisible="False"/>
+            <Border x:Name="ActiveBorder"
+                    BorderBrush="Red"
+                    BorderThickness="2"
+                    Margin="-4"
+                    Visibility="Collapsed"
+                    IsHitTestVisible="false">
+              <Grid>
+                <Rectangle Fill="Red" Width="6" Height="6" VerticalAlignment="Top"
+                           HorizontalAlignment="Left" Margin="-3"/>
+
+                <Rectangle Fill="Red" Width="6" Height="6" VerticalAlignment="Bottom"
+                           HorizontalAlignment="Right" Margin="-3"/>
+              </Grid>
+            </Border>
+          </Grid>
+
+          <ControlTemplate.Triggers>
+            <DataTrigger Binding="{Binding IsSelected}" Value="True">
+              <Setter TargetName="SelectionBorder" Property="Visibility" Value="Visible"/>
+            </DataTrigger>
+            <DataTrigger Binding="{Binding IsActive}" Value="True">
+              <Setter TargetName="ActiveBorder" Property="Visibility" Value="Visible"/>
+            </DataTrigger>
+            <!--<Trigger Property="IsMouseOver" Value="True">
+              <Setter TargetName="SelectionBorder" Property="BorderBrush" Value="LightBlue"/>
+              <Setter TargetName="SelectionBorder" Property="Visibility" Value="Visible"/>
+              <Setter TargetName="SelectionBorder" Property="Opacity" Value="0.5"/>
+            </Trigger>-->
+          </ControlTemplate.Triggers>
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+    
+  </Style>
+
+  
+  
+  
 </ResourceDictionary>
