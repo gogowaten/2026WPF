@@ -7,8 +7,16 @@ namespace _20260305
 {
     public partial class GroupVM : ObservableObject
     {
-        [ObservableProperty] private GroupData _datas = new();
 
+        public GroupVM()
+        {
+            Data = new GroupData() { X = 0, Y = 0, Name = "GroupVM" };
+            Data.Datas.Add(new RectangleData() { X = 0, Y = 0, Width = 100, Height = 50, Name = "Rect1" });
+            Data.Datas.Add(new RectangleData() { X = 30, Y = 40, Width = 100, Height = 50, Name = "Rect2" });
+
+        }
+
+        [ObservableProperty] private GroupData _data;
     }
 
     public partial class RectangleGroupVM : ObservableObject

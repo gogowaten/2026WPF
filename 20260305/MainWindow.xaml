@@ -28,7 +28,16 @@
       </Canvas.DataContext>
       <local:RectangleGroupView x:Name="RectangleGroupView" ItemsSource="{Binding Datas.Datas}" Canvas.Left="10" Canvas.Top="10"/>
     </Canvas>
+    
+    <Canvas>
+      <Canvas.DataContext>
+        <local:GroupVM/>
+      </Canvas.DataContext>
+      <local:GroupView x:Name="GroupVM" ItemsSource="{Binding Data.Datas}" Canvas.Left="10" Canvas.Top="110"/>
+    </Canvas>
 
+    
+    
     <StackPanel Grid.Column="1">
 
     </StackPanel>

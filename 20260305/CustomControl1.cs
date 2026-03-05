@@ -13,6 +13,17 @@ using System.Windows.Shapes;
 
 namespace _20260305
 {
+    public class GroupView : ItemsControl
+    {
+        static GroupView()
+        {
+            DefaultStyleKeyProperty.OverrideMetadata(typeof(GroupView), new FrameworkPropertyMetadata(typeof(GroupView)));
+        }
+        public GroupView()
+        {
+
+        }
+    }
 
     public class RectangleGroupView : ItemsControl
     {
@@ -26,13 +37,6 @@ namespace _20260305
         }
     }
 
-    public class CustomControl1 : Control
-    {
-        static CustomControl1()
-        {
-            DefaultStyleKeyProperty.OverrideMetadata(typeof(CustomControl1), new FrameworkPropertyMetadata(typeof(CustomControl1)));
-        }
-    }
 
     public class RectangleView : ContentControl
     {
