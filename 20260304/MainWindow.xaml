@@ -20,10 +20,11 @@
 
     <local:CanvasEditor x:Name="MyRoot"
                         ItemsSource="{Binding Items}" Service="{Binding EditorService}">
-      <!--<i:Interaction.Behaviors>
+      
+      <i:Interaction.Behaviors>
         <beha:CanvasSelectionBehavior 
           Service="{Binding Service, RelativeSource={RelativeSource AncestorType=local:CanvasEditor}}" />
-      </i:Interaction.Behaviors>-->
+      </i:Interaction.Behaviors>
     </local:CanvasEditor>
     
     <Canvas x:Name="MyCanvas">

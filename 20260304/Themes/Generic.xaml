@@ -4,7 +4,7 @@
   xmlns:local="clr-namespace:_20260304"
   xmlns:beha="clr-namespace:_20260304.Behaviors"
   xmlns:conv="clr-namespace:_20260304.Converters"
-  xmlns:i="http://schemas.microsoft.com/xaml/behaviors">
+  >
 
 
   <Style x:Key="CanvasItemContainerStyle" TargetType="ContentPresenter">
@@ -80,9 +80,9 @@
       <Setter.Value>
         <DataTemplate>
           <local:CanvasElementControl Content="{Binding}">
-            <i:Interaction.Behaviors>
+            <!--<i:Interaction.Behaviors>
               <beha:TestBehavior/>
-            </i:Interaction.Behaviors>
+            </i:Interaction.Behaviors>-->
           </local:CanvasElementControl>
         </DataTemplate>
       </Setter.Value>

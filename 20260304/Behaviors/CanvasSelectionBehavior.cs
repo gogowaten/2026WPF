@@ -9,31 +9,31 @@ using System.Windows.Media;
 
 namespace _20260304.Behaviors
 {
-    // CanvasElementControl
-    public class TestBehavior : Behavior<CanvasElementControl>
-    {
+    //// CanvasElementControl
+    //public class TestBehavior : Behavior<CanvasElementControl>
+    //{
 
-        public EditorService Service
-        {
-            get { return (EditorService)GetValue(ServiceProperty); }
-            set { SetValue(ServiceProperty, value); }
-        }
-        public static readonly DependencyProperty ServiceProperty =
-            DependencyProperty.Register(nameof(Service), typeof(EditorService), typeof(TestBehavior));
+    //    public EditorService Service
+    //    {
+    //        get { return (EditorService)GetValue(ServiceProperty); }
+    //        set { SetValue(ServiceProperty, value); }
+    //    }
+    //    public static readonly DependencyProperty ServiceProperty =
+    //        DependencyProperty.Register(nameof(Service), typeof(EditorService), typeof(TestBehavior));
 
-        protected override void OnAttached()
-        {
-            base.OnAttached();
-            AssociatedObject.PreviewMouseLeftButtonDown += OnPreviewMouseLeftButtonDown;
-        }
+    //    protected override void OnAttached()
+    //    {
+    //        base.OnAttached();
+    //        AssociatedObject.PreviewMouseLeftButtonDown += OnPreviewMouseLeftButtonDown;
+    //    }
 
-        private void OnPreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
-        {
-            var ori = e.OriginalSource;
-            var sor = e.Source;
-        }
-    }
-    // ItemsControl専用のBehavior
+    //    private void OnPreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+    //    {
+    //        var ori = e.OriginalSource;
+    //        var sor = e.Source;
+    //    }
+    //}
+    //// ItemsControl専用のBehavior
 
     public class CanvasSelectionBehavior : Behavior<ItemsControl>
     {
