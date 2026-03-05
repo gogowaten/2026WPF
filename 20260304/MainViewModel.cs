@@ -7,13 +7,19 @@ using System.Text;
 
 namespace _20260304
 {
+    public partial class RootViewModel : ObservableRecipient
+    {
+        [ObservableProperty] private double _x;
+    }
+
+
+
     public partial class MainViewModel : ObservableObject
     {
         public EditorService EditorService { get; } = new();
 
 
-        [ObservableProperty]
-        private ObservableCollection<Data> _items = [];
+        [ObservableProperty] private ObservableCollection<Data> _items = [];
 
         #region コマンド
 

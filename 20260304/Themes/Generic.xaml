@@ -4,7 +4,7 @@
   xmlns:local="clr-namespace:_20260304"
   xmlns:beha="clr-namespace:_20260304.Behaviors"
   xmlns:conv="clr-namespace:_20260304.Converters"
-  >
+  xmlns:i="http://schemas.microsoft.com/xaml/behaviors">
 
 
   <Style x:Key="CanvasItemContainerStyle" TargetType="ContentPresenter">

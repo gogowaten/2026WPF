@@ -19,8 +19,8 @@
     </Grid.ColumnDefinitions>
 
     <local:CanvasEditor x:Name="MyRoot"
-                        ItemsSource="{Binding Items}" Service="{Binding EditorService}">
-      
+                        ItemsSource="{Binding Items}"
+                        Service="{Binding EditorService}">
       <i:Interaction.Behaviors>
         <beha:CanvasSelectionBehavior 
           Service="{Binding Service, RelativeSource={RelativeSource AncestorType=local:CanvasEditor}}" />
