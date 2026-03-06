@@ -31,6 +31,12 @@ namespace _20260306
             MyGroupData.DataList.Add(new EllipseData() { X = 40, Y = 120, Width = 50, Height = 50, Fill = Brushes.Salmon });
             MyGroupData.DataList.Add(MyEllipseData緑);
 
+            GroupData groupData = new();
+            groupData.DataList.Add(MyEllipseDataオリーブ);
+            groupData.DataList.Add(MyEllipseData金色);
+            MyGroupData.DataList.Add(groupData);
+
+
             this.DataContext = this;
         }
     }

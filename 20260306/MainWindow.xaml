@@ -8,16 +8,22 @@
         Title="MainWindow" Height="367" Width="654">
   
   <Window.Resources>
+    <Style x:Key="CanvasItemContainerStyle" TargetType="ContentPresenter">
+      <Setter Property="Canvas.Left" Value="{Binding X}" />
+      <Setter Property="Canvas.Top" Value="{Binding Y}" />
+      <!--<Setter Property="Panel.ZIndex" Value="{Binding Z}" />-->
+    </Style>
+    
     <DataTemplate DataType="{x:Type local:GroupData}">
-      <ItemsControl ItemsSource="{Binding DataList}">
-        
+      <ItemsControl ItemsSource="{Binding DataList}"
+                    ItemContainerStyle="{StaticResource CanvasItemContainerStyle}">
         <ItemsControl.ItemsPanel>
           <ItemsPanelTemplate>
             <Canvas IsItemsHost="True"/>
           </ItemsPanelTemplate>
         </ItemsControl.ItemsPanel>
         
-        <ItemsControl.ItemTemplate>
+        <!--<ItemsControl.ItemTemplate>
           <DataTemplate>
             <ContentControl>
               <ContentControl.Template>
@@ -27,7 +33,7 @@
               </ContentControl.Template>
             </ContentControl>
           </DataTemplate>
-        </ItemsControl.ItemTemplate>
+        </ItemsControl.ItemTemplate>-->
         
       </ItemsControl>
     </DataTemplate>
@@ -63,27 +69,38 @@
     </Grid.ColumnDefinitions>
 
     <Canvas x:Name="MyCanvas">
-      <!--<ContentControl Content="{Binding MyRectangleData}"
-                      Canvas.Left="0" Canvas.Top="0"/>
-      
-      <ContentControl Content="{Binding MyEllipseData}"
-                      Canvas.Left="30" Canvas.Top="20"/>
-      
-      <ContentControl DataContext="{Binding MyEllipseData金色}"
-                      Content="{Binding}"
-                      Canvas.Left="{Binding X}" Canvas.Top="{Binding Y}"/>
-      
-      <ContentControl Content="{Binding MyEllipseDataオリーブ}"
-                      Canvas.Left="{Binding MyEllipseDataオリーブ.X}" Canvas.Top="{Binding MyEllipseDataオリーブ.Y}"/>
-      
-      <ContentControl DataContext="{Binding MyEllipseData緑}"
-                      Canvas.Left="{Binding X}" Canvas.Top="{Binding Y}">
-        <ContentControl.Content>
-          <Ellipse Width="{Binding Width}" Height="{Binding Height}"
-                   Fill="{Binding Fill}"/>
-        </ContentControl.Content>
-      </ContentControl>-->
+      <!--<ItemsControl ItemsSource="{Binding MyGroupData.DataList}"
+                    ItemContainerStyle="{StaticResource CanvasItemContainerStyle}">
+        <ItemsControl.ItemsPanel>
+          <ItemsPanelTemplate>
+            <Canvas IsItemsHost="True"/>
+          </ItemsPanelTemplate>
+        </ItemsControl.ItemsPanel>
 
+        <ItemsControl.ItemTemplate>
+          <ItemContainerTemplate>
+            <ItemsControl ItemsSource="{Binding}"
+                          ItemContainerStyle="{StaticResource CanvasItemContainerStyle}">
+              <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                  <Canvas IsItemsHost="True"/>
+                </ItemsPanelTemplate>
+              </ItemsControl.ItemsPanel>
+
+              <ItemsControl.ItemTemplate>
+                <ItemContainerTemplate>
+                  <ContentPresenter/>
+                </ItemContainerTemplate>
+              </ItemsControl.ItemTemplate>
+              
+            </ItemsControl>
+          </ItemContainerTemplate>
+        </ItemsControl.ItemTemplate>
+        
+      </ItemsControl>-->
+      
+     
+      
       <ItemsControl ItemsSource="{Binding MyGroupData.DataList}">
         <ItemsControl.ItemsPanel>
           <ItemsPanelTemplate>
@@ -98,6 +115,7 @@
           </Style>
         </ItemsControl.ItemContainerStyle>
       </ItemsControl>
+      
     </Canvas>
 
     
