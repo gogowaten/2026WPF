@@ -8,6 +8,46 @@
         Title="MainWindow" Height="367" Width="654">
   
   <Window.Resources>
+    <DataTemplate DataType="{x:Type local:GroupData}">
+      <ItemsControl ItemsSource="{Binding DataList}">
+        
+        <ItemsControl.ItemsPanel>
+          <ItemsPanelTemplate>
+            <Canvas IsItemsHost="True"/>
+          </ItemsPanelTemplate>
+        </ItemsControl.ItemsPanel>
+        
+        <ItemsControl.ItemTemplate>
+          <DataTemplate>
+            <ContentControl>
+              <ContentControl.Template>
+                <ControlTemplate>
+                  <ContentPresenter/>
+                </ControlTemplate>
+              </ContentControl.Template>
+            </ContentControl>
+          </DataTemplate>
+        </ItemsControl.ItemTemplate>
+        
+      </ItemsControl>
+    </DataTemplate>
+
+    <!--<DataTemplate x:Key="aa">
+      <ContentControl>
+        <ContentControl.Style>
+          <Style TargetType="{x:Type ContentControl}">
+            <Setter Property="Template">
+              <Setter.Value>
+                <ControlTemplate TargetType="{x:Type ContentControl}">
+                  <ContentPresenter/>
+                </ControlTemplate>
+              </Setter.Value>
+            </Setter>
+          </Style>
+        </ContentControl.Style>
+      </ContentControl>
+    </DataTemplate>-->
+      
     <DataTemplate DataType="{x:Type local:RectangleData}">
       <Rectangle Width="{Binding Width}" Height="{Binding Height}" Fill="{Binding Fill}"/>
     </DataTemplate>
@@ -23,7 +63,7 @@
     </Grid.ColumnDefinitions>
 
     <Canvas x:Name="MyCanvas">
-      <ContentControl Content="{Binding MyRectangleData}"
+      <!--<ContentControl Content="{Binding MyRectangleData}"
                       Canvas.Left="0" Canvas.Top="0"/>
       
       <ContentControl Content="{Binding MyEllipseData}"
@@ -42,11 +82,45 @@
           <Ellipse Width="{Binding Width}" Height="{Binding Height}"
                    Fill="{Binding Fill}"/>
         </ContentControl.Content>
-      </ContentControl>
+      </ContentControl>-->
+
+      <ItemsControl ItemsSource="{Binding MyGroupData.DataList}">
+        <ItemsControl.ItemsPanel>
+          <ItemsPanelTemplate>
+            <Canvas IsItemsHost="True"/>
+          </ItemsPanelTemplate>
+        </ItemsControl.ItemsPanel>
+        
+        <ItemsControl.ItemContainerStyle>
+          <Style>
+            <Setter Property="Canvas.Left" Value="{Binding X}"/>
+            <Setter Property="Canvas.Top" Value="{Binding Y}"/>
+          </Style>
+        </ItemsControl.ItemContainerStyle>
+      </ItemsControl>
     </Canvas>
 
+    
     <StackPanel Grid.Column="1">
+      <ListBox ItemsSource="{Binding MyGroupData.DataList}">
+        <ListBox.ItemTemplate>
+          <DataTemplate>
+            <StackPanel Orientation="Horizontal" Height="20">
+                <Viewbox>
+                  <ContentControl Content="{Binding}"/>
+                </Viewbox>
+                <TextBlock Text="{Binding X, StringFormat='Left = {0:0.0}'}"/>
+                <TextBlock Text="{Binding Y, StringFormat=', Top = {0:0.0}'}"/>
+            </StackPanel>
+          </DataTemplate>
+        </ListBox.ItemTemplate>
+      </ListBox>
 
+      <Slider Minimum="0" Maximum="200" Value="{Binding MyGroupData.DataList[0].X}"/>
+
+      <TreeView ItemsSource="{Binding MyGroupData.DataList}">
+        
+      </TreeView>
     </StackPanel>
   </Grid>
 </Window>

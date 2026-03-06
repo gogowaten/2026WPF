@@ -1,12 +1,20 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Text;
 using System.Windows.Automation.Peers;
 using System.Windows.Media;
 
 namespace _20260306
 {
+    public partial class GroupData : Data
+    {
+        [ObservableProperty] private ObservableCollection<Data> _dataList = [];
+
+        public GroupData() { Name = "GroupData"; }
+    }
+
     public partial class EllipseData : ShapeData { public EllipseData() { Width = 50; Height = 50; } }
 
     public partial class RectangleData : ShapeData

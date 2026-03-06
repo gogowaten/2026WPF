@@ -18,13 +18,18 @@ namespace _20260306
     {
         public RectangleData MyRectangleData { get; set; } = new RectangleData();
         public EllipseData MyEllipseData { get; set; } = new EllipseData();
-        public EllipseData MyEllipseData金色 { get; set; } = new EllipseData() { X = 150, Y= 50, Fill = Brushes.Gold };
-        public EllipseData MyEllipseDataオリーブ { get; set; } = new EllipseData() { X = 100, Y= 150, Fill = Brushes.Olive };
-        public EllipseData MyEllipseData緑 { get; set; } = new EllipseData() { X = 100, Y= 100, Fill = Brushes.MediumAquamarine };
+        public EllipseData MyEllipseData金色 { get; set; } = new EllipseData() { X = 150, Y = 50, Fill = Brushes.Gold };
+        public EllipseData MyEllipseDataオリーブ { get; set; } = new EllipseData() { X = 100, Y = 150, Fill = Brushes.Olive };
+        public EllipseData MyEllipseData緑 { get; set; } = new EllipseData() { X = 100, Y = 100, Fill = Brushes.MediumAquamarine };
+        public GroupData MyGroupData { get; set; } = new();
 
         public MainWindow()
         {
             InitializeComponent();
+
+            MyGroupData.DataList.Add(new RectangleData() { X = 20, Y = 80, Width = 50, Height = 50, Fill = Brushes.Gray });
+            MyGroupData.DataList.Add(new EllipseData() { X = 40, Y = 120, Width = 50, Height = 50, Fill = Brushes.Salmon });
+            MyGroupData.DataList.Add(MyEllipseData緑);
 
             this.DataContext = this;
         }
