@@ -1,0 +1,52 @@
+﻿<Window x:Class="_20260306.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:_20260306" d:DataContext="{d:DesignInstance Type=local:MainWindow}"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="367" Width="654">
+  
+  <Window.Resources>
+    <DataTemplate DataType="{x:Type local:RectangleData}">
+      <Rectangle Width="{Binding Width}" Height="{Binding Height}" Fill="{Binding Fill}"/>
+    </DataTemplate>
+    <DataTemplate DataType="{x:Type local:EllipseData}">
+      <Ellipse Width="{Binding Width}" Height="{Binding Height}" Fill="{Binding Fill}"/>
+    </DataTemplate>
+  </Window.Resources>
+  
+  <Grid>
+    <Grid.ColumnDefinitions>
+      <ColumnDefinition/>
+      <ColumnDefinition Width="200"/>
+    </Grid.ColumnDefinitions>
+
+    <Canvas x:Name="MyCanvas">
+      <ContentControl Content="{Binding MyRectangleData}"
+                      Canvas.Left="0" Canvas.Top="0"/>
+      
+      <ContentControl Content="{Binding MyEllipseData}"
+                      Canvas.Left="30" Canvas.Top="20"/>
+      
+      <ContentControl DataContext="{Binding MyEllipseData金色}"
+                      Content="{Binding}"
+                      Canvas.Left="{Binding X}" Canvas.Top="{Binding Y}"/>
+      
+      <ContentControl Content="{Binding MyEllipseDataオリーブ}"
+                      Canvas.Left="{Binding MyEllipseDataオリーブ.X}" Canvas.Top="{Binding MyEllipseDataオリーブ.Y}"/>
+      
+      <ContentControl DataContext="{Binding MyEllipseData緑}"
+                      Canvas.Left="{Binding X}" Canvas.Top="{Binding Y}">
+        <ContentControl.Content>
+          <Ellipse Width="{Binding Width}" Height="{Binding Height}"
+                   Fill="{Binding Fill}"/>
+        </ContentControl.Content>
+      </ContentControl>
+    </Canvas>
+
+    <StackPanel Grid.Column="1">
+
+    </StackPanel>
+  </Grid>
+</Window>

@@ -11,7 +11,7 @@ namespace _20260306_DaraTemplateRectangle
         [ObservableProperty] private double _height;
         //[ObservableProperty] private double _x;
         //[ObservableProperty] private double _y;
-        [ObservableProperty] private string _name = string.Empty;
+        //[ObservableProperty] private string _name = string.Empty;
         //[ObservableProperty] bool _isSelected = false;
     }
 
