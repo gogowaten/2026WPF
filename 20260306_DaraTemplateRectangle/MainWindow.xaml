@@ -1,0 +1,37 @@
+﻿<Window x:Class="_20260306_DaraTemplateRectangle.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:_20260306_DaraTemplateRectangle" d:DataContext="{d:DesignInstance Type=local:MainWindow}"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="367" Width="654">
+
+  <Window.Resources>
+    <DataTemplate DataType="{x:Type local:RectangleData}">
+      <Rectangle Width="{Binding Width}"
+                 Height="{Binding Height}"
+                 Fill="Red"
+                 Opacity="0.3"/>
+    </DataTemplate>
+  </Window.Resources>
+  
+  <Grid>
+    <Grid.ColumnDefinitions>
+      <ColumnDefinition/>
+      <ColumnDefinition Width="200"/>
+    </Grid.ColumnDefinitions>
+
+
+    <Canvas x:Name="MyCanvas">
+      <ContentControl x:Name="TestData" Content="{Binding MyRectangleData}" Canvas.Left="0" Canvas.Top="0"/>
+      <ContentControl x:Name="TestVM" Content="{Binding MyRectangleVM.Data}" Canvas.Left="0" Canvas.Top="0"/>
+    </Canvas>
+
+    <StackPanel Grid.Column="1">
+      <TextBlock Text="{Binding MyRectangleData.Height, StringFormat='DataHeight = {0:0.0}'}"/>
+      <Slider Minimum="10" Maximum="200" Value="{Binding MyRectangleData.Height}"/>
+
+    </StackPanel>
+  </Grid>
+</Window>
