@@ -77,7 +77,7 @@
 
       <Slider Minimum="0" Maximum="200" Value="{Binding MyGroupData.DataList[0].X}"/>
 
-      <TreeView ItemsSource="{Binding MyGroupData.DataList}">
+      <!--<TreeView ItemsSource="{Binding MyGroupData.DataList}">
         <TreeView.ItemTemplate>
           <HierarchicalDataTemplate ItemsSource="{Binding DataList}">
             <HierarchicalDataTemplate.ItemTemplate>
@@ -89,7 +89,7 @@
           
         </TreeView.ItemTemplate>
 
-      </TreeView>
+      </TreeView>-->
     </StackPanel>
   </Grid>
 </Window>

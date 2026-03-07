@@ -16,9 +16,9 @@ namespace _20260306
     /// </summary>
     public partial class MainWindow : Window
     {
-        public RectangleData MyRectangleData { get; set; } = new RectangleData();
-        public EllipseData MyEllipseData { get; set; } = new EllipseData();
-        public EllipseData MyEllipseData金色 { get; set; } = new EllipseData() { X = 150, Y = 50, Fill = Brushes.Gold };
+        public RectangleData MyRectangleData { get; set; } = new RectangleData() { Name = "Rectangle" };
+        public EllipseData MyEllipseData { get; set; } = new EllipseData() { Name = "Ellipse" };
+        public EllipseData MyEllipseData金色 { get; set; } = new EllipseData() { X = 150, Y = 50, Fill = Brushes.Gold,Name="金" };
         public EllipseData MyEllipseDataオリーブ { get; set; } = new EllipseData() { X = 100, Y = 150, Fill = Brushes.Olive };
         public EllipseData MyEllipseData緑 { get; set; } = new EllipseData() { X = 100, Y = 100, Fill = Brushes.MediumAquamarine };
         public GroupData MyGroupData { get; set; } = new();
@@ -30,12 +30,13 @@ namespace _20260306
             MyGroupData.DataList.Add(new RectangleData() { X = 20, Y = 80, Width = 50, Height = 50, Fill = Brushes.Gray });
             MyGroupData.DataList.Add(new EllipseData() { X = 40, Y = 120, Width = 50, Height = 50, Fill = Brushes.Salmon });
             MyGroupData.DataList.Add(MyEllipseData緑);
+            MyGroupData.DataList.Add(MyRectangleData);
 
-            GroupData groupData = new();
+            GroupData groupData = new() { X = 100, Y = 50 };
             groupData.DataList.Add(MyEllipseDataオリーブ);
             groupData.DataList.Add(MyEllipseData金色);
+            groupData.DataList.Add(new RectangleData() { X = 0, Y = 0, Width = 30, Height = 30, Fill = Brushes.YellowGreen });
             MyGroupData.DataList.Add(groupData);
-
 
             this.DataContext = this;
         }
