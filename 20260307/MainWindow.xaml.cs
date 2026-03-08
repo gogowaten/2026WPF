@@ -39,6 +39,8 @@ namespace _20260307
             MyGroupData.DataList.Add(groupData);
 
             this.DataContext = this;
+            ItemsControl ic = new();
+            
         }
 
         private void ListBox_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)

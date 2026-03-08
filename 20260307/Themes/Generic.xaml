@@ -3,7 +3,26 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="clr-namespace:_20260307">
 
-
+  <!--Generic.xaml で見た目を定義する
+コンテナ（MySelectorItem）が IsSelected に応じてどう見えるかを定義します。-->
+  <Style TargetType="{x:Type local:MySelectorItem}">
+    <Setter Property="Template">
+      <Setter.Value>
+        <ControlTemplate TargetType="{x:Type local:MySelectorItem}">
+          <Border x:Name="border" Background="Transparent" BorderBrush="Gray" BorderThickness="1" Padding="5">
+            <ContentPresenter/>
+          </Border>
+          <ControlTemplate.Triggers>
+            <Trigger Property="IsSelected" Value="True">
+              <Setter TargetName="border" Property="Background" Value="LightBlue"/>
+              <Setter TargetName="border" Property="BorderBrush" Value="Red"/>
+            </Trigger>
+          </ControlTemplate.Triggers>
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+  </Style>
+  
     <Style TargetType="{x:Type local:CustomControl1}">
         <Setter Property="Template">
             <Setter.Value>

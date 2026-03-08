@@ -60,7 +60,12 @@
 
     <Canvas x:Name="MyCanvas">
 
-
+      <local:MySelector>
+        <TextBlock Text="ttttttt"/>
+        <TextBlock Text="ttttttt"/>
+        <TextBlock Text="ttttttt"/>
+        <TextBlock Text="ttttttt"/>
+      </local:MySelector>
 
       <!--<ItemsControl ItemsSource="{Binding MyGroupData.DataList}"
                     ItemContainerStyle="{StaticResource CanvasItemContainerStyle}">
@@ -71,14 +76,10 @@
         </ItemsControl.ItemsPanel>
       </ItemsControl>-->
 
-      <ListBox ItemsSource="{Binding MyGroupData.DataList}"
+      <!--<ListBox ItemsSource="{Binding MyGroupData.DataList}"
                 ItemContainerStyle="{StaticResource ListBoxItemContainerStyle}"
                 PreviewMouseLeftButtonDown="ListBox_PreviewMouseLeftButtonDown"
                 SelectionMode="Extended">
-
-
-
-
         <ListBox.ItemsPanel>
           <ItemsPanelTemplate>
             <Canvas IsItemsHost="True"/>
@@ -89,7 +90,7 @@
             <ItemsPresenter/>
           </ControlTemplate>
         </ListBox.Template>
-      </ListBox>
+      </ListBox>-->
     </Canvas>
 
 

@@ -12,15 +12,10 @@
     <Style x:Key="CanvasItemContainerStyle" TargetType="ContentPresenter">
       <Setter Property="Canvas.Left" Value="{Binding X}" />
       <Setter Property="Canvas.Top" Value="{Binding Y}" />
-      <Setter Property="Panel.ZIndex" Value="{Binding Z}" />
+      <!--<Setter Property="Panel.ZIndex" Value="{Binding Z}" />-->
     </Style>
-    
-    <!--<Style x:Key="TreeViewItemContainerStyle" TargetType="TreeViewItem">
-      <Setter Property="Canvas.Left" Value="{Binding X}" />
-      <Setter Property="Canvas.Top" Value="{Binding Y}" />
-      <Setter Property="Panel.ZIndex" Value="{Binding Z}" />
-    </Style>-->
-    
+
+    <!--IsSelectedを普通にバインド-->
     <Style x:Key="ListBoxItemContainerStyle" TargetType="ListBoxItem">
       <Setter Property="Canvas.Left" Value="{Binding X}" />
       <Setter Property="Canvas.Top" Value="{Binding Y}" />
@@ -63,10 +58,12 @@
     </Grid.ColumnDefinitions>
 
     <Canvas x:Name="MyCanvas">
+      <!--IsSelectedを普通にバインドすると、
+      SelectionModeをExtendedやMultipleにしても複数選択可能にならない-->
       <ListBox ItemsSource="{Binding MyGroupData.DataList}"
                 ItemContainerStyle="{StaticResource ListBoxItemContainerStyle}"
                 PreviewMouseLeftButtonDown="ListBox_PreviewMouseLeftButtonDown"
-                SelectionMode="Extended">
+                SelectionMode="Multiple">
         <ListBox.ItemsPanel>
           <ItemsPanelTemplate>
             <Canvas IsItemsHost="True"/>
