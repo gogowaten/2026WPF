@@ -12,8 +12,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 
 
-// 独自のコンテナを作る（MySelectorItem）
-//まずは、個々のアイテムを表示するための「器」を作ります。これに IsSelected プロパティを持たせます。
+// 独自のコンテナに IsSelected プロパティを持たせます。
 namespace _20260307
 {
     public class MySelectorItem : ContentControl
