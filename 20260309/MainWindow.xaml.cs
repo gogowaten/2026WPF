@@ -17,6 +17,7 @@ namespace _20260309
     public partial class MainWindow : Window
     {
         public GroupData MyRootData { get; set; } = new();
+        public DataVM MyDataVM { get; set; } = new();
         public MainWindow()
         {
             InitializeComponent();

@@ -6,33 +6,6 @@
         xmlns:local="clr-namespace:_20260309" d:DataContext="{d:DesignInstance Type=local:MainWindow}"
         mc:Ignorable="d"
         Title="MainWindow" Height="367" Width="654">
-  <!--<Window.Resources>
-    <Style x:Key="CanvasItemContainer">
-      <Setter Property="Canvas.Left" Value="{Binding X}"/>
-      <Setter Property="Canvas.Top" Value="{Binding Y}"/>
-    </Style>
-    
-    <DataTemplate DataType="{x:Type local:RectangleData}">
-      <Rectangle Width="{Binding Width}" Height="{Binding Height}" Fill="{Binding Fill}"/>
-    </DataTemplate>
-    
-    <DataTemplate DataType="{x:Type local:EllipseData}">
-      <Ellipse Width="{Binding Width}" Height="{Binding Height}" Fill="{Binding Fill}"/>
-    </DataTemplate>
-    
-    <DataTemplate DataType="{x:Type local:GroupData}">
-      <ItemsControl ItemsSource="{Binding DataList}"
-                    ItemContainerStyle="{StaticResource CanvasItemContainer}">
-        <ItemsControl.ItemsPanel>
-          <ItemsPanelTemplate>
-            <Canvas IsItemsHost="True"/>
-          </ItemsPanelTemplate>
-        </ItemsControl.ItemsPanel>
-        
-      </ItemsControl>
-    </DataTemplate>
-    
-  </Window.Resources>-->
   
   <Grid>
     <Grid.ColumnDefinitions>
@@ -40,24 +13,16 @@
       <ColumnDefinition Width="200"/>
     </Grid.ColumnDefinitions>
 
-    <!--<local:AAA x:Name="MyAAA" ItemsSource="{Binding MyRootData.DataList}"/>-->
-    <local:AAA x:Name="MyAAA" DataContext="{Binding MyRootData}"/>
+    <local:AAA x:Name="MyAAA" DataContext="{Binding MyDataVM}"/>
+    <!--<local:AAA x:Name="MyAAA" DataContext="{Binding MyRootData}"/>-->
 
-    <!--<ItemsControl ItemsSource="{Binding MyRootData.DataList}"
-                  ItemContainerStyle="{StaticResource CanvasItemContainer}">
-      <ItemsControl.ItemsPanel>
-        <ItemsPanelTemplate>
-          <Canvas IsItemsHost="True"/>
-        </ItemsPanelTemplate>
-      </ItemsControl.ItemsPanel>
-    </ItemsControl>-->
     <Canvas x:Name="MyCanvas">
 
     </Canvas>
 
-    <StackPanel Grid.Column="1">
+    <StackPanel Grid.Column="1" DataContext="{Binding MyDataVM}">
       <Button Content="test" Click="Button_Click"/>
-      <Button Content="右へ10移動" Command="{Binding }"/>
+      <Button Content="右へ10移動" Command="{Binding ToRightCommand}"/>
     </StackPanel>
   </Grid>
 </Window>

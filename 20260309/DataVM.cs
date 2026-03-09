@@ -7,9 +7,8 @@ using System.Windows.Media;
 
 namespace _20260309
 {
-    public partial class DataVM : ObservableObject
+    public partial class DataVM : GroupData
     {
-        [ObservableProperty] private GroupData _myRootData = new();
 
         public DataVM()
         {
@@ -31,16 +30,23 @@ namespace _20260309
             GroupData groupEllipse = new() { Name = "GropuB", X = 100, Y = 0 };
             groupEllipse.DataList.Add(maruRed);
             groupEllipse.DataList.Add(maruBlue);
-
-            MyRootData.DataList.Add(groupRect);
-            MyRootData.DataList.Add(groupEllipse);
-            MyRootData.DataList.Add(maruGreen);
+            
+            DataList.Add(groupRect);
+            DataList.Add(groupEllipse);
+            DataList.Add(maruGreen);
         }
 
         [RelayCommand]
-        public void AddEllipse()
+        private void AddEllipse()
         {
-            MyRootData.DataList.Add(new EllipseData() { Width = 50, Height = 50, Fill = Brushes.Red });
+            DataList.Add(new EllipseData() { Width = 50, Height = 50, Fill = Brushes.Red });
+            
+        }
+
+        [RelayCommand]
+        private void ToRight()
+        {
+            DataList[0].X += 10;
         }
     }
 }
