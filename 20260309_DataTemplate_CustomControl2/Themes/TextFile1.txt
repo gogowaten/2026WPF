@@ -1,0 +1,8 @@
+﻿﻿前回の20260309_DataTemplate_CustomControlとの違いは
+DataVMクラスを作成
+そうすることでMainWindow.xaml.csがスッキリした
+また、private void AddEllipse()でEllipseの追加
+        private void ToRight()で右へ移動をついかした、これでCommandからメソッドを起動できる
+        {
+            DataList[0].X += 10;
+        }
