@@ -5,6 +5,8 @@ using System.Windows.Media;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
+
 
 namespace _20260309
 {
@@ -16,20 +18,28 @@ namespace _20260309
             base.OnAttached();
             AssociatedObject.MouseEnter += AssociatedObject_MouseEnter;
             AssociatedObject.MouseLeave += AssociatedObject_MouseLeave;
+            AssociatedObject.PreviewMouseLeftButtonDown += AssociatedObject_PreviewMouseLeftButtonDown;
         }
+
+        private void AssociatedObject_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            
+        }
+
         protected override void OnDetaching()
         {
             base.OnDetaching();
             AssociatedObject.MouseEnter -= AssociatedObject_MouseEnter;
             AssociatedObject.MouseLeave -= AssociatedObject_MouseLeave;
+            AssociatedObject.PreviewMouseLeftButtonDown-= AssociatedObject_PreviewMouseLeftButtonDown;
         }
 
-        private void AssociatedObject_MouseLeave(object sender, System.Windows.Input.MouseEventArgs e)
+        private void AssociatedObject_MouseLeave(object sender, MouseEventArgs e)
         {
             AssociatedObject.Background = Brushes.Transparent;
         }
 
-        private void AssociatedObject_MouseEnter(object sender, System.Windows.Input.MouseEventArgs e)
+        private void AssociatedObject_MouseEnter(object sender, MouseEventArgs e)
         {
             AssociatedObject.Background = new SolidColorBrush(Color.FromArgb(30, 255, 0, 0));
         }
