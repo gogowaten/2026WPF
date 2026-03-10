@@ -16,9 +16,9 @@
     <local:AAA x:Name="MyAAA" DataContext="{Binding MyDataVM}"/>
     <!--<local:AAA x:Name="MyAAA" DataContext="{Binding MyRootData}"/>-->
 
-    <local:TThumb>
+    <!--<local:CustomThumb MyIsSelected="True">
       <Ellipse Width="30" Height="30" Fill="Yellow"/>
-    </local:TThumb>
+    </local:CustomThumb>-->
 
     <StackPanel Grid.Column="1" DataContext="{Binding MyDataVM}">
       <Button Content="test" Click="Button_Click"/>

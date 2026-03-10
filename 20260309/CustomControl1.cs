@@ -17,7 +17,7 @@ using System.Windows.Shapes;
 namespace _20260309
 {
     [ContentProperty(nameof(MyContent))]
-    public class TThumb : Thumb
+    public class CustomThumb : Thumb
     {
 
         public FrameworkElement MyContent
@@ -26,7 +26,7 @@ namespace _20260309
             set { SetValue(MyContentProperty, value); }
         }
         public static readonly DependencyProperty MyContentProperty =
-            DependencyProperty.Register(nameof(MyContent), typeof(FrameworkElement), typeof(TThumb), new PropertyMetadata(null));
+            DependencyProperty.Register(nameof(MyContent), typeof(FrameworkElement), typeof(CustomThumb), new PropertyMetadata(null));
 
 
         public bool MyIsSelected
@@ -35,15 +35,15 @@ namespace _20260309
             set { SetValue(MyIsSelectedProperty, value); }
         }
         public static readonly DependencyProperty MyIsSelectedProperty =
-            DependencyProperty.Register(nameof(MyIsSelected), typeof(bool), typeof(TThumb), new PropertyMetadata(false));
+            DependencyProperty.Register(nameof(MyIsSelected), typeof(bool), typeof(CustomThumb), new PropertyMetadata(false));
 
 
 
-        static TThumb()
+        static CustomThumb()
         {
-            DefaultStyleKeyProperty.OverrideMetadata(typeof(TThumb), new FrameworkPropertyMetadata(typeof(TThumb)));
+            DefaultStyleKeyProperty.OverrideMetadata(typeof(CustomThumb), new FrameworkPropertyMetadata(typeof(CustomThumb)));
         }
-        public TThumb()
+        public CustomThumb()
         {
             DragDelta += TThumb_DragDelta;
         }
@@ -57,6 +57,7 @@ namespace _20260309
             if (MyIsSelected)
             {
             }
+            e.Handled = true;
         }
     }
 
