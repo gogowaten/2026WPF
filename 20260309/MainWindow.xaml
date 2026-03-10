@@ -16,9 +16,49 @@
     <local:AAA x:Name="MyAAA" DataContext="{Binding MyDataVM}"/>
     <!--<local:AAA x:Name="MyAAA" DataContext="{Binding MyRootData}"/>-->
 
-    <Canvas x:Name="MyCanvas">
+    <Thumb>
+      <Thumb.Template>
+        <ControlTemplate>
+          <Rectangle Width="30" Height="30" Fill="Black"/>
+        </ControlTemplate>
+      </Thumb.Template>
+    </Thumb>
+    
+    <!--<Thumb>
+      <Thumb.Template>
+        <ControlTemplate>
+          <Ellipse Width="30" Height="30" Fill="Yellow"/>
+        </ControlTemplate>
+      </Thumb.Template>
+    </Thumb>-->
 
-    </Canvas>
+    <local:TThumb>
+      <Ellipse Width="30" Height="30" Fill="Yellow"/>
+    </local:TThumb>
+    
+    
+    
+    <!--<Canvas x:Name="MyCanvas">
+        --><!--<Canvas.RenderTransform>
+          <RotateTransform Angle="20"/>
+        </Canvas.RenderTransform>--><!--
+      
+      <Rectangle x:Name="MyRectangle" Width="50" Height="50" Fill="Red"
+           Canvas.Left="100" Canvas.Top="100"
+                 PreviewMouseLeftButtonDown="MyRectangle_PreviewMouseLeftButtonDown"
+                 PreviewMouseMove="MyRectangle_PreviewMouseMove"
+                 PreviewMouseLeftButtonUp="MyRectangle_PreviewMouseLeftButtonUp">
+        --><!--<Rectangle.RenderTransform>
+          <RotateTransform Angle="20"/>
+        </Rectangle.RenderTransform>--><!--
+        </Rectangle>
+      <Thumb x:Name="MyThumb" Width="50" Height="50" Canvas.Left="50" Canvas.Top="50"
+             DragDelta="MyThumb_DragDelta">
+        <Thumb.RenderTransform>
+          <RotateTransform Angle="20"/>
+        </Thumb.RenderTransform>
+      </Thumb>
+    </Canvas>-->
 
     <StackPanel Grid.Column="1" DataContext="{Binding MyDataVM}">
       <Button Content="test" Click="Button_Click"/>

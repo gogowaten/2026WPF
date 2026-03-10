@@ -14,7 +14,19 @@
   </DataTemplate>
 
   <DataTemplate DataType="{x:Type local:EllipseData}">
-    <Ellipse Width="{Binding Width}" Height="{Binding Height}" Fill="{Binding Fill}"/>
+    <!--<Thumb>
+      <Thumb.Template>
+        <ControlTemplate>
+          <Grid>
+            <Ellipse Width="{Binding Width}" Height="{Binding Height}" Fill="{Binding Fill}"/>
+          </Grid>
+        </ControlTemplate>
+      </Thumb.Template>
+    </Thumb>-->
+    <local:TThumb Width="100" Height="100">
+      <TextBox Text="aaaa"/>
+      <!--<Ellipse Width="{Binding Width}" Height="{Binding Height}" Fill="{Binding Fill}"/>-->
+    </local:TThumb>
   </DataTemplate>
 
   <DataTemplate DataType="{x:Type local:GroupData}">
@@ -29,6 +41,18 @@
     </ItemsControl>
   </DataTemplate>
 
+
+  <Style TargetType="{x:Type local:TThumb}">
+    <Setter Property="Template">
+      <Setter.Value>
+        <ControlTemplate TargetType="{x:Type local:TThumb}">
+          <ContentPresenter Content="{TemplateBinding MyContent}"/>
+          
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+  </Style>
+  
   <Style TargetType="{x:Type local:AAA}">
     <Setter Property="ItemsSource" Value="{Binding DataList}"/>
     <Setter Property="ItemContainerStyle" Value="{StaticResource CanvasItemContainer}"/>
