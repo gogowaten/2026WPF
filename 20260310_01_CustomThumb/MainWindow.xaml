@@ -5,8 +5,12 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:_20260310_01_CustomThumb"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
-    <Grid>
-
-    </Grid>
+        Title="MainWindow" Height="250" Width="300">
+  <Grid>
+    <Canvas>
+      <local:CustomThumb Canvas.Left="20" Canvas.Top="20">
+        <Ellipse Width="100" Height="100" Fill="Red"/>
+      </local:CustomThumb>
+    </Canvas>
+  </Grid>
 </Window>
