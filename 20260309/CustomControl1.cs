@@ -19,14 +19,25 @@ namespace _20260309
     [ContentProperty(nameof(MyContent))]
     public class TThumb : Thumb
     {
-        
-        public UIElement MyContent
+
+        public FrameworkElement MyContent
         {
-            get { return (UIElement)GetValue(MyContentProperty); }
+            get { return (FrameworkElement)GetValue(MyContentProperty); }
             set { SetValue(MyContentProperty, value); }
         }
         public static readonly DependencyProperty MyContentProperty =
-            DependencyProperty.Register(nameof(MyContent), typeof(UIElement), typeof(TThumb), new PropertyMetadata(null));
+            DependencyProperty.Register(nameof(MyContent), typeof(FrameworkElement), typeof(TThumb), new PropertyMetadata(null));
+
+
+        public bool MyIsSelected
+        {
+            get { return (bool)GetValue(MyIsSelectedProperty); }
+            set { SetValue(MyIsSelectedProperty, value); }
+        }
+        public static readonly DependencyProperty MyIsSelectedProperty =
+            DependencyProperty.Register(nameof(MyIsSelected), typeof(bool), typeof(TThumb), new PropertyMetadata(false));
+
+
 
         static TThumb()
         {
@@ -34,17 +45,19 @@ namespace _20260309
         }
         public TThumb()
         {
-
+            DragDelta += TThumb_DragDelta;
         }
 
-        //public override void OnApplyTemplate()
-        //{
-        //    base.OnApplyTemplate();
-        //    if(GetTemplateChild("PART_Content") is ContentControl cc)
-        //    {
-        //        cc.Content = MyContent;
-        //    }
-        //}
+        private void TThumb_DragDelta(object sender, DragDeltaEventArgs e)
+        {
+            var left = Canvas.GetLeft(this);
+            Canvas.SetLeft(this, Canvas.GetLeft(this) + e.HorizontalChange);
+            Canvas.SetTop(this, Canvas.GetTop(this) + e.VerticalChange);
+            var left2 = Canvas.GetLeft(this);
+            if (MyIsSelected)
+            {
+            }
+        }
     }
 
     public class AAA : ItemsControl
@@ -64,8 +77,8 @@ namespace _20260309
             base.OnPreviewMouseLeftButtonDown(e);
             var sou = e.Source;
             var ori = e.OriginalSource;
-            
-         }
+
+        }
     }
 
     public class CustomControl1 : Control

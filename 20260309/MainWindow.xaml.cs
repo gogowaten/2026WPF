@@ -16,15 +16,14 @@ namespace _20260309
     /// </summary>
     public partial class MainWindow : Window
     {
-        private Point _startP;
-        private bool _isDrag;
+     
 
         public GroupData MyRootData { get; set; } = new();
         public DataVM MyDataVM { get; set; } = new();
         public MainWindow()
         {
             InitializeComponent();
-            MyInit();
+            //MyInit();
             DataContext = this;
         }
 
@@ -55,35 +54,5 @@ namespace _20260309
             //var itemssource = MyAAA.ItemsSource;
         }
 
-        private void MyRectangle_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
-        {
-            _isDrag = true;
-            _startP = e.GetPosition(MyCanvas);
-            MyRectangle.CaptureMouse();
-        }
-
-        private void MyRectangle_PreviewMouseMove(object sender, MouseEventArgs e)
-        {
-            if (_isDrag)
-            {
-                Point currentP = e.GetPosition(MyCanvas);
-                Vector delta = currentP - _startP;
-                Canvas.SetLeft(MyRectangle, Canvas.GetLeft(MyRectangle) + delta.X);
-                Canvas.SetTop(MyRectangle, Canvas.GetTop(MyRectangle) + delta.Y);
-                _startP = currentP;
-            }
-        }
-
-        private void MyRectangle_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
-        {
-            _isDrag = false;
-            MyRectangle.ReleaseMouseCapture();
-        }
-
-        private void MyThumb_DragDelta(object sender, System.Windows.Controls.Primitives.DragDeltaEventArgs e)
-        {
-            Canvas.SetLeft(MyThumb, Canvas.GetLeft(MyThumb) + e.HorizontalChange);
-            Canvas.SetTop(MyThumb, Canvas.GetTop(MyThumb) + e.VerticalChange);
-        }
     }
 }
