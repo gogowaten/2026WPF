@@ -16,6 +16,7 @@ namespace _20260309
      
     public class AAA : ItemsControl
     {
+
         static AAA()
         {
             DefaultStyleKeyProperty.OverrideMetadata(typeof(AAA), new FrameworkPropertyMetadata(typeof(AAA)));

@@ -10,6 +10,7 @@ namespace _20260309
 {
     public partial class GroupData : Data
     {
+        [ObservableProperty] private bool _isEditing; // 編集状態
         [ObservableProperty] private ObservableCollection<Data> _dataList = [];
 
         public GroupData() { Name = "GroupData"; }
@@ -33,6 +34,7 @@ namespace _20260309
         [ObservableProperty] private double _x;
         [ObservableProperty] private double _y;
         [ObservableProperty] private string _name = string.Empty;
-        [ObservableProperty] bool _isSelected = false;
+        [ObservableProperty] bool _isSelected = false; // 選択状態
+        
     }
 }
