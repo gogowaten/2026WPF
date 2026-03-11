@@ -19,6 +19,21 @@ namespace _20260311
     public class CustomThumb : Thumb
     {
 
+        static CustomThumb()
+        {
+            DefaultStyleKeyProperty.OverrideMetadata(typeof(CustomThumb), new FrameworkPropertyMetadata(typeof(CustomThumb)));
+        }
+
+
+        public Data MyData
+        {
+            get { return (Data)GetValue(MyDataProperty); }
+            set { SetValue(MyDataProperty, value); }
+        }
+        public static readonly DependencyProperty MyDataProperty =
+            DependencyProperty.Register(nameof(MyData), typeof(Data), typeof(CustomThumb), new PropertyMetadata(null));
+
+
         public FrameworkElement MyContent
         {
             get { return (FrameworkElement)GetValue(MyContentProperty); }
@@ -38,21 +53,20 @@ namespace _20260311
 
 
 
-        static CustomThumb()
-        {
-            DefaultStyleKeyProperty.OverrideMetadata(typeof(CustomThumb), new FrameworkPropertyMetadata(typeof(CustomThumb)));
-        }
         public CustomThumb()
         {
+            //this.DataContext = this;
             DragDelta += TThumb_DragDelta;
             PreviewMouseLeftButtonDown += CustomThumb_PreviewMouseLeftButtonDown;
         }
 
         private void CustomThumb_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
+            // Groupの中の要素の場合は、先にGroupのクリックが来た後に要素のクリックが来る
             var sou = e.Source;
             var ori = e.OriginalSource;
             var dc = this.DataContext;
+            var myd = MyData;
         }
 
         private void TThumb_DragDelta(object sender, DragDeltaEventArgs e)
@@ -68,6 +82,11 @@ namespace _20260311
         }
     }
 
+
+
+
+
+
     public class AAAItemsCtrl : ItemsControl
     {
 
@@ -77,6 +96,13 @@ namespace _20260311
         }
         public AAAItemsCtrl()
         {
+            PreviewMouseLeftButtonDown += AAAItemsCtrl_PreviewMouseLeftButtonDown;
+        }
+
+        private void AAAItemsCtrl_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            var sou = e.Source;
+            var ori = e.OriginalSource;
 
         }
 
@@ -85,9 +111,15 @@ namespace _20260311
             base.OnPreviewMouseLeftButtonDown(e);
             var sou = e.Source;
             var ori = e.OriginalSource;
-
+            if (ori is UIElement elm)
+            {
+                var youso = ContainerFromElement(elm);
+                var item = ItemsControl.ItemsControlFromItemContainer(youso);
+                var yo = ItemsControl.GetItemsOwner(youso);
+                var io = ItemsControl.GetItemsOwner(item);
+            }
         }
     }
 
-  
+
 }

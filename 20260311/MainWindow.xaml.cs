@@ -26,7 +26,7 @@ namespace _20260311
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-
+            var dc = MyAAA.DataContext;
         }
     }
 }

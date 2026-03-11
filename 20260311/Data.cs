@@ -5,6 +5,7 @@ using System.Collections.ObjectModel;
 using System.Text;
 using System.Windows.Media;
 using System.Xml.Linq;
+using System.Collections.Specialized;
 
 namespace _20260311
 {
@@ -13,8 +14,27 @@ namespace _20260311
         [ObservableProperty] private bool _isEditing; // 編集状態
         [ObservableProperty] private ObservableCollection<Data> _dataList = [];
 
-        public GroupData() { Name = "GroupData"; }
+        public GroupData()
+        {
+            Name = "GroupData";
+            DataList.CollectionChanged += DataList_CollectionChanged;
+        }
+
+        private void DataList_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+        {
+            if (e.Action == NotifyCollectionChangedAction.Add)
+            {
+                if (e.NewItems?[0] is Data newData) { newData.ParentData = this; }
+            }
+            else if (e.Action == NotifyCollectionChangedAction.Remove)
+            {
+                if (e.OldItems?[0] is Data oldData) { oldData.ParentData = null; }
+            }
+        }
+        //public void AddData(Data data) { DataList.Add(data); }
+
     }
+
 
     public partial class EllipseData : ShapeData { }
 
@@ -29,6 +49,7 @@ namespace _20260311
 
     public abstract partial class Data : ObservableObject
     {
+        [ObservableProperty] private GroupData? _parentData;
         [ObservableProperty] private double _width;
         [ObservableProperty] private double _height;
         [ObservableProperty] private double _x;
