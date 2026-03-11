@@ -6,7 +6,7 @@ using System.Text;
 using System.Windows.Media;
 using System.Xml.Linq;
 
-namespace _20260309
+namespace _20260311
 {
     public partial class GroupData : Data
     {
@@ -35,7 +35,6 @@ namespace _20260309
         [ObservableProperty] private double _y;
         [ObservableProperty] private string _name = string.Empty;
         [ObservableProperty] bool _isSelected = false; // 選択状態
-        
-        
+
     }
 }

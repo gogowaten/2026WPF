@@ -6,10 +6,20 @@ using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Controls.Primitives;
 
 
 namespace _20260309
 {
+    public class MyBehavior : Behavior<ContentControl>
+    {
+        protected override void OnAttached()
+        {
+            base.OnAttached();
+            var neko = AssociatedObject;
+            var dc = AssociatedObject.DataContext;
+        }
+    }
 
     public class MouseOverBehavior : Behavior<Grid>
     {
@@ -19,11 +29,12 @@ namespace _20260309
             AssociatedObject.MouseEnter += AssociatedObject_MouseEnter;
             AssociatedObject.MouseLeave += AssociatedObject_MouseLeave;
             AssociatedObject.PreviewMouseLeftButtonDown += AssociatedObject_PreviewMouseLeftButtonDown;
+
         }
 
         private void AssociatedObject_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            
+
         }
 
         protected override void OnDetaching()
@@ -31,7 +42,6 @@ namespace _20260309
             base.OnDetaching();
             AssociatedObject.MouseEnter -= AssociatedObject_MouseEnter;
             AssociatedObject.MouseLeave -= AssociatedObject_MouseLeave;
-            AssociatedObject.PreviewMouseLeftButtonDown-= AssociatedObject_PreviewMouseLeftButtonDown;
         }
 
         private void AssociatedObject_MouseLeave(object sender, MouseEventArgs e)

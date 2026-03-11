@@ -10,12 +10,16 @@ namespace _20260309
 {
     public partial class DataVM : GroupData
     {
+        
 
         public DataVM()
         {
             MyInit();
-
         }
+
+        
+
+
         private void MyInit()
         {
             RectangleData rRed = new() { Name = "RedRect", X = 0, Y = 0, Width = 60, Height = 60, Fill = new SolidColorBrush(Color.FromArgb(50, 255, 0, 0)) };

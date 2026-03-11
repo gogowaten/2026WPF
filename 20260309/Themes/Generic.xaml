@@ -52,21 +52,40 @@
     <Setter Property="Canvas.Left" Value="{Binding X, Mode=TwoWay}"/>
     <Setter Property="Canvas.Top" Value="{Binding Y, Mode=TwoWay}"/>
     <Setter Property="MyIsSelected" Value="{Binding IsSelected}"/>
-
-    <!--<Setter Property="Background" Value="Red"/>-->
     <Setter Property="Template">
       <Setter.Value>
         <ControlTemplate TargetType="{x:Type local:CustomThumb}">
           <Grid>
-            <i:Interaction.Behaviors>
-              <local:MouseOverBehavior/>
-            </i:Interaction.Behaviors>
-            <ContentPresenter Content="{TemplateBinding MyContent}"/>
+            <ContentControl Content="{TemplateBinding MyContent}">
+              <i:Interaction.Behaviors>
+                <local:MyBehavior/>
+              </i:Interaction.Behaviors>
+            </ContentControl>
           </Grid>
         </ControlTemplate>
       </Setter.Value>
     </Setter>
   </Style>
+  
+
+  <!--<Style TargetType="{x:Type local:CustomThumb}">
+    <Setter Property="Canvas.Left" Value="{Binding X, Mode=TwoWay}"/>
+    <Setter Property="Canvas.Top" Value="{Binding Y, Mode=TwoWay}"/>
+    <Setter Property="MyIsSelected" Value="{Binding IsSelected}"/>
+    <Setter Property="Template">
+      <Setter.Value>
+        <ControlTemplate TargetType="{x:Type local:CustomThumb}">
+          <Grid>
+            --><!--<i:Interaction.Behaviors>
+              <local:MouseOverBehavior/>
+            </i:Interaction.Behaviors>--><!--
+            <ContentPresenter Content="{TemplateBinding MyContent}"/>
+          </Grid>
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+  </Style>-->
+  
 
   <Style TargetType="{x:Type local:AAA}">
     <Setter Property="ItemsSource" Value="{Binding DataList}"/>
