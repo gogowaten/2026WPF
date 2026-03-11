@@ -3,10 +3,27 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:_20260311"
+        xmlns:local="clr-namespace:_20260311" d:DataContext="{d:DesignInstance Type=local:MainWindow}"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
-    <Grid>
+        Title="MainWindow" Height="367" Width="654">
 
-    </Grid>
+  <Grid>
+    <Grid.ColumnDefinitions>
+      <ColumnDefinition/>
+      <ColumnDefinition Width="200"/>
+    </Grid.ColumnDefinitions>
+
+    <!--<local:AAAItemsCtrl x:Name="MyAAA" DataContext="{Binding MyDataVM}"/>-->
+    <!--<local:AAA x:Name="MyAAA" DataContext="{Binding MyRootData}"/>-->
+    <local:AAAItemsCtrl x:Name="MyAAA" DataContext="{Binding MyDataVM.Datas}"/>
+    
+    <!--<local:CustomThumb MyIsSelected="True">
+      <Ellipse Width="30" Height="30" Fill="Yellow"/>
+    </local:CustomThumb>-->
+
+    <StackPanel Grid.Column="1" DataContext="{Binding MyDataVM}">
+      <Button Content="test" Click="Button_Click"/>
+      <!--<Button Content="右へ10移動" Command="{Binding ToRightCommand}"/>-->
+    </StackPanel>
+  </Grid>
 </Window>

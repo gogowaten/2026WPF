@@ -16,9 +16,17 @@ namespace _20260311
     /// </summary>
     public partial class MainWindow : Window
     {
+        public DataVM MyDataVM { get; set; } = new();
+
         public MainWindow()
         {
             InitializeComponent();
+            this.DataContext = this;
+        }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+
         }
     }
 }
