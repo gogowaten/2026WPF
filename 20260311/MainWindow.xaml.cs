@@ -16,7 +16,7 @@ namespace _20260311
     /// </summary>
     public partial class MainWindow : Window
     {
-        public DataVM MyDataVM { get; set; } = new();
+        public RootData MyDataVM { get; set; } = new();
 
         public MainWindow()
         {

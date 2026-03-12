@@ -14,18 +14,36 @@
     </Grid.ColumnDefinitions>
 
     <local:AAAItemsCtrl x:Name="MyAAA" DataContext="{Binding MyDataVM}"/>
-    <!--<local:AAAItemsCtrl x:Name="MyAAA" DataContext="{Binding MyDataVM.Datas}"/>-->
-    
-    
-    
-    
-    
-    
-    
+    <!--<local:AAAItemsCtrl x:Name="MyAAA" DataContext="{Binding MyDataVM}"
+                        AAADataService="{Binding MyService}"/>-->
+
+
+
+
+
+
+
     <StackPanel Grid.Column="1" DataContext="{Binding MyDataVM}">
       <Button Content="test" Click="Button_Click"/>
       <!--<Button Content="右へ10移動" Command="{Binding ToRightCommand}"/>-->
-      
+
+      <TreeView ItemsSource="{Binding DataList}">
+        <TreeView.ItemContainerStyle>
+          <Style TargetType="TreeViewItem">
+            <Setter Property="IsExpanded" Value="True"/>
+          </Style>
+        </TreeView.ItemContainerStyle>
+
+        <TreeView.ItemTemplate>
+          <HierarchicalDataTemplate DataType="{x:Type local:GroupData}" ItemsSource="{Binding DataList}">
+            <StackPanel Orientation="Horizontal">
+              <TextBlock Text="{Binding Name}"/>
+              <TextBlock Text="{Binding IsSelected, StringFormat=' _ 選択状態 = {0}'}"/>
+            </StackPanel>
+          </HierarchicalDataTemplate>
+        </TreeView.ItemTemplate>
+      </TreeView>
+
     </StackPanel>
   </Grid>
 </Window>

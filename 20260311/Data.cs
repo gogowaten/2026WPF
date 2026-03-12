@@ -31,8 +31,6 @@ namespace _20260311
                 if (e.OldItems?[0] is Data oldData) { oldData.ParentData = null; }
             }
         }
-        //public void AddData(Data data) { DataList.Add(data); }
-
     }
 
 
@@ -49,6 +47,7 @@ namespace _20260311
 
     public abstract partial class Data : ObservableObject
     {
+        [ObservableProperty] private GroupData? _rootData;
         [ObservableProperty] private GroupData? _parentData;
         [ObservableProperty] private double _width;
         [ObservableProperty] private double _height;
@@ -56,6 +55,8 @@ namespace _20260311
         [ObservableProperty] private double _y;
         [ObservableProperty] private string _name = string.Empty;
         [ObservableProperty] bool _isSelected = false; // 選択状態
+        [ObservableProperty] bool _isCurrent = false; // 筆頭
+
 
     }
 }

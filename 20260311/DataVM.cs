@@ -5,33 +5,46 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Text;
 using System.Windows.Media;
+using System.Collections.Specialized;
+
 
 namespace _20260311
 {
-    public partial class DataVM : GroupData
+    public partial class RootData : GroupData
     {
-        [ObservableProperty] private Data? _activeData;
-        [ObservableProperty] private ObservableCollection<Data> _selectedDatas = [];
-        [ObservableProperty] private GroupData? _editingGroupData;
+        [ObservableProperty] private Data? _currentItem;
+        [ObservableProperty] private ObservableCollection<Data> _selectedItems = [];
+        [ObservableProperty] private GroupData? _editingGroup;
         //[ObservableProperty] private GroupData _datas = new();
+        //public DataService MyService { get; } = new();
 
 
-        public DataVM()
+        public RootData()
         {
             MyInit();
-            
+            //SelectedItems.CollectionChanged += SelectedItems_CollectionChanged;
+        }
+
+        private void SelectedItems_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+        {
+            if (e.Action == NotifyCollectionChangedAction.Add)
+            {
+                if (e.NewItems?[0] is Data newData) { newData.IsSelected = true; }
+            }
+            else if (e.Action == NotifyCollectionChangedAction.Remove)
+            {
+                if (e.OldItems?[0] is Data oldData) { oldData.IsSelected = false; }
+            }
         }
 
         public void AddData(Data data)
         {
-            if(EditingGroupData is GroupData group)
-            {
-                group.DataList.Add(data);
-            }
+            EditingGroup?.DataList.Add(data);
         }
 
         private void MyInit()
         {
+            //this.RootData = this; // 自身をRootにしておく
             this.IsEditing = true; // 起動時は自身が編集状態グループ
 
             RectangleData rRed = new() { Name = "RedRect", X = 0, Y = 0, Width = 60, Height = 60, Fill = new SolidColorBrush(Color.FromArgb(50, 255, 0, 0)) };

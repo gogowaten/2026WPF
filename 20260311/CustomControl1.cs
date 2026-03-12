@@ -58,7 +58,33 @@ namespace _20260311
             //this.DataContext = this;
             DragDelta += TThumb_DragDelta;
             PreviewMouseLeftButtonDown += CustomThumb_PreviewMouseLeftButtonDown;
+            //KeyDown += CustomThumb_KeyDown;
+            //PreviewKeyDown += CustomThumb_PreviewKeyDown;
         }
+
+        //protected override void OnKeyDown(KeyEventArgs e)
+        //{
+        //    base.OnKeyDown(e);
+        //    var imakey = e.Key;
+        //}
+        protected override void OnPreviewKeyDown(KeyEventArgs e)
+        {
+            base.OnPreviewKeyDown(e);
+            if (e.Key == Key.F2)
+            {
+                var md = MyData;
+            }
+        }
+
+        //private void CustomThumb_PreviewKeyDown(object sender, KeyEventArgs e)
+        //{
+        //    var imakey = e.Key;
+        //}
+
+        //private void CustomThumb_KeyDown(object sender, KeyEventArgs e)
+        //{
+        //    var imakey = e.Key;
+        //}
 
         private void CustomThumb_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
@@ -67,6 +93,11 @@ namespace _20260311
             var ori = e.OriginalSource;
             var dc = this.DataContext;
             var myd = MyData;
+            this.Focus();
+            var isfo = this.IsFocused;
+            var iskeyfo = this.IsKeyboardFocused;
+            var iii = this.Focusable;
+
         }
 
         private void TThumb_DragDelta(object sender, DragDeltaEventArgs e)
@@ -90,6 +121,15 @@ namespace _20260311
     public class AAAItemsCtrl : ItemsControl
     {
 
+        //public DataService AAADataService
+        //{
+        //    get { return (DataService)GetValue(AAADataServiceProperty); }
+        //    set { SetValue(AAADataServiceProperty, value); }
+        //}
+        //public static readonly DependencyProperty AAADataServiceProperty =
+        //    DependencyProperty.Register(nameof(AAADataService), typeof(DataService), typeof(AAAItemsCtrl));
+
+
         static AAAItemsCtrl()
         {
             DefaultStyleKeyProperty.OverrideMetadata(typeof(AAAItemsCtrl), new FrameworkPropertyMetadata(typeof(AAAItemsCtrl)));
@@ -111,9 +151,12 @@ namespace _20260311
             base.OnPreviewMouseLeftButtonDown(e);
             var sou = e.Source;
             var ori = e.OriginalSource;
+            var dc = this.DataContext;
             if (ori is UIElement elm)
             {
+                // 要素からコンテナ取得？
                 var youso = ContainerFromElement(elm);
+                var youso2 = ContainerFromElement(this, elm);
                 var item = ItemsControl.ItemsControlFromItemContainer(youso);
                 var yo = ItemsControl.GetItemsOwner(youso);
                 var io = ItemsControl.GetItemsOwner(item);
