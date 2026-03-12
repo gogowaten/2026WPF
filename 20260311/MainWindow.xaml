@@ -26,7 +26,10 @@
     <StackPanel Grid.Column="1" DataContext="{Binding MyDataVM}">
       <Button Content="test" Click="Button_Click"/>
       <!--<Button Content="右へ10移動" Command="{Binding ToRightCommand}"/>-->
-
+      <TextBlock Text="{Binding CurrentItem.Name, StringFormat=CurrentItem {0}}"/>
+      <TextBlock Text="{Binding EditingGroup.Name, StringFormat=EditingGroup {0}}"/>
+      <TextBlock Text="{Binding SelectedItems.Count, StringFormat=SelectedItemsCount {0}}"/>
+      <ContentPresenter Content="{Binding CurrentItem}"/>
       <TreeView ItemsSource="{Binding DataList}">
         <TreeView.ItemContainerStyle>
           <Style TargetType="TreeViewItem">

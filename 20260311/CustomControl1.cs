@@ -70,20 +70,23 @@ namespace _20260311
             base.OnPreviewKeyDown(e);
             if (e.Key == Key.F2)
             {
-                var md = MyData;
+                if(MyData is GroupData group && group.IsCurrent) { group.RootData?.ChangeEditingGroup(group); }
             }
         }
 
-        //private void CustomThumb_PreviewKeyDown(object sender, KeyEventArgs e)
-        //{
-        //    var imakey = e.Key;
-        //}
-
-        //private void CustomThumb_KeyDown(object sender, KeyEventArgs e)
-        //{
-        //    var imakey = e.Key;
-        //}
-
+        protected override void OnPreviewMouseLeftButtonDown(MouseButtonEventArgs e)
+        {
+            base.OnPreviewMouseLeftButtonDown(e);
+            var sou = e.Source;
+            var ori = e.OriginalSource;
+            var dc = this.DataContext;
+            var myd = MyData;
+            this.Focus();
+            var isfo = this.IsFocused;
+            var iskeyfo = this.IsKeyboardFocused;
+            var iii = this.Focusable;
+            if (MyData.IsSelectable) { MyData.RootData?.AddSelect(MyData); }
+        }
         private void CustomThumb_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             // Groupの中の要素の場合は、先にGroupのクリックが来た後に要素のクリックが来る

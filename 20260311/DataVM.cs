@@ -12,7 +12,7 @@ namespace _20260311
 {
     public partial class RootData : GroupData
     {
-        [ObservableProperty] private Data? _currentItem;
+        [ObservableProperty] private Data? _currentItem; // 筆頭
         [ObservableProperty] private ObservableCollection<Data> _selectedItems = [];
         [ObservableProperty] private GroupData? _editingGroup;
 
@@ -22,11 +22,48 @@ namespace _20260311
 
         public RootData()
         {
+            Name = "RootDataです";
             EditingGroup = this;
             MyInit();
-            //SelectedItems.CollectionChanged += SelectedItems_CollectionChanged;
+            SelectedItems.CollectionChanged += SelectedItems_CollectionChanged;
         }
 
+        partial void OnCurrentItemChanged(Data? oldValue, Data? newValue)
+        {
+            if (oldValue is not null) { oldValue.IsCurrent = false; }
+            if (newValue is not null) { newValue.IsCurrent = true; }
+        }
+
+        // 編集状態のGroup変更時
+        partial void OnEditingGroupChanged(GroupData? oldValue, GroupData? newValue)
+        {
+            ClearSelectedItems();
+
+            if (oldValue is not null)
+            {
+                oldValue.IsEditing = false;
+                foreach (var item in oldValue.DataList) { item.IsSelectable = false; }
+
+            }
+            if (newValue is not null)
+            {
+                newValue.IsEditing = true;
+                foreach (var item in newValue.DataList) { item.IsSelectable = true; }
+            }
+        }
+
+        // 全選択解除
+        private void ClearSelectedItems()
+        {
+            foreach (var item in SelectedItems)
+            {
+                item.IsSelected = false;
+            }
+            SelectedItems.Clear();
+            CurrentItem = null;
+        }
+
+        // 選択状態のData変更時
         private void SelectedItems_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
         {
             if (e.Action == NotifyCollectionChangedAction.Add)
@@ -39,19 +76,10 @@ namespace _20260311
             }
         }
 
-        partial void OnEditingGroupChanged(GroupData? oldValue, GroupData? newValue)
-        {
-            if (oldValue is not null)
-            {
-                oldValue.IsEditing = false;
-                foreach (var item in oldValue.DataList) { item.IsSelectable = false; }
-            }
-            if (newValue is not null)
-            {
-                newValue.IsEditing = true;
-                foreach (var item in newValue.DataList) { item.IsSelectable = true; }
-            }
-        }
+        public void ChangeCurrentItem(Data data) { CurrentItem = data; }
+
+
+        public void ChangeEditingGroup(GroupData group) { EditingGroup = group; }
 
         public void AddSelect(Data data)
         {
@@ -59,6 +87,7 @@ namespace _20260311
             if (SelectedItems.Contains(data)) return;
 
             SelectedItems.Add(data);
+            CurrentItem = data;
         }
 
         public void RemoveSelect(Data data)
@@ -80,6 +109,7 @@ namespace _20260311
         private void MyInit()
         {
             this.RootData = this; // 自身をRootにしておく
+            this.CurrentItem = this; // 自身を筆頭にしておく
             this.IsEditing = true; // 起動時は自身が編集状態グループ
 
             RectangleData rRed = new() { Name = "RedRect", X = 0, Y = 0, Width = 60, Height = 60, Fill = new SolidColorBrush(Color.FromArgb(50, 255, 0, 0)) };
@@ -122,6 +152,6 @@ namespace _20260311
             }
         }
 
-        
+
     }
 }
