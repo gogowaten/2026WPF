@@ -13,8 +13,10 @@ namespace _20260311
     public partial class RootData : GroupData
     {
         [ObservableProperty] private Data? _currentItem; // 筆頭
+        [ObservableProperty] private Data? _clickedItem; // 大抵は最後にクリックしたItem
         [ObservableProperty] private ObservableCollection<Data> _selectedItems = [];
         [ObservableProperty] private GroupData? _editingGroup;
+
 
         //[ObservableProperty] private GroupData _datas = new();
         //public DataService MyService { get; } = new();
@@ -28,6 +30,13 @@ namespace _20260311
             SelectedItems.CollectionChanged += SelectedItems_CollectionChanged;
         }
 
+        #region On～プロパティの変更時
+
+        partial void OnClickedItemChanged(Data? oldValue, Data? newValue)
+        {
+            if (oldValue is not null) { oldValue.IsClicked = false; }
+            if (newValue is not null) { newValue.IsClicked = true; }
+        }
         partial void OnCurrentItemChanged(Data? oldValue, Data? newValue)
         {
             if (oldValue is not null) { oldValue.IsCurrent = false; }
@@ -51,6 +60,8 @@ namespace _20260311
                 foreach (var item in newValue.DataList) { item.IsSelectable = true; }
             }
         }
+
+        #endregion On～プロパティの変更時
 
         // 全選択解除
         private void ClearSelectedItems()

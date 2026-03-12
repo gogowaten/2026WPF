@@ -57,7 +57,7 @@ namespace _20260311
         [ObservableProperty] bool _isSelected = false; // 選択状態
         [ObservableProperty] bool _isSelectable = false; // 選択状態
         [ObservableProperty] bool _isCurrent = false; // 筆頭
-
+        [ObservableProperty] bool _isClicked = false; // クリックされた要素
 
     }
 }

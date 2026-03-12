@@ -81,10 +81,17 @@ namespace _20260311
             var ori = e.OriginalSource;
             var dc = this.DataContext;
             var myd = MyData;
+
             this.Focus();
             var isfo = this.IsFocused;
             var iskeyfo = this.IsKeyboardFocused;
-            var iii = this.Focusable;
+
+            // ClickedItemの更新
+            if(e.OriginalSource is FrameworkElement elm && elm.DataContext is Data data)
+            {
+                data.RootData?.ClickedItem = data;
+            }
+
             if (MyData.IsSelectable) { MyData.RootData?.AddSelect(MyData); }
         }
         private void CustomThumb_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
