@@ -43,13 +43,13 @@ namespace _20260311
             DependencyProperty.Register(nameof(MyContent), typeof(FrameworkElement), typeof(CustomThumb), new PropertyMetadata(null));
 
 
-        public bool MyIsSelected
-        {
-            get { return (bool)GetValue(MyIsSelectedProperty); }
-            set { SetValue(MyIsSelectedProperty, value); }
-        }
-        public static readonly DependencyProperty MyIsSelectedProperty =
-            DependencyProperty.Register(nameof(MyIsSelected), typeof(bool), typeof(CustomThumb), new PropertyMetadata(false));
+        //public bool MyIsSelected
+        //{
+        //    get { return (bool)GetValue(MyIsSelectedProperty); }
+        //    set { SetValue(MyIsSelectedProperty, value); }
+        //}
+        //public static readonly DependencyProperty MyIsSelectedProperty =
+        //    DependencyProperty.Register(nameof(MyIsSelected), typeof(bool), typeof(CustomThumb), new PropertyMetadata(false));
 
 
 
@@ -58,8 +58,6 @@ namespace _20260311
             //this.DataContext = this;
             DragDelta += TThumb_DragDelta;
             PreviewMouseLeftButtonDown += CustomThumb_PreviewMouseLeftButtonDown;
-            //KeyDown += CustomThumb_KeyDown;
-            //PreviewKeyDown += CustomThumb_PreviewKeyDown;
         }
 
         //protected override void OnKeyDown(KeyEventArgs e)
@@ -97,7 +95,7 @@ namespace _20260311
             var isfo = this.IsFocused;
             var iskeyfo = this.IsKeyboardFocused;
             var iii = this.Focusable;
-
+            
         }
 
         private void TThumb_DragDelta(object sender, DragDeltaEventArgs e)
@@ -106,9 +104,9 @@ namespace _20260311
             Canvas.SetLeft(this, Canvas.GetLeft(this) + e.HorizontalChange);
             Canvas.SetTop(this, Canvas.GetTop(this) + e.VerticalChange);
             var left2 = Canvas.GetLeft(this);
-            if (MyIsSelected)
-            {
-            }
+            //if (MyIsSelected)
+            //{
+            //}
             e.Handled = true;
         }
     }
@@ -118,8 +116,20 @@ namespace _20260311
 
 
 
+
+
+
     public class AAAItemsCtrl : ItemsControl
     {
+
+        public RootData MyRootData
+        {
+            get { return (RootData)GetValue(MyRootDataProperty); }
+            set { SetValue(MyRootDataProperty, value); }
+        }
+        public static readonly DependencyProperty MyRootDataProperty =
+            DependencyProperty.Register(nameof(MyRootData), typeof(RootData), typeof(AAAItemsCtrl), new PropertyMetadata(null));
+
 
         //public DataService AAADataService
         //{
@@ -152,6 +162,13 @@ namespace _20260311
             var sou = e.Source;
             var ori = e.OriginalSource;
             var dc = this.DataContext;
+            var root = MyRootData;
+
+            if (ori is FrameworkElement elem && elem.DataContext is Data oo)
+            {
+                var neko = oo;
+            }
+
             if (ori is UIElement elm)
             {
                 // 要素からコンテナ取得？

@@ -13,7 +13,7 @@
       <ColumnDefinition Width="200"/>
     </Grid.ColumnDefinitions>
 
-    <local:AAAItemsCtrl x:Name="MyAAA" DataContext="{Binding MyDataVM}"/>
+    <local:AAAItemsCtrl x:Name="MyAAA" DataContext="{Binding MyDataVM}" MyRootData="{Binding}"/>
     <!--<local:AAAItemsCtrl x:Name="MyAAA" DataContext="{Binding MyDataVM}"
                         AAADataService="{Binding MyService}"/>-->
 

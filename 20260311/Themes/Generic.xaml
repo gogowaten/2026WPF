@@ -10,7 +10,7 @@
     <Setter Property="MyData" Value="{Binding}"/>
     <Setter Property="Canvas.Left" Value="{Binding X, Mode=TwoWay}"/>
     <Setter Property="Canvas.Top" Value="{Binding Y, Mode=TwoWay}"/>
-    <Setter Property="MyIsSelected" Value="{Binding IsSelected}"/>
+    <!--<Setter Property="MyIsSelected" Value="{Binding IsSelected}"/>-->
     <Setter Property="Template">
       <Setter.Value>
         <ControlTemplate TargetType="{x:Type local:CustomThumb}">
@@ -34,7 +34,7 @@
   </DataTemplate>
 
   <DataTemplate DataType="{x:Type local:EllipseData}">
-    <local:CustomThumb MyIsSelected="{Binding IsSelected}">
+    <local:CustomThumb>
       <Ellipse Width="{Binding Width}" Height="{Binding Height}" Fill="{Binding Fill}"/>
     </local:CustomThumb>
   </DataTemplate>
