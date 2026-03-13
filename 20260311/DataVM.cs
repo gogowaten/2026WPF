@@ -6,6 +6,7 @@ using System.Collections.ObjectModel;
 using System.Text;
 using System.Windows.Media;
 using System.Collections.Specialized;
+using System.ComponentModel.DataAnnotations;
 
 
 namespace _20260311
@@ -32,6 +33,7 @@ namespace _20260311
 
         #region On～プロパティの変更時
 
+
         partial void OnClickedItemChanged(Data? oldValue, Data? newValue)
         {
             if (oldValue is not null)
@@ -44,6 +46,8 @@ namespace _20260311
             }
         }
 
+       
+
         partial void OnCurrentItemChanged(Data? oldValue, Data? newValue)
         {
             if (oldValue is not null) { oldValue.IsCurrent = false; }
@@ -54,17 +58,25 @@ namespace _20260311
         partial void OnEditingGroupChanged(GroupData? oldValue, GroupData? newValue)
         {
             ClearSelectedItems();
+            CurrentItem = null;
+            ClickedItem = null;
 
             if (oldValue is not null)
             {
                 oldValue.IsEditing = false;
-                foreach (var item in oldValue.DataList) { item.IsSelectable = false; }
+                foreach (var item in oldValue.DataList)
+                {
+                    item.IsSelectable = false;
+                }
 
             }
             if (newValue is not null)
             {
                 newValue.IsEditing = true;
-                foreach (var item in newValue.DataList) { item.IsSelectable = true; }
+                foreach (var item in newValue.DataList)
+                {
+                    item.IsSelectable = true;
+                }
             }
         }
 
@@ -109,6 +121,7 @@ namespace _20260311
         {
             // 二重登録禁止
             if (SelectedItems.Contains(data)) return;
+            if (data.IsSelectable == false) { return; }
 
             SelectedItems.Add(data);
             CurrentItem = data;

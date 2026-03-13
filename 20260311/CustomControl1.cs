@@ -275,7 +275,7 @@ namespace _20260311
 
         private void CustomThumb_DragCompleted(object sender, DragCompletedEventArgs e)
         {
-            // 選択リストからの削除
+            
             // 移動していない
             if (e.HorizontalChange == 0 && e.VerticalChange == 0)
             {
@@ -289,6 +289,8 @@ namespace _20260311
                         {
                             if (root.SelectedItems.Count > 1)
                             {
+                                // 選択リストから自身を削除
+                                // 既選択をCtrlクリックでのトグル選択での削除
                                 root.RemoveSelect(MyData);
                             }
                         }
@@ -299,6 +301,7 @@ namespace _20260311
                 {
                     if (MyData.RootData is RootData root)
                     {
+                        // 選択リストをクリアした後に自身を追加
                         root.ClearSelectedItems();
                         root.AddSelect(MyData);
                     }
