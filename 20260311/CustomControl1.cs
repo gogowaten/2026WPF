@@ -60,17 +60,20 @@ namespace _20260311
             PreviewMouseLeftButtonDown += CustomThumb_PreviewMouseLeftButtonDown;
         }
 
-        //protected override void OnKeyDown(KeyEventArgs e)
-        //{
-        //    base.OnKeyDown(e);
-        //    var imakey = e.Key;
-        //}
+       
         protected override void OnPreviewKeyDown(KeyEventArgs e)
         {
             base.OnPreviewKeyDown(e);
             if (e.Key == Key.F2)
             {
-                if(MyData is GroupData group && group.IsCurrent) { group.RootData?.ChangeEditingGroup(group); }
+                if (MyData is GroupData group && group.IsCurrent) { group.RootData?.ChangeEditingGroup(group); }
+            }
+            else if(e.Key== Key.Escape)
+            {
+                if(MyData.ParentData is GroupData parent && parent.IsEditing)
+                {
+                    MyData.RootData?.ChangeEditingGroup(parent);
+                }
             }
         }
 
@@ -86,14 +89,46 @@ namespace _20260311
             var isfo = this.IsFocused;
             var iskeyfo = this.IsKeyboardFocused;
 
-            // ClickedItemの更新
-            if(e.OriginalSource is FrameworkElement elm && elm.DataContext is Data data)
+            if (MyData.RootData is RootData root)
             {
-                data.RootData?.ClickedItem = data;
+                // ClickedItemの更新
+                if (e.OriginalSource is FrameworkElement elm && elm.DataContext is Data data)
+                {
+                    root.ClickedItem = data;
+                }
+
+                // 選択状態の更新
+                if (MyData.IsSelectable)
+                {
+                    if (Keyboard.Modifiers.HasFlag(ModifierKeys.Control))
+                    {
+                        // 選択リストに自身が既に在る？
+                        if (root.SelectedItems.Contains(MyData))
+                        {
+                            // 選択リストの要素数が2個以上で
+                            if (root.SelectedItems.Count > 1)
+                            {
+                                root.RemoveSelect(MyData); // 選択リストから削除
+                            }
+                            // 自身だけが選択されている状態なら、何もしない、そのままを維持
+                        }
+                        else
+                        {
+                            root.AddSelect(MyData); // 選択リストに追加
+                        }
+                    }
+                    // 通常クリック時
+                    else
+                    {
+                        root.ClearSelectedItems();
+                        root.AddSelect(MyData);
+                    }
+                }
             }
 
-            if (MyData.IsSelectable) { MyData.RootData?.AddSelect(MyData); }
         }
+
+
         private void CustomThumb_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             // Groupの中の要素の場合は、先にGroupのクリックが来た後に要素のクリックが来る
@@ -105,7 +140,7 @@ namespace _20260311
             var isfo = this.IsFocused;
             var iskeyfo = this.IsKeyboardFocused;
             var iii = this.Focusable;
-            
+
         }
 
         private void TThumb_DragDelta(object sender, DragDeltaEventArgs e)

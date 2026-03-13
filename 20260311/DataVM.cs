@@ -64,7 +64,8 @@ namespace _20260311
         #endregion On～プロパティの変更時
 
         // 全選択解除
-        private void ClearSelectedItems()
+        [RelayCommand]
+        public void ClearSelectedItems()
         {
             foreach (var item in SelectedItems)
             {
