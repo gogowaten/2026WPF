@@ -34,9 +34,16 @@ namespace _20260311
 
         partial void OnClickedItemChanged(Data? oldValue, Data? newValue)
         {
-            if (oldValue is not null) { oldValue.IsClicked = false; }
-            if (newValue is not null) { newValue.IsClicked = true; }
+            if (oldValue is not null)
+            {
+                oldValue.IsClicked = false;
+            }
+            if (newValue is not null)
+            {
+                newValue.IsClicked = true;
+            }
         }
+
         partial void OnCurrentItemChanged(Data? oldValue, Data? newValue)
         {
             if (oldValue is not null) { oldValue.IsCurrent = false; }
@@ -70,6 +77,7 @@ namespace _20260311
             foreach (var item in SelectedItems)
             {
                 item.IsSelected = false;
+                item.IsCurrent = false;
             }
             SelectedItems.Clear();
             CurrentItem = null;
@@ -84,7 +92,11 @@ namespace _20260311
             }
             else if (e.Action == NotifyCollectionChangedAction.Remove)
             {
-                if (e.OldItems?[0] is Data oldData) { oldData.IsSelected = false; }
+                if (e.OldItems?[0] is Data oldData)
+                {
+                    oldData.IsSelected = false;
+                    oldData.IsCurrent = false;
+                }
             }
         }
 
@@ -104,8 +116,14 @@ namespace _20260311
 
         public void RemoveSelect(Data data)
         {
+            var dataIndex = SelectedItems.IndexOf(data) - 1;
             SelectedItems.Remove(data);
+            // 筆頭Itemを更新
+            // 一個前を筆頭にする、一個前がなければ一個後を筆頭にする
+            if (dataIndex < 0) { dataIndex++; }
+            CurrentItem = SelectedItems[dataIndex];
         }
+
 
         public void AddData(Data data)
         {
@@ -124,15 +142,13 @@ namespace _20260311
             this.CurrentItem = this; // 自身を筆頭にしておく
             this.IsEditing = true; // 起動時は自身が編集状態グループ
 
-            RectangleData rRed = new() { Name = "RedRect", X = 0, Y = 0, Width = 60, Height = 60, Fill = new SolidColorBrush(Color.FromArgb(50, 255, 0, 0)) };
-            RectangleData rBlue = new() { Name = "BlueRect", X = 20, Y = 20, Width = 60, Height = 60, Fill = new SolidColorBrush(Color.FromArgb(50, 0, 0, 255)) };
-            EllipseData maruRed = new() { Name = "RedEllipse", X = 0, Y = 0, Width = 50, Height = 50, Fill = new SolidColorBrush(Color.FromArgb(50, 255, 0, 0)) };
-            EllipseData maruBlue = new() { Name = "BlueEllipse", X = 20, Y = 20, Width = 50, Height = 50, Fill = new SolidColorBrush(Color.FromArgb(50, 0, 0, 255)) };
-            EllipseData maruGreen = new() { Name = "GreenEllipse", X = 40, Y = 140, Width = 50, Height = 50, Fill = new SolidColorBrush(Color.FromArgb(50, 0, 255, 0)) };
+            RectangleData rRed = new() { Name = "赤四角", X = 0, Y = 0, Width = 60, Height = 60, Fill = new SolidColorBrush(Color.FromArgb(50, 255, 0, 0)) };
+            RectangleData rBlue = new() { Name = "青四角", X = 20, Y = 20, Width = 60, Height = 60, Fill = new SolidColorBrush(Color.FromArgb(50, 0, 0, 255)) };
+            EllipseData maruRed = new() { Name = "黄玉", X = 0, Y = 0, Width = 50, Height = 50, Fill = new SolidColorBrush(Color.FromArgb(50, 255, 200, 0)) };
+            EllipseData maruBlue = new() { Name = "水玉", X = 120, Y = 20, Width = 50, Height = 50, Fill = new SolidColorBrush(Color.FromArgb(50, 0, 200, 255)) };
+            EllipseData maruGreen = new() { Name = "翠玉", X = 40, Y = 140, Width = 50, Height = 50, Fill = new SolidColorBrush(Color.FromArgb(50, 0, 255, 0)) };
 
             GroupData groupRect = new() { RootData = this, Name = "GropuA", X = 0, Y = 0 };
-            //groupRect.RootData.AddData(rRed);
-            //groupRect.RootData.AddData(rBlue);
             groupRect.DataList.Add(rRed);
             groupRect.DataList.Add(rBlue);
 
