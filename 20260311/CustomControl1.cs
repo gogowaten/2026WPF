@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
@@ -42,6 +43,25 @@ namespace _20260311
         public static readonly DependencyProperty MyDataProperty =
             DependencyProperty.Register(nameof(MyData), typeof(Data), typeof(CustomThumb), new PropertyMetadata(null));
 
+
+        //public bool MyIsCurrent
+        //{
+        //    get { return (bool)GetValue(MyIsCurrentProperty); }
+        //    set { SetValue(MyIsCurrentProperty, value); }
+        //}
+        //public static readonly DependencyProperty MyIsCurrentProperty =
+        //    DependencyProperty.Register(nameof(MyIsCurrent), typeof(bool), typeof(CustomThumb), new FrameworkPropertyMetadata(false, OnMyIsCurrentChanged));
+
+        //private static void OnMyIsCurrentChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        //{
+        //    if (d is CustomThumb thumb)
+        //    {
+        //        if (e.NewValue is bool flag && flag)
+        //        {
+        //            thumb.Focus();
+        //        }
+        //    }
+        //}
 
         public FrameworkElement MyContent
         {
@@ -198,58 +218,20 @@ namespace _20260311
         private void CustomThumb_DragCompleted(object sender, DragCompletedEventArgs e)
         {
             // 選択リストから削除して、未選択状態にする処理
-            // 削除対象になる条件は2種類
+            // 削除対象になる条件はAとBの2種類
+
+            // AB共通条件
+            // * 移動していない
+            // * クリック前から既選択だった
 
             // パターンA
-            // * 移動していない
             // * クリック時にCtrlキーが押されていた
-            // * クリック前から既選択だった
-            // * 選択リストの要素数が2個以上
+            // * 選択リストの要素数が2個以上(選択要素を0個にしたくないだけなので、これは変えても良いかも)
 
             // パターンB
-            // * 移動していない
-            // * クリック時にCtrlキーが押されていない通常クリックだった
+            // * 通常クリックだった(Ctrlキーが押されていない)
             // * 選択リストに自身が在る
 
-            //if (e.HorizontalChange == 0 && e.VerticalChange == 0)
-            //{
-            //    // Ctrlクリック
-            //    if (isDragStartWithPressedCtrl == true)
-            //    {
-            //        // クリック以前から既選択だった
-            //        if (isSelectedAtDragStart == true)
-            //        {
-            //            if (MyData.RootData is RootData root)
-            //            {
-            //                if (root.SelectedItems.Count > 1)
-            //                {
-            //                    // 選択リストから自身を削除
-            //                    // 既選択をCtrlクリックでのトグル選択での削除
-            //                    root.RemoveSelect(MyData);
-            //                    e.Handled = true;
-            //                }
-            //            }
-            //        }
-            //        else
-            //        {
-            //            // 未選択をCtrlクリックしていた場合は、削除しないでそのままにする
-            //            e.Handled = true; // 必要
-            //        }
-            //    }
-            //    // 通常クリック
-            //    else
-            //    {
-            //        if (MyData.IsSelected == false) { return; }
-
-            //        if (MyData.RootData is RootData root)
-            //        {
-            //            // 選択リストをクリアした後に自身を追加
-            //            root.ClearSelectedItems();
-            //            root.AddSelect(MyData);
-            //            e.Handled = true; // ここで止める。止めないと親要素も処理されてしまう
-            //        }
-            //    }
-            //}
 
             // 移動なし＋既選択
             if (e.HorizontalChange == 0 && e.VerticalChange == 0 && isSelectedAtDragStart && MyData.RootData is RootData root)
@@ -261,7 +243,7 @@ namespace _20260311
                         // 通常クリックだった場合、自身だけを選択状態
                         root.ClearSelectedItems();
                         root.AddSelect(MyData);
-                        e.Handled = true;
+                        e.Handled = true;// ここで止める。
                     }
                     else
                     {
@@ -269,17 +251,20 @@ namespace _20260311
                         if (root.SelectedItems.Count > 1)
                         {
                             root.RemoveSelect(MyData);
-                            e.Handled = true;
+                            e.Handled = true;// ここで止める。
                         }
                         // 選択要素が自身だけ(1個だけ)なら何もしないで終了
                         else
                         {
-                            e.Handled = true;
+                            e.Handled = true;// ここで止める。
                         }
                     }
                 }
             }
-            else { e.Handled = true; }
+            else
+            {
+                e.Handled = true;// ここで止める。
+            }
         }
 
         #endregion ドラッグ移動

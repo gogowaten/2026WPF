@@ -59,7 +59,7 @@
           <HierarchicalDataTemplate DataType="{x:Type local:GroupData}" ItemsSource="{Binding DataList}">
             <StackPanel Orientation="Horizontal">
               <TextBlock Text="{Binding Name}"/>
-              <TextBlock Text="{Binding IsSelectable, StringFormat=' _ 選択可能 = {0}'}"/>
+              <TextBlock Text="{Binding IsCurrent, StringFormat='  = {0}'}"/>
             </StackPanel>
           </HierarchicalDataTemplate>
         </TreeView.ItemTemplate>

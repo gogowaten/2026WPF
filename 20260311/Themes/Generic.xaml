@@ -10,6 +10,7 @@
     <Setter Property="MyData" Value="{Binding}"/>
     <Setter Property="Canvas.Left" Value="{Binding X, Mode=TwoWay}"/>
     <Setter Property="Canvas.Top" Value="{Binding Y, Mode=TwoWay}"/>
+    <!--<Setter Property="MyIsCurrent" Value="{Binding IsCurrent}"/>-->
     <!--<Setter Property="MyIsSelected" Value="{Binding IsSelected}"/>-->
     <Setter Property="Template">
       <Setter.Value>
