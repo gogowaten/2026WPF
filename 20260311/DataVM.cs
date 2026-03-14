@@ -30,6 +30,7 @@ namespace _20260311
             MyInit();
             SelectedItems.CollectionChanged += SelectedItems_CollectionChanged;
         }
+        
 
         #region On～プロパティの変更時
 
@@ -129,10 +130,10 @@ namespace _20260311
         // Currentを編集モードにする
         public void MigrateEditingGroupCurrent()
         {
-            if(CurrentItem is GroupData group) { EditingGroup = group; }
+            if (CurrentItem is GroupData group) { EditingGroup = group; }
         }
 
-        
+
 
         public void AddSelect(Data data)
         {
@@ -165,6 +166,26 @@ namespace _20260311
         {
             EditingGroup?.DataList.Remove(data);
         }
+
+
+        public void UpdateSize(GroupData group)
+        {
+            double right = 0;
+            double bottom = 0;
+            double mx = double.MaxValue;
+            double my = double.MaxValue;
+            foreach (var item in group.DataList)
+            {
+                mx = Math.Min(mx, item.X);
+                my = Math.Min(my, item.Y);
+                right = Math.Max(right, item.X + item.Width);
+                bottom = Math.Max(bottom, item.Y + item.Height);
+            }
+            //group.X = mx; group.Y = my;
+            group.Width = right; group.Height = bottom;
+        }
+
+
 
         private void MyInit()
         {

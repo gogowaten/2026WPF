@@ -265,6 +265,14 @@ namespace _20260311
             {
                 e.Handled = true;// ここで止める。
             }
+
+            if (e.HorizontalChange != 0 || e.VerticalChange != 0)
+            {
+                if(MyData.ParentData?.IsEditing == true)
+                {
+                    MyData.RootData?.UpdateSize(MyData.ParentData);
+                }
+            }
         }
 
         #endregion ドラッグ移動

@@ -43,7 +43,7 @@
   <DataTemplate DataType="{x:Type local:GroupData}">
     <local:CustomThumb>
       <ItemsControl ItemsSource="{Binding DataList}"
-                    Width="200" Height="200"
+                    Width="{Binding Width}" Height="{Binding Height}"
                     Background="Transparent" BorderBrush="Red" BorderThickness="1"
                     ItemContainerStyle="{StaticResource CanvasItemContainer}">
 

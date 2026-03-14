@@ -6,9 +6,14 @@ using System.Text;
 using System.Windows.Media;
 using System.Xml.Linq;
 using System.Collections.Specialized;
+using System.Windows.Controls;
+using System.Windows;
+using CommunityToolkit.Mvvm.Input;
 
 namespace _20260311
 {
+
+
     public partial class GroupData : Data
     {
         [ObservableProperty] private bool _isEditing; // 編集状態
@@ -20,19 +25,63 @@ namespace _20260311
             DataList.CollectionChanged += DataList_CollectionChanged;
         }
 
+
+
         private void DataList_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
         {
             if (e.Action == NotifyCollectionChangedAction.Add)
             {
-                if (e.NewItems?[0] is Data newData) { newData.ParentData = this; }
+                if (e.NewItems?[0] is Data newData)
+                {
+                    newData.ParentData = this;
+                    UpdateSize();
+                }
             }
             else if (e.Action == NotifyCollectionChangedAction.Remove)
             {
-                if (e.OldItems?[0] is Data oldData) { oldData.ParentData = null; }
+                if (e.OldItems?[0] is Data oldData)
+                {
+                    oldData.ParentData = null;
+                    UpdateSize();
+                }
             }
         }
+
+        [RelayCommand]
+        public void UpdateSize()
+        {
+            double right = 0;
+            double bottom = 0;
+            double mx = double.MaxValue;
+            double my = double.MaxValue;
+            foreach (var item in DataList)
+            {
+                mx = Math.Min(mx, item.X);
+                my = Math.Min(my, item.Y);
+                right = Math.Max(right, item.X + item.Width);
+                bottom = Math.Max(bottom, item.Y + item.Height);
+            }
+            //X = mx; Y = my;
+            Width = right; Height = bottom;
+            //var neko = DataList.Max(n => n.X + n.Width);
+        }
+
+
     }
 
+    public partial class TextBlockData : TextData
+    {
+
+    }
+    public abstract partial class TextData : Data
+    {
+        [ObservableProperty] private string _text = string.Empty;
+        [ObservableProperty] private string _fontName = Application.Current.MainWindow.FontFamily.ToString();
+        [ObservableProperty] private double _fontSize = Application.Current.MainWindow.FontSize;
+
+    }
+
+    #region 図形
 
     public partial class EllipseData : ShapeData { }
 
@@ -43,7 +92,7 @@ namespace _20260311
     {
         [ObservableProperty] private Brush _fill = new SolidColorBrush(Color.FromArgb(50, 255, 0, 0));
     }
-
+    #endregion 図形
 
     public abstract partial class Data : ObservableObject
     {
