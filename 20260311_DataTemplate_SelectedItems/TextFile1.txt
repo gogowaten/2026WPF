@@ -1,0 +1,18 @@
+﻿テストしているのはプロパティの動き、特に選択状態
+Dataでは、IsSelected、IsSelectable、IsCurrent、IsClicked
+GroupDataでは、DataList、IsEditing
+RootDataは別ファイルにしているけど、Dataの継承クラスだからDataと同じファイルのほうが良かったかも？
+そのRootDataでは、CurrentItem、ClickedItem、SelectedItems、EditingGroup
+これらのプロパティの連携と動き
+groupのサイズは200x200の固定にしている
+
+できることは
+要素のマウスドラッグ移動
+複数選択可能
+編集グループの切り替え、CurrentがグループのときにF2キーで編集モードになる
+編集モードのグループの子要素だけが
+	ドラッグ移動できる
+	選択状態にできる
+	Ctrlクリックでトグル選択できる
+Escapeキーで編集モードが1個上のグループに移行する
+
