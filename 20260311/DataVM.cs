@@ -46,15 +46,15 @@ namespace _20260311
             }
         }
 
-       
 
+        // 筆頭変更後
         partial void OnCurrentItemChanged(Data? oldValue, Data? newValue)
         {
             if (oldValue is not null) { oldValue.IsCurrent = false; }
             if (newValue is not null) { newValue.IsCurrent = true; }
         }
 
-        // 編集状態のGroup変更時
+        // 編集Group変更時
         partial void OnEditingGroupChanged(GroupData? oldValue, GroupData? newValue)
         {
             ClearSelectedItems();
@@ -114,8 +114,25 @@ namespace _20260311
 
         public void ChangeCurrentItem(Data data) { CurrentItem = data; }
 
+        // 指定グループを編集モードにする
+        public void MigrateEditingGroup(GroupData group) { EditingGroup = group; }
 
-        public void ChangeEditingGroup(GroupData group) { EditingGroup = group; }
+        // 編集モードを今の1個上に移行する
+        public void MigrateEditingGroupUpper()
+        {
+            if (EditingGroup?.ParentData is GroupData upper)
+            {
+                EditingGroup = upper;
+            }
+        }
+
+        // Currentを編集モードにする
+        public void MigrateEditingGroupCurrent()
+        {
+            if(CurrentItem is GroupData group) { EditingGroup = group; }
+        }
+
+        
 
         public void AddSelect(Data data)
         {

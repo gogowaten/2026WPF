@@ -69,7 +69,9 @@ namespace _20260311
             DragDelta += TThumb_DragDelta;
             DragCompleted += CustomThumb_DragCompleted;
             PreviewMouseLeftButtonDown += CustomThumb_PreviewMouseLeftButtonDown;
+
         }
+
 
         #region キーイベント
 
@@ -78,14 +80,13 @@ namespace _20260311
             base.OnPreviewKeyDown(e);
             if (e.Key == Key.F2)
             {
-                if (MyData is GroupData group && group.IsCurrent) { group.RootData?.ChangeEditingGroup(group); }
+                // 自身がCurrentなら編集モードにする
+                MyData.RootData?.MigrateEditingGroupCurrent();
             }
             else if (e.Key == Key.Escape)
             {
-                if (MyData.ParentData is GroupData parent && parent.IsEditing)
-                {
-                    MyData.RootData?.ChangeEditingGroup(parent);
-                }
+                // Parentを編集モードにする
+                if (MyData is GroupData) { MyData.RootData?.MigrateEditingGroupUpper(); }
             }
         }
         #endregion キーイベント
@@ -115,88 +116,13 @@ namespace _20260311
                     root.ClickedItem = data;
                 }
 
-                //// 選択状態の更新
-                //UpdateSelectedItems2(MyData, root);
-
-            }
-
-        }
-
-        //protected override void OnPreviewMouseLeftButtonUp(MouseButtonEventArgs e)
-        //{
-        //    base.OnPreviewMouseLeftButtonUp(e);
-        //    if (MyData.RootData is RootData root)
-        //    {
-        //        UpdateSelectedItems(MyData, root);
-        //    }
-
-        //}
-
-        private void UpdateSelectedItems(Data ClickedData, RootData root)
-        {
-
-            // 選択状態の更新
-            if (ClickedData.IsSelectable)
-            {
-                if (Keyboard.Modifiers.HasFlag(ModifierKeys.Control))
-                {
-                    // 選択リストに自身が既に在る？
-                    if (root.SelectedItems.Contains(ClickedData))
-                    {
-                        // 選択リストの要素数が2個以上で
-                        if (root.SelectedItems.Count > 1)
-                        {
-                            root.RemoveSelect(ClickedData); // 選択リストから削除
-                        }
-                        // 自身だけが選択されている状態なら、何もしない、そのままを維持
-                    }
-                    else
-                    {
-                        root.AddSelect(ClickedData); // 選択リストに追加
-                    }
-                }
-                // 通常クリック時
-                else
-                {
-                    root.ClearSelectedItems();
-                    root.AddSelect(ClickedData);
-                }
             }
 
         }
 
 
-        private void UpdateSelectedItems2(Data ClickedData, RootData root)
-        {
-            // 選択状態の更新
-            if (ClickedData.IsSelectable)
-            {
-                if (Keyboard.Modifiers.HasFlag(ModifierKeys.Control))
-                {
-                    // 選択リストに自身が既に在る？
-                    if (root.SelectedItems.Contains(ClickedData))
-                    {
-                        //// 選択リストの要素数が2個以上で
-                        //if (root.SelectedItems.Count > 1)
-                        //{
-                        //    root.RemoveSelect(ClickedData); // 選択リストから削除
-                        //}
-                        //// 自身だけが選択されている状態なら、何もしない、そのままを維持
-                    }
-                    else
-                    {
-                        root.AddSelect(ClickedData); // 選択リストに追加
-                    }
-                }
-                // 通常クリック時
-                else
-                {
-                    root.ClearSelectedItems();
-                    root.AddSelect(ClickedData);
-                }
-            }
 
-        }
+
 
         private void CustomThumb_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
@@ -216,37 +142,35 @@ namespace _20260311
 
         #region ドラッグ移動
 
-        // SelectedItemsへの追加をする
+        // ドラッグ移動開始時
         private void CustomThumb_DragStarted(object sender, DragStartedEventArgs e)
         {
             if (MyData.IsSelectable == false) { return; }
 
             if (MyData.RootData is RootData root)
             {
-                // 自身が既に選択リストに在ったかを記録
+                // 自身の選択状態を記録 自身が既に選択リストに在ったかを記録
                 isSelectedAtDragStart = root.SelectedItems.Contains(MyData);
 
                 // Ctrlキーの状態を記録
                 isDragStartWithPressedCtrl = Keyboard.Modifiers.HasFlag(ModifierKeys.Control);
 
-                // 未選択をCtrlクリックの場合、選択リストに追加
-                if (isDragStartWithPressedCtrl)
+                // 選択状態を更新
+                if (MyData.IsSelected == false)
                 {
-                    if (MyData.IsSelected == false)
+                    // 未選択をCtrlクリックした場合は、選択リストに追加して選択状態にする
+                    if (isDragStartWithPressedCtrl)
                     {
                         root.AddSelect(MyData);
                     }
-                }
-                // 既選択を通常クリックの場合、自身だけを選択状態にする
-                else
-                {
-                    if (MyData.IsSelected == false)
+                    // 未選択を通常クリックした場合は、自身だけを選択状態にしたいので
+                    // 選択リストをクリアした後、自身をリストに追加
+                    else
                     {
                         root.ClearSelectedItems();
                         root.AddSelect(MyData);
                     }
                 }
-
             }
 
 
@@ -268,62 +192,94 @@ namespace _20260311
                 }
 
             }
-            //MyData.X += e.HorizontalChange;
-            //MyData.Y += e.VerticalChange;
-            //e.Handled= true;
         }
 
+        // ドラッグ移動完了後
         private void CustomThumb_DragCompleted(object sender, DragCompletedEventArgs e)
         {
-            
-            // 移動していない
-            if (e.HorizontalChange == 0 && e.VerticalChange == 0)
-            {
-                // Ctrlクリック
-                if (isDragStartWithPressedCtrl == true)
-                {
-                    // クリック以前から既選択だった
-                    if (isSelectedAtDragStart == true)
-                    {
-                        if (MyData.RootData is RootData root)
-                        {
-                            if (root.SelectedItems.Count > 1)
-                            {
-                                // 選択リストから自身を削除
-                                // 既選択をCtrlクリックでのトグル選択での削除
-                                root.RemoveSelect(MyData);
-                            }
-                        }
-                    }
-                }
-                // 通常クリック
-                else
-                {
-                    if (MyData.RootData is RootData root)
-                    {
-                        // 選択リストをクリアした後に自身を追加
-                        root.ClearSelectedItems();
-                        root.AddSelect(MyData);
-                    }
-                }
-            }
+            // 選択リストから削除して、未選択状態にする処理
+            // 削除対象になる条件は2種類
 
-            //    // 選択状態の解除
-            //    // 移動していない
-            //    if (e.HorizontalChange == 0 && e.VerticalChange == 0)
+            // パターンA
+            // * 移動していない
+            // * クリック時にCtrlキーが押されていた
+            // * クリック前から既選択だった
+            // * 選択リストの要素数が2個以上
+
+            // パターンB
+            // * 移動していない
+            // * クリック時にCtrlキーが押されていない通常クリックだった
+            // * 選択リストに自身が在る
+
+            //if (e.HorizontalChange == 0 && e.VerticalChange == 0)
             //{
-            //    if (MyData.RootData is RootData root)
+            //    // Ctrlクリック
+            //    if (isDragStartWithPressedCtrl == true)
             //    {
-            //        // 選択リストの要素数が2個以上で
-            //        if (root.SelectedItems.Count > 1)
+            //        // クリック以前から既選択だった
+            //        if (isSelectedAtDragStart == true)
             //        {
-            //            if (isSelectedAtDragStart)
+            //            if (MyData.RootData is RootData root)
             //            {
-            //                root.RemoveSelect(MyData); // 選択リストから削除
+            //                if (root.SelectedItems.Count > 1)
+            //                {
+            //                    // 選択リストから自身を削除
+            //                    // 既選択をCtrlクリックでのトグル選択での削除
+            //                    root.RemoveSelect(MyData);
+            //                    e.Handled = true;
+            //                }
             //            }
+            //        }
+            //        else
+            //        {
+            //            // 未選択をCtrlクリックしていた場合は、削除しないでそのままにする
+            //            e.Handled = true; // 必要
+            //        }
+            //    }
+            //    // 通常クリック
+            //    else
+            //    {
+            //        if (MyData.IsSelected == false) { return; }
+
+            //        if (MyData.RootData is RootData root)
+            //        {
+            //            // 選択リストをクリアした後に自身を追加
+            //            root.ClearSelectedItems();
+            //            root.AddSelect(MyData);
+            //            e.Handled = true; // ここで止める。止めないと親要素も処理されてしまう
             //        }
             //    }
             //}
+
+            // 移動なし＋既選択
+            if (e.HorizontalChange == 0 && e.VerticalChange == 0 && isSelectedAtDragStart && MyData.RootData is RootData root)
+            {
+                if (MyData.IsSelected)
+                {
+                    if (isDragStartWithPressedCtrl == false)
+                    {
+                        // 通常クリックだった場合、自身だけを選択状態
+                        root.ClearSelectedItems();
+                        root.AddSelect(MyData);
+                        e.Handled = true;
+                    }
+                    else
+                    {
+                        // Ctrlクリックだった場合で選択要素が2個以上あるなら、自身を選択リストから削除
+                        if (root.SelectedItems.Count > 1)
+                        {
+                            root.RemoveSelect(MyData);
+                            e.Handled = true;
+                        }
+                        // 選択要素が自身だけ(1個だけ)なら何もしないで終了
+                        else
+                        {
+                            e.Handled = true;
+                        }
+                    }
+                }
+            }
+            else { e.Handled = true; }
         }
 
         #endregion ドラッグ移動
