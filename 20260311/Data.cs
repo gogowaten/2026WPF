@@ -34,7 +34,7 @@ namespace _20260311
                 if (e.NewItems?[0] is Data newData)
                 {
                     newData.ParentData = this;
-                    UpdateSize();
+                    newData.UpdateParentSize();
                 }
             }
             else if (e.Action == NotifyCollectionChangedAction.Remove)
@@ -42,7 +42,7 @@ namespace _20260311
                 if (e.OldItems?[0] is Data oldData)
                 {
                     oldData.ParentData = null;
-                    UpdateSize();
+                    oldData.UpdateParentSize();
                 }
             }
         }
@@ -52,19 +52,39 @@ namespace _20260311
         {
             double right = 0;
             double bottom = 0;
+            foreach (var item in DataList)
+            {
+                right = Math.Max(right, item.X + item.Width);
+                bottom = Math.Max(bottom, item.Y + item.Height);
+            }
+            Width = right; Height = bottom;
+            //var neko = DataList.Max(n => n.X + n.Width);
+        }
+
+        // Bounds更新
+        public void UpdateBounds(GroupData group)
+        {
+            double right = 0;
+            double bottom = 0;
             double mx = double.MaxValue;
             double my = double.MaxValue;
-            foreach (var item in DataList)
+            foreach (var item in group.DataList)
             {
                 mx = Math.Min(mx, item.X);
                 my = Math.Min(my, item.Y);
                 right = Math.Max(right, item.X + item.Width);
                 bottom = Math.Max(bottom, item.Y + item.Height);
             }
-            //X = mx; Y = my;
-            Width = right; Height = bottom;
-            //var neko = DataList.Max(n => n.X + n.Width);
+
+            // サイズ更新
+            group.Width = right - mx; group.Height = bottom - my;
+            // 座標更新
+            foreach (var item in group.DataList) { item.X -= mx; item.Y -= my; }
+
+            // 親要素のBounds更新
+            group.ParentData?.UpdateBounds(group.ParentData);
         }
+
 
 
     }
@@ -108,5 +128,23 @@ namespace _20260311
         [ObservableProperty] bool _isCurrent = false; // 筆頭
         [ObservableProperty] bool _isClicked = false; // クリックされた要素
 
+        public void UpdateParentSize()
+        {
+            if (ParentData is null) { return; }
+
+            double right = 0;
+            double bottom = 0;
+            //double mx = double.MaxValue;
+            //double my = double.MaxValue;
+            foreach (var item in ParentData.DataList)
+            {
+                //mx = Math.Min(mx, item.X);
+                //my = Math.Min(my, item.Y);
+                right = Math.Max(right, item.X + item.Width);
+                bottom = Math.Max(bottom, item.Y + item.Height);
+            }
+            //X = mx; Y = my;
+            ParentData.Width = right; ParentData.Height = bottom;
+        }
     }
 }

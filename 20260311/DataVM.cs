@@ -30,7 +30,7 @@ namespace _20260311
             MyInit();
             SelectedItems.CollectionChanged += SelectedItems_CollectionChanged;
         }
-        
+
 
         #region On～プロパティの変更時
 
@@ -168,22 +168,61 @@ namespace _20260311
         }
 
 
-        public void UpdateSize(GroupData group)
+        public static void UpdateSize(GroupData group)
         {
             double right = 0;
             double bottom = 0;
-            double mx = double.MaxValue;
-            double my = double.MaxValue;
             foreach (var item in group.DataList)
             {
-                mx = Math.Min(mx, item.X);
-                my = Math.Min(my, item.Y);
                 right = Math.Max(right, item.X + item.Width);
                 bottom = Math.Max(bottom, item.Y + item.Height);
             }
-            //group.X = mx; group.Y = my;
             group.Width = right; group.Height = bottom;
         }
+
+        //public static void UpdateBound(GroupData group)
+        //{
+        //    double right = 0;
+        //    double bottom = 0;
+        //    double mx = double.MaxValue;
+        //    double my = double.MaxValue;
+        //    foreach (var item in group.DataList)
+        //    {
+        //        mx = Math.Min(mx, item.X);
+        //        my = Math.Min(my, item.Y);
+        //        right = Math.Max(right, item.X + item.Width);
+        //        bottom = Math.Max(bottom, item.Y + item.Height);
+        //    }
+        //    //group.X = mx; group.Y = my;
+        //    group.Width = right; group.Height = bottom;
+        //    if (group.ParentData is GroupData data)
+        //    {
+        //        UpdateBound(data);
+        //    }
+        //}
+
+        //public void UpdateBound()
+        //{
+        //    if (EditingGroup is GroupData group)
+        //    {
+        //        UpdateBound(group);
+
+        //    }
+        //    double right = 0;
+        //    double bottom = 0;
+        //    double mx = double.MaxValue;
+        //    double my = double.MaxValue;
+        //    foreach (var item in EditingGroup.DataList)
+        //    {
+        //        mx = Math.Min(mx, item.X);
+        //        my = Math.Min(my, item.Y);
+        //        right = Math.Max(right, item.X + item.Width);
+        //        bottom = Math.Max(bottom, item.Y + item.Height);
+        //    }
+        //    group.X = mx; group.Y = my;
+        //    group.Width = right; group.Height = bottom;
+        //}
+
 
 
 
@@ -206,6 +245,11 @@ namespace _20260311
             GroupData groupEllipse = new() { RootData = this, Name = "GropuB", X = 100, Y = 0 };
             groupEllipse.DataList.Add(maruRed);
             groupEllipse.DataList.Add(maruBlue);
+
+            GroupData groupB_1 = new() { RootData = this, Name = "GroupB_1", X = 0, Y = 100 };
+            groupB_1.DataList.Add(new EllipseData() { Name = "青丸", X = 0, Y = 0, Width = 50, Height = 50, Fill = new SolidColorBrush(Color.FromArgb(50, 0, 0, 255)) });
+            groupB_1.DataList.Add(new EllipseData() { Name = "赤丸", X = 100, Y = 100, Width = 50, Height = 50, Fill = new SolidColorBrush(Color.FromArgb(50, 255, 0, 0)) });
+            groupEllipse.DataList.Add(groupB_1);
 
             DataList.Add(groupRect);
             DataList.Add(groupEllipse);

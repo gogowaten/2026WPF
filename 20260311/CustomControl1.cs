@@ -268,10 +268,15 @@ namespace _20260311
 
             if (e.HorizontalChange != 0 || e.VerticalChange != 0)
             {
-                if(MyData.ParentData?.IsEditing == true)
-                {
-                    MyData.RootData?.UpdateSize(MyData.ParentData);
-                }
+                var sou = e.Source;
+                var ori = e.OriginalSource;
+                var myd = MyData;
+
+                MyData.ParentData?.UpdateBounds(MyData.ParentData);
+                //if(MyData.ParentData?.IsEditing == true)
+                //{
+                //    //MyData.RootData?.UpdateSize(MyData.ParentData);
+                //}
             }
         }
 

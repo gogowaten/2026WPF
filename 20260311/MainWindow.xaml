@@ -13,10 +13,12 @@
       <ColumnDefinition Width="200"/>
     </Grid.ColumnDefinitions>
 
+    <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto"
+                  HorizontalAlignment="Left" VerticalAlignment="top">
     <local:AAAItemsCtrl x:Name="MyAAA" DataContext="{Binding MyDataVM}" MyRootData="{Binding}"/>
     <!--<local:AAAItemsCtrl x:Name="MyAAA" DataContext="{Binding MyDataVM}"
                         AAADataService="{Binding MyService}"/>-->
-
+    </ScrollViewer>
 
 
 
@@ -27,6 +29,7 @@
       <Button Content="test" Click="Button_Click"/>
       <Button Content="updateSize" Command="{Binding UpdateSizeCommand}"/>
       <!--<Button Content="右へ10移動" Command="{Binding ToRightCommand}"/>-->
+      <TextBlock Text="{Binding Width, StringFormat=RootWidth {0}}"/>
       <TextBlock Text="{Binding CurrentItem.Name, StringFormat=CurrentItem {0}}"/>
       <TextBlock Text="{Binding ClickedItem.Name, StringFormat=ClickedItem {0}}"/>
       <TextBlock Text="{Binding ClickedItem.ParentData.Name, StringFormat=ClickedItem.ParentData {0}}"/>

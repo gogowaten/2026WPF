@@ -3,7 +3,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="clr-namespace:_20260311">
 
- 
+
 
   <Style TargetType="{x:Type local:CustomThumb}">
     <Setter Property="Focusable" Value="True"/>
@@ -15,7 +15,15 @@
     <Setter Property="Template">
       <Setter.Value>
         <ControlTemplate TargetType="{x:Type local:CustomThumb}">
-          <ContentPresenter Content="{TemplateBinding MyContent}"/>
+          <Grid>
+            <ContentPresenter Content="{TemplateBinding MyContent}"/>
+            <Border x:Name="SelectedBorder" Visibility="Collapsed" BorderBrush="Orange" BorderThickness="1" Margin="-10"/>
+          </Grid>
+          <ControlTemplate.Triggers>
+            <DataTrigger Binding="{Binding IsSelected}" Value="True">
+              <Setter TargetName="SelectedBorder" Property="Visibility" Value="Visible"/>
+            </DataTrigger>
+          </ControlTemplate.Triggers>
         </ControlTemplate>
       </Setter.Value>
     </Setter>
@@ -25,6 +33,7 @@
   <Style x:Key="CanvasItemContainer">
     <Setter Property="Canvas.Left" Value="{Binding X}"/>
     <Setter Property="Canvas.Top" Value="{Binding Y}"/>
+
   </Style>
 
 
@@ -42,17 +51,22 @@
 
   <DataTemplate DataType="{x:Type local:GroupData}">
     <local:CustomThumb>
-      <ItemsControl ItemsSource="{Binding DataList}"
+      <Grid>
+        <Rectangle Stroke="Blue" StrokeThickness="1" StrokeDashArray="2,2"/>
+        <!--<Border Background="Transparent" BorderBrush="Red" BorderThickness="10"/>-->
+        <ItemsControl ItemsSource="{Binding DataList}"
                     Width="{Binding Width}" Height="{Binding Height}"
-                    Background="Transparent" BorderBrush="Red" BorderThickness="1"
+                    Background="Transparent"
                     ItemContainerStyle="{StaticResource CanvasItemContainer}">
 
-        <ItemsControl.ItemsPanel>
-          <ItemsPanelTemplate>
-            <Canvas IsItemsHost="True"/>
-          </ItemsPanelTemplate>
-        </ItemsControl.ItemsPanel>
-      </ItemsControl>
+          <ItemsControl.ItemsPanel>
+            <ItemsPanelTemplate>
+              <Canvas IsItemsHost="True"/>
+            </ItemsPanelTemplate>
+          </ItemsControl.ItemsPanel>
+        </ItemsControl>
+
+      </Grid>
     </local:CustomThumb>
   </DataTemplate>
 
@@ -94,10 +108,24 @@
     <Setter Property="Template">
       <Setter.Value>
         <ControlTemplate TargetType="{x:Type local:AAAItemsCtrl}">
-          <ItemsPresenter/>
+          <Grid Background="WhiteSmoke">
+            <ItemsPresenter Width="{Binding Width}" Height="{Binding Height}"/>
+            <Border BorderBrush="Orange" BorderThickness="0" Margin="0"/>
+          </Grid>
         </ControlTemplate>
       </Setter.Value>
     </Setter>
+
+    <!--<Setter Property="ItemContainerStyle">
+      <Setter.Value>
+        <Style TargetType="ItemsControl">
+          <Setter Property="Background" Value="Black"/>
+          <Setter Property="BorderBrush" Value="Aqua"/>
+          <Setter Property="BorderThickness" Value="20"/>
+        </Style>
+      </Setter.Value>
+    </Setter>-->
+
   </Style>
 
 
