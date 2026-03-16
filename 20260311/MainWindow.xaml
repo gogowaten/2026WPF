@@ -15,14 +15,15 @@
 
     <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto"
                   HorizontalAlignment="Left" VerticalAlignment="top">
-    <local:AAAItemsCtrl x:Name="MyAAA" DataContext="{Binding MyDataVM}" MyRootData="{Binding}"/>
-    <!--<local:AAAItemsCtrl x:Name="MyAAA" DataContext="{Binding MyDataVM}"
+      <local:AAAItemsCtrl x:Name="MyAAA" DataContext="{Binding MyDataVM}" MyRootData="{Binding}"/>
+      <!--<local:AAAItemsCtrl x:Name="MyAAA" DataContext="{Binding MyDataVM}"
                         AAADataService="{Binding MyService}"/>-->
     </ScrollViewer>
 
+    <!--<local:CustomThumb>
+      <local:TTTextBlock x:Name="MyTTText" Text="aaaaaaa" Background="Yellow"/>
 
-
-
+    </local:CustomThumb>-->
 
 
     <StackPanel Grid.Column="1" DataContext="{Binding MyDataVM}">

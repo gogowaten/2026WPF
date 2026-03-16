@@ -37,6 +37,15 @@
   </Style>
 
 
+  <DataTemplate DataType="{x:Type local:TextBlockData}">
+    <local:CustomThumb>
+      <local:TTTextBlock Text="{Binding Text}" FontSize="{Binding FontSize}" FontFamily="{Binding FontName}"
+                 Foreground="Black" Background="Red"
+                 
+                 Opacity="0.5"/>
+    </local:CustomThumb>
+  </DataTemplate>
+
   <DataTemplate DataType="{x:Type local:RectangleData}">
     <local:CustomThumb>
       <Rectangle Width="{Binding Width}" Height="{Binding Height}" Fill="{Binding Fill}"/>

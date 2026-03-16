@@ -44,24 +44,6 @@ namespace _20260311
             DependencyProperty.Register(nameof(MyData), typeof(Data), typeof(CustomThumb), new PropertyMetadata(null));
 
 
-        //public bool MyIsCurrent
-        //{
-        //    get { return (bool)GetValue(MyIsCurrentProperty); }
-        //    set { SetValue(MyIsCurrentProperty, value); }
-        //}
-        //public static readonly DependencyProperty MyIsCurrentProperty =
-        //    DependencyProperty.Register(nameof(MyIsCurrent), typeof(bool), typeof(CustomThumb), new FrameworkPropertyMetadata(false, OnMyIsCurrentChanged));
-
-        //private static void OnMyIsCurrentChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        //{
-        //    if (d is CustomThumb thumb)
-        //    {
-        //        if (e.NewValue is bool flag && flag)
-        //        {
-        //            thumb.Focus();
-        //        }
-        //    }
-        //}
 
         public FrameworkElement MyContent
         {
@@ -89,9 +71,18 @@ namespace _20260311
             DragDelta += TThumb_DragDelta;
             DragCompleted += CustomThumb_DragCompleted;
             PreviewMouseLeftButtonDown += CustomThumb_PreviewMouseLeftButtonDown;
-
+          
         }
 
+
+        //protected override bool HandlesScrolling
+        //{
+        //    get
+        //    {
+        //        //return base.HandlesScrolling;
+        //        return true;
+        //    }
+        //}
 
         #region キーイベント
 
@@ -106,7 +97,13 @@ namespace _20260311
             else if (e.Key == Key.Escape)
             {
                 // Parentを編集モードにする
-                if (MyData is GroupData) { MyData.RootData?.MigrateEditingGroupUpper(); }
+                MyData.RootData?.MigrateEditingGroupUpper();
+                e.Handled = true;
+                //if (MyData is GroupData)
+                //{
+                //    MyData.RootData?.MigrateEditingGroupUpper();
+                //    e.Handled = true;
+                //}
             }
         }
         #endregion キーイベント
@@ -266,6 +263,7 @@ namespace _20260311
                 e.Handled = true;// ここで止める。
             }
 
+            // 移動した場合はBounds更新
             if (e.HorizontalChange != 0 || e.VerticalChange != 0)
             {
                 var sou = e.Source;
@@ -273,10 +271,6 @@ namespace _20260311
                 var myd = MyData;
 
                 MyData.ParentData?.UpdateBounds(MyData.ParentData);
-                //if(MyData.ParentData?.IsEditing == true)
-                //{
-                //    //MyData.RootData?.UpdateSize(MyData.ParentData);
-                //}
             }
         }
 
@@ -320,7 +314,10 @@ namespace _20260311
         public AAAItemsCtrl()
         {
             PreviewMouseLeftButtonDown += AAAItemsCtrl_PreviewMouseLeftButtonDown;
+            // 子要素クリック時のスクロールバーの自動移動をキャンセル
+            RequestBringIntoView += (s, e) => { e.Handled = true; };
         }
+
 
         private void AAAItemsCtrl_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {

@@ -9,25 +9,16 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace _20260311
+namespace _20260316
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
     public partial class MainWindow : Window
     {
-        public RootData MyDataVM { get; set; } = new();
-
         public MainWindow()
         {
             InitializeComponent();
-            this.DataContext = this;
-        }
-
-        private void Button_Click(object sender, RoutedEventArgs e)
-        {
-            var dc = MyAAA.DataContext;
-            //MyTTText.Text = "acb";
         }
     }
 }
