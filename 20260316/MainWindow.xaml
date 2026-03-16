@@ -3,10 +3,23 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:_20260316"
+        xmlns:local="clr-namespace:_20260316" d:DataContext="{d:DesignInstance Type=local:MainWindow}"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
-    <Grid>
+        Title="MainWindow" Height="367" Width="654">
+  <Grid>
+    <Grid.ColumnDefinitions>
+      <ColumnDefinition/>
+      <ColumnDefinition Width="200"/>
+    </Grid.ColumnDefinitions>
 
-    </Grid>
+    <Canvas x:Name="MyCanvas">
+      <local:TestControl x:Name="MyCustomTextBlock" Content="{Binding MyData}"/>
+    </Canvas>
+
+    <StackPanel Grid.Column="1">
+      <TextBlock Text="{Binding ElementName=MyCustomTextBlock, Path=ActualWidth}"/>
+      <TextBlock Text="{Binding ElementName=MyCustomTextBlock, Path=Width}"/>
+      <TextBlock Text="{Binding Path=MyData.Width}"/>
+    </StackPanel>
+  </Grid>
 </Window>

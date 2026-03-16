@@ -16,9 +16,12 @@ namespace _20260316
     /// </summary>
     public partial class MainWindow : Window
     {
+        public TextBlockData MyData { get; set; } = new();
         public MainWindow()
         {
             InitializeComponent();
+            MyData.Text = "ゆっくりしていってね！！！";
+            this.DataContext = this;
         }
     }
 }
