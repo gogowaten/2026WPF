@@ -14,12 +14,20 @@
 
     <Canvas x:Name="MyCanvas">
       <local:TestControl x:Name="MyCustomTextBlock" Content="{Binding MyData}"/>
+      <local:TTTextBlock x:Name="MyTTT" DataContext="{Binding MyData}"
+                         Text="{Binding Text}"
+                         FontSize="{Binding FontSize}"
+                         Canvas.Left="10" Canvas.Top="10"
+                         />
     </Canvas>
 
     <StackPanel Grid.Column="1">
       <TextBlock Text="{Binding ElementName=MyCustomTextBlock, Path=ActualWidth}"/>
       <TextBlock Text="{Binding ElementName=MyCustomTextBlock, Path=Width}"/>
       <TextBlock Text="{Binding Path=MyData.Width}"/>
+      <TextBlock Text="{Binding ElementName=MyTTT, Path=ActualWidth}"/>
+      <TextBlock Text="{Binding ElementName=MyTTT, Path=MyWidth, StringFormat='MyWidth = {0:0.0}'}"/>
+      <Button Content="test" Click="Button_Click"/>
     </StackPanel>
   </Grid>
 </Window>

@@ -40,6 +40,7 @@ namespace _20260316
             {
                 fe.SizeChanged += (s, args) =>
                 {
+                    //SetObserveWidth(fe, fe.DesiredSize.Width);
                     SetObserveWidth(fe, fe.ActualWidth);
                     SetObserveHeight(fe, fe.ActualHeight);
                 };

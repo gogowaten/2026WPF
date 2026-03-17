@@ -32,6 +32,7 @@
       <!--<Button Content="右へ10移動" Command="{Binding ToRightCommand}"/>-->
       <TextBlock Text="{Binding Width, StringFormat=RootWidth {0}}"/>
       <TextBlock Text="{Binding CurrentItem.Name, StringFormat=CurrentItem {0}}"/>
+      <TextBlock Text="{Binding CurrentItem.Width, StringFormat=CurrentItem.Width {0:0.0}}"/>
       <TextBlock Text="{Binding ClickedItem.Name, StringFormat=ClickedItem {0}}"/>
       <TextBlock Text="{Binding ClickedItem.ParentData.Name, StringFormat=ClickedItem.ParentData {0}}"/>
       <TextBlock Text="{Binding EditingGroup.Name, StringFormat=EditingGroup {0}}"/>
@@ -39,7 +40,7 @@
       <Viewbox Height="30">
         <ContentPresenter Content="{Binding CurrentItem}"/>
       </Viewbox>
-      <ListBox ItemsSource="{Binding SelectedItems}">
+      <ListBox ItemsSource="{Binding SelectedItems}" IsHitTestVisible="False">
         <ListBox.ItemsPanel>
           <ItemsPanelTemplate>
             <StackPanel Orientation="Horizontal"/>
@@ -47,7 +48,7 @@
         </ListBox.ItemsPanel>
         <ListBox.ItemTemplate>
           <DataTemplate>
-            <Viewbox Height="50">
+            <Viewbox Height="50" Width="50">
               <ContentPresenter Content="{Binding}"/>
             </Viewbox>
           </DataTemplate>

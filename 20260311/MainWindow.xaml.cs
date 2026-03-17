@@ -28,6 +28,13 @@ namespace _20260311
         {
             var dc = MyAAA.DataContext;
             //MyTTText.Text = "acb";
+            foreach (var item in MyDataVM.DataList)
+            {
+                if(item is TextBlockData txt)
+                {
+                    txt.Text = "ゆっくりしていってね！！！";
+                }
+            }
         }
     }
 }

@@ -71,7 +71,8 @@ namespace _20260311
             DragDelta += TThumb_DragDelta;
             DragCompleted += CustomThumb_DragCompleted;
             PreviewMouseLeftButtonDown += CustomThumb_PreviewMouseLeftButtonDown;
-          
+            
+
         }
 
 

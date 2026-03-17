@@ -9,6 +9,14 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
+
+/* DesiredSizeの変更を自動取得したい
+ * 王道はSizeChangedイベントで取得するのが良いけど、TextBlockがGridなどの全体に広がるパネルに置かれているときは
+ * パネルサイズより大きくなったときしかSizeChangedが発生しないのが欠点、しかしこれは
+ * TextBlockをCanvasなどのパネルに置くなどで解決できる。
+ * SizeChangedイベントの他ではLayoutUpdateイベントでもできる。これの欠点はLayoutUpdateイベントが頻繁に発生するところで
+ * 対象の要素が増えると負荷が気になるかも？
+ */
 namespace _20260316
 {
     /// <summary>
@@ -22,6 +30,13 @@ namespace _20260316
             InitializeComponent();
             MyData.Text = "ゆっくりしていってね！！！";
             this.DataContext = this;
+        }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            //MyData.FontSize++;
+            Canvas.SetTop(MyTTT, Canvas.GetTop(MyTTT) + 10);
+            var neko = MyTTT.DesiredSize;
         }
     }
 }
