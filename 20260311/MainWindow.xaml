@@ -29,6 +29,8 @@
     <StackPanel Grid.Column="1" DataContext="{Binding MyDataVM}">
       <Button Content="test" Click="Button_Click"/>
       <Button Content="updateSize" Command="{Binding UpdateSizeCommand}"/>
+      <Button Content="addData" Command="{Binding AddDataCommand}"/>
+      <Button Content="removeCurrent" Command="{Binding RemoveCurrentItemCommand}"/>
       <!--<Button Content="右へ10移動" Command="{Binding ToRightCommand}"/>-->
       <TextBlock Text="{Binding Width, StringFormat=RootWidth {0}}"/>
       <TextBlock Text="{Binding CurrentItem.Name, StringFormat=CurrentItem {0}}"/>

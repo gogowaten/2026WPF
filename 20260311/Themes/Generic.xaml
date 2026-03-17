@@ -39,8 +39,9 @@
 
   <DataTemplate DataType="{x:Type local:TextBlockData}">
     <local:CustomThumb>
-      <local:TTTextBlock Text="{Binding Text}" FontSize="{Binding FontSize}" FontFamily="{Binding FontName}"
-                 Foreground="Black" Background="Red" Opacity="0.5"
+      <TextBlock Text="{Binding Text}" FontSize="{Binding FontSize}" FontFamily="{Binding FontName}"
+                 Foreground="{Binding Foreground}" Background="{Binding Background}"
+                 Opacity="0.5"
                          local:SizeObserver.Observe="True"
                          local:SizeObserver.ObservedWidth="{Binding Width, Mode=OneWayToSource}"
                          local:SizeObserver.ObservedHeight="{Binding Height, Mode=OneWayToSource}"

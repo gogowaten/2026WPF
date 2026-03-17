@@ -15,7 +15,10 @@ namespace _20260311
 
     public partial class RootData : GroupData
     {
-        [ObservableProperty] private Data? _currentItem; // 筆頭
+        [ObservableProperty]
+        [NotifyCanExecuteChangedFor(nameof(RemoveCurrentItemCommand))]
+        private Data? _currentItem; // 筆頭
+
         [ObservableProperty] private Data? _clickedItem; // 大抵は最後にクリックしたItem
         [ObservableProperty] private ObservableCollection<Data> _selectedItems = [];
         [ObservableProperty] private GroupData? _editingGroup;
@@ -103,7 +106,10 @@ namespace _20260311
         {
             if (e.Action == NotifyCollectionChangedAction.Add)
             {
-                if (e.NewItems?[0] is Data newData) { newData.IsSelected = true; }
+                if (e.NewItems?[0] is Data newData)
+                {
+                    newData.IsSelected = true;
+                }
             }
             else if (e.Action == NotifyCollectionChangedAction.Remove)
             {
@@ -117,8 +123,10 @@ namespace _20260311
 
 
         #region メソッド
-        
+
         public void ChangeCurrentItem(Data data) { CurrentItem = data; }
+
+        #region 編集モード
 
         // 指定グループを編集モードにする
         public void MigrateEditingGroup(GroupData group) { EditingGroup = group; }
@@ -138,7 +146,7 @@ namespace _20260311
             if (CurrentItem is GroupData group) { EditingGroup = group; }
         }
 
-
+        #endregion 編集モード
 
         public void AddSelect(Data data)
         {
@@ -150,7 +158,7 @@ namespace _20260311
             CurrentItem = data;
         }
 
-        public void RemoveSelect(Data data)
+        public void RemoveDataFromSelect(Data data)
         {
             var dataIndex = SelectedItems.IndexOf(data) - 1;
             SelectedItems.Remove(data);
@@ -160,13 +168,42 @@ namespace _20260311
             CurrentItem = SelectedItems[dataIndex];
         }
 
-
+        [RelayCommand]
         public void AddData(Data data)
         {
-            if (data.RootData is null) { data.RootData = this; }
+            data.RootData = this;
             EditingGroup?.DataList.Add(data);
         }
 
+
+        public void RemoveSelectedItems()
+        {
+            foreach (var item in SelectedItems)
+            {
+                DataList.Remove(item);
+            }
+        }
+
+        [RelayCommand(CanExecute = nameof(CanRemoveCurrentItem))]
+        public void RemoveCurrentItem()
+        {
+            if (CurrentItem is not null)
+            {
+                EditingGroup?.DataList.Remove(CurrentItem);
+                CurrentItem = null;
+                if (CurrentItem == ClickedItem)
+                {
+                    ClickedItem = null;
+                }
+            }
+
+        }
+        private bool CanRemoveCurrentItem()
+        {
+            return CurrentItem is not null;
+        }
+
+        [RelayCommand]
         public void RemoveData(Data data)
         {
             EditingGroup?.DataList.Remove(data);
@@ -185,48 +222,6 @@ namespace _20260311
             group.Width = right; group.Height = bottom;
         }
 
-        //public static void UpdateBound(GroupData group)
-        //{
-        //    double right = 0;
-        //    double bottom = 0;
-        //    double mx = double.MaxValue;
-        //    double my = double.MaxValue;
-        //    foreach (var item in group.DataList)
-        //    {
-        //        mx = Math.Min(mx, item.X);
-        //        my = Math.Min(my, item.Y);
-        //        right = Math.Max(right, item.X + item.Width);
-        //        bottom = Math.Max(bottom, item.Y + item.Height);
-        //    }
-        //    //group.X = mx; group.Y = my;
-        //    group.Width = right; group.Height = bottom;
-        //    if (group.ParentData is GroupData data)
-        //    {
-        //        UpdateBound(data);
-        //    }
-        //}
-
-        //public void UpdateBound()
-        //{
-        //    if (EditingGroup is GroupData group)
-        //    {
-        //        UpdateBound(group);
-
-        //    }
-        //    double right = 0;
-        //    double bottom = 0;
-        //    double mx = double.MaxValue;
-        //    double my = double.MaxValue;
-        //    foreach (var item in EditingGroup.DataList)
-        //    {
-        //        mx = Math.Min(mx, item.X);
-        //        my = Math.Min(my, item.Y);
-        //        right = Math.Max(right, item.X + item.Width);
-        //        bottom = Math.Max(bottom, item.Y + item.Height);
-        //    }
-        //    group.X = mx; group.Y = my;
-        //    group.Width = right; group.Height = bottom;
-        //}
 
         #endregion メソッド
 
@@ -261,7 +256,7 @@ namespace _20260311
             DataList.Add(maruGreen);
             TextBlockData textBlockData = new() { Name = "Text1", X = 0, Y = 0, Text = "Text1", FontSize = 30 };
             DataList.Add(textBlockData);
-            
+
 
             // 直下のItemのIsSelectableをtrueにする
             foreach (var item in DataList)
@@ -313,8 +308,8 @@ namespace _20260311
             {
                 if (e.OldItems?[0] is Data oldData)
                 {
-                    oldData.ParentData = null;
                     oldData.UpdateParentSize();
+                    oldData.ParentData = null; // Parentをリサイズしてからnullにする
                 }
             }
         }
@@ -357,7 +352,7 @@ namespace _20260311
             group.ParentData?.UpdateBounds(group.ParentData);
         }
 
-        
+
 
     }
 
@@ -370,11 +365,11 @@ namespace _20260311
         [ObservableProperty] private string _text = string.Empty;
         [ObservableProperty] private string _fontName = SystemFonts.MessageFontFamily.ToString();
         [ObservableProperty] private double _fontSize = SystemFonts.MessageFontSize;
+        [ObservableProperty] private Brush? _foreground = Brushes.Black;
+        [ObservableProperty] private Brush? _background = Brushes.Transparent;
 
-        public TextData()
-        {
-            
-        }
+
+
     }
 
     #region 図形

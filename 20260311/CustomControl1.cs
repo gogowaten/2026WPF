@@ -248,7 +248,7 @@ namespace _20260311
                         // Ctrlクリックだった場合で選択要素が2個以上あるなら、自身を選択リストから削除
                         if (root.SelectedItems.Count > 1)
                         {
-                            root.RemoveSelect(MyData);
+                            root.RemoveDataFromSelect(MyData);
                             e.Handled = true;// ここで止める。
                         }
                         // 選択要素が自身だけ(1個だけ)なら何もしないで終了
