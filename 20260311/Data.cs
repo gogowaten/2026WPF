@@ -15,6 +15,7 @@ namespace _20260311
 
     public partial class RootData : GroupData
     {
+        // TextBlock追加時に使う文字列用
         [NotifyCanExecuteChangedFor(nameof(AddTextBlockDataCommand))]
         [ObservableProperty] private string _addText = "ここに文字列";
 
@@ -196,8 +197,10 @@ namespace _20260311
             data.IsSelectable = true;
         }
 
+        // TextBlock追加できるかの判定用
         private bool CanAddTextBlockData()
         {
+            // 文字が入力されている ＆ 編集モードのグループがある
             return !string.IsNullOrEmpty(AddText) && (EditingGroup is not null);
         }
 
