@@ -32,6 +32,7 @@
       <TextBox Text="{Binding AddText, UpdateSourceTrigger=PropertyChanged}"/>
       <Button Content="TextBlockを追加" Command="{Binding AddTextBlockDataCommand}" CommandParameter="{Binding Path=AddText}"/>
       <Button Content="選択Itemを削除" Command="{Binding RemoveSelectedItemsCommand}"/>
+      <Button Content="age" Command="{Binding ZAgeCommand}"/>
       <!--<Button Content="右へ10移動" Command="{Binding ToRightCommand}"/>-->
       <TextBlock Text="{Binding Width, StringFormat=RootWidth {0}}"/>
       <TextBlock Text="{Binding CurrentItem.Name, StringFormat=CurrentItem {0}}"/>
@@ -68,7 +69,7 @@
           <HierarchicalDataTemplate DataType="{x:Type local:GroupData}" ItemsSource="{Binding DataList}">
             <StackPanel Orientation="Horizontal">
               <TextBlock Text="{Binding Name}"/>
-              <TextBlock Text="{Binding IsCurrent, StringFormat='  = {0}'}"/>
+              <TextBlock Text="{Binding Z, StringFormat='  = {0}'}"/>
             </StackPanel>
           </HierarchicalDataTemplate>
         </TreeView.ItemTemplate>

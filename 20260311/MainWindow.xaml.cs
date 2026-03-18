@@ -36,5 +36,18 @@ namespace _20260311
                 }
             }
         }
+
+        private void Button_Click_1(object sender, RoutedEventArgs e)
+        {
+
+            if (MyDataVM.RootData is RootData root)
+            {
+                if(root.CurrentItem is Data data)
+                {
+
+                    data.Z++;
+                }
+            }
+        }
     }
 }

@@ -33,7 +33,7 @@
   <Style x:Key="CanvasItemContainer">
     <Setter Property="Canvas.Left" Value="{Binding X}"/>
     <Setter Property="Canvas.Top" Value="{Binding Y}"/>
-
+    <Setter Property="Panel.ZIndex" Value="{Binding Z}"/>
   </Style>
 
 

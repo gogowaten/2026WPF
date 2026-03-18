@@ -9,6 +9,7 @@ using System.Collections.Specialized;
 using System.Windows.Controls;
 using System.Windows;
 using CommunityToolkit.Mvvm.Input;
+using System.ComponentModel;
 
 namespace _20260311
 {
@@ -24,7 +25,11 @@ namespace _20260311
         private Data? _currentItem; // 筆頭
 
         [ObservableProperty] private Data? _clickedItem; // 大抵は最後にクリックしたItem
+
+        //[NotifyCanExecuteChangedFor(nameof(ZAgeCommand))]
         [ObservableProperty] private ObservableCollection<Data> _selectedItems = [];
+
+        [NotifyCanExecuteChangedFor(nameof(ZAgeCommand))]
         [ObservableProperty] private GroupData? _editingGroup;
 
 
@@ -118,6 +123,7 @@ namespace _20260311
                 {
                     newData.IsSelected = true;
                     RemoveSelectedItemsCommand.NotifyCanExecuteChanged(); // 削除Command実行判定
+                    ZAgeCommand.NotifyCanExecuteChanged();
                 }
             }
             else if (e.Action == NotifyCollectionChangedAction.Remove)
@@ -129,7 +135,7 @@ namespace _20260311
                     if (CurrentItem == oldData) { CurrentItem = null; }
                     if (ClickedItem == oldData) { ClickedItem = null; }
                     RemoveSelectedItemsCommand.NotifyCanExecuteChanged(); // 削除Command実行判定
-
+                    ZAgeCommand.NotifyCanExecuteChanged();
                 }
             }
         }
@@ -137,7 +143,72 @@ namespace _20260311
 
         #region メソッド
 
-        public void ChangeCurrentItem(Data data) { CurrentItem = data; }
+        // Z、選択Itemを上に移動、ZIndexを1増やす
+        [RelayCommand(CanExecute = nameof(CanZAage))]
+        private void ZAge()
+        {
+            if (EditingGroup is null) { return; }
+
+            // 下げリスト
+            var list = EditingGroup.DataList;
+            int minZ = int.MaxValue;
+            int maxZ = 0;
+            foreach (var item in SelectedItems)
+            {
+                if (minZ > item.Z) { minZ = item.Z; }
+                if (maxZ < item.Z) { maxZ = item.Z; }
+            }
+            List<Data> sageList = [];
+            for (int i = minZ; i <= maxZ; i++)
+            {
+                // 上げカウントしてここで上げ下げする
+
+                if (SelectedItems.Contains(list[i]))
+                {
+                    if (SelectedItems.Contains(list[i + 1]) == false)
+                    {
+                        sageList.Add(list[i + 1]);
+                    }
+                }
+            }
+
+
+            foreach (var item in SelectedItems)
+            {
+                item.Z++;
+            }
+            foreach (var item in sageList)
+            {
+                item.Z--;
+            }
+            ZAgeCommand.NotifyCanExecuteChanged();
+
+        }
+
+        private bool CanZAage()
+        {
+            // 編集モードのグループが在る
+            if (EditingGroup is null) { return false; }
+            // 選択Item個数が在る
+            int selectCount = SelectedItems.Count;
+            if (selectCount == 0) { return false; }
+
+            // 選択Item個数は子要素個数より少ない
+            if (selectCount >= EditingGroup.DataList.Count) { return false; }
+
+            // 選択Itemに最上層のItemが含まれていない
+            int maxZ = 0;
+            foreach (var item in EditingGroup.DataList)
+            {
+                if (maxZ < item.Z) { maxZ = item.Z; }
+            }
+            foreach (var item in SelectedItems)
+            {
+                if (item.Z == maxZ) { return false; }
+            }
+            return true;
+        }
+
 
         #region 編集モード
 
@@ -181,6 +252,8 @@ namespace _20260311
             CurrentItem = SelectedItems[dataIndex];
         }
 
+
+
         // TextBlockを追加するテスト
         [RelayCommand(CanExecute = nameof(CanAddTextBlockData))]
         public void AddTextBlockData(string name)
@@ -222,32 +295,13 @@ namespace _20260311
         }
 
 
-
+        // 選択状態のItemすべてを削除できるかの判定
         private bool CanSelectedItemsRemove()
         {
             return SelectedItems.Count > 0;
         }
 
 
-
-        [RelayCommand]
-        public void RemoveData(Data data)
-        {
-            EditingGroup?.DataList.Remove(data);
-        }
-
-
-        public static void UpdateSize(GroupData group)
-        {
-            double right = 0;
-            double bottom = 0;
-            foreach (var item in group.DataList)
-            {
-                right = Math.Max(right, item.X + item.Width);
-                bottom = Math.Max(bottom, item.Y + item.Height);
-            }
-            group.Width = right; group.Height = bottom;
-        }
 
 
         #endregion メソッド
@@ -334,6 +388,7 @@ namespace _20260311
             {
                 if (e.NewItems?[0] is Data newData)
                 {
+                    newData.Z = DataList.Count - 1;
                     newData.ParentData = this;
                     newData.UpdateParentSize();
                 }
@@ -342,6 +397,16 @@ namespace _20260311
             {
                 if (e.OldItems?[0] is Data oldData)
                 {
+                    // 削除した要素より上の要素のZを1下げる
+                    int currentZ = oldData.Z;
+                    foreach (var item in this.DataList)
+                    {
+                        if (item.Z > currentZ)
+                        {
+                            item.Z--;
+                        }
+                    }
+
                     oldData.UpdateParentSize();
                     oldData.ParentData = null; // Parentをリサイズしてからnullにする
                 }
@@ -427,6 +492,7 @@ namespace _20260311
         [ObservableProperty] private double _height;
         [ObservableProperty] private double _x;
         [ObservableProperty] private double _y;
+        [ObservableProperty] private int _z;
         [ObservableProperty] private string _name = string.Empty;
         [ObservableProperty] bool _isSelected = false; // 選択状態
         [ObservableProperty] bool _isSelectable = false; // 選択状態
