@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:_20260311" d:DataContext="{d:DesignInstance Type=local:MainWindow}"
         mc:Ignorable="d"
-        Title="MainWindow" Height="367" Width="654">
+        Title="MainWindow" Height="567" Width="654">
 
   <Grid>
     <Grid.ColumnDefinitions>
@@ -29,8 +29,9 @@
     <StackPanel Grid.Column="1" DataContext="{Binding MyDataVM}">
       <Button Content="test" Click="Button_Click"/>
       <Button Content="updateSize" Command="{Binding UpdateSizeCommand}"/>
-      <Button Content="addData" Command="{Binding AddDataCommand}"/>
-      <Button Content="removeCurrent" Command="{Binding RemoveCurrentItemCommand}"/>
+      <TextBox Text="{Binding AddText, UpdateSourceTrigger=PropertyChanged}"/>
+      <Button Content="TextBlockを追加" Command="{Binding AddTextBlockDataCommand}" CommandParameter="{Binding Path=AddText}"/>
+      <Button Content="選択Itemを削除" Command="{Binding RemoveSelectedItemsCommand}"/>
       <!--<Button Content="右へ10移動" Command="{Binding ToRightCommand}"/>-->
       <TextBlock Text="{Binding Width, StringFormat=RootWidth {0}}"/>
       <TextBlock Text="{Binding CurrentItem.Name, StringFormat=CurrentItem {0}}"/>

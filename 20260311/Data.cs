@@ -15,8 +15,11 @@ namespace _20260311
 
     public partial class RootData : GroupData
     {
+        [NotifyCanExecuteChangedFor(nameof(AddTextBlockDataCommand))]
+        [ObservableProperty] private string _addText = "ここに文字列";
+
+
         [ObservableProperty]
-        [NotifyCanExecuteChangedFor(nameof(RemoveCurrentItemCommand))]
         private Data? _currentItem; // 筆頭
 
         [ObservableProperty] private Data? _clickedItem; // 大抵は最後にクリックしたItem
@@ -24,7 +27,7 @@ namespace _20260311
         [ObservableProperty] private GroupData? _editingGroup;
 
 
-        //[ObservableProperty] private GroupData _datas = new();
+
         //public DataService MyService { get; } = new();
 
 
@@ -39,7 +42,7 @@ namespace _20260311
 
         #region On～プロパティの変更時
 
-
+        // クリックItem
         partial void OnClickedItemChanged(Data? oldValue, Data? newValue)
         {
             if (oldValue is not null)
@@ -97,7 +100,11 @@ namespace _20260311
                 item.IsSelected = false;
                 item.IsCurrent = false;
             }
-            SelectedItems.Clear();
+
+            //SelectedItems.Clear(); // Clearメソッドは使わない
+            var tempList = new List<Data>(SelectedItems);
+            foreach (Data item in tempList) { _ = SelectedItems.Remove(item); }
+
             CurrentItem = null;
         }
 
@@ -109,6 +116,7 @@ namespace _20260311
                 if (e.NewItems?[0] is Data newData)
                 {
                     newData.IsSelected = true;
+                    RemoveSelectedItemsCommand.NotifyCanExecuteChanged(); // 削除Command実行判定
                 }
             }
             else if (e.Action == NotifyCollectionChangedAction.Remove)
@@ -116,7 +124,11 @@ namespace _20260311
                 if (e.OldItems?[0] is Data oldData)
                 {
                     oldData.IsSelected = false;
-                    oldData.IsCurrent = false;
+                    //oldData.IsCurrent = false;
+                    if (CurrentItem == oldData) { CurrentItem = null; }
+                    if (ClickedItem == oldData) { ClickedItem = null; }
+                    RemoveSelectedItemsCommand.NotifyCanExecuteChanged(); // 削除Command実行判定
+
                 }
             }
         }
@@ -168,40 +180,52 @@ namespace _20260311
             CurrentItem = SelectedItems[dataIndex];
         }
 
-        [RelayCommand]
-        public void AddData(Data data)
+        // TextBlockを追加するテスト
+        [RelayCommand(CanExecute = nameof(CanAddTextBlockData))]
+        public void AddTextBlockData(string name)
         {
-            data.RootData = this;
+            TextBlockData data = new()
+            {
+                Name = name,
+                Text = name,
+                Foreground = Brushes.MidnightBlue,
+                RootData = this,
+                FontSize = 30,
+            };
             EditingGroup?.DataList.Add(data);
+            data.IsSelectable = true;
+        }
+
+        private bool CanAddTextBlockData()
+        {
+            return !string.IsNullOrEmpty(AddText) && (EditingGroup is not null);
         }
 
 
+        // 選択状態のItemすべてを削除
+        [RelayCommand(CanExecute = nameof(CanSelectedItemsRemove))]
         public void RemoveSelectedItems()
         {
+            if (EditingGroup is null) { return; }
+
+            // リストから削除
             foreach (var item in SelectedItems)
             {
-                DataList.Remove(item);
-            }
-        }
-
-        [RelayCommand(CanExecute = nameof(CanRemoveCurrentItem))]
-        public void RemoveCurrentItem()
-        {
-            if (CurrentItem is not null)
-            {
-                EditingGroup?.DataList.Remove(CurrentItem);
-                CurrentItem = null;
-                if (CurrentItem == ClickedItem)
-                {
-                    ClickedItem = null;
-                }
+                EditingGroup.DataList.Remove(item);
             }
 
+            // 選択状態解除
+            ClearSelectedItems();
         }
-        private bool CanRemoveCurrentItem()
+
+
+
+        private bool CanSelectedItemsRemove()
         {
-            return CurrentItem is not null;
+            return SelectedItems.Count > 0;
         }
+
+
 
         [RelayCommand]
         public void RemoveData(Data data)
@@ -280,6 +304,13 @@ namespace _20260311
 
 
     }
+
+
+
+
+    /*Group*/
+
+
 
     public partial class GroupData : Data
     {
