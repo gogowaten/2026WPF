@@ -35,6 +35,7 @@
       <Button Content="前面へ移動" Command="{Binding ZUpCommand}"/>
       <Button Content="最前面へ移動" Command="{Binding ZtoTopCommand}"/>
       <Button Content="背面へ移動" Command="{Binding ZDownCommand}"/>
+      <Button Content="最背面へ移動" Command="{Binding ZtoBottomCommand}"/>
       <!--<Button Content="右へ10移動" Command="{Binding ToRightCommand}"/>-->
       <TextBlock Text="{Binding Width, StringFormat=RootWidth {0}}"/>
       <TextBlock Text="{Binding CurrentItem.Name, StringFormat=今 {0}}"/>
@@ -47,6 +48,8 @@
       <Viewbox Height="30">
         <ContentPresenter Content="{Binding CurrentItem}"/>
       </Viewbox>
+      
+      
       <ListBox ItemsSource="{Binding SelectedItems}" IsHitTestVisible="False">
         <ListBox.ItemsPanel>
           <ItemsPanelTemplate>
@@ -61,6 +64,8 @@
           </DataTemplate>
         </ListBox.ItemTemplate>
       </ListBox>
+      
+      
       <TreeView ItemsSource="{Binding DataList}">
         <TreeView.ItemContainerStyle>
           <Style TargetType="TreeViewItem">

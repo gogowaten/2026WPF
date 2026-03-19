@@ -127,6 +127,7 @@ namespace _20260311
                     ZUpCommand.NotifyCanExecuteChanged();
                     ZtoTopCommand.NotifyCanExecuteChanged();
                     ZDownCommand.NotifyCanExecuteChanged();
+                    ZtoBottomCommand.NotifyCanExecuteChanged();
                 }
             }
             else if (e.Action == NotifyCollectionChangedAction.Remove)
@@ -141,6 +142,7 @@ namespace _20260311
                     ZUpCommand.NotifyCanExecuteChanged();
                     ZtoTopCommand.NotifyCanExecuteChanged();
                     ZDownCommand.NotifyCanExecuteChanged();
+                    ZtoBottomCommand.NotifyCanExecuteChanged();
                 }
             }
         }
@@ -148,33 +150,81 @@ namespace _20260311
 
         #region メソッド
 
+        // 選択Itemを最背面へ移動
+        [RelayCommand(CanExecute = nameof(CanZDown))]
+        private void ZtoBottom()
+        {
+            if (EditingGroup is null) { return; }
+
+            // 選択Itemの下げ幅を計算、
+            // 下げ幅 = 選択Itemの最下層Z - 0(全体の最下層Z)
+            // つまり選択Itemの最下層Z
+            int sageHaba = 0;
+            foreach (var item in SelectedItems)
+            {
+                if (sageHaba < item.Z) { sageHaba = item.Z; }
+            }
+
+            // 新リスト作成、非選択Itemを詰め込む
+            var newList = new ObservableCollection<Data>();
+            foreach (var item in EditingGroup.DataList)
+            {
+                if (item.IsSelected == false) { newList.Add(item); }
+            }
+
+            // 新リストに選択Itemを順番に挿入、場所は下げ幅を加味
+            var sorted = SelectedItems.OrderBy(n => n.Z).ToList();
+            for (int i = 0; i < sorted.Count; i++)
+            {
+                newList.Insert(sorted[i].Z - sageHaba, sorted[i]);
+            }
+
+            // ItemのZをIndexに合わせる
+            for (int i = 0; i < newList.Count; i++) { newList[i].Z = i; }
+
+            // リストの入れ替え
+            EditingGroup.DataList = newList;
+
+            ZDownCommand.NotifyCanExecuteChanged();
+            ZtoBottomCommand.NotifyCanExecuteChanged();
+            ZUpCommand.NotifyCanExecuteChanged();
+            ZtoTopCommand.NotifyCanExecuteChanged();
+        }
+
         // Z、選択Itemを上に移動、ZIndexを1増やす
         [RelayCommand(CanExecute = nameof(CanZDown))]
         private void ZDown()
         {
             if (EditingGroup is null) { return; }
 
-            var itemList = EditingGroup.DataList;
+            // 入れ替え方式
+            // 下げ幅 = 1
+            int sageHaba = 1;
 
-
-            int sageCount = 0; // 連続したsageItem数
-            // 後ろから処理
-            for (int i = itemList.Count - 1; i >= 0; i--)
+            // 新リスト作成、非選択Itemを詰め込む
+            var newList = new ObservableCollection<Data>();
+            foreach (var item in EditingGroup.DataList)
             {
-                // 選択Itemをカウント
-                if (itemList[i].IsSelected)
-                {
-                    sageCount++;
-                }
-                // 非選択なら今のZからカウント分を移動
-                else if (sageCount > 0)
-                {
-                    itemList.Move(i, i + sageCount);
-                    sageCount = 0;
-                }
+                if (item.IsSelected == false) { newList.Add(item); }
             }
 
+            // 新リストに選択Itemを順番に挿入、場所は下げ幅を加味
+            var sorted = SelectedItems.OrderBy(n => n.Z).ToList();
+            for (int i = 0; i < sorted.Count; i++)
+            {
+                newList.Insert(sorted[i].Z - sageHaba, sorted[i]);
+            }
+
+            // ItemのZをIndexに合わせる
+            for (int i = 0; i < newList.Count; i++) { newList[i].Z = i; }
+
+            // リストの入れ替え
+            EditingGroup.DataList = newList;
+
             ZDownCommand.NotifyCanExecuteChanged();
+            ZtoBottomCommand.NotifyCanExecuteChanged();
+            ZUpCommand.NotifyCanExecuteChanged();
+            ZtoTopCommand.NotifyCanExecuteChanged();
         }
 
         private bool CanZDown()
@@ -247,6 +297,8 @@ namespace _20260311
 
             ZUpCommand.NotifyCanExecuteChanged();
             ZtoTopCommand.NotifyCanExecuteChanged();
+            ZDownCommand.NotifyCanExecuteChanged();
+            ZtoBottomCommand.NotifyCanExecuteChanged();
         }
 
 
@@ -258,27 +310,36 @@ namespace _20260311
         {
             if (EditingGroup is null) { return; }
 
-            var itemList = EditingGroup.DataList;
+            // 入れ替え方式
+            int ageHaba = 1;
 
-            // 上げカウントしてここで上げ下げする
-            int ageCount = 0; // 連続した上げItem数
-            for (int i = 0; i < itemList.Count; i++)
+            // 新リスト作成、非選択Itemを詰め込む
+            var newList = new ObservableCollection<Data>();
+            foreach (var item in EditingGroup.DataList)
             {
-                Data cd = itemList[i];
-                if (cd.IsSelected)
-                {
-                    ageCount++;
-                }
-                else if (ageCount > 0)
-                {
-                    itemList.Move(i, i - ageCount);
-                    ageCount = 0;
-                }
+                if (item.IsSelected == false) { newList.Add(item); }
             }
+
+            // 新リストに選択Itemを順番に挿入、場所は上げ幅を加味
+            var sorted = SelectedItems.OrderBy(n => n.Z).ToList();
+            for (int i = 0; i < sorted.Count; i++)
+            {
+                newList.Insert(sorted[i].Z + ageHaba, sorted[i]);
+            }
+
+            // ItemのZをIndexに合わせる
+            for (int i = 0; i < newList.Count; i++) { newList[i].Z = i; }
+
+            // リストの入れ替え
+            EditingGroup.DataList = newList;
+
 
             ZUpCommand.NotifyCanExecuteChanged();
             ZtoTopCommand.NotifyCanExecuteChanged();
+            ZDownCommand.NotifyCanExecuteChanged();
+            ZtoBottomCommand.NotifyCanExecuteChanged();
         }
+
 
 
 
