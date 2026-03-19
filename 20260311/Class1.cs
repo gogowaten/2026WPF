@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Text;
 using System.Windows;
@@ -8,6 +9,20 @@ using System.Windows.Data;
 
 namespace _20260311
 {
+
+    public class LLlist : ObservableCollection<Data>
+    {
+        protected override void MoveItem(int oldIndex, int newIndex)
+        {
+            base.MoveItem(oldIndex, newIndex);
+        }
+
+        protected override void SetItem(int index, Data item)
+        {
+            base.SetItem(index, item);
+        }
+    }
+
     public class TTTextBlock : TextBlock
     {
 

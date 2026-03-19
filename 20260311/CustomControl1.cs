@@ -19,6 +19,11 @@ namespace _20260311
     [ContentProperty(nameof(MyContent))]
     public class CustomThumb : Thumb
     {
+        public override string ToString()
+        {
+            //return base.ToString();
+            return MyData.Name;
+        }
 
         static CustomThumb()
         {
@@ -144,15 +149,15 @@ namespace _20260311
 
         private void CustomThumb_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            // Groupの中の要素の場合は、先にGroupのクリックが来た後に要素のクリックが来る
-            var sou = e.Source;
-            var ori = e.OriginalSource;
-            var dc = this.DataContext;
-            var myd = MyData;
-            this.Focus();
-            var isfo = this.IsFocused;
-            var iskeyfo = this.IsKeyboardFocused;
-            var iii = this.Focusable;
+            //// Groupの中の要素の場合は、先にGroupのクリックが来た後に要素のクリックが来る
+            //var sou = e.Source;
+            //var ori = e.OriginalSource;
+            //var dc = this.DataContext;
+            //var myd = MyData;
+            //this.Focus();
+            //var isfo = this.IsFocused;
+            //var iskeyfo = this.IsKeyboardFocused;
+            //var iii = this.Focusable;
 
         }
 
@@ -259,10 +264,10 @@ namespace _20260311
                     }
                 }
             }
-            else
-            {
-                e.Handled = true;// ここで止める。
-            }
+            //else
+            //{
+            //    //e.Handled = true;// これは要らない
+            //}
 
             // 移動した場合はBounds更新
             if (e.HorizontalChange != 0 || e.VerticalChange != 0)

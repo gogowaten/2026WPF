@@ -29,7 +29,8 @@ namespace _20260311
         //[NotifyCanExecuteChangedFor(nameof(ZAgeCommand))]
         [ObservableProperty] private ObservableCollection<Data> _selectedItems = [];
 
-        [NotifyCanExecuteChangedFor(nameof(ZAgeCommand))]
+        [NotifyCanExecuteChangedFor(nameof(ZUpCommand))]
+        [NotifyCanExecuteChangedFor(nameof(ZtoTopCommand))]
         [ObservableProperty] private GroupData? _editingGroup;
 
 
@@ -123,7 +124,9 @@ namespace _20260311
                 {
                     newData.IsSelected = true;
                     RemoveSelectedItemsCommand.NotifyCanExecuteChanged(); // 削除Command実行判定
-                    ZAgeCommand.NotifyCanExecuteChanged();
+                    ZUpCommand.NotifyCanExecuteChanged();
+                    ZtoTopCommand.NotifyCanExecuteChanged();
+                    ZDownCommand.NotifyCanExecuteChanged();
                 }
             }
             else if (e.Action == NotifyCollectionChangedAction.Remove)
@@ -133,9 +136,11 @@ namespace _20260311
                     oldData.IsSelected = false;
                     //oldData.IsCurrent = false;
                     if (CurrentItem == oldData) { CurrentItem = null; }
-                    if (ClickedItem == oldData) { ClickedItem = null; }
+                    //if (ClickedItem == oldData) { ClickedItem = null; }
                     RemoveSelectedItemsCommand.NotifyCanExecuteChanged(); // 削除Command実行判定
-                    ZAgeCommand.NotifyCanExecuteChanged();
+                    ZUpCommand.NotifyCanExecuteChanged();
+                    ZtoTopCommand.NotifyCanExecuteChanged();
+                    ZDownCommand.NotifyCanExecuteChanged();
                 }
             }
         }
@@ -144,52 +149,145 @@ namespace _20260311
         #region メソッド
 
         // Z、選択Itemを上に移動、ZIndexを1増やす
-        [RelayCommand(CanExecute = nameof(CanZAage))]
-        private void ZAge()
+        [RelayCommand(CanExecute = nameof(CanZDown))]
+        private void ZDown()
         {
             if (EditingGroup is null) { return; }
 
-            // 下げリスト
-            var list = EditingGroup.DataList;
-            int minZ = int.MaxValue;
-            int maxZ = 0;
-            foreach (var item in SelectedItems)
-            {
-                if (minZ > item.Z) { minZ = item.Z; }
-                if (maxZ < item.Z) { maxZ = item.Z; }
-            }
-            List<Data> sageList = [];
-            for (int i = minZ; i <= maxZ; i++)
-            {
-                // 上げカウントしてここで上げ下げする
+            var itemList = EditingGroup.DataList;
 
-                if (SelectedItems.Contains(list[i]))
+
+            int sageCount = 0; // 連続したsageItem数
+            // 後ろから処理
+            for (int i = itemList.Count - 1; i >= 0; i--)
+            {
+                // 選択Itemをカウント
+                if (itemList[i].IsSelected)
                 {
-                    if (SelectedItems.Contains(list[i + 1]) == false)
-                    {
-                        sageList.Add(list[i + 1]);
-                    }
+                    sageCount++;
+                }
+                // 非選択なら今のZからカウント分を移動
+                else if (sageCount > 0)
+                {
+                    itemList.Move(i, i + sageCount);
+                    sageCount = 0;
                 }
             }
 
-
-            foreach (var item in SelectedItems)
-            {
-                item.Z++;
-            }
-            foreach (var item in sageList)
-            {
-                item.Z--;
-            }
-            ZAgeCommand.NotifyCanExecuteChanged();
-
+            ZDownCommand.NotifyCanExecuteChanged();
         }
 
-        private bool CanZAage()
+        private bool CanZDown()
         {
             // 編集モードのグループが在る
             if (EditingGroup is null) { return false; }
-            // 選択Item個数が在る
+
+            // 選択Item在る
+            int selectCount = SelectedItems.Count;
+            if (selectCount == 0) { return false; }
+
+            // 選択Item個数は子要素個数より少ない
+            if (selectCount >= EditingGroup.DataList.Count) { return false; }
+
+            // 選択Itemに最下層のItemが含まれていない
+            foreach (var item in SelectedItems)
+            {
+                if (item.Z == 0) { return false; }
+            }
+            return true;
+        }
+
+
+
+
+        // 選択Itemを最前面へ移動
+        [RelayCommand(CanExecute = nameof(CanZUp))]
+        private void ZtoTop()
+        {
+            if (EditingGroup is null) { return; }
+
+            // 並べ替えたリストを別に用意して、今のリストと入れ替える
+            var imaList = EditingGroup.DataList;
+
+            // 選択Itemが最前面になるまでの上げ幅を取得
+            int maxZ = int.MinValue;
+            foreach (var item in SelectedItems)
+            {
+                if (maxZ < item.Z) { maxZ = item.Z; }
+                //DataList.IndexOf(item);
+            }
+            int agehaba = imaList.Count - 1 - maxZ;
+
+            // 別のリスト作成、非選択Itemを詰め込む
+            ObservableCollection<Data> newList = [];
+            for (int i = 0; i < imaList.Count; i++)
+            {
+                if (imaList[i].IsSelected == false)
+                {
+                    newList.Add(imaList[i]);
+                }
+            }
+
+            // 選択ItemリストをZ順にソート
+            var sortedList = SelectedItems.OrderBy(d => d.Z).ToArray();
+            // 選択Itemを上げ幅を足した場所に挿入
+            foreach (var item in sortedList)
+            {
+                newList.Insert(item.Z + agehaba, item);
+            }
+
+            // ZをIndexに合わせる
+            for (int i = 0; i < newList.Count; i++)
+            {
+                newList[i].Z = i;
+            }
+
+            // リストを入れ替える
+            EditingGroup.DataList = newList;
+
+            ZUpCommand.NotifyCanExecuteChanged();
+            ZtoTopCommand.NotifyCanExecuteChanged();
+        }
+
+
+
+
+        // Z、選択Itemを上に移動、ZIndexを1増やす
+        [RelayCommand(CanExecute = nameof(CanZUp))]
+        private void ZUp()
+        {
+            if (EditingGroup is null) { return; }
+
+            var itemList = EditingGroup.DataList;
+
+            // 上げカウントしてここで上げ下げする
+            int ageCount = 0; // 連続した上げItem数
+            for (int i = 0; i < itemList.Count; i++)
+            {
+                Data cd = itemList[i];
+                if (cd.IsSelected)
+                {
+                    ageCount++;
+                }
+                else if (ageCount > 0)
+                {
+                    itemList.Move(i, i - ageCount);
+                    ageCount = 0;
+                }
+            }
+
+            ZUpCommand.NotifyCanExecuteChanged();
+            ZtoTopCommand.NotifyCanExecuteChanged();
+        }
+
+
+
+        private bool CanZUp()
+        {
+            // 編集モードのグループが在る
+            if (EditingGroup is null) { return false; }
+
+            // 選択Item在る
             int selectCount = SelectedItems.Count;
             if (selectCount == 0) { return false; }
 
@@ -197,14 +295,10 @@ namespace _20260311
             if (selectCount >= EditingGroup.DataList.Count) { return false; }
 
             // 選択Itemに最上層のItemが含まれていない
-            int maxZ = 0;
-            foreach (var item in EditingGroup.DataList)
-            {
-                if (maxZ < item.Z) { maxZ = item.Z; }
-            }
+            int max = EditingGroup.DataList.Count - 1;
             foreach (var item in SelectedItems)
             {
-                if (item.Z == maxZ) { return false; }
+                if (item.Z == max) { return false; }
             }
             return true;
         }
@@ -313,11 +407,11 @@ namespace _20260311
             this.CurrentItem = this; // 自身を筆頭にしておく
             this.IsEditing = true; // 起動時は自身が編集状態グループ
 
-            RectangleData rRed = new() { Name = "赤四角", X = 0, Y = 0, Width = 60, Height = 60, Fill = new SolidColorBrush(Color.FromArgb(50, 255, 0, 0)) };
-            RectangleData rBlue = new() { Name = "青四角", X = 20, Y = 20, Width = 60, Height = 60, Fill = new SolidColorBrush(Color.FromArgb(50, 0, 0, 255)) };
-            EllipseData maruRed = new() { Name = "黄玉", X = 0, Y = 0, Width = 50, Height = 50, Fill = new SolidColorBrush(Color.FromArgb(50, 255, 200, 0)) };
-            EllipseData maruBlue = new() { Name = "水玉", X = 120, Y = 20, Width = 50, Height = 50, Fill = new SolidColorBrush(Color.FromArgb(50, 0, 200, 255)) };
-            EllipseData maruGreen = new() { Name = "翠玉", X = 40, Y = 140, Width = 50, Height = 50, Fill = new SolidColorBrush(Color.FromArgb(50, 0, 255, 0)) };
+            RectangleData rRed = new() { Name = "赤四角", X = 0, Y = 0, Width = 60, Height = 60, Fill = new SolidColorBrush(Color.FromArgb(250, 255, 0, 0)) };
+            RectangleData rBlue = new() { Name = "青四角", X = 20, Y = 20, Width = 60, Height = 60, Fill = new SolidColorBrush(Color.FromArgb(250, 0, 0, 255)) };
+            EllipseData maruRed = new() { Name = "黄玉", X = 0, Y = 0, Width = 50, Height = 50, Fill = new SolidColorBrush(Color.FromArgb(250, 255, 200, 0)) };
+            EllipseData maruBlue = new() { Name = "水玉", X = 120, Y = 20, Width = 50, Height = 50, Fill = new SolidColorBrush(Color.FromArgb(250, 0, 200, 255)) };
+            EllipseData maruGreen = new() { Name = "翠玉", X = 40, Y = 140, Width = 50, Height = 50, Fill = new SolidColorBrush(Color.FromArgb(250, 0, 255, 0)) };
 
             GroupData groupRect = new() { RootData = this, Name = "GropuA", X = 0, Y = 0 };
             groupRect.DataList.Add(rRed);
@@ -328,8 +422,8 @@ namespace _20260311
             groupEllipse.DataList.Add(maruBlue);
 
             GroupData groupB_1 = new() { RootData = this, Name = "GroupB_1", X = 0, Y = 100 };
-            groupB_1.DataList.Add(new EllipseData() { Name = "青丸", X = 0, Y = 0, Width = 50, Height = 50, Fill = new SolidColorBrush(Color.FromArgb(50, 0, 0, 255)) });
-            groupB_1.DataList.Add(new EllipseData() { Name = "赤丸", X = 100, Y = 100, Width = 50, Height = 50, Fill = new SolidColorBrush(Color.FromArgb(50, 255, 0, 0)) });
+            groupB_1.DataList.Add(new EllipseData() { Name = "青丸", X = 0, Y = 0, Width = 50, Height = 50, Fill = new SolidColorBrush(Color.FromArgb(250, 0, 0, 255)) });
+            groupB_1.DataList.Add(new EllipseData() { Name = "赤丸", X = 100, Y = 100, Width = 50, Height = 50, Fill = new SolidColorBrush(Color.FromArgb(250, 255, 0, 0)) });
             groupEllipse.DataList.Add(groupB_1);
 
             DataList.Add(groupRect);
@@ -410,6 +504,26 @@ namespace _20260311
                     oldData.UpdateParentSize();
                     oldData.ParentData = null; // Parentをリサイズしてからnullにする
                 }
+            }
+            else if (e.Action == NotifyCollectionChangedAction.Move)
+            {
+                var oi = e.OldStartingIndex;
+                var ni = e.NewStartingIndex;
+                if (ni < oi)
+                {
+                    for (int i = ni; i <= oi; i++)
+                    {
+                        this.DataList[i].Z = i;
+                    }
+                }
+                else if (oi < ni)
+                {
+                    for (int i = oi; i <= ni; i++)
+                    {
+                        this.DataList[i].Z = i;
+                    }
+                }
+
             }
         }
 

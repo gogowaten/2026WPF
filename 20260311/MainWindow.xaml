@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:_20260311" d:DataContext="{d:DesignInstance Type=local:MainWindow}"
         mc:Ignorable="d"
-        Title="MainWindow" Height="567" Width="654">
+        Title="MainWindow" Height="667" Width="654">
 
   <Grid>
     <Grid.ColumnDefinitions>
@@ -32,15 +32,18 @@
       <TextBox Text="{Binding AddText, UpdateSourceTrigger=PropertyChanged}"/>
       <Button Content="TextBlockを追加" Command="{Binding AddTextBlockDataCommand}" CommandParameter="{Binding Path=AddText}"/>
       <Button Content="選択Itemを削除" Command="{Binding RemoveSelectedItemsCommand}"/>
-      <Button Content="age" Command="{Binding ZAgeCommand}"/>
+      <Button Content="前面へ移動" Command="{Binding ZUpCommand}"/>
+      <Button Content="最前面へ移動" Command="{Binding ZtoTopCommand}"/>
+      <Button Content="背面へ移動" Command="{Binding ZDownCommand}"/>
       <!--<Button Content="右へ10移動" Command="{Binding ToRightCommand}"/>-->
       <TextBlock Text="{Binding Width, StringFormat=RootWidth {0}}"/>
-      <TextBlock Text="{Binding CurrentItem.Name, StringFormat=CurrentItem {0}}"/>
-      <TextBlock Text="{Binding CurrentItem.Width, StringFormat=CurrentItem.Width {0:0.0}}"/>
-      <TextBlock Text="{Binding ClickedItem.Name, StringFormat=ClickedItem {0}}"/>
+      <TextBlock Text="{Binding CurrentItem.Name, StringFormat=今 {0}}"/>
+      <TextBlock Text="{Binding CurrentItem.Width, StringFormat=今.Width {0:0.0}}"/>
+      <TextBlock Text="{Binding CurrentItem.Z, StringFormat=今.Z {0:0}}"/>
+      <TextBlock Text="{Binding ClickedItem.Name, StringFormat=クリック {0}}"/>
       <TextBlock Text="{Binding ClickedItem.ParentData.Name, StringFormat=ClickedItem.ParentData {0}}"/>
-      <TextBlock Text="{Binding EditingGroup.Name, StringFormat=EditingGroup {0}}"/>
-      <TextBlock Text="{Binding SelectedItems.Count, StringFormat=SelectedItemsCount {0}}"/>
+      <TextBlock Text="{Binding EditingGroup.Name, StringFormat=編集モード {0}}"/>
+      <TextBlock Text="{Binding SelectedItems.Count, StringFormat=選択Item数 {0}}"/>
       <Viewbox Height="30">
         <ContentPresenter Content="{Binding CurrentItem}"/>
       </Viewbox>
