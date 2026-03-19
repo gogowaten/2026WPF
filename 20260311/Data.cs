@@ -1,15 +1,16 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
+using System.ComponentModel;
 using System.Text;
+using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Media;
 using System.Xml.Linq;
-using System.Collections.Specialized;
-using System.Windows.Controls;
-using System.Windows;
-using CommunityToolkit.Mvvm.Input;
-using System.ComponentModel;
 
 namespace _20260311
 {
@@ -255,53 +256,12 @@ namespace _20260311
         private void ZtoTop()
         {
             if (EditingGroup is null) { return; }
-
-            // 並べ替えたリストを別に用意して、今のリストと入れ替える
-            var imaList = EditingGroup.DataList;
-
+            
             // 選択Itemが最前面になるまでの上げ幅を取得
-            int maxZ = int.MinValue;
-            foreach (var item in SelectedItems)
-            {
-                if (maxZ < item.Z) { maxZ = item.Z; }
-                //DataList.IndexOf(item);
-            }
-            int agehaba = imaList.Count - 1 - maxZ;
-
-            // 別のリスト作成、非選択Itemを詰め込む
-            ObservableCollection<Data> newList = [];
-            for (int i = 0; i < imaList.Count; i++)
-            {
-                if (imaList[i].IsSelected == false)
-                {
-                    newList.Add(imaList[i]);
-                }
-            }
-
-            // 選択ItemリストをZ順にソート
-            var sortedList = SelectedItems.OrderBy(d => d.Z).ToArray();
-            // 選択Itemを上げ幅を足した場所に挿入
-            foreach (var item in sortedList)
-            {
-                newList.Insert(item.Z + agehaba, item);
-            }
-
-            // ZをIndexに合わせる
-            for (int i = 0; i < newList.Count; i++)
-            {
-                newList[i].Z = i;
-            }
-
-            // リストを入れ替える
-            EditingGroup.DataList = newList;
-
-            ZUpCommand.NotifyCanExecuteChanged();
-            ZtoTopCommand.NotifyCanExecuteChanged();
-            ZDownCommand.NotifyCanExecuteChanged();
-            ZtoBottomCommand.NotifyCanExecuteChanged();
+            int mi = SelectedItems.Max(n => n.Z);
+            int agehaba = EditingGroup.DataList.Count - 1 - mi;
+            ZUpSub(agehaba);
         }
-
-
 
 
         // Z、選択Itemを上に移動、ZIndexを1増やす
@@ -309,10 +269,18 @@ namespace _20260311
         private void ZUp()
         {
             if (EditingGroup is null) { return; }
+            ZUpSub(1);
+        }
+
+
+
+        // 選択ItemのZを上げ幅分上げる
+        private void ZUpSub(int ageHaba)
+        {
+            if (EditingGroup is null) { return; }
 
             // 入れ替え方式
-            int ageHaba = 1;
-
+            
             // 新リスト作成、非選択Itemを詰め込む
             var newList = new ObservableCollection<Data>();
             foreach (var item in EditingGroup.DataList)
