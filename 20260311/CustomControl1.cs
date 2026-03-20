@@ -184,14 +184,14 @@ namespace _20260311
                     // 未選択をCtrlクリックした場合は、選択リストに追加して選択状態にする
                     if (isDragStartWithPressedCtrl)
                     {
-                        root.AddSelect(MyData);
+                        root.AddDataToSelectedItems(MyData);
                     }
                     // 未選択を通常クリックした場合は、自身だけを選択状態にしたいので
                     // 選択リストをクリアした後、自身をリストに追加
                     else
                     {
                         root.ClearSelectedItems();
-                        root.AddSelect(MyData);
+                        root.AddDataToSelectedItems(MyData);
                     }
                 }
             }
@@ -245,7 +245,7 @@ namespace _20260311
                     {
                         // 通常クリックだった場合、自身だけを選択状態
                         root.ClearSelectedItems();
-                        root.AddSelect(MyData);
+                        root.AddDataToSelectedItems(MyData);
                         e.Handled = true;// ここで止める。
                     }
                     else

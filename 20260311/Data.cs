@@ -68,7 +68,11 @@ namespace _20260311
         partial void OnCurrentItemChanged(Data? oldValue, Data? newValue)
         {
             if (oldValue is not null) { oldValue.IsCurrent = false; }
-            if (newValue is not null) { newValue.IsCurrent = true; }
+            if (newValue is not null)
+            {
+                newValue.IsCurrent = true;
+                UnGroupCommand.NotifyCanExecuteChanged();
+            }
         }
 
         // 編集Group変更時
@@ -129,6 +133,8 @@ namespace _20260311
                     ZtoTopCommand.NotifyCanExecuteChanged();
                     ZDownCommand.NotifyCanExecuteChanged();
                     ZtoBottomCommand.NotifyCanExecuteChanged();
+                    AddGroupFromSelectedItemsCommand.NotifyCanExecuteChanged();
+
                 }
             }
             else if (e.Action == NotifyCollectionChangedAction.Remove)
@@ -144,6 +150,8 @@ namespace _20260311
                     ZtoTopCommand.NotifyCanExecuteChanged();
                     ZDownCommand.NotifyCanExecuteChanged();
                     ZtoBottomCommand.NotifyCanExecuteChanged();
+                    AddGroupFromSelectedItemsCommand.NotifyCanExecuteChanged();
+                    UnGroupCommand.NotifyCanExecuteChanged();
                 }
             }
         }
@@ -151,13 +159,86 @@ namespace _20260311
 
         #region メソッド
 
-        [RelayCommand]
+        private bool CanUnGroup()
+        {
+            if (SelectedItems.Count == 0) { return false; }
+            if (CurrentItem is not GroupData) { return false; }
+            if (EditingGroup is null) { return false; }
+            return true;
+        }
+
+        [RelayCommand(CanExecute = nameof(CanUnGroup))]
+        private void UnGroup()
+        {
+            if (CurrentItem is not GroupData) { return; }
+            if (EditingGroup is null) { return; }
+
+            if (CurrentItem is GroupData targetGroupData)
+            {
+                int z = targetGroupData.Z;
+                for (int i = targetGroupData.DataList.Count - 1; i >= 0; i--)
+                {
+                    var item = targetGroupData.DataList[i];
+                    EditingGroup.DataList.Insert(z, item);
+                    item.IsSelectable = true;
+                    item.IsSelected = true;
+                }
+
+                // 子要素の座標調整
+                foreach (var item in targetGroupData.DataList)
+                {
+                    item.X += targetGroupData.X;
+                    item.Y += targetGroupData.Y;
+                }
+
+                // 親要素のDataListを整える
+                for (int i = 0; i < EditingGroup.DataList.Count; i++)
+                {
+                    EditingGroup.DataList[i].Z = i;
+                }
+                // 選択Itemを整える、解除したグループの子要素を選択状態にする
+                ClearSelectedItems();
+                foreach (var item in targetGroupData.DataList)
+                {
+                    AddDataToSelectedItems(item);
+                }
+
+                // 解除するDataを外す
+                EditingGroup.DataList.Remove(targetGroupData);
+                //RemoveDataFromSelect(targetGroupData);
+                targetGroupData.IsClicked = false;
+                targetGroupData.IsSelectable = false;
+                targetGroupData.IsSelected = false;
+                targetGroupData.DataList.Clear(); // 要る？
+
+                UnGroupCommand.NotifyCanExecuteChanged();
+            }
+
+
+
+
+        }
+
+        private bool CanAddGroupFromSelectedItems()
+        {
+            if (EditingGroup is null) { return false; }
+            if (SelectedItems.Count <= 1) { return false; }
+            if (EditingGroup.DataList.Count < 1) { return false; }
+            if (EditingGroup.DataList.Count == SelectedItems.Count) { return false; }
+            return true;
+        }
+
+        [RelayCommand(CanExecute = nameof(CanAddGroupFromSelectedItems))]
         private void AddGroupFromSelectedItems()
         {
             if (EditingGroup is null) { return; }
-            if (SelectedItems.Count < 1) { return; }
+            if (SelectedItems.Count <= 1) { return; }
             if (EditingGroup.DataList.Count < 1) { return; }
             if (EditingGroup.DataList.Count == SelectedItems.Count) { return; }
+
+            // 新グループのZを先に計算しておく
+            // 新グループのZ = 選択Itemの最上層Z - (選択個数 - 1)
+            int groupZ = SelectedItems.Max(n => n.Z) - (SelectedItems.Count - 1);
 
 
             // 新リスト作成、非選択Itemを詰め込む
@@ -167,24 +248,21 @@ namespace _20260311
                 if (item.IsSelected == false) { newDataList.Add(item); }
             }
 
-         
+
             // 新グループ作成、そのDataListに選択Itemを順番に追加
-            var sortedItems = SelectedItems.OrderBy(n => n.Z).ToArray();
             GroupData newGroup = new()
             {
                 RootData = this.RootData,
                 IsSelectable = true,
                 ParentData = EditingGroup,
             };
+            var sortedItems = SelectedItems.OrderBy(n => n.Z).ToArray();
             for (int i = 0; i < sortedItems.Length; i++)
             {
                 newGroup.DataList.Add(sortedItems[i]);
             }
 
-
-            // 新グループを新リストに挿入
-            /*新グループのZ = 選択Itemの最上層Z - （選択個数 - 1）*/
-            int groupZ = SelectedItems.Max(n => n.Z) - (SelectedItems.Count - 1);
+            // 新グループを新リストに挿入            
             newDataList.Insert(groupZ, newGroup);
 
             // 新グループと子要素の座標調整
@@ -220,8 +298,9 @@ namespace _20260311
 
             // 選択Itemリストを整える
             ClearSelectedItems();
-            AddSelect(newGroup);// 新グループを選択状態にする
+            AddDataToSelectedItems(newGroup);// 新グループを選択状態にする
 
+            AddGroupFromSelectedItemsCommand.NotifyCanExecuteChanged();
         }
 
         #region Z
@@ -372,7 +451,7 @@ namespace _20260311
 
         #endregion 編集モード
 
-        public void AddSelect(Data data)
+        public void AddDataToSelectedItems(Data data)
         {
             // 二重登録禁止
             if (SelectedItems.Contains(data)) return;
@@ -528,7 +607,8 @@ namespace _20260311
             {
                 if (e.NewItems?[0] is Data newData)
                 {
-                    newData.Z = DataList.Count - 1;
+                    //newData.Z = DataList.Count - 1;
+                    newData.Z = e.NewStartingIndex;
                     newData.ParentData = this;
                     newData.UpdateParentSize();
                 }

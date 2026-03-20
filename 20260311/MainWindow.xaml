@@ -37,6 +37,7 @@
       <Button Content="背面へ移動" Command="{Binding ZDownCommand}"/>
       <Button Content="最背面へ移動" Command="{Binding ZtoBottomCommand}"/>
       <Button Content="グループ化" Command="{Binding AddGroupFromSelectedItemsCommand}"/>
+      <Button Content="グループ解除" Command="{Binding UnGroupCommand}"/>
       <!--<Button Content="右へ10移動" Command="{Binding ToRightCommand}"/>-->
       <TextBlock Text="{Binding Width, StringFormat=RootWidth {0}}"/>
       <TextBlock Text="{Binding CurrentItem.Name, StringFormat=今 {0}}"/>
