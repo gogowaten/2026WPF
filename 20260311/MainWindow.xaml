@@ -43,6 +43,7 @@
       <TextBlock Text="{Binding CurrentItem.Name, StringFormat=今 {0}}"/>
       <TextBlock Text="{Binding CurrentItem.IsSelectable, StringFormat=今.選択可能 {0:0.0}}"/>
       <TextBlock Text="{Binding CurrentItem.Z, StringFormat=今.Z {0:0}}"/>
+      <TextBlock Text="{Binding CurrentItem.Width, StringFormat=今.Width {0:0}}"/>
       <TextBlock Text="{Binding ClickedItem.Name, StringFormat=クリック {0}}"/>
       <TextBlock Text="{Binding ClickedItem.IsSelectable, StringFormat=クリック.選択可能 {0}}"/>
       <TextBlock Text="{Binding EditingGroup.Name, StringFormat=編集モード {0}}"/>

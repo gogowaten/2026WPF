@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CommunityToolkit.Mvvm.Input;
+using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -76,8 +77,28 @@ namespace _20260311
             DragDelta += TThumb_DragDelta;
             DragCompleted += CustomThumb_DragCompleted;
             PreviewMouseLeftButtonDown += CustomThumb_PreviewMouseLeftButtonDown;
-            
+            Loaded += CustomThumb_Loaded;
 
+        }
+
+        // 起動時
+        private void CustomThumb_Loaded(object sender, RoutedEventArgs e)
+        {
+            // TextBlockなどのサイズがNaNの要素が追加された時用
+            // Dataが追加された時点で親要素のサイズ計測がされるけど、これらの要素はその時点でのサイズは0で
+            // 正しいサイズが設定されるのは描画後で、それがここなので、ここで親要素のサイズ計測
+            //if (MyData.RootData is RootData root && root.Width == 0)
+            //{
+            //    root.UpdateSize();
+            //}
+
+
+            if (MyData is TextData text && text.RootData is RootData root)
+            {
+
+                root.UpdateSize();
+
+            }
         }
 
 

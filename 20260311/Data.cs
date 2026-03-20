@@ -159,6 +159,8 @@ namespace _20260311
 
         #region メソッド
 
+        #region グループ化
+        
         private bool CanUnGroup()
         {
             if (SelectedItems.Count == 0) { return false; }
@@ -167,6 +169,14 @@ namespace _20260311
             return true;
         }
 
+        /// <summary>
+        /// 現在選択されているグループ項目をグループ解除し、子要素を親グループに移動させ、選択状態と位置を更新します。
+        /// </summary>
+        /// <remarks>このメソッドは、現在の項目がグループであり、かつ編集グループが存在する場合にのみ使用できます。
+        /// グループ解除後、グループのすべての子要素が選択され、親グループに対する位置が調整されます。
+        /// グループ自体は親グループから削除されます。この操作により、
+        /// 選択状態が更新され、必要に応じてコマンド状態の変更が通知されます。
+        /// </remarks>
         [RelayCommand(CanExecute = nameof(CanUnGroup))]
         private void UnGroup()
         {
@@ -175,6 +185,10 @@ namespace _20260311
 
             if (CurrentItem is GroupData targetGroupData)
             {
+                // ClickedItemチェック
+                if (ClickedItem == targetGroupData) { ClickedItem = null; }
+
+                // 親要素のDataListにバラした要素を順番に挿入
                 int z = targetGroupData.Z;
                 for (int i = targetGroupData.DataList.Count - 1; i >= 0; i--)
                 {
@@ -191,7 +205,7 @@ namespace _20260311
                     item.Y += targetGroupData.Y;
                 }
 
-                // 親要素のDataListを整える
+                // 子要素全体のZを整える
                 for (int i = 0; i < EditingGroup.DataList.Count; i++)
                 {
                     EditingGroup.DataList[i].Z = i;
@@ -211,6 +225,10 @@ namespace _20260311
                 targetGroupData.IsSelected = false;
                 targetGroupData.DataList.Clear(); // 要る？
 
+                // 選択ItemにClickedItemが在ればそれをCurrentItemにする
+                if (ClickedItem is not null && ClickedItem.IsSelected) { CurrentItem = ClickedItem; }
+
+
                 UnGroupCommand.NotifyCanExecuteChanged();
             }
 
@@ -228,6 +246,12 @@ namespace _20260311
             return true;
         }
 
+        /// <summary>
+        /// 編集グループ内で現在選択されている項目から新しいグループを作成し、データリストを更新します。
+        /// </summary>
+        /// <remarks>このメソッドは、選択された項目を新しいグループにまとめ、位置とZオーダーを再計算し、
+        /// 編集グループのデータリストを更新された構造に置き換えます。その後、新しいグループが選択されます。
+        /// </remarks>
         [RelayCommand(CanExecute = nameof(CanAddGroupFromSelectedItems))]
         private void AddGroupFromSelectedItems()
         {
@@ -302,6 +326,7 @@ namespace _20260311
 
             AddGroupFromSelectedItemsCommand.NotifyCanExecuteChanged();
         }
+        #endregion グループ化
 
         #region Z
 
@@ -451,6 +476,10 @@ namespace _20260311
 
         #endregion 編集モード
 
+        /// <summary>
+        /// SelectedItemsに指定したDataを追加する
+        /// </summary>
+        /// <param name="data"></param>
         public void AddDataToSelectedItems(Data data)
         {
             // 二重登録禁止
@@ -474,6 +503,7 @@ namespace _20260311
 
 
         // TextBlockを追加するテスト
+        // 追加後はSelectedをクリアして、追加Itemを選択状態にする、Currentにする
         [RelayCommand(CanExecute = nameof(CanAddTextBlockData))]
         public void AddTextBlockData(string name)
         {
@@ -487,6 +517,9 @@ namespace _20260311
             };
             EditingGroup?.DataList.Add(data);
             data.IsSelectable = true;
+            ClearSelectedItems();
+            AddDataToSelectedItems(data);
+            
         }
 
         // TextBlock追加できるかの判定用
@@ -507,6 +540,7 @@ namespace _20260311
             foreach (var item in SelectedItems)
             {
                 EditingGroup.DataList.Remove(item);
+                if (item.IsClicked) { ClickedItem = null; }
             }
 
             // 選択状態解除
@@ -698,7 +732,7 @@ namespace _20260311
 
     public partial class TextBlockData : TextData
     {
-
+        
     }
     public abstract partial class TextData : Data
     {

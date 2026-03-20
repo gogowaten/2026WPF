@@ -39,12 +39,13 @@
 
   <DataTemplate DataType="{x:Type local:TextBlockData}">
     <local:CustomThumb>
-      <TextBlock Text="{Binding Text}" FontSize="{Binding FontSize}" FontFamily="{Binding FontName}"
+      <TextBlock Text="{Binding Text}"
+                 FontSize="{Binding FontSize}" FontFamily="{Binding FontName}"
                  Foreground="{Binding Foreground}" Background="{Binding Background}"
                  Opacity="0.5"
-                         local:SizeObserver.Observe="True"
-                         local:SizeObserver.ObservedWidth="{Binding Width, Mode=OneWayToSource}"
-                         local:SizeObserver.ObservedHeight="{Binding Height, Mode=OneWayToSource}"
+                  local:SizeObserver.Observe="True"
+                  local:SizeObserver.ObservedWidth="{Binding Width, Mode=OneWayToSource}"
+                  local:SizeObserver.ObservedHeight="{Binding Height, Mode=OneWayToSource}"
 />
     </local:CustomThumb>
   </DataTemplate>
@@ -84,27 +85,6 @@
 
 
 
-  <!--<Style TargetType="{x:Type local:CustomThumb}">
-    <Setter Property="Canvas.Left" Value="{Binding X, Mode=TwoWay}"/>
-    <Setter Property="Canvas.Top" Value="{Binding Y, Mode=TwoWay}"/>
-    <Setter Property="MyIsSelected" Value="{Binding IsSelected}"/>
-    <Setter Property="Template">
-      <Setter.Value>
-        <ControlTemplate TargetType="{x:Type local:CustomThumb}">
-          <Grid>
-            <ContentControl Content="{TemplateBinding MyContent}">
-              <i:Interaction.Behaviors>
-                <local:MyBehavior/>
-              </i:Interaction.Behaviors>
-            </ContentControl>
-          </Grid>
-        </ControlTemplate>
-      </Setter.Value>
-    </Setter>
-  </Style>-->
-
-
-
 
   <Style TargetType="{x:Type local:AAAItemsCtrl}">
     <Setter Property="ItemsSource" Value="{Binding DataList}"/>
@@ -121,7 +101,7 @@
       <Setter.Value>
         <ControlTemplate TargetType="{x:Type local:AAAItemsCtrl}">
           <Grid Background="WhiteSmoke">
-            <ItemsPresenter Width="{Binding Width}" Height="{Binding Height}"/>
+            <ItemsPresenter x:Name="MyPresenter" Width="{Binding Width}" Height="{Binding Height}"/>
             <Border BorderBrush="Orange" BorderThickness="0" Margin="0"/>
           </Grid>
         </ControlTemplate>
