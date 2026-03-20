@@ -157,50 +157,29 @@ namespace _20260311
         {
             if (EditingGroup is null) { return; }
 
-            // 選択Itemの下げ幅を計算、
-            // 下げ幅 = 選択Itemの最下層Z - 0(全体の最下層Z)
-            // つまり選択Itemの最下層Z
-            int sageHaba = 0;
-            foreach (var item in SelectedItems)
-            {
-                if (sageHaba < item.Z) { sageHaba = item.Z; }
-            }
-
-            // 新リスト作成、非選択Itemを詰め込む
-            var newList = new ObservableCollection<Data>();
-            foreach (var item in EditingGroup.DataList)
-            {
-                if (item.IsSelected == false) { newList.Add(item); }
-            }
-
-            // 新リストに選択Itemを順番に挿入、場所は下げ幅を加味
-            var sorted = SelectedItems.OrderBy(n => n.Z).ToList();
-            for (int i = 0; i < sorted.Count; i++)
-            {
-                newList.Insert(sorted[i].Z - sageHaba, sorted[i]);
-            }
-
-            // ItemのZをIndexに合わせる
-            for (int i = 0; i < newList.Count; i++) { newList[i].Z = i; }
-
-            // リストの入れ替え
-            EditingGroup.DataList = newList;
-
-            ZDownCommand.NotifyCanExecuteChanged();
-            ZtoBottomCommand.NotifyCanExecuteChanged();
-            ZUpCommand.NotifyCanExecuteChanged();
-            ZtoTopCommand.NotifyCanExecuteChanged();
+            // 選択Item全体の移動距離を計算、一番下のItemが0になる値
+            // = 0 - 一番下のItemのZ
+            ZMove(0 - SelectedItems.Min(n => n.Z));
         }
 
-        // Z、選択Itemを上に移動、ZIndexを1増やす
+        // 背面へ移動
         [RelayCommand(CanExecute = nameof(CanZDown))]
         private void ZDown()
         {
             if (EditingGroup is null) { return; }
 
-            // 入れ替え方式
-            // 下げ幅 = 1
-            int sageHaba = 1;
+            ZMove(-1);
+        }
+
+
+        /// </summary>
+        /// <remarks>編集グループ内の選択されたアイテムのZオーダーを更新し、
+        /// 関連するコマンドの状態を更新します</remarks>
+        /// <param name="distination">Zオーダー内で選択されたアイテムを移動するオフセット。正の値はアイテムを前方に移動させ、
+        /// 負の値はアイテムを後方に移動させます。</param>
+        private void ZMove(int distination)
+        {
+            if (EditingGroup is null) { return; }
 
             // 新リスト作成、非選択Itemを詰め込む
             var newList = new ObservableCollection<Data>();
@@ -209,11 +188,11 @@ namespace _20260311
                 if (item.IsSelected == false) { newList.Add(item); }
             }
 
-            // 新リストに選択Itemを順番に挿入、場所は下げ幅を加味
+            // 新リストに選択Itemを順番に挿入、場所は移動距離(方向)を加味
             var sorted = SelectedItems.OrderBy(n => n.Z).ToList();
             for (int i = 0; i < sorted.Count; i++)
             {
-                newList.Insert(sorted[i].Z - sageHaba, sorted[i]);
+                newList.Insert(sorted[i].Z + distination, sorted[i]);
             }
 
             // ItemのZをIndexに合わせる
@@ -256,11 +235,11 @@ namespace _20260311
         private void ZtoTop()
         {
             if (EditingGroup is null) { return; }
-            
+
             // 選択Itemが最前面になるまでの上げ幅を取得
             int mi = SelectedItems.Max(n => n.Z);
             int agehaba = EditingGroup.DataList.Count - 1 - mi;
-            ZUpSub(agehaba);
+            ZMove(agehaba);
         }
 
 
@@ -269,45 +248,8 @@ namespace _20260311
         private void ZUp()
         {
             if (EditingGroup is null) { return; }
-            ZUpSub(1);
+            ZMove(1);
         }
-
-
-
-        // 選択ItemのZを上げ幅分上げる
-        private void ZUpSub(int ageHaba)
-        {
-            if (EditingGroup is null) { return; }
-
-            // 入れ替え方式
-            
-            // 新リスト作成、非選択Itemを詰め込む
-            var newList = new ObservableCollection<Data>();
-            foreach (var item in EditingGroup.DataList)
-            {
-                if (item.IsSelected == false) { newList.Add(item); }
-            }
-
-            // 新リストに選択Itemを順番に挿入、場所は上げ幅を加味
-            var sorted = SelectedItems.OrderBy(n => n.Z).ToList();
-            for (int i = 0; i < sorted.Count; i++)
-            {
-                newList.Insert(sorted[i].Z + ageHaba, sorted[i]);
-            }
-
-            // ItemのZをIndexに合わせる
-            for (int i = 0; i < newList.Count; i++) { newList[i].Z = i; }
-
-            // リストの入れ替え
-            EditingGroup.DataList = newList;
-
-
-            ZUpCommand.NotifyCanExecuteChanged();
-            ZtoTopCommand.NotifyCanExecuteChanged();
-            ZDownCommand.NotifyCanExecuteChanged();
-            ZtoBottomCommand.NotifyCanExecuteChanged();
-        }
-
 
 
 
