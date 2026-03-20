@@ -36,13 +36,14 @@
       <Button Content="最前面へ移動" Command="{Binding ZtoTopCommand}"/>
       <Button Content="背面へ移動" Command="{Binding ZDownCommand}"/>
       <Button Content="最背面へ移動" Command="{Binding ZtoBottomCommand}"/>
+      <Button Content="グループ化" Command="{Binding AddGroupFromSelectedItemsCommand}"/>
       <!--<Button Content="右へ10移動" Command="{Binding ToRightCommand}"/>-->
       <TextBlock Text="{Binding Width, StringFormat=RootWidth {0}}"/>
       <TextBlock Text="{Binding CurrentItem.Name, StringFormat=今 {0}}"/>
-      <TextBlock Text="{Binding CurrentItem.Width, StringFormat=今.Width {0:0.0}}"/>
+      <TextBlock Text="{Binding CurrentItem.IsSelectable, StringFormat=今.選択可能 {0:0.0}}"/>
       <TextBlock Text="{Binding CurrentItem.Z, StringFormat=今.Z {0:0}}"/>
       <TextBlock Text="{Binding ClickedItem.Name, StringFormat=クリック {0}}"/>
-      <TextBlock Text="{Binding ClickedItem.ParentData.Name, StringFormat=ClickedItem.ParentData {0}}"/>
+      <TextBlock Text="{Binding ClickedItem.IsSelectable, StringFormat=クリック.選択可能 {0}}"/>
       <TextBlock Text="{Binding EditingGroup.Name, StringFormat=編集モード {0}}"/>
       <TextBlock Text="{Binding SelectedItems.Count, StringFormat=選択Item数 {0}}"/>
       <Viewbox Height="30">

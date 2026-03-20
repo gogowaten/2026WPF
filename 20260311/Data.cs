@@ -151,6 +151,81 @@ namespace _20260311
 
         #region メソッド
 
+        [RelayCommand]
+        private void AddGroupFromSelectedItems()
+        {
+            if (EditingGroup is null) { return; }
+            if (SelectedItems.Count < 1) { return; }
+            if (EditingGroup.DataList.Count < 1) { return; }
+            if (EditingGroup.DataList.Count == SelectedItems.Count) { return; }
+
+
+            // 新リスト作成、非選択Itemを詰め込む
+            var newDataList = new ObservableCollection<Data>();
+            foreach (var item in EditingGroup.DataList)
+            {
+                if (item.IsSelected == false) { newDataList.Add(item); }
+            }
+
+         
+            // 新グループ作成、そのDataListに選択Itemを順番に追加
+            var sortedItems = SelectedItems.OrderBy(n => n.Z).ToArray();
+            GroupData newGroup = new()
+            {
+                RootData = this.RootData,
+                IsSelectable = true,
+                ParentData = EditingGroup,
+            };
+            for (int i = 0; i < sortedItems.Length; i++)
+            {
+                newGroup.DataList.Add(sortedItems[i]);
+            }
+
+
+            // 新グループを新リストに挿入
+            /*新グループのZ = 選択Itemの最上層Z - （選択個数 - 1）*/
+            int groupZ = SelectedItems.Max(n => n.Z) - (SelectedItems.Count - 1);
+            newDataList.Insert(groupZ, newGroup);
+
+            // 新グループと子要素の座標調整
+            double minX = double.MaxValue;
+            double minY = double.MaxValue;
+            double right = 0;
+            double bottom = 0;
+            foreach (var item in newGroup.DataList)
+            {
+                if (minX > item.X) { minX = item.X; }
+                if (minY > item.Y) { minY = item.Y; }
+                if (right < item.X + item.Width) { right = item.X + item.Width; }
+                if (bottom < item.Y + item.Height) { bottom = item.Y + item.Height; }
+            }
+            newGroup.X = minX; newGroup.Y = minY;
+            newGroup.Width = right - minX;
+            newGroup.Height = bottom - minY;
+
+            // 子要素の座標調整、ついでにIsSelectableとIsSelectedをfalseに変更
+            foreach (var item in newGroup.DataList)
+            {
+                item.X -= minX;
+                item.Y -= minY;
+                item.IsSelectable = false;
+                item.IsSelected = false;
+            }
+
+            // 新リストの要素のZを整える
+            for (int i = 0; i < newDataList.Count; i++) { newDataList[i].Z = i; }
+
+            // 今の全体リストと新リストを入れ替えて完了
+            EditingGroup.DataList = newDataList;
+
+            // 選択Itemリストを整える
+            ClearSelectedItems();
+            AddSelect(newGroup);// 新グループを選択状態にする
+
+        }
+
+        #region Z
+
         // 選択Itemを最背面へ移動
         [RelayCommand(CanExecute = nameof(CanZDown))]
         private void ZtoBottom()
@@ -273,7 +348,7 @@ namespace _20260311
             }
             return true;
         }
-
+        #endregion Z
 
         #region 編集モード
 
@@ -382,7 +457,7 @@ namespace _20260311
             RectangleData rBlue = new() { Name = "青四角", X = 20, Y = 20, Width = 60, Height = 60, Fill = new SolidColorBrush(Color.FromArgb(250, 0, 0, 255)) };
             EllipseData maruRed = new() { Name = "黄玉", X = 0, Y = 0, Width = 50, Height = 50, Fill = new SolidColorBrush(Color.FromArgb(250, 255, 200, 0)) };
             EllipseData maruBlue = new() { Name = "水玉", X = 120, Y = 20, Width = 50, Height = 50, Fill = new SolidColorBrush(Color.FromArgb(250, 0, 200, 255)) };
-            EllipseData maruGreen = new() { Name = "翠玉", X = 40, Y = 140, Width = 50, Height = 50, Fill = new SolidColorBrush(Color.FromArgb(250, 0, 255, 0)) };
+            EllipseData maruGreen = new() { Name = "翠玉", X = 40, Y = 140, Width = 50, Height = 50, Fill = new SolidColorBrush(Color.FromArgb(250, 100, 200, 150)) };
 
             GroupData groupRect = new() { RootData = this, Name = "GropuA", X = 0, Y = 0 };
             groupRect.DataList.Add(rRed);
@@ -529,7 +604,8 @@ namespace _20260311
 
             // サイズ更新
             group.Width = right - mx; group.Height = bottom - my;
-            // 座標更新
+
+            // 子要素の座標更新
             foreach (var item in group.DataList) { item.X -= mx; item.Y -= my; }
 
             // 親要素のBounds更新
