@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Microsoft.Xaml.Behaviors;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -160,7 +161,7 @@ namespace _20260311
         #region メソッド
 
         #region グループ化
-        
+
         private bool CanUnGroup()
         {
             if (SelectedItems.Count == 0) { return false; }
@@ -519,7 +520,7 @@ namespace _20260311
             data.IsSelectable = true;
             ClearSelectedItems();
             AddDataToSelectedItems(data);
-            
+
         }
 
         // TextBlock追加できるかの判定用
@@ -687,6 +688,28 @@ namespace _20260311
             }
         }
 
+
+        /// <summary>
+        /// 特別、TextBlockなどサイズが確定していない要素を
+        /// まっさらなRootに追加した直後にRootのサイズを決定するのに使う
+        /// DataTemplateのXAMLからBehaviorで使う
+        ///   xmlns:i="http://schemas.microsoft.com/xaml/behaviors">
+        ///      <i:Interaction.Triggers>
+        ///        <i:EventTrigger EventName = "Loaded" >
+        ///          < i:InvokeCommandAction Command = "{Binding RootData.UpdateRootSizeForNaNSizeElementCommand}" />
+        ///        </ i:EventTrigger>
+        ///      </i:Interaction.Triggers>
+        /// </summary>
+        [RelayCommand]
+        private void UpdateRootSizeForNaNSizeElement()
+        {
+            if (DataList.Count == 1 && Width == 0)
+            {
+                Width = DataList[0].Width;
+                Height = DataList[0].Height;
+            }
+        }
+
         [RelayCommand]
         public void UpdateSize()
         {
@@ -732,7 +755,7 @@ namespace _20260311
 
     public partial class TextBlockData : TextData
     {
-        
+
     }
     public abstract partial class TextData : Data
     {
@@ -742,8 +765,20 @@ namespace _20260311
         [ObservableProperty] private Brush? _foreground = Brushes.Black;
         [ObservableProperty] private Brush? _background = Brushes.Transparent;
 
-
-
+        #region サイズ変更に関わる
+        partial void OnTextChanged(string value)
+        {
+            UpdateParentSize();
+        }
+        partial void OnFontNameChanged(string value)
+        {
+            UpdateParentSize();
+        }
+        partial void OnFontSizeChanged(double value)
+        {
+            UpdateParentSize();
+        }
+        #endregion サイズ変更に関わる
     }
 
     #region 図形
@@ -792,5 +827,8 @@ namespace _20260311
             //X = mx; Y = my;
             ParentData.Width = right; ParentData.Height = bottom;
         }
+
+
+
     }
 }

@@ -77,29 +77,35 @@ namespace _20260311
             DragDelta += TThumb_DragDelta;
             DragCompleted += CustomThumb_DragCompleted;
             PreviewMouseLeftButtonDown += CustomThumb_PreviewMouseLeftButtonDown;
-            Loaded += CustomThumb_Loaded;
+
+            // 以下はXAMLのほうで処理するように変更した
+            // TextBlockなどサイズが確定していない要素を
+            // まっさらなRootに追加した直後にRootのサイズを決定するのに使う
+            //Loaded += CustomThumb_Loaded; // これは動くけど、DataTemplateからだとクリックのたびに実行される
+            //Initialized += CustomThumb_Initialized;// こっちだとまだ描画されていない感じ
 
         }
 
-        // 起動時
-        private void CustomThumb_Loaded(object sender, RoutedEventArgs e)
-        {
-            // TextBlockなどのサイズがNaNの要素が追加された時用
-            // Dataが追加された時点で親要素のサイズ計測がされるけど、これらの要素はその時点でのサイズは0で
-            // 正しいサイズが設定されるのは描画後で、それがここなので、ここで親要素のサイズ計測
-            //if (MyData.RootData is RootData root && root.Width == 0)
-            //{
-            //    root.UpdateSize();
-            //}
+        //// 起動時
+        //private void CustomThumb_Loaded(object sender, RoutedEventArgs e)
+        //{
+        //    // TextBlockなどのサイズがNaNの要素が追加された時用
+        //    // Dataが追加された時点で親要素のサイズ計測がされるけど、これらの要素はその時点でのサイズは0で
+        //    // 正しいサイズが設定されるのは描画後で、それがここなので、ここで親要素のサイズ計測
 
 
-            if (MyData is TextData text && text.RootData is RootData root)
-            {
+        //    if (MyData is TextData text && text.RootData is RootData root)
+        //    {
+        //        if (text.Width != 0 && root.DataList.Count == 1)
+        //        {
+        //            root.UpdateSize();
+        //        }
 
-                root.UpdateSize();
-
-            }
-        }
+        //    }
+        //    // 起動時に1回だけ実行されればいいので、ここで解除
+        //    // とは言ってもDateTemplateで表示しているとクリックのたびに再作成している？から意味ないかも？
+        //    Loaded -= CustomThumb_Loaded;
+        //}
 
 
         //protected override bool HandlesScrolling

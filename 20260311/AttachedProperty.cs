@@ -28,7 +28,7 @@ namespace _20260311
             if (d is FrameworkElement fe)
             {
                 if ((bool)e.NewValue)
-                {                    
+                {
                     fe.SizeChanged += Fe_SizeChanged;
                     //SetObservedWidth(fe, fe.ActualWidth);// これだと初回読み込み時のサイズが常に0になってしまう
 
@@ -44,7 +44,7 @@ namespace _20260311
 
         private static void Fe_Loaded(object sender, RoutedEventArgs e)
         {
-            if(sender is FrameworkElement fe)
+            if (sender is FrameworkElement fe)
             {
                 // 読み込みが完了したので、この時点のActualWidthを反映
                 SetObservedWidth(fe, fe.ActualWidth);
@@ -58,12 +58,15 @@ namespace _20260311
         // サイズ変更時の処理、新たなサイズをObservedWidthとHeightそれぞれに記録
         private static void Fe_SizeChanged(object sender, SizeChangedEventArgs e)
         {
-            if (sender is FrameworkElement fe)
+            if (e.NewSize.Width != 0 && e.NewSize.Height != 0)
             {
-                SetObservedWidth(fe, e.NewSize.Width);
-                SetObservedHeight(fe, e.NewSize.Height);
-                //SetObservedHeight(fe, fe.DesiredSize.Height); // これで問題ない？
+                if (sender is FrameworkElement fe)
+                {
+                    SetObservedWidth(fe, e.NewSize.Width);
+                    SetObservedHeight(fe, e.NewSize.Height);
+                    //SetObservedHeight(fe, fe.DesiredSize.Height); // これで問題ない？
 
+                }
             }
         }
 

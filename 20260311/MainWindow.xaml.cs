@@ -32,7 +32,8 @@ namespace _20260311
             {
                 if(item is TextBlockData txt)
                 {
-                    txt.Text = "ゆっくりしていってね！！！";
+                    //txt.Text = "ゆっくりしていってね！！！";
+                    txt.FontSize++;
                 }
             }
         }

@@ -1,7 +1,8 @@
 <ResourceDictionary
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:local="clr-namespace:_20260311">
+    xmlns:local="clr-namespace:_20260311"
+  xmlns:i="http://schemas.microsoft.com/xaml/behaviors">
 
 
 
@@ -46,7 +47,14 @@
                   local:SizeObserver.Observe="True"
                   local:SizeObserver.ObservedWidth="{Binding Width, Mode=OneWayToSource}"
                   local:SizeObserver.ObservedHeight="{Binding Height, Mode=OneWayToSource}"
-/>
+>
+        <i:Interaction.Triggers>
+          <i:EventTrigger EventName="Loaded">
+            <i:InvokeCommandAction Command="{Binding RootData.UpdateRootSizeForNaNSizeElementCommand}"/>
+          </i:EventTrigger>
+        </i:Interaction.Triggers>
+        
+      </TextBlock>
     </local:CustomThumb>
   </DataTemplate>
 
