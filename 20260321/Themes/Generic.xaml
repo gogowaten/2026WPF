@@ -52,9 +52,14 @@
             <i:InvokeCommandAction Command="{Binding RootData.UpdateRootSizeForNaNSizeElementCommand}"/>
           </i:EventTrigger>
         </i:Interaction.Triggers>
-
+        
       </TextBlock>
     </local:CustomThumb>
+    <DataTemplate.Triggers>
+      <EventTrigger RoutedEvent="FrameworkElement.Loaded">
+        
+      </EventTrigger>
+    </DataTemplate.Triggers>
   </DataTemplate>
 
 

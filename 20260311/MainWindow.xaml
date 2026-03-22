@@ -19,7 +19,6 @@
       <!--<local:AAAItemsCtrl x:Name="MyAAA" DataContext="{Binding MyDataVM}"
                         AAADataService="{Binding MyService}"/>-->
     </ScrollViewer>
-
     <!--<local:CustomThumb>
       <local:TTTextBlock x:Name="MyTTText" Text="aaaaaaa" Background="Yellow"/>
 

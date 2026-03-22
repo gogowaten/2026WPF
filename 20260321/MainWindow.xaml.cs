@@ -26,17 +26,16 @@ namespace _20260321
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            var dc = MyAAA.DataContext;
-            //MyTTText.Text = "acb";
-            foreach (var item in MyDataVM.DataList)
-            {
-                if (item is TextBlockData txt)
-                {
-                    //txt.Text = "ゆっくりしていってね！！！";
-                    txt.FontSize++;
-                }
-            }
+            
         }
 
+        private void Button_Click_1(object sender, RoutedEventArgs e)
+        {
+            Rect bounds = VisualTreeHelper.GetDescendantBounds(MyLine);// 指定要素＋子要素
+            Rect cbounds = VisualTreeHelper.GetContentBounds(MyLine); // 指定要素のみ
+            Rect ccbounds = VisualTreeHelper.GetDescendantBounds(MyCanvas);// 指定要素＋子要素
+            Rect cccbounds = VisualTreeHelper.GetContentBounds(MyCanvas); // 指定要素のみ
+            
+        }
     }
 }

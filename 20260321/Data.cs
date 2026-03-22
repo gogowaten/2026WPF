@@ -187,30 +187,30 @@ namespace _20260321
             //var neko = DataList.Max(n => n.X + n.Width);
         }
 
-        // Bounds更新
-        public void UpdateBounds(GroupData group)
-        {
-            double right = 0;
-            double bottom = 0;
-            double mx = double.MaxValue;
-            double my = double.MaxValue;
-            foreach (var item in group.DataList)
-            {
-                mx = Math.Min(mx, item.X);
-                my = Math.Min(my, item.Y);
-                right = Math.Max(right, item.X + item.Width);
-                bottom = Math.Max(bottom, item.Y + item.Height);
-            }
+        //// Bounds更新
+        //public void UpdateBounds(GroupData group)
+        //{
+        //    double right = 0;
+        //    double bottom = 0;
+        //    double mx = double.MaxValue;
+        //    double my = double.MaxValue;
+        //    foreach (var item in group.DataList)
+        //    {
+        //        mx = Math.Min(mx, item.X);
+        //        my = Math.Min(my, item.Y);
+        //        right = Math.Max(right, item.X + item.Width);
+        //        bottom = Math.Max(bottom, item.Y + item.Height);
+        //    }
 
-            // サイズ更新
-            group.Width = right - mx; group.Height = bottom - my;
+        //    // サイズ更新
+        //    group.Width = right - mx; group.Height = bottom - my;
 
-            // 子要素の座標更新
-            foreach (var item in group.DataList) { item.X -= mx; item.Y -= my; }
+        //    // 子要素の座標更新
+        //    foreach (var item in group.DataList) { item.X -= mx; item.Y -= my; }
 
-            // 親要素のBounds更新
-            group.ParentData?.UpdateBounds(group.ParentData);
-        }
+        //    // 親要素のBounds更新
+        //    group.ParentData?.UpdateBounds(group.ParentData);
+        //}
 
 
 

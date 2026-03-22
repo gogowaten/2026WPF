@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
@@ -47,6 +48,62 @@ namespace _20260311
             MyInit();
             SelectedItems.CollectionChanged += SelectedItems_CollectionChanged;
         }
+
+        #region テスト用初期化
+        
+        private void MyInit()
+        {
+            this.RootData = this; // 自身をRootにしておく
+            this.CurrentItem = this; // 自身を筆頭にしておく
+            this.IsEditing = true; // 起動時は自身が編集状態グループ
+
+            RectangleData rRed = new() { Name = "赤四角", X = 0, Y = 0, Width = 60, Height = 60, Fill = new SolidColorBrush(Color.FromArgb(250, 255, 0, 0)) };
+            RectangleData rBlue = new() { Name = "青四角", X = 20, Y = 20, Width = 60, Height = 60, Fill = new SolidColorBrush(Color.FromArgb(250, 0, 0, 255)) };
+            EllipseData maruRed = new() { Name = "黄玉", X = 0, Y = 0, Width = 50, Height = 50, Fill = new SolidColorBrush(Color.FromArgb(250, 255, 200, 0)) };
+            EllipseData maruBlue = new() { Name = "水玉", X = 120, Y = 20, Width = 50, Height = 50, Fill = new SolidColorBrush(Color.FromArgb(250, 0, 200, 255)) };
+            EllipseData maruGreen = new() { Name = "翠玉", X = 40, Y = 140, Width = 50, Height = 50, Fill = new SolidColorBrush(Color.FromArgb(250, 100, 200, 150)) };
+
+            GroupData groupRect = new() { RootData = this, Name = "GropuA", X = 0, Y = 0 };
+            groupRect.DataList.Add(rRed);
+            groupRect.DataList.Add(rBlue);
+
+            GroupData groupEllipse = new() { RootData = this, Name = "GropuB", X = 100, Y = 0 };
+            groupEllipse.DataList.Add(maruRed);
+            groupEllipse.DataList.Add(maruBlue);
+
+            GroupData groupB_1 = new() { RootData = this, Name = "GroupB_1", X = 0, Y = 100 };
+            groupB_1.DataList.Add(new EllipseData() { Name = "青丸", X = 0, Y = 0, Width = 50, Height = 50, Fill = new SolidColorBrush(Color.FromArgb(250, 0, 0, 255)) });
+            groupB_1.DataList.Add(new EllipseData() { Name = "赤丸", X = 100, Y = 100, Width = 50, Height = 50, Fill = new SolidColorBrush(Color.FromArgb(250, 255, 0, 0)) });
+            groupEllipse.DataList.Add(groupB_1);
+
+            DataList.Add(groupRect);
+            DataList.Add(groupEllipse);
+            DataList.Add(maruGreen);
+            TextBlockData textBlockData = new() { Name = "Text1", X = 0, Y = 0, Text = "Text1", FontSize = 30 };
+            DataList.Add(textBlockData);
+            DataList.Add(new PolylineData() { Name = "ボリライン", X = 0, Y = 0, StrokeThickness = 50, Stroke = Brushes.MediumPurple});
+
+
+            // 直下のItemのIsSelectableをtrueにする
+            foreach (var item in DataList)
+            {
+                item.IsSelectable = true;
+            }
+
+            DataSyokika(this);
+        }
+
+        // 起動時のDataの辻褄合わせ
+        // すべてのItemのRootDataを自身にする
+        private void DataSyokika(GroupData data)
+        {
+            foreach (var item in data.DataList)
+            {
+                item.RootData = this;
+                if (item is GroupData group) { DataSyokika(group); }
+            }
+        }
+        #endregion テスト用初期化
 
 
         #region On～プロパティの変更時
@@ -560,58 +617,7 @@ namespace _20260311
 
         #endregion メソッド
 
-        // テスト用初期化
-        private void MyInit()
-        {
-            this.RootData = this; // 自身をRootにしておく
-            this.CurrentItem = this; // 自身を筆頭にしておく
-            this.IsEditing = true; // 起動時は自身が編集状態グループ
-
-            RectangleData rRed = new() { Name = "赤四角", X = 0, Y = 0, Width = 60, Height = 60, Fill = new SolidColorBrush(Color.FromArgb(250, 255, 0, 0)) };
-            RectangleData rBlue = new() { Name = "青四角", X = 20, Y = 20, Width = 60, Height = 60, Fill = new SolidColorBrush(Color.FromArgb(250, 0, 0, 255)) };
-            EllipseData maruRed = new() { Name = "黄玉", X = 0, Y = 0, Width = 50, Height = 50, Fill = new SolidColorBrush(Color.FromArgb(250, 255, 200, 0)) };
-            EllipseData maruBlue = new() { Name = "水玉", X = 120, Y = 20, Width = 50, Height = 50, Fill = new SolidColorBrush(Color.FromArgb(250, 0, 200, 255)) };
-            EllipseData maruGreen = new() { Name = "翠玉", X = 40, Y = 140, Width = 50, Height = 50, Fill = new SolidColorBrush(Color.FromArgb(250, 100, 200, 150)) };
-
-            GroupData groupRect = new() { RootData = this, Name = "GropuA", X = 0, Y = 0 };
-            groupRect.DataList.Add(rRed);
-            groupRect.DataList.Add(rBlue);
-
-            GroupData groupEllipse = new() { RootData = this, Name = "GropuB", X = 100, Y = 0 };
-            groupEllipse.DataList.Add(maruRed);
-            groupEllipse.DataList.Add(maruBlue);
-
-            GroupData groupB_1 = new() { RootData = this, Name = "GroupB_1", X = 0, Y = 100 };
-            groupB_1.DataList.Add(new EllipseData() { Name = "青丸", X = 0, Y = 0, Width = 50, Height = 50, Fill = new SolidColorBrush(Color.FromArgb(250, 0, 0, 255)) });
-            groupB_1.DataList.Add(new EllipseData() { Name = "赤丸", X = 100, Y = 100, Width = 50, Height = 50, Fill = new SolidColorBrush(Color.FromArgb(250, 255, 0, 0)) });
-            groupEllipse.DataList.Add(groupB_1);
-
-            DataList.Add(groupRect);
-            DataList.Add(groupEllipse);
-            DataList.Add(maruGreen);
-            TextBlockData textBlockData = new() { Name = "Text1", X = 0, Y = 0, Text = "Text1", FontSize = 30 };
-            DataList.Add(textBlockData);
-
-
-            // 直下のItemのIsSelectableをtrueにする
-            foreach (var item in DataList)
-            {
-                item.IsSelectable = true;
-            }
-
-            DataSyokika(this);
-        }
-
-        // 起動時のDataの辻褄合わせ
-        // すべてのItemのRootDataを自身にする
-        private void DataSyokika(GroupData data)
-        {
-            foreach (var item in data.DataList)
-            {
-                item.RootData = this;
-                if (item is GroupData group) { DataSyokika(group); }
-            }
-        }
+       
 
 
     }
@@ -782,6 +788,16 @@ namespace _20260311
     }
 
     #region 図形
+    public partial class PolylineData : ShapeData
+    {
+        public PolylineData()
+        {
+            StrokeThickness = 20;
+            Stroke = Brushes.Red;
+            Points = new PointCollection([new Point(), new Point(100, 0)]);
+        }
+        [ObservableProperty] private PointCollection _points = [];
+    }
 
     public partial class EllipseData : ShapeData { }
 
@@ -790,7 +806,9 @@ namespace _20260311
 
     public abstract partial class ShapeData : Data
     {
-        [ObservableProperty] private Brush _fill = new SolidColorBrush(Color.FromArgb(50, 255, 0, 0));
+        [ObservableProperty] private Brush _fill = new SolidColorBrush(Color.FromArgb(200, 255, 0, 0));
+        [ObservableProperty] private Brush _stroke = new SolidColorBrush(Color.FromArgb(200, 0, 250, 200));
+        [ObservableProperty] private double _strokeThickness = 1.0;
     }
     #endregion 図形
 

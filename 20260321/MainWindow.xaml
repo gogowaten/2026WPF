@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:_20260321" d:DataContext="{d:DesignInstance Type=local:MainWindow}"
         mc:Ignorable="d"
-        Title="MainWindow" Height="667" Width="654">
+        Title="MainWindow" Height="367" Width="654">
 
   <Grid>
     <Grid.ColumnDefinitions>
@@ -13,34 +13,37 @@
       <ColumnDefinition Width="200"/>
     </Grid.ColumnDefinitions>
 
-    <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto"
+    <!--<ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto"
                   HorizontalAlignment="Left" VerticalAlignment="top">
-      <local:AAAItemsCtrl x:Name="MyAAA" DataContext="{Binding MyDataVM}" MyRootData="{Binding}"/>
-      <!--<local:AAAItemsCtrl x:Name="MyAAA" DataContext="{Binding MyDataVM}"
-                        AAADataService="{Binding MyService}"/>-->
-    </ScrollViewer>
+    </ScrollViewer>-->
+    <Canvas x:Name="MyCanvas">
+      <Polyline x:Name="MyLine0" Canvas.Left="100" Canvas.Top="100"
+                  Stroke="MediumOrchid" StrokeThickness="100"
+                  Points="0,0 200,0"/>
 
-    <!--<local:CustomThumb>
-      <local:TTTextBlock x:Name="MyTTText" Text="aaaaaaa" Background="Yellow"/>
-
-    </local:CustomThumb>-->
-
-
-    <StackPanel Grid.Column="1" DataContext="{Binding MyDataVM}">
-      <TextBlock Text="{Binding CurrentItem.FontSize, StringFormat='FontSize = {0:0.0}'}"/>
-      <Slider Value="{Binding CurrentItem.FontSize}" Minimum="10" Maximum="100"/>
-      <Button Content="test" Click="Button_Click"/>
-      <Button Content="updateSize" Command="{Binding UpdateSizeCommand}"/>
-      <TextBox Text="{Binding AddText, UpdateSourceTrigger=PropertyChanged}"/>
-      <Button Content="TextBlockを追加" Command="{Binding AddTextBlockDataCommand}" CommandParameter="{Binding Path=AddText}"/>
-      <!--<Button Content="右へ10移動" Command="{Binding ToRightCommand}"/>-->
-      <TextBlock Text="{Binding Width, StringFormat=RootWidth {0}}"/>
-      <TextBlock Text="{Binding SelectedItems.Count, StringFormat=選択Item数 {0}}"/>
+      <Canvas Canvas.Left="100" Canvas.Top="100" Width="{Binding ElementName=MyLine, Path=ActualWidth}"
+              Height="{Binding ElementName=MyLine, Path=ActualHeight}" RenderTransformOrigin="0.5,0.5">
+        <Canvas.RenderTransform>
+            <RotateTransform Angle="25"/>
+        </Canvas.RenderTransform>
+        <Polyline x:Name="MyLine" Canvas.Left="0" Canvas.Top="0"
+                  Stroke="MediumAquamarine" StrokeThickness="100"
+                  Points="0,0 200,0"/>
+      </Canvas>
 
 
+    </Canvas>
 
 
-
+    <StackPanel Grid.Column="1" DataContext="{Binding ElementName=MyLine}">
+      <TextBlock Text="{Binding DesiredSize, StringFormat='DesiredSize = {0:0.0}'}"/>
+      <TextBlock Text="{Binding RenderSize, StringFormat='RenderSize = {0:0.0}'}"/>
+      <TextBlock Text="{Binding ActualWidth, StringFormat='ActWidth = {0:0.0}'}"/>
+      <TextBlock Text="{Binding Width, StringFormat='Width = {0:0.0}'}"/>
+      <TextBlock Text="{Binding ActualHeight, StringFormat='ActHeight = {0:0.0}'}"/>
+      <TextBlock Text="{Binding Height, StringFormat='Height = {0:0.0}'}"/>
+      <Button Content="test" Click="Button_Click_1"/>
     </StackPanel>
   </Grid>
+
 </Window>

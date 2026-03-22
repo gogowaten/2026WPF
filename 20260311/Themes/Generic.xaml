@@ -37,6 +37,12 @@
     <Setter Property="Panel.ZIndex" Value="{Binding Z}"/>
   </Style>
 
+  <DataTemplate DataType="{x:Type local:PolylineData}">
+    <local:CustomThumb>
+      <Polyline Stroke="{Binding Stroke}" StrokeThickness="{Binding StrokeThickness}"
+              Points="{Binding Points}"/>
+    </local:CustomThumb>
+  </DataTemplate>
 
   <DataTemplate DataType="{x:Type local:TextBlockData}">
     <local:CustomThumb>
@@ -53,7 +59,7 @@
             <i:InvokeCommandAction Command="{Binding RootData.UpdateRootSizeForNaNSizeElementCommand}"/>
           </i:EventTrigger>
         </i:Interaction.Triggers>
-        
+
       </TextBlock>
     </local:CustomThumb>
   </DataTemplate>
