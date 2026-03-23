@@ -6,53 +6,43 @@
         xmlns:local="clr-namespace:_20260321"
         mc:Ignorable="d"
         Title="MainWindow" Height="367" Width="654">
-  <Window.DataContext>
+  <!--<Window.DataContext>
     <local:PathData/>
   </Window.DataContext>
   <Window.Resources>
     <DataTemplate DataType="{x:Type local:PathData}">
 
     </DataTemplate>
-  </Window.Resources>
+  </Window.Resources>-->
 
   <Grid>
     <Grid.ColumnDefinitions>
       <ColumnDefinition/>
-      <ColumnDefinition Width="200"/>
+      <ColumnDefinition Width="240"/>
     </Grid.ColumnDefinitions>
 
     <!--<ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto"
                   HorizontalAlignment="Left" VerticalAlignment="top">
     </ScrollViewer>-->
-    <Canvas x:Name="MyCanvas">
-        <!--<local:GeoShape x:Name="MyLine" Stroke="DeepSkyBlue" StrokeThickness="30"
-                      Points="50,70 250,150 50,250 50,200 50,150 150,100 250,250"
-                      StrokeEndLineCap="Triangle"/>-->
-      <local:BezierThumb Points="50,70 250,150 50,250 50,200 50,150 150,100 250,250"
-                         >
-        <local:BezierThumb.Style>
-          <Style TargetType="{x:Type local:BezierThumb}">
-            <Setter Property="Template">
-              <Setter.Value>
-                <ControlTemplate TargetType="{x:Type local:BezierThumb}">
-                  <Canvas Background="Transparent"/>
-                </ControlTemplate>
-              </Setter.Value>
-            </Setter>
-          </Style>
-        </local:BezierThumb.Style>
-      </local:BezierThumb>
+     
+    <Canvas x:Name="MyCanvas" HorizontalAlignment="Left" VerticalAlignment="Top">
+      <local:CustomThumb Background="Gold">
+          <local:GeoShape x:Name="MyLine" Stroke="DeepSkyBlue" StrokeThickness="30"
+              Points="50,70 250,150 50,250 50,200 50,150 150,100 250,250"
+              StrokeEndLineCap="Triangle"/>
+        </local:CustomThumb>
     </Canvas>
 
 
     <StackPanel Grid.Column="1" DataContext="{Binding ElementName=MyLine}">
+      <Button Content="test" Click="Button_Click_1"/>
+      <TextBlock Text="{Binding ActualHeight, StringFormat='ActualHeight = {0:0.0}'}"/>
+      <TextBlock Text="{Binding Height, StringFormat='Height = {0:0.0}'}"/>
+      <TextBlock Text="{Binding ActualWidth, StringFormat='ActualWidth = {0:0.0}'}"/>
+      <TextBlock Text="{Binding Width, StringFormat='Width = {0:0.0}'}"/>
       <TextBlock Text="{Binding DesiredSize, StringFormat='DesiredSize = {0:0.0}'}"/>
       <TextBlock Text="{Binding RenderSize, StringFormat='RenderSize = {0:0.0}'}"/>
-      <TextBlock Text="{Binding ActualWidth, StringFormat='ActWidth = {0:0.0}'}"/>
-      <TextBlock Text="{Binding Width, StringFormat='Width = {0:0.0}'}"/>
-      <TextBlock Text="{Binding ActualHeight, StringFormat='ActHeight = {0:0.0}'}"/>
-      <TextBlock Text="{Binding Height, StringFormat='Height = {0:0.0}'}"/>
-      <Button Content="test" Click="Button_Click_1"/>
+      <TextBlock Text="{Binding RenderBounds, StringFormat='RenderBounds = {0: 0}'}"/>
     </StackPanel>
   </Grid>
 

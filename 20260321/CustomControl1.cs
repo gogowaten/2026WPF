@@ -16,14 +16,109 @@ using System.Windows.Shapes;
 namespace _20260321
 {
 
+    public class GeoLine : Shape
+    {
+        static GeoLine()
+        {
+            DefaultStyleKeyProperty.OverrideMetadata(typeof(GeoLine), new FrameworkPropertyMetadata(typeof(GeoLine)));
+        }
+        public GeoLine()
+        {
+
+        }
+
+
+        public Rect RenderBounds
+        {
+            get { return (Rect)GetValue(RenderBoundsProperty); }
+            set { SetValue(RenderBoundsProperty, value); }
+        }
+        public static readonly DependencyProperty RenderBoundsProperty =
+            DependencyProperty.Register(nameof(RenderBounds), typeof(Rect), typeof(GeoLine), new PropertyMetadata(new Rect(0, 0, 0, 0)));
+
+
+        public PointCollection Points
+        {
+            get { return (PointCollection)GetValue(PointsProperty); }
+            set { SetValue(PointsProperty, value); }
+        }
+        public static readonly DependencyProperty PointsProperty =
+            DependencyProperty.Register(nameof(Points), typeof(PointCollection), typeof(GeoLine), new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.AffectsRender));
+
+
+
+
+        protected override Geometry DefiningGeometry
+        {
+            get
+            {
+                if (Points is null || Points.Count == 0) { return Geometry.Empty; }
+
+                var figure = new PathFigure { StartPoint = Points[0] };
+
+                var segment = new PolyBezierSegment();
+                for (int i = 1; i < Points.Count; i++)
+                {
+                    segment.Points.Add(Points[i]);
+                }
+
+                var geometry = new PathGeometry();
+                figure.Segments.Add(segment);
+                geometry.Figures.Add(figure);
+
+                return geometry;
+
+            }
+        }
+
+        protected override void OnRender(DrawingContext drawingContext)
+        {
+            // 今使っているpenを再現
+            Pen pen = new(Brushes.Black, StrokeThickness)
+            {
+                EndLineCap = StrokeEndLineCap,
+                StartLineCap = StrokeStartLineCap,
+                LineJoin = StrokeLineJoin,
+                MiterLimit = StrokeMiterLimit
+            };
+
+            // ジオメトリのBoundsをpenを使って取得
+            RenderBounds = DefiningGeometry.GetRenderBounds(pen);
+
+            // 背景を先に描画
+            Rect bgRenderBounds = new(new Point(), RenderBounds.Size);
+            drawingContext.DrawRectangle(Brushes.LightGray, null, bgRenderBounds);
+
+            //drawingContext.DrawRectangle(Brushes.LightGray, null, RenderBounds);
+
+
+
+            Width = RenderBounds.Width;
+            Height = RenderBounds.Height;
+
+            TranslateTransform tt = new(-RenderBounds.X, -RenderBounds.Y);
+            drawingContext.PushTransform(tt);
+
+
+            // その後に元の線を描画
+            base.OnRender(drawingContext);
+        }
+
+    }
+
+
+
+
+
+
     [ContentProperty(nameof(MyContent))]
     public class CustomThumb : Thumb
     {
-        public override string ToString()
-        {
-            //return base.ToString();
-            return MyData.Name;
-        }
+        //public override string ToString()
+        //{
+        //    //return base.ToString();
+        //    return MyData.Name;
+        //}
 
         static CustomThumb()
         {
@@ -50,7 +145,16 @@ namespace _20260321
             set { SetValue(MyContentProperty, value); }
         }
         public static readonly DependencyProperty MyContentProperty =
-            DependencyProperty.Register(nameof(MyContent), typeof(FrameworkElement), typeof(CustomThumb), new PropertyMetadata(null));
+            DependencyProperty.Register(nameof(MyContent), typeof(FrameworkElement), typeof(CustomThumb), new FrameworkPropertyMetadata(null, OnMyContentChanged));
+
+        private static void OnMyContentChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            if (d is CustomThumb ct)
+            {
+                if (double.IsNaN(Canvas.GetLeft(ct))) { Canvas.SetLeft(ct, 0); }
+                if (double.IsNaN(Canvas.GetTop(ct))) { Canvas.SetTop(ct, 0); }
+            }
+        }
         #endregion 依存関係プロパティ
 
         //public bool MyIsSelected
@@ -67,11 +171,6 @@ namespace _20260321
         {
             //this.DataContext = this;
 
-            // 以下はXAMLのほうで処理するように変更した
-            // TextBlockなどサイズが確定していない要素を
-            // まっさらなRootに追加した直後にRootのサイズを決定するのに使う
-            //Loaded += CustomThumb_Loaded; // これは動くけど、DataTemplateからだとクリックのたびに実行される
-            //Initialized += CustomThumb_Initialized;// こっちだとまだ描画されていない感じ
             DragDelta += CustomThumb_DragDelta;
             DragCompleted += CustomThumb_DragCompleted;
         }
@@ -79,6 +178,7 @@ namespace _20260321
         private void CustomThumb_DragCompleted(object sender, DragCompletedEventArgs e)
         {
             //MyData.RootData?.UpdateSize();
+
         }
 
         private void CustomThumb_DragDelta(object sender, DragDeltaEventArgs e)
@@ -86,38 +186,11 @@ namespace _20260321
             //MyData.X += e.HorizontalChange;
             //MyData.Y += e.VerticalChange;
 
+            Canvas.SetLeft(this, Canvas.GetLeft(this) + e.HorizontalChange);
+            Canvas.SetTop(this, Canvas.GetTop(this) + e.VerticalChange);
+
         }
 
-        //// 起動時
-        //private void CustomThumb_Loaded(object sender, RoutedEventArgs e)
-        //{
-        //    // TextBlockなどのサイズがNaNの要素が追加された時用
-        //    // Dataが追加された時点で親要素のサイズ計測がされるけど、これらの要素はその時点でのサイズは0で
-        //    // 正しいサイズが設定されるのは描画後で、それがここなので、ここで親要素のサイズ計測
-
-
-        //    if (MyData is TextData text && text.RootData is RootData root)
-        //    {
-        //        if (text.Width != 0 && root.DataList.Count == 1)
-        //        {
-        //            root.UpdateSize();
-        //        }
-
-        //    }
-        //    // 起動時に1回だけ実行されればいいので、ここで解除
-        //    // とは言ってもDateTemplateで表示しているとクリックのたびに再作成している？から意味ないかも？
-        //    Loaded -= CustomThumb_Loaded;
-        //}
-
-
-        //protected override bool HandlesScrolling
-        //{
-        //    get
-        //    {
-        //        //return base.HandlesScrolling;
-        //        return true;
-        //    }
-        //}
 
 
 
@@ -131,30 +204,6 @@ namespace _20260321
 
 
 
-    //public class AAAItemsCtrl : ItemsControl
-    //{
-
-    //    public RootData MyRootData
-    //    {
-    //        get { return (RootData)GetValue(MyRootDataProperty); }
-    //        set { SetValue(MyRootDataProperty, value); }
-    //    }
-    //    public static readonly DependencyProperty MyRootDataProperty =
-    //        DependencyProperty.Register(nameof(MyRootData), typeof(RootData), typeof(AAAItemsCtrl), new PropertyMetadata(null));
-
-
-
-    //    static AAAItemsCtrl()
-    //    {
-    //        DefaultStyleKeyProperty.OverrideMetadata(typeof(AAAItemsCtrl), new FrameworkPropertyMetadata(typeof(AAAItemsCtrl)));
-    //    }
-    //    public AAAItemsCtrl()
-    //    {
-          
-    //    }
-
-
-    //}
 
 
 }

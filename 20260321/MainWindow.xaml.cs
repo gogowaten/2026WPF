@@ -22,7 +22,7 @@ namespace _20260321
         public MainWindow()
         {
             InitializeComponent();
-            this.DataContext = this;
+            //this.DataContext = this;
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)

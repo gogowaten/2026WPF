@@ -20,6 +20,15 @@ namespace _20260321
     public class GeoShape : Shape
     {
 
+        public Rect RenderBounds
+        {
+            get { return (Rect)GetValue(RenderBoundsProperty); }
+            set { SetValue(RenderBoundsProperty, value); }
+        }
+        public static readonly DependencyProperty RenderBoundsProperty =
+            DependencyProperty.Register(nameof(RenderBounds), typeof(Rect), typeof(GeoShape), new PropertyMetadata(new Rect()));
+
+
         public PointCollection Points
         {
             get { return (PointCollection)GetValue(PointsProperty); }
@@ -46,8 +55,6 @@ namespace _20260321
                 figure.Segments.Add(segment);
                 geometry.Figures.Add(figure);
 
-                var neko = geometry.GetRenderBounds(null);
-                var inu = geometry.GetRenderBounds(new Pen(Brushes.AliceBlue, StrokeThickness));
                 return geometry;
 
             }
@@ -65,14 +72,25 @@ namespace _20260321
             };
 
             // ジオメトリのBoundsをpenを使って取得
-            Rect withPenBounds = DefiningGeometry.GetRenderBounds(pen);
+            RenderBounds = DefiningGeometry.GetRenderBounds(pen);
 
-            // 背景を先に描画
-            drawingContext.DrawRectangle(Brushes.LightGray, null, withPenBounds);
+            //// 背景を先に描画
+            //Rect bgRenderBounds = new(new Point(), RenderBounds.Size);
+            //drawingContext.DrawRectangle(Brushes.LightGray, null, bgRenderBounds);
+
+            //drawingContext.DrawRectangle(Brushes.LightGray, null, RenderBounds);
+
+
+
+            Width = RenderBounds.Width;
+            Height = RenderBounds.Height;
+
+            TranslateTransform tt = new(-RenderBounds.X, -RenderBounds.Y);
+            drawingContext.PushTransform(tt);
+
 
             // その後に元の線を描画
             base.OnRender(drawingContext);
-
         }
     }
 }

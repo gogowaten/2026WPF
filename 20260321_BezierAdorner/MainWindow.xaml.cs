@@ -20,5 +20,12 @@ namespace _20260321_BezierAdorner
         {
             InitializeComponent();
         }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            MyShape.Points.Add(new Point(10, 10));
+            MyShape.Points.Add(new Point(10, 100));
+            MyShape.Points.Add(new Point(10, 200));
+        }
     }
 }
