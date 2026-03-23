@@ -4,12 +4,39 @@ using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
+using System.Windows.Documents;
 using System.Windows.Media;
+using System.Windows.Shapes;
 
 namespace _20260321
 {
+
+
+
+    public class ControlPointThumb : Thumb
+    {
+        public int Index { get; }
+
+        public ControlPointThumb(int index)
+        {
+            this.Index = index;
+            Width = 10;
+            Height = 10;
+            Background = Brushes.Red;
+
+            Template = new ControlTemplate(typeof(Thumb))
+            {
+                VisualTree = new FrameworkElementFactory(typeof(Ellipse)) { Name = "ellipse" }
+            };
+            Template.VisualTree.SetValue(Shape.FillProperty, Brushes.Red);
+
+        }
+    }
+
+
     public class BezierThumb : Thumb
     {
+
         // PointCollectionプロパティ（変更時に再描画を促す）
         public PointCollection Points
         {
@@ -19,12 +46,31 @@ namespace _20260321
         public static readonly DependencyProperty PointsProperty =
             DependencyProperty.Register(nameof(Points), typeof(PointCollection), typeof(BezierThumb), new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.AffectsRender));
 
+
+
+
         public BezierThumb()
         {
+            // テンプレートを空にする
+            Template = new ControlTemplate(typeof(Thumb));
             DragDelta += OnDragDelta;
+
+            // ロード時にAdorner表示
+            Loaded += (s, e) =>
+            {
+                var layer = AdornerLayer.GetAdornerLayer(this);
+                if (layer is not null) { layer.Add(new BezierAdorner(this)); }
+            };
+
+
             Canvas.SetLeft(this, 0);
             Canvas.SetTop(this, 0);
+
+
         }
+
+
+
 
         private void OnDragDelta(object sender, DragDeltaEventArgs e)
         {
@@ -65,5 +111,7 @@ namespace _20260321
             //Canvas.SetTop(this, Canvas.GetTop(this)- bounds.Top);
         }
 
+      
+     
     }
 }
