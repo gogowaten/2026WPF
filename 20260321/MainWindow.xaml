@@ -3,9 +3,17 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:_20260321" d:DataContext="{d:DesignInstance Type=local:MainWindow}"
+        xmlns:local="clr-namespace:_20260321"
         mc:Ignorable="d"
         Title="MainWindow" Height="367" Width="654">
+  <Window.DataContext>
+    <local:PathData/>
+  </Window.DataContext>
+  <Window.Resources>
+    <DataTemplate DataType="{x:Type local:PathData}">
+
+    </DataTemplate>
+  </Window.Resources>
 
   <Grid>
     <Grid.ColumnDefinitions>
@@ -17,21 +25,23 @@
                   HorizontalAlignment="Left" VerticalAlignment="top">
     </ScrollViewer>-->
     <Canvas x:Name="MyCanvas">
-      <Polyline x:Name="MyLine0" Canvas.Left="100" Canvas.Top="100"
-                  Stroke="MediumOrchid" StrokeThickness="100"
-                  Points="0,0 200,0"/>
-
-      <Canvas Canvas.Left="100" Canvas.Top="100" Width="{Binding ElementName=MyLine, Path=ActualWidth}"
-              Height="{Binding ElementName=MyLine, Path=ActualHeight}" RenderTransformOrigin="0.5,0.5">
-        <Canvas.RenderTransform>
-            <RotateTransform Angle="25"/>
-        </Canvas.RenderTransform>
-        <Polyline x:Name="MyLine" Canvas.Left="0" Canvas.Top="0"
-                  Stroke="MediumAquamarine" StrokeThickness="100"
-                  Points="0,0 200,0"/>
-      </Canvas>
-
-
+        <local:GeoShape x:Name="MyLine" Stroke="DeepSkyBlue" StrokeThickness="30"
+                      Points="50,70 250,150 50,250 50,200 50,150 150,100 250,250"
+                      StrokeEndLineCap="Triangle"/>
+      <local:BezierThumb Points="50,70 250,150 50,250 50,200 50,150 150,100 250,250"
+                         >
+        <local:BezierThumb.Style>
+          <Style TargetType="{x:Type local:BezierThumb}">
+            <Setter Property="Template">
+              <Setter.Value>
+                <ControlTemplate TargetType="{x:Type local:BezierThumb}">
+                  <Canvas Background="Transparent"/>
+                </ControlTemplate>
+              </Setter.Value>
+            </Setter>
+          </Style>
+        </local:BezierThumb.Style>
+      </local:BezierThumb>
     </Canvas>
 
 

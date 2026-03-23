@@ -78,13 +78,14 @@ namespace _20260321
 
         private void CustomThumb_DragCompleted(object sender, DragCompletedEventArgs e)
         {
-            MyData.RootData?.UpdateSize();
+            //MyData.RootData?.UpdateSize();
         }
 
         private void CustomThumb_DragDelta(object sender, DragDeltaEventArgs e)
         {
-            MyData.X += e.HorizontalChange;
-            MyData.Y += e.VerticalChange;
+            //MyData.X += e.HorizontalChange;
+            //MyData.Y += e.VerticalChange;
+
         }
 
         //// 起動時
@@ -130,30 +131,30 @@ namespace _20260321
 
 
 
-    public class AAAItemsCtrl : ItemsControl
-    {
+    //public class AAAItemsCtrl : ItemsControl
+    //{
 
-        public RootData MyRootData
-        {
-            get { return (RootData)GetValue(MyRootDataProperty); }
-            set { SetValue(MyRootDataProperty, value); }
-        }
-        public static readonly DependencyProperty MyRootDataProperty =
-            DependencyProperty.Register(nameof(MyRootData), typeof(RootData), typeof(AAAItemsCtrl), new PropertyMetadata(null));
+    //    public RootData MyRootData
+    //    {
+    //        get { return (RootData)GetValue(MyRootDataProperty); }
+    //        set { SetValue(MyRootDataProperty, value); }
+    //    }
+    //    public static readonly DependencyProperty MyRootDataProperty =
+    //        DependencyProperty.Register(nameof(MyRootData), typeof(RootData), typeof(AAAItemsCtrl), new PropertyMetadata(null));
 
 
 
-        static AAAItemsCtrl()
-        {
-            DefaultStyleKeyProperty.OverrideMetadata(typeof(AAAItemsCtrl), new FrameworkPropertyMetadata(typeof(AAAItemsCtrl)));
-        }
-        public AAAItemsCtrl()
-        {
+    //    static AAAItemsCtrl()
+    //    {
+    //        DefaultStyleKeyProperty.OverrideMetadata(typeof(AAAItemsCtrl), new FrameworkPropertyMetadata(typeof(AAAItemsCtrl)));
+    //    }
+    //    public AAAItemsCtrl()
+    //    {
           
-        }
+    //    }
 
 
-    }
+    //}
 
 
 }

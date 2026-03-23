@@ -16,7 +16,8 @@ namespace _20260321
     /// </summary>
     public partial class MainWindow : Window
     {
-        public RootData MyDataVM { get; set; } = new();
+        //public RootData MyDataVM { get; set; } = new();
+        
 
         public MainWindow()
         {
@@ -31,8 +32,8 @@ namespace _20260321
 
         private void Button_Click_1(object sender, RoutedEventArgs e)
         {
-            Rect bounds = VisualTreeHelper.GetDescendantBounds(MyLine);// 指定要素＋子要素
-            Rect cbounds = VisualTreeHelper.GetContentBounds(MyLine); // 指定要素のみ
+            //Rect bounds = VisualTreeHelper.GetDescendantBounds(MyLine);// 指定要素＋子要素
+            //Rect cbounds = VisualTreeHelper.GetContentBounds(MyLine); // 指定要素のみ
             Rect ccbounds = VisualTreeHelper.GetDescendantBounds(MyCanvas);// 指定要素＋子要素
             Rect cccbounds = VisualTreeHelper.GetContentBounds(MyCanvas); // 指定要素のみ
             

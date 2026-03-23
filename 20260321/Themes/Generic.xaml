@@ -36,8 +36,9 @@
     <Setter Property="Panel.ZIndex" Value="{Binding Z}"/>
   </Style>
 
+  
 
-  <DataTemplate DataType="{x:Type local:TextBlockData}">
+  <!--<DataTemplate DataType="{x:Type local:TextBlockData}">
     <local:CustomThumb>
       <TextBlock Text="{Binding Text}"
                  FontSize="{Binding FontSize}" FontFamily="{Binding FontName}"
@@ -60,14 +61,14 @@
         
       </EventTrigger>
     </DataTemplate.Triggers>
-  </DataTemplate>
+  </DataTemplate>-->
 
 
-  <DataTemplate DataType="{x:Type local:GroupData}">
+  <!--<DataTemplate DataType="{x:Type local:GroupData}">
     <local:CustomThumb>
       <Grid>
         <Rectangle Stroke="Blue" StrokeThickness="1" StrokeDashArray="2,2"/>
-        <!--<Border Background="Transparent" BorderBrush="Red" BorderThickness="10"/>-->
+        --><!--<Border Background="Transparent" BorderBrush="Red" BorderThickness="10"/>--><!--
         <ItemsControl ItemsSource="{Binding DataList}"
                     Width="{Binding Width}" Height="{Binding Height}"
                     Background="Transparent"
@@ -82,12 +83,12 @@
 
       </Grid>
     </local:CustomThumb>
-  </DataTemplate>
+  </DataTemplate>-->
 
 
 
 
-  <Style TargetType="{x:Type local:AAAItemsCtrl}">
+  <!--<Style TargetType="{x:Type local:AAAItemsCtrl}">
     <Setter Property="ItemsSource" Value="{Binding DataList}"/>
     <Setter Property="ItemContainerStyle" Value="{StaticResource CanvasItemContainer}"/>
     <Setter Property="ItemsPanel">
@@ -109,7 +110,7 @@
       </Setter.Value>
     </Setter>
 
-    <!--<Setter Property="ItemContainerStyle">
+    --><!--<Setter Property="ItemContainerStyle">
       <Setter.Value>
         <Style TargetType="ItemsControl">
           <Setter Property="Background" Value="Black"/>
@@ -117,9 +118,9 @@
           <Setter Property="BorderThickness" Value="20"/>
         </Style>
       </Setter.Value>
-    </Setter>-->
+    </Setter>--><!--
 
-  </Style>
+  </Style>-->
 
 
 
