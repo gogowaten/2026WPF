@@ -17,6 +17,11 @@ using System.Windows.Shapes;
 
 namespace _20260311
 {
+
+
+
+
+
     [ContentProperty(nameof(MyContent))]
     public class CustomThumb : Thumb
     {

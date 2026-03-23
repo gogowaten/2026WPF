@@ -22,7 +22,7 @@ namespace _20260311
             set { SetValue(RenderBoundsProperty, value); }
         }
         public static readonly DependencyProperty RenderBoundsProperty =
-            DependencyProperty.Register(nameof(RenderBounds), typeof(Rect), typeof(GeoLine), new PropertyMetadata(new Rect(0, 0, 0, 0)));
+            DependencyProperty.Register(nameof(RenderBounds), typeof(Rect), typeof(GeoLine), new FrameworkPropertyMetadata(new Rect(0, 0, 0, 0), FrameworkPropertyMetadataOptions.AffectsRender));
 
         public PointCollection Points
         {
@@ -32,6 +32,12 @@ namespace _20260311
         public static readonly DependencyProperty PointsProperty =
             DependencyProperty.Register(nameof(Points), typeof(PointCollection), typeof(GeoLine), new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.AffectsRender));
 
+        public GeoLine()
+        {
+            //SetBinding(WidthProperty, new Binding() { Source = this, Path = new PropertyPath(this.RenderBounds.Width) , Mode = BindingMode.OneWayToSource});
+            //SetBinding(HeightProperty, new Binding() { Source = this, Path = new PropertyPath(this.RenderBounds.Height) , Mode = BindingMode.OneWayToSource});
+
+        }
         protected override Geometry DefiningGeometry
         {
             get
@@ -45,43 +51,53 @@ namespace _20260311
                 {
                     segment.Points.Add(Points[i]);
                 }
-                
+
                 var geometry = new PathGeometry();
                 figure.Segments.Add(segment);
                 geometry.Figures.Add(figure);
 
-                //SetRenderBounds();
-                
+                //UpdateRenderBounds();
+
                 return geometry;
             }
         }
 
-     
+
 
         protected override void OnRender(DrawingContext drawingContext)
         {
             //UpdateRenderBounds();
             //if (RenderBounds.Width == 0) { return; }
-            //// 背景を先に描画
-            //Rect bgRenderBounds = new(new Point(), RenderBounds.Size);
-            //drawingContext.DrawRectangle(Brushes.LightGray, null, bgRenderBounds);
+
+            // 背景を先に描画
+            Rect bgRenderBounds = new(new Point(), RenderBounds.Size);
+            drawingContext.DrawRectangle(Brushes.LightGray, null, bgRenderBounds);
 
 
             //Width = RenderBounds.Width;
             //Height = RenderBounds.Height;
 
-            //// 描画位置をオフセット
-            //TranslateTransform tt = new(-RenderBounds.X, -RenderBounds.Y);
-            //drawingContext.PushTransform(tt);
+            // 描画位置をオフセット
+            TranslateTransform tt = new(-RenderBounds.X, -RenderBounds.Y);
+            drawingContext.PushTransform(tt);
+
 
 
             // 最後に元の線を描画
             base.OnRender(drawingContext);
+
         }
 
         [RelayCommand]
-        private void UpdateRenderBounds()
+        public void UpdateRenderBounds()
         {
+            if (Points is null || Points.Count == 0)
+            {
+                RenderBounds = new Rect();
+                return;
+            }
+
+            //InvalidateMeasure();
             // 今使っているpenを再現
             Pen pen = new(Brushes.Black, StrokeThickness)
             {
@@ -93,14 +109,11 @@ namespace _20260311
 
             // 見た目上のBoundsをpenを使って取得
             var temp = DefiningGeometry.GetRenderBounds(pen);
-            if (temp == Rect.Empty)
-            {
-                return;
-            }
-            else
-            {
-                RenderBounds = temp;
-            }
+            Width = temp.Width;
+            Height = temp.Height;
+            RenderBounds = temp;
+            //InvalidateVisual();
+
 
         }
 

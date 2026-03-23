@@ -19,6 +19,7 @@
       <!--<local:AAAItemsCtrl x:Name="MyAAA" DataContext="{Binding MyDataVM}"
                         AAADataService="{Binding MyService}"/>-->
     </ScrollViewer>
+    
     <!--<local:CustomThumb>
       <local:TTTextBlock x:Name="MyTTText" Text="aaaaaaa" Background="Yellow"/>
 
@@ -28,6 +29,7 @@
               StrokeEndLineCap="Triangle"/>-->
 
     <StackPanel Grid.Column="1" DataContext="{Binding MyDataVM}">
+      
       <TextBlock Text="{Binding CurrentItem.FontSize, StringFormat='FontSize = {0:0.0}'}"/>
       <Slider Value="{Binding CurrentItem.FontSize}" Minimum="10" Maximum="100"/>
       <Button Content="test" Click="Button_Click"/>

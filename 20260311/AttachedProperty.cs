@@ -1,12 +1,53 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Windows.Media;
 using System.Text;
 using System.Windows;
 using System.Windows.Input;
+using System.Windows.Shapes;
+
 
 
 namespace _20260311
 {
+
+    #region テスト図形用、RenderBoundsを計算して取得
+    public static class RenderBoundsObserverTest
+    {
+
+        public static readonly DependencyProperty ObserveProperty =
+            DependencyProperty.RegisterAttached("Observe", typeof(bool), typeof(RenderBoundsObserverTest), new FrameworkPropertyMetadata(OnObserveChanged));
+        public static bool GetObserve(DependencyObject obj) => (bool)obj.GetValue(ObserveProperty);
+        public static void SetObserve(DependencyObject obj, bool value) => obj.SetValue(ObserveProperty, value);
+
+        private static void OnObserveChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            if(d is Shape shape)
+            {
+                if ((bool)e.NewValue)
+                {
+                    shape.SizeChanged += Shape_SizeChanged;
+                }
+                else
+                {
+                    shape.SizeChanged -= Shape_SizeChanged;
+                }
+            }
+        }
+
+        private static void Shape_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            if(sender is  GeoLine geoLine)
+            {
+                geoLine.UpdateRenderBounds();
+            }
+        }
+    }
+    #endregion テスト図形用、RenderBoundsを計算して取得
+
+
+    #region Actualからサイズを取得
+
     // TextBlockなどWidthとHeightがNaNの要素からサイズを取得するときに使う添付プロパティ
     // 取得する値は、たぶんActualHeight、ActualWidth
     /*                   local:SizeObserver.Observe="True"
@@ -32,8 +73,8 @@ namespace _20260311
                     fe.SizeChanged += Fe_SizeChanged;
                     //SetObservedWidth(fe, fe.ActualWidth);// これだと初回読み込み時のサイズが常に0になってしまう
 
-                    //初回のみLoadedイベントをフックして、レンダリング後のサイズを取得する
-                    fe.Loaded += Fe_Loaded;
+                    ////初回のみLoadedイベントをフックして、レンダリング後のサイズを取得する
+                    //fe.Loaded += Fe_Loaded;
                 }
                 else
                 {
@@ -42,17 +83,17 @@ namespace _20260311
             }
         }
 
-        private static void Fe_Loaded(object sender, RoutedEventArgs e)
-        {
-            if (sender is FrameworkElement fe)
-            {
-                // 読み込みが完了したので、この時点のActualWidthを反映
-                SetObservedWidth(fe, fe.ActualWidth);
-                SetObservedHeight(fe, fe.ActualHeight);
-                // 一度取得すれば用済みなので、イベントを外してメモリリークを防止
-                fe.Loaded -= Fe_Loaded;
-            }
-        }
+        //private static void Fe_Loaded(object sender, RoutedEventArgs e)
+        //{
+        //    if (sender is FrameworkElement fe)
+        //    {
+        //        // 読み込みが完了したので、この時点のActualWidthを反映
+        //        SetObservedWidth(fe, fe.ActualWidth);
+        //        SetObservedHeight(fe, fe.ActualHeight);
+        //        // 一度取得すれば用済みなので、イベントを外してメモリリークを防止
+        //        fe.Loaded -= Fe_Loaded;
+        //    }
+        //}
 
 
         // サイズ変更時の処理、新たなサイズをObservedWidthとHeightそれぞれに記録
@@ -87,8 +128,8 @@ namespace _20260311
         //    DependencyProperty.RegisterAttached("WidthChangedCommand", typeof(ICommand), typeof(SizeObserver), new PropertyMetadata(null));
         //public static ICommand GetWidthChangedCommand(DependencyObject obj) => (ICommand)obj.GetValue(WidthChangedCommandProperty);
         //public static void SetWidthChangedCommand(DependencyObject obj, ICommand value) => obj.SetValue(WidthChangedCommandProperty, value);
-
     }
+    #endregion Actualからサイズを取得
 
     internal class AttachedProperty
     {
