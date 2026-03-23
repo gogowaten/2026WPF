@@ -22,6 +22,7 @@ namespace _20260311
         {
             InitializeComponent();
             this.DataContext = this;
+            
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)
@@ -50,5 +51,7 @@ namespace _20260311
                 }
             }
         }
+
+        
     }
 }

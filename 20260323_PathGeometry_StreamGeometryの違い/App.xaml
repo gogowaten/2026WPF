@@ -1,0 +1,9 @@
+﻿<Application x:Class="_20260323_PathGeometry_StreamGeometryの違い.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:_20260323_PathGeometry_StreamGeometryの違い"
+             StartupUri="MainWindow.xaml">
+    <Application.Resources>
+         
+    </Application.Resources>
+</Application>

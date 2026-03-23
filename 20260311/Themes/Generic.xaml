@@ -40,7 +40,17 @@
   <DataTemplate DataType="{x:Type local:GeoLineData}">
     <local:CustomThumb>
       <local:GeoLine Points="{Binding Points}" Stroke="{Binding Stroke}" StrokeThickness="{Binding StrokeThickness}"
-                     Width="{Binding Width, Mode=OneWayToSource}" Height="{Binding Height, Mode=OneWayToSource}"/>
+                     local:SizeObserver.Observe="True"
+                     local:SizeObserver.ObservedWidth="{Binding Width, Mode=OneWayToSource}"
+                     local:SizeObserver.ObservedHeight="{Binding Height, Mode=OneWayToSource}">
+        <i:Interaction.Triggers>
+          <i:EventTrigger EventName="Loaded">
+            <i:InvokeCommandAction Command="{Binding RelativeSource={RelativeSource AncestorType=local:GeoLine}, Path=UpdateRenderBoundsCommand}"/>
+          </i:EventTrigger>
+        </i:Interaction.Triggers>
+      </local:GeoLine>
+                     
+                     
     </local:CustomThumb>
   </DataTemplate>
   

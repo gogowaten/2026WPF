@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CommunityToolkit.Mvvm.Input;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
@@ -12,7 +13,7 @@ using System.Windows.Shapes;
 namespace _20260311
 {
 
-    public class GeoLine : Shape
+    public partial class GeoLine : Shape
     {
 
         public Rect RenderBounds
@@ -44,39 +45,42 @@ namespace _20260311
                 {
                     segment.Points.Add(Points[i]);
                 }
-
+                
                 var geometry = new PathGeometry();
                 figure.Segments.Add(segment);
                 geometry.Figures.Add(figure);
 
                 //SetRenderBounds();
-
+                
                 return geometry;
             }
         }
 
+     
+
         protected override void OnRender(DrawingContext drawingContext)
         {
-            SetRenderBounds();
-            if (RenderBounds.Width == 0) { return; }
-            // 背景を先に描画
-            Rect bgRenderBounds = new(new Point(), RenderBounds.Size);
-            drawingContext.DrawRectangle(Brushes.LightGray, null, bgRenderBounds);
+            //UpdateRenderBounds();
+            //if (RenderBounds.Width == 0) { return; }
+            //// 背景を先に描画
+            //Rect bgRenderBounds = new(new Point(), RenderBounds.Size);
+            //drawingContext.DrawRectangle(Brushes.LightGray, null, bgRenderBounds);
 
 
-            Width = RenderBounds.Width;
-            Height = RenderBounds.Height;
+            //Width = RenderBounds.Width;
+            //Height = RenderBounds.Height;
 
-            // 描画位置をオフセット
-            TranslateTransform tt = new(-RenderBounds.X, -RenderBounds.Y);
-            drawingContext.PushTransform(tt);
+            //// 描画位置をオフセット
+            //TranslateTransform tt = new(-RenderBounds.X, -RenderBounds.Y);
+            //drawingContext.PushTransform(tt);
 
 
             // 最後に元の線を描画
             base.OnRender(drawingContext);
         }
 
-        private void SetRenderBounds()
+        [RelayCommand]
+        private void UpdateRenderBounds()
         {
             // 今使っているpenを再現
             Pen pen = new(Brushes.Black, StrokeThickness)
