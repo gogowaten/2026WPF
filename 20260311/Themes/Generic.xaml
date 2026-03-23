@@ -37,6 +37,13 @@
     <Setter Property="Panel.ZIndex" Value="{Binding Z}"/>
   </Style>
 
+  <DataTemplate DataType="{x:Type local:GeoLineData}">
+    <local:CustomThumb>
+      <local:GeoLine Points="{Binding Points}" Stroke="{Binding Stroke}" StrokeThickness="{Binding StrokeThickness}"
+                     Width="{Binding Width, Mode=OneWayToSource}" Height="{Binding Height, Mode=OneWayToSource}"/>
+    </local:CustomThumb>
+  </DataTemplate>
+  
   <DataTemplate DataType="{x:Type local:PolylineData}">
     <local:CustomThumb>
       <Polyline Stroke="{Binding Stroke}" StrokeThickness="{Binding StrokeThickness}"

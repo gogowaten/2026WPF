@@ -82,6 +82,8 @@ namespace _20260311
             TextBlockData textBlockData = new() { Name = "Text1", X = 0, Y = 0, Text = "Text1", FontSize = 30 };
             DataList.Add(textBlockData);
             DataList.Add(new PolylineData() { Name = "ボリライン", X = 0, Y = 0, StrokeThickness = 50, Stroke = Brushes.MediumPurple});
+            DataList.Add(new GeoLineData() { Name = "ベジェ曲線", X = 100, Y = 100, Stroke = Brushes.MediumAquamarine, StrokeThickness = 20.0, Points = new PointCollection() { new Point(50, 70), new Point(250, 150), new Point(50, 250), new Point(50, 200), new Point(50, 150), new Point(150, 100), new Point(250, 250), } });
+
 
 
             // 直下のItemのIsSelectableをtrueにする
@@ -788,6 +790,11 @@ namespace _20260311
     }
 
     #region 図形
+    public partial class GeoLineData : ShapeData
+    {
+        [ObservableProperty] private PointCollection _points = [];
+
+    }
     public partial class PolylineData : ShapeData
     {
         public PolylineData()
