@@ -34,7 +34,7 @@ namespace _20260324
             //MyLine.Points.Add(new Point(0, 200));
             MyData.Points[0] = new Point(0, 0);
             var geo = MyGeoLineThumb;
-            var neko = MyGeoLineThumb.DataContext;
+            var dc = MyGeoLineThumb.DataContext;
             var inu = MyGeoLineThumb.MyData;
         }
     }

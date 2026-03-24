@@ -31,7 +31,8 @@ namespace _20260324
         }
         public GeoLineThumb()
         {
-            this.DataContext = this;
+            //this.DataContext = this;
+            //this.DataContext = MyData;
         }
     }
 }

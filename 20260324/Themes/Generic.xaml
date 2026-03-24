@@ -7,6 +7,7 @@
 
   <Style TargetType="{x:Type local:GeoLineThumb}">
     <Style.Resources>
+      
       <!--<DataTemplate DataType="local:GeoLineData">
         <local:GeoLine Points="{Binding Points}"
                        Stroke="{Binding Brush}"
@@ -18,7 +19,8 @@
     <Setter Property="Template">
       <Setter.Value>
         <ControlTemplate TargetType="{x:Type local:GeoLineThumb}">
-          <Border Background="{Binding Background}"
+          <Border
+                  Background="{Binding Background}"
                   BorderBrush="{TemplateBinding BorderBrush}"
                   BorderThickness="{TemplateBinding BorderThickness}">
             <Canvas>

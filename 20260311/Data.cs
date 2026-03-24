@@ -12,6 +12,7 @@ using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+using System.Windows.Shapes;
 using System.Xml.Linq;
 
 namespace _20260311
@@ -793,7 +794,11 @@ namespace _20260311
     public partial class GeoLineData : ShapeData
     {
         [ObservableProperty] private PointCollection _points = [];
-
+        [ObservableProperty] private Brush? _background;
+        [ObservableProperty] private PenLineCap _strokeEndLineCap = PenLineCap.Flat;
+        [ObservableProperty] private PenLineCap _strokeStartLineCap = PenLineCap.Flat;
+        [ObservableProperty] private PenLineJoin _strokeLineJoin = PenLineJoin.Miter;
+        [ObservableProperty] private double _strokeMiterLimit =1.0;
     }
     public partial class PolylineData : ShapeData
     {

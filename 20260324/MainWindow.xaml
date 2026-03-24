@@ -37,7 +37,7 @@
                    Stroke="Gold" StrokeThickness="20"
                    />-->
     <local:GeoLineThumb x:Name="MyGeoLineThumb" DataContext="{Binding MyData}"
-                        MyData="{Binding}"/>
+                        />
     <Canvas x:Name="MyCanvas">
 
     </Canvas>
