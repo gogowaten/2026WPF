@@ -83,7 +83,7 @@ namespace _20260311
             TextBlockData textBlockData = new() { Name = "Text1", X = 0, Y = 0, Text = "Text1", FontSize = 30 };
             DataList.Add(textBlockData);
             DataList.Add(new PolylineData() { Name = "ボリライン", X = 0, Y = 0, StrokeThickness = 50, Stroke = Brushes.MediumPurple});
-            DataList.Add(new GeoLineData() { Name = "ベジェ曲線", X = 100, Y = 100, Stroke = Brushes.MediumAquamarine, StrokeThickness = 20.0, Points = new PointCollection() { new Point(50, 70), new Point(250, 150), new Point(50, 250), new Point(50, 200), new Point(50, 150), new Point(150, 100), new Point(250, 250), } });
+            DataList.Add(new GeoLineData() { Name = "ベジェ曲線", X = 100, Y = 100, Stroke = Brushes.MediumAquamarine, StrokeThickness = 20.0, Points = [new Point(50, 70), new Point(250, 150), new Point(50, 250), new Point(50, 200), new Point(50, 150), new Point(150, 100), new Point(250, 250),], StrokeEndLineCap = PenLineCap.Round });
 
 
 
@@ -799,6 +799,8 @@ namespace _20260311
         [ObservableProperty] private PenLineCap _strokeStartLineCap = PenLineCap.Flat;
         [ObservableProperty] private PenLineJoin _strokeLineJoin = PenLineJoin.Miter;
         [ObservableProperty] private double _strokeMiterLimit =1.0;
+
+        
     }
     public partial class PolylineData : ShapeData
     {

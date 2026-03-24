@@ -39,7 +39,13 @@
 
   <DataTemplate DataType="{x:Type local:GeoLineData}">
     <local:CustomThumb>
-      <local:GeoLine Points="{Binding Points}" Stroke="{Binding Stroke}" StrokeThickness="{Binding StrokeThickness}"
+      <local:GeoLine Points="{Binding Points}"
+                     Stroke="{Binding Stroke}"
+                     StrokeThickness="{Binding StrokeThickness}"
+                     StrokeEndLineCap="{Binding StrokeEndLineCap}"
+                     StrokeStartLineCap="{Binding StrokeStartLineCap}"
+                     StrokeMiterLimit="{Binding StrokeMiterLimit}"
+                     StrokeLineJoin="{Binding StrokeLineJoin}"
                      local:RenderBoundsObserverTest.Observe="True"
                      Width="{Binding Width, Mode=OneWayToSource}"
                      Height="{Binding Height, Mode=OneWayToSource}"

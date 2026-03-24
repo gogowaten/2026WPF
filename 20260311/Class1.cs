@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
+using System.Linq.Expressions;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
@@ -15,6 +16,22 @@ namespace _20260311
 
     public partial class GeoLine : Shape
     {
+
+        public Pen StrokePen
+        {
+            get { return (Pen)GetValue(StrokePenProperty); }
+            set { SetValue(StrokePenProperty, value); }
+        }
+        public static readonly DependencyProperty StrokePenProperty =
+            DependencyProperty.Register(nameof(StrokePen), typeof(Pen), typeof(GeoLine), new FrameworkPropertyMetadata(null, OnStrokePenChanged));
+
+        private static void OnStrokePenChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            if (d is GeoLine geoLine)
+            {
+                geoLine.UpdateRenderBounds();
+            }
+        }
 
         public Rect RenderBounds
         {
@@ -30,12 +47,29 @@ namespace _20260311
             set { SetValue(PointsProperty, value); }
         }
         public static readonly DependencyProperty PointsProperty =
-            DependencyProperty.Register(nameof(Points), typeof(PointCollection), typeof(GeoLine), new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.AffectsRender));
+            DependencyProperty.Register(nameof(Points), typeof(PointCollection), typeof(GeoLine), new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.AffectsRender, OnStrokePenChanged));
 
         public GeoLine()
         {
-            //SetBinding(WidthProperty, new Binding() { Source = this, Path = new PropertyPath(this.RenderBounds.Width) , Mode = BindingMode.OneWayToSource});
-            //SetBinding(HeightProperty, new Binding() { Source = this, Path = new PropertyPath(this.RenderBounds.Height) , Mode = BindingMode.OneWayToSource});
+            MultiBinding mb = new() { Converter = new ConvStrokePen() };
+            mb.Bindings.Add(new Binding() { Source = this, Path = new PropertyPath(StrokeThicknessProperty) });
+            mb.Bindings.Add(new Binding() { Source = this, Path = new PropertyPath(StrokeMiterLimitProperty) });
+            mb.Bindings.Add(new Binding() { Source = this, Path = new PropertyPath(StrokeEndLineCapProperty) });
+            mb.Bindings.Add(new Binding() { Source = this, Path = new PropertyPath(StrokeStartLineCapProperty) });
+            mb.Bindings.Add(new Binding() { Source = this, Path = new PropertyPath(StrokeLineJoinProperty) });
+            SetBinding(StrokePenProperty, mb);
+
+        }
+        private void DrawBezier(StreamGeometryContext context, Point begin, Point end, bool isFill, bool isClose, bool isSmoothJoin)
+        {
+            context.BeginFigure(begin, isFill, isClose);
+            var bezier = Points.Clone();
+            bezier.RemoveAt(0);
+            
+            //var bezier = MySegmentPoints.Clone();
+            ////            List<Point> bezier = MyPoints.Skip(1).Take(MyPoints.Count - 2).ToList();
+            //bezier.Add(end);
+            context.PolyBezierTo(bezier, true, isSmoothJoin);
 
         }
         protected override Geometry DefiningGeometry
@@ -44,22 +78,34 @@ namespace _20260311
             {
                 if (Points is null || Points.Count == 0) { return Geometry.Empty; }
 
-                var figure = new PathFigure { StartPoint = Points[0] };
-
-                var segment = new PolyBezierSegment();
-                for (int i = 1; i < Points.Count; i++)
+                StreamGeometry geo = new();
+                using (var context = geo.Open())
                 {
-                    segment.Points.Add(Points[i]);
+                    DrawBezier(context, Points[0], Points[^1], false, false, false);
                 }
 
-                var geometry = new PathGeometry();
-                figure.Segments.Add(segment);
-                geometry.Figures.Add(figure);
-
-                //UpdateRenderBounds();
-
-                return geometry;
+                geo.Freeze();
+                return geo;
             }
+            //get
+            //{
+            //    if (Points is null || Points.Count == 0) { return Geometry.Empty; }
+
+            //    var figure = new PathFigure { StartPoint = Points[0] };
+
+            //    var segment = new PolyBezierSegment();
+            //    for (int i = 1; i < Points.Count; i++)
+            //    {
+            //        segment.Points.Add(Points[i]);
+            //    }
+
+            //    var geometry = new PathGeometry();
+            //    figure.Segments.Add(segment);
+            //    geometry.Figures.Add(figure);
+
+            //    return geometry;
+            //}
+
         }
 
 
