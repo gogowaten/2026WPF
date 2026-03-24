@@ -129,13 +129,13 @@ namespace _20260321
         #region 依存関係プロパティ
 
 
-        public Data MyData
-        {
-            get { return (Data)GetValue(MyDataProperty); }
-            set { SetValue(MyDataProperty, value); }
-        }
-        public static readonly DependencyProperty MyDataProperty =
-            DependencyProperty.Register(nameof(MyData), typeof(Data), typeof(CustomThumb), new PropertyMetadata(null));
+        //public Data MyData
+        //{
+        //    get { return (Data)GetValue(MyDataProperty); }
+        //    set { SetValue(MyDataProperty, value); }
+        //}
+        //public static readonly DependencyProperty MyDataProperty =
+        //    DependencyProperty.Register(nameof(MyData), typeof(Data), typeof(CustomThumb), new PropertyMetadata(null));
 
 
 

@@ -32,6 +32,10 @@ namespace _20260321
 
         private void Button_Click_1(object sender, RoutedEventArgs e)
         {
+            MyLine.Points.Add(new Point(10, 10));
+            MyLine.Points.Add(new Point(10, 100));
+            MyLine.Points.Add(new Point(10, 200));
+            
             //Rect bounds = VisualTreeHelper.GetDescendantBounds(MyLine);// 指定要素＋子要素
             //Rect cbounds = VisualTreeHelper.GetContentBounds(MyLine); // 指定要素のみ
             Rect ccbounds = VisualTreeHelper.GetDescendantBounds(MyCanvas);// 指定要素＋子要素
