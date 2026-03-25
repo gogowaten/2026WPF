@@ -65,7 +65,7 @@ namespace _20260311
             context.BeginFigure(begin, isFill, isClose);
             var bezier = Points.Clone();
             bezier.RemoveAt(0);
-            
+
             //var bezier = MySegmentPoints.Clone();
             ////            List<Point> bezier = MyPoints.Skip(1).Take(MyPoints.Count - 2).ToList();
             //bezier.Add(end);
@@ -119,10 +119,6 @@ namespace _20260311
             Rect bgRenderBounds = new(new Point(), RenderBounds.Size);
             drawingContext.DrawRectangle(Brushes.LightGray, null, bgRenderBounds);
 
-
-            //Width = RenderBounds.Width;
-            //Height = RenderBounds.Height;
-
             // 描画位置をオフセット
             TranslateTransform tt = new(-RenderBounds.X, -RenderBounds.Y);
             drawingContext.PushTransform(tt);
@@ -143,25 +139,42 @@ namespace _20260311
                 return;
             }
 
-            //InvalidateMeasure();
-            // 今使っているpenを再現
-            Pen pen = new(Brushes.Black, StrokeThickness)
-            {
-                EndLineCap = StrokeEndLineCap,
-                StartLineCap = StrokeStartLineCap,
-                LineJoin = StrokeLineJoin,
-                MiterLimit = StrokeMiterLimit
-            };
-
             // 見た目上のBoundsをpenを使って取得
-            var temp = DefiningGeometry.GetRenderBounds(pen);
-            Width = temp.Width;
-            Height = temp.Height;
-            RenderBounds = temp;
+            Rect bounds = DefiningGeometry.GetRenderBounds(StrokePen);
+            Width = bounds.Width;
+            Height = bounds.Height;
+            RenderBounds = bounds;
             //InvalidateVisual();
-
-
         }
+
+        //[RelayCommand]
+        //public void UpdateRenderBounds()
+        //{
+        //    if (Points is null || Points.Count == 0)
+        //    {
+        //        RenderBounds = new Rect();
+        //        return;
+        //    }
+
+        //    //InvalidateMeasure();
+        //    // 今使っているpenを再現
+        //    Pen pen = new(Brushes.Black, StrokeThickness)
+        //    {
+        //        EndLineCap = StrokeEndLineCap,
+        //        StartLineCap = StrokeStartLineCap,
+        //        LineJoin = StrokeLineJoin,
+        //        MiterLimit = StrokeMiterLimit
+        //    };
+
+        //    // 見た目上のBoundsをpenを使って取得
+        //    var temp = DefiningGeometry.GetRenderBounds(pen);
+        //    Width = temp.Width;
+        //    Height = temp.Height;
+        //    RenderBounds = temp;
+        //    //InvalidateVisual();
+        //}
+
+
 
     }
 
