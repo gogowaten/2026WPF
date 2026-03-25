@@ -3,10 +3,34 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:_20260325"
+        xmlns:local="clr-namespace:_20260325" d:DataContext="{d:DesignInstance Type=local:MainWindow}"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
-    <Grid>
+        Title="MainWindow" Height="367" Width="654">
+  <Grid>
+    <Grid.ColumnDefinitions>
+      <ColumnDefinition/>
+      <ColumnDefinition Width="200"/>
+    </Grid.ColumnDefinitions>
 
-    </Grid>
+    <Canvas x:Name="MyCanvas">
+      <local:DataThumb x:Name="MyThumb" MyData="{Binding MyData}"/>
+      <local:GeoShape x:Name="MyGeo" Canvas.Left="100" Visibility="Collapsed"
+                      Points="50,70 250,150 50,250 50,200 50,150 150,100 250,250" Stroke="Red" StrokeThickness="10"/>
+      
+      <!--<local:DataThumb x:Name="MyThumb" DataContext="{Binding MyData}"/>-->
+      <!--<local:DataThumb DataContext="{Binding }"/>-->
+      <!--<local:DataThumb/>-->
+    </Canvas>
+
+    <StackPanel Grid.Column="1" DataContext="{Binding ElementName=MyThumb}">
+      <Button Content="test" Click="Button_Click"/>
+      <TextBlock Text="{Binding ActualWidth, StringFormat='ActualWidth = {0:0}'}"/>
+      <TextBlock Text="{Binding ActualHeight, StringFormat='ActualHeight = {0:0}'}"/>
+      <TextBlock Text="{Binding Height, StringFormat='Height = {0:0}'}"/>
+      <TextBlock Text="{Binding Width, StringFormat='Width = {0:0}'}"/>
+      <TextBlock Text="{Binding MyData.Width, StringFormat='MyData.Width = {0:0}'}"/>
+      <TextBlock Text="{Binding MyData.Height, StringFormat='MyData.Height = {0:0}'}"/>
+      <TextBlock Text="{Binding MyData.Points, StringFormat='Points = {0:0}'}" TextWrapping="Wrap"/>
+    </StackPanel>
+  </Grid>
 </Window>
