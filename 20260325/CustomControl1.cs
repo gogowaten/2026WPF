@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Windows;
+using System.Windows.Automation.Provider;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Data;
@@ -36,7 +37,15 @@ namespace _20260325
             //MyData = new GeoShapeData() { Name = "ベジェ曲線", Stroke = Brushes.MediumAquamarine, StrokeThickness = 20.0, Points = [new Point(50, 70), new Point(250, 150), new Point(50, 250), new Point(50, 200), new Point(50, 150), new Point(150, 100), new Point(250, 250),], StrokeEndLineCap = PenLineCap.Round };
 
             //DataContext = MyData;
+            DragDelta += OnDragDelta;
+        }
 
+        private void OnDragDelta(object sender, DragDeltaEventArgs e)
+        {
+            if (MyData is null) { return; }
+
+            MyData.Left += e.HorizontalChange;
+            MyData.Top += e.VerticalChange;
         }
     }
 

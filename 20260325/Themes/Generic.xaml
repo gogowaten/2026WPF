@@ -20,7 +20,8 @@
                     StrokeEndLineCap="{Binding StrokeEndLineCap}"
                     StrokeStartLineCap="{Binding StrokeStartLineCap}"
                     StrokeLineJoin="{Binding StrokeLineJoin}"
-                    />
+                    RenderBounds="{Binding RenderBounds, Mode=OneWayToSource}"
+                    IsOffset="True"/>
   </DataTemplate>
 
   <!--<local:DataThumb x:Name="MyThumb" MyData="{Binding MyData}"/>-->
@@ -51,7 +52,7 @@
                 Width="{TemplateBinding Width}"
                 Height="{TemplateBinding Height}"
                 >
-            <ContentPresenter Content="{Binding MyData}"/>
+            <ContentPresenter Content="{Binding MyData}" IsHitTestVisible="False"/>
           </Grid>
         </ControlTemplate>
       </Setter.Value>

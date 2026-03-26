@@ -15,6 +15,7 @@ namespace _20260325
         [ObservableProperty] private PenLineCap _strokeEndLineCap = PenLineCap.Flat;
         [ObservableProperty] private PenLineCap _strokeStartLineCap = PenLineCap.Flat;
         [ObservableProperty] private double _strokeMiterLimit = 1.0;
+        [ObservableProperty] private Rect _renderBounds;
 
     }
     public partial class EllipseData : ShapeData { }
