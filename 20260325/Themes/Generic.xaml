@@ -40,8 +40,8 @@
   <!--<local:DataThumb x:Name="MyThumb" MyData="{Binding MyData}"/>-->
   <!--MainWindowで上の時は下-->
   <Style TargetType="{x:Type local:DataThumb}">
-    <!--<Setter Property="Width" Value="{Binding MyData.Width, Mode=TwoWay}"/>
-    <Setter Property="Height" Value="{Binding MyData.Height, Mode=TwoWay}"/>-->
+    <Setter Property="Width" Value="{Binding MyData.Width, Mode=TwoWay}"/>
+    <Setter Property="Height" Value="{Binding MyData.Height, Mode=TwoWay}"/>
     <Setter Property="Canvas.Left" Value="{Binding MyData.Left, Mode=TwoWay}"/>
     <Setter Property="Canvas.Top" Value="{Binding MyData.Top, Mode=TwoWay}"/>
     <Setter Property="Template">
@@ -51,7 +51,7 @@
                 Width="{TemplateBinding Width}"
                 Height="{TemplateBinding Height}"
                 >
-            <ContentPresenter Width="{Binding MyData.Width}" Height="{Binding MyData.Height}" Content="{Binding MyData}"/>
+            <ContentPresenter Content="{Binding MyData}"/>
           </Grid>
         </ControlTemplate>
       </Setter.Value>

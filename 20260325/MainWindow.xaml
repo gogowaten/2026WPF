@@ -31,6 +31,8 @@
       <TextBlock Text="{Binding MyData.Width, StringFormat='MyData.Width = {0:0}'}"/>
       <TextBlock Text="{Binding MyData.Height, StringFormat='MyData.Height = {0:0}'}"/>
       <TextBlock Text="{Binding MyData.Points, StringFormat='Points = {0:0}'}" TextWrapping="Wrap"/>
+      <TextBlock Text="{Binding MyData.Left, StringFormat='Left = {0:0}'}"/>
+      <TextBlock Text="{Binding MyData.Top, StringFormat='Top = {0:0}'}"/>
     </StackPanel>
   </Grid>
 </Window>

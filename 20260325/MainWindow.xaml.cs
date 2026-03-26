@@ -33,9 +33,9 @@ namespace _20260325
                     new Point(250, 150),
                     new Point(50, 250),
                     new Point(50, 200),
-                    new Point(50, 150),
-                    new Point(150, 100),
-                    new Point(250, 250),
+                    //new Point(50, 150),
+                    //new Point(150, 100),
+                    //new Point(250, 250),
                 ],
                 StrokeEndLineCap = PenLineCap.Round,
                 Background = Brushes.Gray
@@ -52,20 +52,27 @@ namespace _20260325
             // 以下は描画更新される
             //MyData.Stroke = Brushes.Red;
             //MyData.StrokeThickness = 30;
+            MyData.StrokeStartLineCap = PenLineCap.Square;
 
-            MyData.Points[0] = new Point();
+            //MyData.Points[0] = new Point();
+            //MyData.Points[0] = new Point(20,20);
 
-            //// Pointの追加では描画更新されない
+            // Pointの追加
+            MyData.Points.Add(new Point(50, 150));
+            MyData.Points.Add(new Point(150, 100));
+            MyData.Points.Add(new Point(250, 250));
+
+            //// Pointの追加
             //MyData.Points.Add(new Point(10, 10));
             //MyData.Points.Add(new Point(10, 100));
-            //MyData.Points.Add(new Point(10, 200));
+            //MyData.Points.Add(new Point(100, 200));
 
-            
+
             //MyGeo.Points.Add(new Point(10, 10));
             //MyGeo.Points.Add(new Point(10, 100));
             //MyGeo.Points.Add(new Point(10, 200));
 
-            
+
         }
     }
 }
