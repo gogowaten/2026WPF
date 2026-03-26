@@ -1,0 +1,10 @@
+﻿IsOffsetの指定で描画位置が変化する図形クラス
+
+trueで図形がピッタリ収まるBoundsが0,0座標に表示、
+Falseでは通常の表示
+
+オフセット方法はGeometry自体をTranslateTransformしている
+
+Property
+OriginRenderBounds	PointsからのGeometryのBounds
+RenderBounds		OriginRenderBoundsをTranslateしたGeometryのBounds、オフセット用
