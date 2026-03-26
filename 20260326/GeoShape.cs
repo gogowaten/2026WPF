@@ -70,22 +70,30 @@ namespace _20260326
             DependencyProperty.Register(nameof(Points), typeof(PointCollection), typeof(GeoShape),
                 new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.AffectsRender, OnPointsChanged));
 
+        
+        //private static void OnPointsChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        //{
+        //    var shape = (GeoShape)d;
+
+        //    // 古いコレクションのイベントを解除
+        //    if (e.OldValue is PointCollection oldPC && !oldPC.IsFrozen)
+        //    {
+        //        oldPC.Changed -= shape.OnPointsCollectionChanged;
+        //    }
+        //    // 新しいコレクションのイベントを購読
+        //    if (e.NewValue is PointCollection newPC && !newPC.IsFrozen)
+        //    {
+        //        newPC.Changed += shape.OnPointsCollectionChanged;
+        //    }
+
+        //    //shape.UpdateRenderBounds();
+        //}
+
+        // OnPointsChangedでの処理はこれで十分？
         private static void OnPointsChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             var shape = (GeoShape)d;
-
-            // 古いコレクションのイベントを解除
-            if (e.OldValue is PointCollection oldPC && !oldPC.IsFrozen)
-            {
-                oldPC.Changed -= shape.OnPointsCollectionChanged;
-            }
-            // 新しいコレクションのイベントを購読
-            if (e.NewValue is PointCollection newPC && !newPC.IsFrozen)
-            {
-                newPC.Changed += shape.OnPointsCollectionChanged;
-            }
-
-            //shape.UpdateRenderBounds();
+            shape.UpdateRenderBounds();
         }
 
         // 既存の OnPointsChanged などを利用してGeometryキャッシュを破棄する

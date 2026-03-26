@@ -23,14 +23,14 @@ namespace _20260326
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            MyShape.StrokeThickness = 30;
-            MyShape.Stroke = Brushes.MediumAquamarine;
+            //MyShape.StrokeThickness = 30;
+            //MyShape.Stroke = Brushes.MediumAquamarine;
 
-            MyShape.Points.Add(new Point(50, 150));
-            MyShape.Points.Add(new Point(150, 100));
-            MyShape.Points.Add(new Point(250, 250));
+            //MyShape.Points.Add(new Point(50, 150));
+            //MyShape.Points.Add(new Point(150, 100));
+            //MyShape.Points.Add(new Point(250, 250));
 
-            //MyShape.Points[0] = new Point(-100,50);
+            ////MyShape.Points[0] = new Point(-100,50);
             MyShape.Points[0] = new Point(-10, 50);
 
         }

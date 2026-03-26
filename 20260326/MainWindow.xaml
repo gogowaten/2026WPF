@@ -20,7 +20,6 @@
                         Points="50,70 250,150 50,250 50,200" Stroke="Gold" StrokeThickness="20"
                         StrokeEndLineCap="Round"
                         IsOffset="True"
-                        IsHitTestVisible="True"
                         PreviewMouseDown="MyShape_PreviewMouseDown"/>
       </Grid>
 
