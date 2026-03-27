@@ -122,11 +122,8 @@ namespace _20260326
 
         private void GeoShape_Loaded(object sender, RoutedEventArgs e)
         {
-
-
             UpdateRenderBounds();
             InvalidateVisual(); // 再描画を強制
-
         }
 
         protected override Geometry DefiningGeometry
@@ -145,29 +142,27 @@ namespace _20260326
                 }
 
                 // 変形前のBoundsを記録
-
-
-
                 OriginRenderBounds = geo.GetRenderBounds(StrokePen);
+
                 // オフセット有効なら、変形後のGeometryをキャッシュ
                 // 無効ならそのままのGeometryをキャッシュ
                 if (IsOffset)
                 {
+                    // 描画位置が(0,0)になるようにオフセットしたGeometryを作成して返す
                     var transformedGeo = geo.Clone();
                     transformedGeo.Transform = new TranslateTransform(-OriginRenderBounds.X, -OriginRenderBounds.Y);
                     transformedGeo.Freeze();
                     _cachedGeometry = transformedGeo;
-                    RenderBounds = transformedGeo.GetRenderBounds(StrokePen);
-                    return transformedGeo;
                 }
                 else
                 {
+                    // オフセットなしのGeometryを返す
                     geo.Freeze();
                     _cachedGeometry = geo;
-                    //OriginRenderBounds = geo.GetRenderBounds(StrokePen);
-                    RenderBounds = geo.GetRenderBounds(StrokePen);
-                    return geo;
                 }
+
+                RenderBounds = _cachedGeometry.GetRenderBounds(StrokePen);
+                return _cachedGeometry;
             }
 
         }
@@ -187,12 +182,7 @@ namespace _20260326
 
         // オフセット版
         public void UpdateRenderBounds()
-        {
-            var inu = IsOffset;
-
-            // DefiningGeometry を一度呼んで _lastRawBounds を確定させる
-            //var geometry = DefiningGeometry;
-
+        {   
             _cachedGeometry = null; // 強制再計算
 
             if (Points is null || Points.Count == 0 || StrokePen == null) { return; }
