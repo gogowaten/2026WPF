@@ -34,7 +34,7 @@ namespace _20260327
             set { SetValue(IsOffsetProperty, value); }
         }
         public static readonly DependencyProperty IsOffsetProperty =
-            DependencyProperty.Register(nameof(IsOffset), typeof(bool), typeof(GeoShape), new PropertyMetadata(false));
+            DependencyProperty.Register(nameof(IsOffset), typeof(bool), typeof(GeoShape), new FrameworkPropertyMetadata(false, OnPointsChanged));
 
         public Pen StrokePen
         {
@@ -59,7 +59,7 @@ namespace _20260327
             set { SetValue(RenderBoundsProperty, value); }
         }
         public static readonly DependencyProperty RenderBoundsProperty =
-            DependencyProperty.Register(nameof(RenderBounds), typeof(Rect), typeof(GeoShape), new FrameworkPropertyMetadata(new Rect(0, 0, 0, 0), FrameworkPropertyMetadataOptions.AffectsRender));
+            DependencyProperty.Register(nameof(RenderBounds), typeof(Rect), typeof(GeoShape), new FrameworkPropertyMetadata(new Rect(0, 0, 0, 0)));
 
         public PointCollection Points
         {
@@ -68,7 +68,7 @@ namespace _20260327
         }
         public static readonly DependencyProperty PointsProperty =
             DependencyProperty.Register(nameof(Points), typeof(PointCollection), typeof(GeoShape),
-                new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.AffectsRender, OnPointsChanged));
+                new FrameworkPropertyMetadata(null, OnPointsChanged));
 
 
         //private static void OnPointsChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
@@ -92,18 +92,17 @@ namespace _20260327
         // OnPointsChangedでの処理はこれで十分？
         private static void OnPointsChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            var shape = (GeoShape)d;
-            shape.UpdateRenderBounds();
+            if (d is GeoShape shape) { shape.UpdateRenderBounds(); }
         }
 
-        // 既存の OnPointsChanged などを利用してGeometryキャッシュを破棄する
-        private void OnPointsCollectionChanged(object? sender, EventArgs e)
-        {
-            _cachedGeometry = null; // キャッシュクリア
-            // コレクションの中身が変わったときに再描画とサイズ更新を強制
-            InvalidateVisual();
-            UpdateRenderBounds();
-        }
+        //// 既存の OnPointsChanged などを利用してGeometryキャッシュを破棄する
+        //private void OnPointsCollectionChanged(object? sender, EventArgs e)
+        //{
+        //    _cachedGeometry = null; // キャッシュクリア
+        //    // コレクションの中身が変わったときに再描画とサイズ更新を強制
+        //    //InvalidateVisual();
+        //    //UpdateRenderBounds();
+        //}
         #endregion 依存関係プロパティ
 
 
@@ -123,7 +122,7 @@ namespace _20260327
         private void GeoShape_Loaded(object sender, RoutedEventArgs e)
         {
             UpdateRenderBounds();
-            InvalidateVisual(); // 再描画を強制
+            //InvalidateVisual(); // 再描画を強制、いる？なくても動く
         }
 
         protected override Geometry DefiningGeometry
@@ -147,13 +146,13 @@ namespace _20260327
                     // 描画位置が(0,0)になるようにオフセットしたGeometryを作成して返す
                     var transformedGeo = geo.Clone();
                     transformedGeo.Transform = new TranslateTransform(-OriginRenderBounds.X, -OriginRenderBounds.Y);
-                    transformedGeo.Freeze();
+                    transformedGeo.Freeze(); // 要る？
                     _cachedGeometry = transformedGeo;
                 }
                 else
                 {
                     // オフセットなしのGeometryを返す
-                    geo.Freeze();
+                    geo.Freeze(); // 要る？
                     _cachedGeometry = geo;
                 }
 
@@ -177,22 +176,27 @@ namespace _20260327
         }
 
 
-        private void DrawBezier(StreamGeometryContext context, Point begin, bool isFill, bool isClose, bool isSmoothJoin)
-        {
-            context.BeginFigure(begin, isFill, isClose);
-            List<Point> bezier = Points.ToList();
-            //var bezier = Points.Clone();
-            bezier.RemoveAt(0);
+        //private void DrawBezier(StreamGeometryContext context, Point begin, bool isFill, bool isClose, bool isSmoothJoin)
+        //{
+        //    context.BeginFigure(begin, isFill, isClose);
+        //    List<Point> bezier = Points.ToList();
+        //    //var bezier = Points.Clone();
+        //    bezier.RemoveAt(0);
 
-            context.PolyBezierTo(bezier, true, isSmoothJoin);
-        }
+        //    context.PolyBezierTo(bezier, true, isSmoothJoin);
+        //}
 
-        // オフセット版
+
         public void UpdateRenderBounds()
         {
             _cachedGeometry = null; // 強制再計算
 
-            if (Points is null || Points.Count == 0 || StrokePen == null) { return; }
+            if (Points is null || Points.Count == 0 || StrokePen == null)
+            {
+                OriginRenderBounds = new Rect();
+                RenderBounds = new Rect();
+                return;
+            }
 
             // 見た目上のBoundsをpenを使って取得
             Rect bounds = DefiningGeometry.GetRenderBounds(StrokePen);
@@ -202,19 +206,6 @@ namespace _20260327
 
             RenderBounds = bounds;
 
-            //if (DataContext is GeoShapeData data)
-            //{
-            //    //data.Width = _lastRawBounds.Width;
-            //    //data.Height = _lastRawBounds.Height;
-            //    //data.Left = _lastRawBounds.X;
-            //    //data.Top = _lastRawBounds.Y;
-            //    var neko = RenderBounds;
-            //    var last = _lastRawBounds;
-            //    data.Width = RenderBounds.Width;
-            //    data.Height = RenderBounds.Height;
-            //    data.Left = RenderBounds.Left;
-            //    data.Top = RenderBounds.Top;
-            //}
         }
 
 

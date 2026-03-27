@@ -13,16 +13,22 @@
     </Grid.ColumnDefinitions>
 
     <Canvas x:Name="MyCanvas">
-      <Grid x:Name="MyGrid" Background="Silver" Canvas.Left="20" Canvas.Top="20"
+      <Grid x:Name="MyGrid" Background="DodgerBlue" Canvas.Left="20" Canvas.Top="20"
             Width="{Binding ElementName=MyShape, Path=RenderBounds.Width}"
             Height="{Binding ElementName=MyShape, Path=RenderBounds.Height}">
         <local:GeoShape x:Name="MyShape"
                         Points="50,70 250,150 50,250 50,200" Stroke="Gold" StrokeThickness="20"
                         StrokeEndLineCap="Round"
                         IsOffset="True"
-                        PreviewMouseDown="MyShape_PreviewMouseDown"/>
+                        />
       </Grid>
-
+      
+      <!--<local:GeoShape x:Name="MyShape" Canvas.Left="20" Canvas.Top="20"
+                Points="50,70 250,150 50,250 50,200" Stroke="Gold" StrokeThickness="20"
+                StrokeEndLineCap="Round"
+                IsOffset="False"
+                />-->
+      
       <!--<local:GeoShape x:Name="MyShape"
                       Points="50,70 250,150 50,250 50,200 50,150 150,100 250,250" Stroke="Gold" StrokeThickness="20"
                       StrokeEndLineCap="Round"/>-->
@@ -30,11 +36,14 @@
     </Canvas>
 
     <StackPanel Grid.Column="1" DataContext="{Binding ElementName=MyShape}">
+      <Slider Value="{Binding StrokeThickness}" Minimum="1" Maximum="50"/>
       <Button Content="AddPoints" Click="Button_Click"/>
-      <TextBlock Text="{Binding ActualWidth, StringFormat='ActualWidth = {0:0}'}"/>
+      <Button Content="PointsClear" Click="Button_Click_1"/>
+      <TextBlock Text="{Binding ActualWidth, StringFormat='ShapeActualWidth = {0:0}'}"/>
       <TextBlock Text="{Binding IsFocused, StringFormat='IsOffset = {0:0}'}"/>
-      <TextBlock Text="{Binding RenderBounds, StringFormat='RenderBounds = {0: 0}'}"/>
+      <TextBlock Text="{Binding RenderBounds, StringFormat='RenderBounds = {0: 0; -0; 0}'}"/>
       <TextBlock Text="{Binding OriginRenderBounds, StringFormat='OriginRenderBounds = {0: 0; -0; 0}'}"/>
+
       <TextBlock Text="{Binding ElementName=MyGrid, Path=ActualWidth, StringFormat='GridActualWidth = {0: 0}'}"/>
       <TextBlock Text="{Binding ElementName=MyGrid, Path=ActualWidth, StringFormat='{}{0:F0}'}"/>
     </StackPanel>

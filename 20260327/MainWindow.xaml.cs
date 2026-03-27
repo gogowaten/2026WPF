@@ -23,21 +23,24 @@ namespace _20260327
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            MyShape.StrokeThickness = 30;
-            MyShape.Stroke = Brushes.MediumAquamarine;
+            //MyShape.StrokeThickness = 30;
+            //MyShape.Stroke = Brushes.MediumAquamarine;
 
             MyShape.Points.Add(new Point(50, 150));
             MyShape.Points.Add(new Point(150, 100));
             MyShape.Points.Add(new Point(250, 250));
 
-            //MyShape.Points[0] = new Point(-100,50);
+            //先頭座標変更
             MyShape.Points[0] = new Point(-10, 50);
+
 
         }
 
-        private void MyShape_PreviewMouseDown(object sender, MouseButtonEventArgs e)
+        private void Button_Click_1(object sender, RoutedEventArgs e)
         {
-            var neko = 0;
+            // Pointsクリア
+            MyShape.Points.Clear();
+
         }
     }
 }
