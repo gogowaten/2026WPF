@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿
+using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -16,9 +17,12 @@ namespace _20260327
     /// </summary>
     public partial class MainWindow : Window
     {
+        public GeoShapeData MyData { get; set; }
         public MainWindow()
         {
             InitializeComponent();
+            MyData = new();
+            DataContext = this;
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)
@@ -26,12 +30,12 @@ namespace _20260327
             //MyShape.StrokeThickness = 30;
             //MyShape.Stroke = Brushes.MediumAquamarine;
 
-            MyShape.Points.Add(new Point(50, 150));
-            MyShape.Points.Add(new Point(150, 100));
-            MyShape.Points.Add(new Point(250, 250));
+            //MyShape.Points.Add(new Point(50, 150));
+            //MyShape.Points.Add(new Point(150, 100));
+            //MyShape.Points.Add(new Point(250, 250));
 
-            //先頭座標変更
-            MyShape.Points[0] = new Point(-10, 50);
+            ////先頭座標変更
+            //MyShape.Points[0] = new Point(-10, 50);
 
 
         }
@@ -39,8 +43,13 @@ namespace _20260327
         private void Button_Click_1(object sender, RoutedEventArgs e)
         {
             // Pointsクリア
-            MyShape.Points.Clear();
+            //MyShape.Points.Clear();
 
+        }
+
+        private void Button_Click_2(object sender, RoutedEventArgs e)
+        {
+            MyData.IsOffset = !MyData.IsOffset;
         }
     }
 }

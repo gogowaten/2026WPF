@@ -1,5 +1,7 @@
-﻿using System;
+﻿using CommunityToolkit.Mvvm.Input;
+using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Text;
 using System.Windows;
 using System.Windows.Data;
@@ -12,8 +14,6 @@ namespace _20260327
     {
         //private Vector _lastOffset;// 描画位置オフセット用
         private Geometry? _cachedGeometry;
-        private Rect _lastRawBounds;
-        //public bool IsOffset = false;
 
         #region 依存関係プロパティ
 
@@ -176,20 +176,12 @@ namespace _20260327
         }
 
 
-        //private void DrawBezier(StreamGeometryContext context, Point begin, bool isFill, bool isClose, bool isSmoothJoin)
-        //{
-        //    context.BeginFigure(begin, isFill, isClose);
-        //    List<Point> bezier = Points.ToList();
-        //    //var bezier = Points.Clone();
-        //    bezier.RemoveAt(0);
-
-        //    context.PolyBezierTo(bezier, true, isSmoothJoin);
-        //}
 
 
         public void UpdateRenderBounds()
         {
             _cachedGeometry = null; // 強制再計算
+            InvalidateMeasure();
 
             if (Points is null || Points.Count == 0 || StrokePen == null)
             {
@@ -206,8 +198,52 @@ namespace _20260327
 
             RenderBounds = bounds;
 
+            if (DataContext is Data data)
+            {
+                //data.Width = ActualWidth; // これが良いけど一手遅れる
+                //data.Height = ActualHeight;
+
+                //data.Width = bounds.Width;
+                //data.Height = bounds.Height;
+                //data.Width = OriginRenderBounds.Width;
+                //data.Height = OriginRenderBounds.Height;
+                data.Bounds = RenderBounds;
+                data.OriginBounds = OriginRenderBounds;
+            }
         }
 
-
+        //[RelayCommand]
+        //public void ChangeOffset()
+        //{
+        //    IsOffset = !IsOffset;
+        //}
     }
+
+
+
+    public class ConvStrokePen : IMultiValueConverter
+    {
+        public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
+        {
+            var thick = (double)values[0];
+            var miter = (double)values[1];
+            var end = (PenLineCap)values[2];
+            var start = (PenLineCap)values[3];
+            var join = (PenLineJoin)values[4];
+            Pen pen = new(Brushes.Transparent, thick)
+            {
+                EndLineCap = end,
+                StartLineCap = start,
+                LineJoin = join,
+                MiterLimit = miter
+            };
+            return pen;
+        }
+
+        public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
 }
