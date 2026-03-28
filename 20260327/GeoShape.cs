@@ -1,6 +1,8 @@
 ﻿using CommunityToolkit.Mvvm.Input;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.Globalization;
 using System.Text;
 using System.Windows;
@@ -61,6 +63,29 @@ namespace _20260327
         public static readonly DependencyProperty RenderBoundsProperty =
             DependencyProperty.Register(nameof(RenderBounds), typeof(Rect), typeof(GeoShape), new FrameworkPropertyMetadata(new Rect(0, 0, 0, 0)));
 
+        //public ObservableCollection<Point> Points
+        //{
+        //    get { return (ObservableCollection<Point>)GetValue(PointsProperty); }
+        //    set { SetValue(PointsProperty, value); }
+        //}
+        //public static readonly DependencyProperty PointsProperty =
+        //    DependencyProperty.Register(nameof(Points), typeof(ObservableCollection<Point>), typeof(GeoShape),
+        //        new FrameworkPropertyMetadata(null, OnPointsChanged));
+
+        //public PointCollection Points
+        //{
+        //    get { return (PointCollection)GetValue(PointsProperty); }
+        //    set { SetValue(PointsProperty, value); }
+        //}
+        //public static readonly DependencyProperty PointsProperty =
+        //    DependencyProperty.Register(nameof(Points), typeof(PointCollection), typeof(GeoShape),
+        //        new FrameworkPropertyMetadata(null, OnPointsChanged));
+
+        // PointCollectionが
+        // 反応する状況は、PointのAdd、Remove、
+        // 逆に反応しないのがClear、Clearで起動するようにするにはChangedイベントを購読する方法があるけど、
+        // もっと簡単なのはPointCollectionのChangedイベントを購読
+
         public PointCollection Points
         {
             get { return (PointCollection)GetValue(PointsProperty); }
@@ -68,7 +93,8 @@ namespace _20260327
         }
         public static readonly DependencyProperty PointsProperty =
             DependencyProperty.Register(nameof(Points), typeof(PointCollection), typeof(GeoShape),
-                new FrameworkPropertyMetadata(null, OnPointsChanged));
+                new PropertyMetadata(null));
+
 
 
         //private static void OnPointsChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
@@ -92,17 +118,53 @@ namespace _20260327
         // OnPointsChangedでの処理はこれで十分？
         private static void OnPointsChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            if (d is GeoShape shape) { shape.UpdateRenderBounds(); }
+            if (d is GeoShape shape)
+            {
+                shape.UpdateRenderBounds();
+
+                //if (e.NewValue is ObservableCollection<Point> npc)
+                //{
+                //    npc.CollectionChanged += shape.OnCollectionChanged;
+                //    //npc.Changed += shape.OnPointsCollectionChanged;
+                //}
+                //if (e.OldValue is ObservableCollection<Point> opc)
+                //{
+                //    opc.CollectionChanged -= shape.OnCollectionChanged;
+                //    //opc.Changed -= shape.OnPointsCollectionChanged;
+                //}
+            }
         }
 
-        //// 既存の OnPointsChanged などを利用してGeometryキャッシュを破棄する
-        //private void OnPointsCollectionChanged(object? sender, EventArgs e)
+        private void OnCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+        {
+            UpdateRenderBounds();
+        }
+
+        //private static void OnPointsChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         //{
-        //    _cachedGeometry = null; // キャッシュクリア
-        //    // コレクションの中身が変わったときに再描画とサイズ更新を強制
-        //    //InvalidateVisual();
-        //    //UpdateRenderBounds();
+        //    if (d is GeoShape shape)
+        //    {
+        //        shape.UpdateRenderBounds();
+        //        if (e.NewValue is PointCollection npc)
+        //        {
+        //            npc.Changed += shape.OnPointsCollectionChanged;
+        //        }
+        //        if (e.OldValue is PointCollection opc)
+        //        {
+        //            opc.Changed -= shape.OnPointsCollectionChanged;
+        //        }
+        //    }
         //}
+
+        // 既存の OnPointsChanged などを利用してGeometryキャッシュを破棄する
+        private void OnPointsCollectionChanged(object? sender, EventArgs e)
+        {
+            //_cachedGeometry = null; // キャッシュクリア
+            // コレクションの中身が変わったときに再描画とサイズ更新を強制
+            //InvalidateVisual();
+            UpdateRenderBounds();
+        }
+
         #endregion 依存関係プロパティ
 
 
@@ -117,13 +179,31 @@ namespace _20260327
             SetBinding(StrokePenProperty, mb);
 
             Loaded += GeoShape_Loaded; // 起動直後に表示されないときはあったほうが良い？必要ないかも
+            
+        }
+
+        private void Points_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+        {
+            if (e.Action is NotifyCollectionChangedAction.Reset)
+            {
+                UpdateRenderBounds();
+            }
         }
 
         private void GeoShape_Loaded(object sender, RoutedEventArgs e)
         {
+            // PointCollectionのChangedイベントはAddやRemoveのほか、Clear時にも反応する
+            Points.Changed += Points_Changed;
+            //Points.CollectionChanged += Points_CollectionChanged;
             UpdateRenderBounds();
             //InvalidateVisual(); // 再描画を強制、いる？なくても動く
         }
+
+        private void Points_Changed(object? sender, EventArgs e)
+        {
+            UpdateRenderBounds();
+        }
+        
 
         protected override Geometry DefiningGeometry
         {
@@ -132,9 +212,14 @@ namespace _20260327
                 // キャッシュが在ればそれを返して終わる
                 if (_cachedGeometry is not null) { return _cachedGeometry; }
 
-                if (Points is null || Points.Count == 0) { return Geometry.Empty; }
+                if (Points is null || Points.Count == 0)
+                {
+                    OriginRenderBounds = new Rect();
+                    RenderBounds = new Rect();
+                    return Geometry.Empty;
+                }
 
-                var geo = MakeBezierPathGeometry();
+                var geo = MakeBezierPathGeometry(Points);
 
                 // 変形前のBoundsを記録
                 OriginRenderBounds = geo.GetRenderBounds(StrokePen);
@@ -162,13 +247,14 @@ namespace _20260327
 
         }
 
-        private PathGeometry MakeBezierPathGeometry()
+        private PathGeometry MakeBezierPathGeometry(PointCollection ps)
         {
-            var figure = new PathFigure() { StartPoint = Points[0] };
+            if (ps.Count == 0) { return new PathGeometry(); }
+            var figure = new PathFigure() { StartPoint = ps[0] };
             var segment = new PolyBezierSegment();
-            for (int i = 1; i < Points.Count; i++)
+            for (int i = 1; i < ps.Count; i++)
             {
-                segment.Points.Add(Points[i]);
+                segment.Points.Add(ps[i]);
             }
             figure.Segments.Add(segment);
             var geo = new PathGeometry([figure]);
@@ -182,6 +268,8 @@ namespace _20260327
         {
             _cachedGeometry = null; // 強制再計算
             InvalidateMeasure();
+            InvalidateVisual();
+
 
             if (Points is null || Points.Count == 0 || StrokePen == null)
             {
@@ -245,5 +333,17 @@ namespace _20260327
             throw new NotImplementedException();
         }
     }
+
+
+
+
+
+
+
+
+
+
+
+
 
 }

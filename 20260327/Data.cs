@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Windows.Media;
 using System.Windows;
+using System.Collections.ObjectModel;
 
 namespace _20260327
 {
@@ -31,12 +32,25 @@ namespace _20260327
         }
 
         [ObservableProperty] private PointCollection _points = [];
+        //[ObservableProperty] private ObservableCollection<Point> _points = [];
         [ObservableProperty] private PenLineCap _endLineCap;
         [ObservableProperty] private PenLineCap _startLineCap;
         [ObservableProperty] private double _miterLimit = 1.0;
         [ObservableProperty] private PenLineJoin _lineJoin;
         [ObservableProperty] private bool _isOffset;
-
+        partial void OnIsOffsetChanged(bool value)
+        {
+            if (value)
+            {
+                X += OriginBounds.X;
+                Y += OriginBounds.Y;
+            }
+            else
+            {
+                X -= OriginBounds.X;
+                Y -= OriginBounds.Y;
+            }
+        }
     }
     public abstract partial class ShapeData : Data
     {

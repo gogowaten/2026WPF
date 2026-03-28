@@ -74,18 +74,20 @@ namespace _20260327
         {
             if (ThumbData is GeoShapeData data)
             {
-                if (data.IsOffset)
-                {
-                    data.IsOffset = false;
-                    data.X -= data.OriginBounds.X;
-                    data.Y -= data.OriginBounds.Y;
-                }
-                else
-                {
-                    data.IsOffset = true;
-                    data.X += data.OriginBounds.X;
-                    data.Y += data.OriginBounds.Y;
-                }
+                data.IsOffset = !data.IsOffset;
+
+                //if (data.IsOffset)
+                //{
+                //    data.IsOffset = false;
+                //    data.X -= data.OriginBounds.X;
+                //    data.Y -= data.OriginBounds.Y;
+                //}
+                //else
+                //{
+                //    data.IsOffset = true;
+                //    data.X += data.OriginBounds.X;
+                //    data.Y += data.OriginBounds.Y;
+                //}
 
             }
 
