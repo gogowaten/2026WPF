@@ -71,12 +71,9 @@ namespace _20260327_02_OffsetGeoShape
         [RelayCommand(CanExecute = nameof(CanChangeGeoShepeRnderOffset))]
         private void ChangeGeoShepeRenderOffset()
         {
-
             if (ThumbData is GeoShapeData data)
             {
-
                 data.IsOffset = !data.IsOffset;
-
 
                 //if (data.IsOffset)
                 //{
@@ -111,4 +108,3 @@ namespace _20260327_02_OffsetGeoShape
         }
     }
 }
-

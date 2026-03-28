@@ -44,27 +44,30 @@
 
     </Canvas>
 
-    <StackPanel Grid.Column="1" DataContext="{Binding ElementName=MyThumb}">
-      <Button Content="ChangeOffset" Click="Button_Click_2"/>
-      <TextBlock Text="{Binding ThumbData}"/>
-      <Button Content="offset" Command="{Binding ChangeGeoShepeRenderOffsetCommand}"/>
 
-      <StackPanel DataContext="{Binding ThumbData}">
-        <Slider Value="{Binding StrokeThickness}" Minimum="1" Maximum="50"/>
-        <TextBlock Text="{Binding IsOffset}"/>
-        <TextBlock Text="{Binding Bounds, StringFormat='bounds = {0: 0; -0; 0}'}"/>
-        <TextBlock Text="{Binding OriginBounds, StringFormat='OBounds = {0: 0; -0; 0}'}"/>
-        <TextBlock Text="{Binding X, StringFormat='X = {0:0}'}"/>
-        <TextBlock Text="{Binding Points}"/>
+    <StackPanel Grid.Column="1" DataContext="{Binding}">
+      <TextBlock Text="{Binding MyData.Points, StringFormat='Points = {0:0}'}"/>
+      <TextBlock Text="{Binding MyData.Points}"/>
+
+      <StackPanel Grid.Column="1" DataContext="{Binding ElementName=MyThumb}">
+        <Button Content="ChangeOffset" Click="Button_Click_2"/>
+        <TextBlock Text="{Binding ThumbData}"/>
+        <Button Content="offset" Command="{Binding ChangeGeoShepeRenderOffsetCommand}"/>
+
+        <StackPanel DataContext="{Binding ThumbData}">
+          <Slider Value="{Binding StrokeThickness}" Minimum="1" Maximum="50"/>
+          <TextBlock Text="{Binding IsOffset}"/>
+          <TextBlock Text="{Binding Bounds, StringFormat='bounds = {0: 0; -0; 0}'}"/>
+          <TextBlock Text="{Binding OriginBounds, StringFormat='OriginBounds = {0: 0; -0; 0}'}"/>
+          <TextBlock Text="{Binding X, StringFormat='X = {0:0}'}"/>
+          <TextBlock Text="{Binding Points, StringFormat='X = {0:0}'}"/>
+        </StackPanel>
+
+        <Button Content="AddPoints" Click="Button_Click"/>
+        <Button Content="PointsClear" Click="Button_Click_1"/>
+        <TextBlock Text="{Binding ActualWidth, StringFormat='ShapeActualWidth = {0:0}'}"/>
+
       </StackPanel>
-
-      <Button Content="AddPoints" Click="Button_Click"/>
-      <Button Content="PointsClear" Click="Button_Click_1"/>
-      <TextBlock Text="{Binding ActualWidth, StringFormat='ShapeActualWidth = {0:0}'}"/>
-      <!--<TextBlock Text="{Binding IsOffset, StringFormat='IsOffset = {0:0}'}"/>
-      <TextBlock Text="{Binding RenderBounds, StringFormat='RenderBounds = {0: 0; -0; 0}'}"/>
-      <TextBlock Text="{Binding OriginRenderBounds, StringFormat='OriginRenderBounds = {0: 0; -0; 0}'}"/>-->
-
     </StackPanel>
   </Grid>
 </Window>

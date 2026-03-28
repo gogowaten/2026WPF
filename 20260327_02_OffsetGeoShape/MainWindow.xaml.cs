@@ -26,17 +26,16 @@ namespace _20260327_02_OffsetGeoShape
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            //MyShape.StrokeThickness = 30;
-            //MyShape.Stroke = Brushes.MediumAquamarine;
+            MyData.StrokeThickness = 30;
+            MyData.Stroke = Brushes.MediumAquamarine;
+            MyData.Background = Brushes.Gray;
 
-            //MyShape.Points.Add(new Point(50, 150));
-            //MyShape.Points.Add(new Point(150, 100));
-            //MyShape.Points.Add(new Point(250, 250));
+            MyData.Points.Add(new Point(50, 150));
+            MyData.Points.Add(new Point(150, 100));
+            MyData.Points.Add(new Point(250, 250));
 
             ////先頭座標変更
-            //MyShape.Points[0] = new Point(-10, 50);
-
-
+            //MyData.Points[0] = new Point(-10, 50);
         }
 
         private void Button_Click_1(object sender, RoutedEventArgs e)
@@ -53,19 +52,6 @@ namespace _20260327_02_OffsetGeoShape
             {
                 data.IsOffset = !data.IsOffset;
 
-
-                //if (data.IsOffset)
-                //{
-                //    data.IsOffset= false;
-                //    data.X -= data.OriginBounds.X;
-                //    data.Y -= data.OriginBounds.Y;
-                //}
-                //else
-                //{
-                //    data.IsOffset = true;
-                //    data.X += data.OriginBounds.X;
-                //    data.Y += data.OriginBounds.Y;
-                //}
             }
         }
     }
