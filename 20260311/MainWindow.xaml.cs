@@ -36,7 +36,7 @@ namespace _20260311
                     //txt.Text = "ゆっくりしていってね！！！";
                     txt.FontSize++;
                 }
-                if(item is GeoLineData geo)
+                if(item is GeoShapeData geo)
                 {
                     geo.Points.Add(new Point(0, 10));
                     geo.Points.Add(new Point(10, 100));

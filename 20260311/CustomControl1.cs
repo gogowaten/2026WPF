@@ -53,7 +53,14 @@ namespace _20260311
         }
         public static readonly DependencyProperty MyDataProperty =
             DependencyProperty.Register(nameof(MyData), typeof(Data), typeof(CustomThumb), new PropertyMetadata(null));
-
+        //private static void OnThumbDataChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        //{
+        //    if (d is CustomThumb thumb && thumb.MyData is GeoShapeData data && data.RootData is RootData root)
+        //    {
+        //        //root.ChangeGeoShapeOffsetCommand.Execute(true);
+        //        root.CanChageGeoShapeData();
+        //    }
+        //}
 
 
         public FrameworkElement MyContent
@@ -74,7 +81,7 @@ namespace _20260311
         //    DependencyProperty.Register(nameof(MyIsSelected), typeof(bool), typeof(CustomThumb), new PropertyMetadata(false));
 
 
-
+        // コンストラクタ
         public CustomThumb()
         {
             //this.DataContext = this;

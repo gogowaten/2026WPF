@@ -1,5 +1,7 @@
-﻿using System;
+﻿using CommunityToolkit.Mvvm.Input;
+using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Globalization;
 using System.Text;
@@ -8,7 +10,7 @@ using System.Windows.Data;
 using System.Windows.Media;
 using System.Windows.Shapes;
 
-namespace _20260327_02_OffsetGeoShape
+namespace _20260311
 {
     public class GeoShape : Shape
     {
@@ -34,16 +36,7 @@ namespace _20260327_02_OffsetGeoShape
             set { SetValue(IsOffsetProperty, value); }
         }
         public static readonly DependencyProperty IsOffsetProperty =
-            DependencyProperty.Register(nameof(IsOffset), typeof(bool), typeof(GeoShape), new FrameworkPropertyMetadata(false, OnIsOffsetChanged));
-
-        private static void OnIsOffsetChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            if (d is GeoShape shape)
-            {
-                shape.UpdateRenderBounds();
-
-            }
-        }
+            DependencyProperty.Register(nameof(IsOffset), typeof(bool), typeof(GeoShape), new FrameworkPropertyMetadata(false, OnPointsChanged));
 
         public Pen StrokePen
         {
@@ -70,6 +63,24 @@ namespace _20260327_02_OffsetGeoShape
         public static readonly DependencyProperty RenderBoundsProperty =
             DependencyProperty.Register(nameof(RenderBounds), typeof(Rect), typeof(GeoShape), new FrameworkPropertyMetadata(new Rect(0, 0, 0, 0)));
 
+        //public ObservableCollection<Point> Points
+        //{
+        //    get { return (ObservableCollection<Point>)GetValue(PointsProperty); }
+        //    set { SetValue(PointsProperty, value); }
+        //}
+        //public static readonly DependencyProperty PointsProperty =
+        //    DependencyProperty.Register(nameof(Points), typeof(ObservableCollection<Point>), typeof(GeoShape),
+        //        new FrameworkPropertyMetadata(null, OnPointsChanged));
+
+        //public PointCollection Points
+        //{
+        //    get { return (PointCollection)GetValue(PointsProperty); }
+        //    set { SetValue(PointsProperty, value); }
+        //}
+        //public static readonly DependencyProperty PointsProperty =
+        //    DependencyProperty.Register(nameof(Points), typeof(PointCollection), typeof(GeoShape),
+        //        new FrameworkPropertyMetadata(null, OnPointsChanged));
+
         // PointCollectionが
         // 反応する状況は、PointのAdd、Remove、
         // 逆に反応しないのがClear、Clearで起動するようにするにはChangedイベントを購読する方法があるけど、
@@ -85,6 +96,65 @@ namespace _20260327_02_OffsetGeoShape
                 new PropertyMetadata(null));
 
 
+
+        //private static void OnPointsChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        //{
+        //    var shape = (GeoShape)d;
+
+        //    // 古いコレクションのイベントを解除
+        //    if (e.OldValue is PointCollection oldPC && !oldPC.IsFrozen)
+        //    {
+        //        oldPC.Changed -= shape.OnPointsCollectionChanged;
+        //    }
+        //    // 新しいコレクションのイベントを購読
+        //    if (e.NewValue is PointCollection newPC && !newPC.IsFrozen)
+        //    {
+        //        newPC.Changed += shape.OnPointsCollectionChanged;
+        //    }
+
+        //    //shape.UpdateRenderBounds();
+        //}
+
+        // OnPointsChangedでの処理はこれで十分？
+        private static void OnPointsChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            if (d is GeoShape shape)
+            {
+                shape.UpdateRenderBounds();
+
+                //if (e.NewValue is ObservableCollection<Point> npc)
+                //{
+                //    npc.CollectionChanged += shape.OnCollectionChanged;
+                //    //npc.Changed += shape.OnPointsCollectionChanged;
+                //}
+                //if (e.OldValue is ObservableCollection<Point> opc)
+                //{
+                //    opc.CollectionChanged -= shape.OnCollectionChanged;
+                //    //opc.Changed -= shape.OnPointsCollectionChanged;
+                //}
+            }
+        }
+
+        private void OnCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+        {
+            UpdateRenderBounds();
+        }
+
+        //private static void OnPointsChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        //{
+        //    if (d is GeoShape shape)
+        //    {
+        //        shape.UpdateRenderBounds();
+        //        if (e.NewValue is PointCollection npc)
+        //        {
+        //            npc.Changed += shape.OnPointsCollectionChanged;
+        //        }
+        //        if (e.OldValue is PointCollection opc)
+        //        {
+        //            opc.Changed -= shape.OnPointsCollectionChanged;
+        //        }
+        //    }
+        //}
 
         // 既存の OnPointsChanged などを利用してGeometryキャッシュを破棄する
         private void OnPointsCollectionChanged(object? sender, EventArgs e)
@@ -124,7 +194,9 @@ namespace _20260327_02_OffsetGeoShape
         {
             // PointCollectionのChangedイベントはAddやRemoveのほか、Clear時にも反応する
             Points.Changed += Points_Changed;
+            //Points.CollectionChanged += Points_CollectionChanged;
             UpdateRenderBounds();
+            //InvalidateVisual(); // 再描画を強制、いる？なくても動く
         }
 
         private void Points_Changed(object? sender, EventArgs e)
@@ -195,8 +267,8 @@ namespace _20260327_02_OffsetGeoShape
         public void UpdateRenderBounds()
         {
             _cachedGeometry = null; // 強制再計算
-            InvalidateMeasure(); // 必要、Pointsクリア時の再計測
-            //InvalidateVisual();
+            InvalidateMeasure();
+            InvalidateVisual();
 
 
             if (Points is null || Points.Count == 0 || StrokePen == null)
@@ -216,11 +288,23 @@ namespace _20260327_02_OffsetGeoShape
 
             if (DataContext is Data data)
             {
+                //data.Width = ActualWidth; // これが良いけど一手遅れる
+                //data.Height = ActualHeight;
+
+                //data.Width = bounds.Width;
+                //data.Height = bounds.Height;
+                //data.Width = OriginRenderBounds.Width;
+                //data.Height = OriginRenderBounds.Height;
                 data.Bounds = RenderBounds;
                 data.OriginBounds = OriginRenderBounds;
             }
         }
 
+        //[RelayCommand]
+        //public void ChangeOffset()
+        //{
+        //    IsOffset = !IsOffset;
+        //}
     }
 
 

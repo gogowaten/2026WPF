@@ -35,6 +35,7 @@
       <Slider Value="{Binding CurrentItem.StrokeThickness}" Minimum="10" Maximum="100"/>
       <Button Content="test" Click="Button_Click"/>
       <Button Content="updateSize" Command="{Binding UpdateSizeCommand}"/>
+      <Button Content="GeoShapeChangeOffset" Command="{Binding ChangeGeoShapeOffsetCommand}"/>
       <TextBox Text="{Binding AddText, UpdateSourceTrigger=PropertyChanged}"/>
       <Button Content="TextBlockを追加" Command="{Binding AddTextBlockDataCommand}" CommandParameter="{Binding Path=AddText}"/>
       <Button Content="選択Itemを削除" Command="{Binding RemoveSelectedItemsCommand}"/>

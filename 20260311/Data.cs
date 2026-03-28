@@ -51,7 +51,7 @@ namespace _20260311
         }
 
         #region テスト用初期化
-        
+
         private void MyInit()
         {
             this.RootData = this; // 自身をRootにしておく
@@ -82,8 +82,8 @@ namespace _20260311
             DataList.Add(maruGreen);
             TextBlockData textBlockData = new() { Name = "Text1", X = 0, Y = 0, Text = "Text1", FontSize = 30 };
             DataList.Add(textBlockData);
-            DataList.Add(new PolylineData() { Name = "ボリライン", X = 0, Y = 0, StrokeThickness = 50, Stroke = Brushes.MediumPurple});
-            DataList.Add(new GeoLineData() { Name = "ベジェ曲線", X = 100, Y = 100, Stroke = Brushes.MediumAquamarine, StrokeThickness = 20.0, Points = [new Point(50, 70), new Point(250, 150), new Point(50, 250), new Point(50, 200), new Point(50, 150), new Point(150, 100), new Point(250, 250),], StrokeEndLineCap = PenLineCap.Round });
+            DataList.Add(new PolylineData() { Name = "ボリライン", X = 0, Y = 0, StrokeThickness = 50, Stroke = Brushes.MediumPurple });
+            DataList.Add(new GeoShapeData() { Name = "ベジェ曲線", X = 100, Y = 100, Stroke = Brushes.MediumAquamarine, StrokeThickness = 20.0, Points = [new Point(50, 70), new Point(250, 150), new Point(50, 250), new Point(50, 200), new Point(50, 150), new Point(150, 100), new Point(250, 250),], StrokeEndLineCap = PenLineCap.Round , Background = Brushes.Gray});
 
 
 
@@ -133,6 +133,10 @@ namespace _20260311
             {
                 newValue.IsCurrent = true;
                 UnGroupCommand.NotifyCanExecuteChanged();
+                if(newValue is GeoShapeData geo)
+                {
+                    CanChageGeoShapeData();
+                }
             }
         }
 
@@ -163,6 +167,25 @@ namespace _20260311
         }
 
         #endregion On～プロパティの変更時
+
+        /// <summary>
+        /// オフセットの切り替え、GeoShapeData専用
+        /// 図形の位置が左上(0,0)になるのと、通常の位置の切り替えになる
+        /// 図形の位置が変わるののでThumbのいちも相対的に変更するため、DataのX,Yを変更している
+        /// </summary>
+        //[RelayCommand(CanExecute = nameof(CanChageGeoShapeData))]
+        [RelayCommand]
+        private void ChangeGeoShapeOffset()
+        {
+            if (CurrentItem is GeoShapeData data)
+            {
+                data.IsOffset = !data.IsOffset;
+            }
+        }
+        public bool CanChageGeoShapeData()
+        {
+            return CurrentItem is GeoShapeData;
+        }
 
         // 全選択解除
         [RelayCommand]
@@ -620,7 +643,7 @@ namespace _20260311
 
         #endregion メソッド
 
-       
+
 
 
     }
@@ -791,17 +814,41 @@ namespace _20260311
     }
 
     #region 図形
-    public partial class GeoLineData : ShapeData
+    public partial class GeoShapeData : ShapeData
     {
         [ObservableProperty] private PointCollection _points = [];
-        [ObservableProperty] private Brush? _background;
         [ObservableProperty] private PenLineCap _strokeEndLineCap = PenLineCap.Flat;
         [ObservableProperty] private PenLineCap _strokeStartLineCap = PenLineCap.Flat;
         [ObservableProperty] private PenLineJoin _strokeLineJoin = PenLineJoin.Miter;
-        [ObservableProperty] private double _strokeMiterLimit =1.0;
+        [ObservableProperty] private double _strokeMiterLimit = 1.0;
+        [ObservableProperty] private bool _isOffset;
 
-        
+
+        partial void OnIsOffsetChanged(bool value)
+        {
+            if (value)
+            {
+                X += OriginBounds.X;
+                Y += OriginBounds.Y;
+            }
+            else
+            {
+                X -= OriginBounds.X;
+                Y -= OriginBounds.Y;
+            }
+        }
     }
+
+    //public partial class GeoLineData : ShapeData
+    //{
+    //    [ObservableProperty] private PointCollection _points = [];
+    //    [ObservableProperty] private PenLineCap _strokeEndLineCap = PenLineCap.Flat;
+    //    [ObservableProperty] private PenLineCap _strokeStartLineCap = PenLineCap.Flat;
+    //    [ObservableProperty] private PenLineJoin _strokeLineJoin = PenLineJoin.Miter;
+    //    [ObservableProperty] private double _strokeMiterLimit =1.0;
+
+    //}
+
     public partial class PolylineData : ShapeData
     {
         public PolylineData()
@@ -820,7 +867,7 @@ namespace _20260311
 
     public abstract partial class ShapeData : Data
     {
-        [ObservableProperty] private Brush _fill = new SolidColorBrush(Color.FromArgb(200, 255, 0, 0));
+        [ObservableProperty] private Brush? _fill;
         [ObservableProperty] private Brush _stroke = new SolidColorBrush(Color.FromArgb(200, 0, 250, 200));
         [ObservableProperty] private double _strokeThickness = 1.0;
     }
@@ -836,6 +883,9 @@ namespace _20260311
         [ObservableProperty] private double _y;
         [ObservableProperty] private int _z;
         [ObservableProperty] private string _name = string.Empty;
+        [ObservableProperty] private Brush? _background;
+        [ObservableProperty] private Rect _bounds = new();
+        [ObservableProperty] private Rect _originBounds = new();
         [ObservableProperty] bool _isSelected = false; // 選択状態
         [ObservableProperty] bool _isSelectable = false; // 選択状態
         [ObservableProperty] bool _isCurrent = false; // 筆頭
