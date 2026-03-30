@@ -21,6 +21,8 @@
     <StackPanel Grid.Column="1">
       <Button Content="fit" Click="Button_Click"/>
       <TextBlock Text="{Binding ElementName=MyCanvas, Path=Width ,StringFormat='Width = {0:0}'}"/>
+      <Button Content="adornerOn" Click="Button_Click_1"/>
+      <Button Content="AdornerOff" Click="Button_Click_2"/>
     </StackPanel>
   </Grid>
 </Window>
