@@ -19,11 +19,24 @@ namespace _20260330
         public MainWindow()
         {
             InitializeComponent();
+            Loaded += MainWindow_Loaded;
+        }
+
+        private void MainWindow_Loaded(object sender, RoutedEventArgs e)
+        {
+            if(AdornerLayer.GetAdornerLayer(TargetRect) is AdornerLayer layer)
+            {
+                layer.Add(new ResizeAdorner(TargetRect));
+            }
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
             MyCanvas.UpdateSizeToContent();
+            if (AdornerLayer.GetAdornerLayer(MyCanvas) is AdornerLayer layer)
+            {
+                layer.Add(new ResizeAdorner(MyCanvas));
+            }
         }
     }
 }

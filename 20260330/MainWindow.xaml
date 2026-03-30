@@ -15,6 +15,7 @@
     <local:FitCanvas x:Name="MyCanvas" Background="DeepSkyBlue">
       <Rectangle Canvas.Left="-10" Canvas.Top="10" Width="50" Height="50" Fill="Gold"/>
       <Rectangle Canvas.Left="100" Canvas.Top="-10" Width="50" Height="50" Fill="Gold"/>
+      <Rectangle x:Name="TargetRect" Canvas.Left="100" Canvas.Top="100" Width="50" Height="50" Fill="DodgerBlue"/>
     </local:FitCanvas>
 
     <StackPanel Grid.Column="1">
