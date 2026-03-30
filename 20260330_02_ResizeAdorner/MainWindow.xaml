@@ -19,6 +19,8 @@
     <StackPanel Grid.Column="1">
       <TextBlock Text="{Binding ElementName=TargetRect, Path=Width ,StringFormat='Width = {0:0}'}"/>
       <TextBlock Text="{Binding ElementName=TargetRect, Path=Height ,StringFormat='Height = {0:0}'}"/>
+      <Button Content="adornerOn" Click="Button_Click_1"/>
+      <Button Content="AdornerOff" Click="Button_Click_2"/>
     </StackPanel>
   </Grid>
 </Window>
