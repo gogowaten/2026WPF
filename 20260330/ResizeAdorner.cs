@@ -22,6 +22,8 @@ namespace _20260330
         private readonly VisualCollection _visualChildren;
         private readonly Dictionary<ResizeDirection, Thumb> HT = [];
         private readonly ToolTip _sizeTip;
+        private readonly TextBlock _widthText = new();
+        private readonly TextBlock _heightText = new();
 
         public ResizeAdorner(UIElement adornedElement) : base(adornedElement)
         {
@@ -40,52 +42,20 @@ namespace _20260330
                 PlacementTarget = adornedElement,
                 HorizontalOffset = 0,
                 VerticalOffset = 10,
+                // ToolTipText
+                Content = new StackPanel()
+                {
+                    Orientation = Orientation.Horizontal,
+                    Children = {
+                        new TextBlock(){Text = "幅：", Foreground=Brushes.Gray},
+                        _widthText,
+                        new TextBlock(){Text = ", 高：", Foreground=Brushes.Gray},
+                        _heightText }
+                }
             };
         }
 
 
-        //// Thumbの移動、対象要素のサイズ変更
-        //private void OnResize(object sender, DragDeltaEventArgs e)
-        //{
-        //    if (sender is not Thumb thumb || AdornedElement is not FrameworkElement element) { return; }
-
-        //    var dir = (ResizeDirection)thumb.Tag;
-        //    double deltaX = e.HorizontalChange;
-        //    double deltaY = e.VerticalChange;
-
-        //    // 横方向の計算
-        //    if (dir is ResizeDirection.Left or ResizeDirection.TopLeft or ResizeDirection.BottomLeft)
-        //    {
-        //        // 左要素の変更時は、横幅と同時に位置も移動させる
-        //        double newWidth = element.Width - deltaX;
-        //        if (newWidth > 10)
-        //        {
-        //            element.Width = newWidth;
-        //            Canvas.SetLeft(element, Canvas.GetLeft(element) + deltaX);
-        //        }
-        //    }
-        //    else if (dir is ResizeDirection.Right or ResizeDirection.BottomRight or ResizeDirection.TopRight)
-        //    {
-        //        if (element.Width + deltaX > 10) { element.Width += deltaX; }
-        //    }
-
-        //    // 縦方向の計算
-        //    if (dir is ResizeDirection.Top or ResizeDirection.TopLeft or ResizeDirection.TopRight)
-        //    {
-        //        double newHeight = element.Height - deltaY;
-        //        if (newHeight > 10)
-        //        {
-        //            element.Height = newHeight;
-        //            Canvas.SetTop(element, Canvas.GetTop(element) + deltaY);
-        //        }
-        //    }
-        //    else if (dir is ResizeDirection.Bottom or ResizeDirection.BottomLeft or ResizeDirection.BottomRight)
-        //    {
-        //        if (element.Height + deltaY > 10) element.Height += deltaY;
-        //    }
-
-        //    UpdateToolTipText();
-        //}
 
         //Thumbの移動、対象要素のサイズ変更
         private void OnResize(object sender, DragDeltaEventArgs e)
@@ -142,17 +112,19 @@ namespace _20260330
         {
             if (AdornedElement is FrameworkElement element)
             {
-                //_sizeTip.Content = $"{(int)element.Width} x {(int)element.Height}";
-                _sizeTip.Content = new StackPanel
-                {
-                    Orientation = Orientation.Horizontal,
-                    Children = {
-        new TextBlock { Text = "幅: ", Foreground = Brushes.Gray },
-        new TextBlock { Text = $"{(int)element.Width}", FontWeight = FontWeights.Bold },
-        new TextBlock { Text = "  高: ", Foreground = Brushes.Gray, Margin = new Thickness(5,0,0,0) },
-        new TextBlock { Text = $"{(int)element.Height}", FontWeight = FontWeights.Bold }
-    }
-                };
+                _widthText.Text = $"{(int)element.Width}";
+                _heightText.Text = $"{(int)element.Height}";
+
+                ////_sizeTip.Content = $"{(int)element.Width} x {(int)element.Height}";
+                //_sizeTip.Content = new StackPanel
+                //{
+                //    Orientation = Orientation.Horizontal,
+                //    Children = {
+                //        new TextBlock { Text = "幅: ", Foreground = Brushes.Gray },
+                //        new TextBlock { Text = $"{(int)element.Width}", FontWeight = FontWeights.Bold },
+                //        new TextBlock { Text = "  高: ", Foreground = Brushes.Gray, Margin = new Thickness(5,0,0,0) },
+                //        new TextBlock { Text = $"{(int)element.Height}", FontWeight = FontWeights.Bold }}
+                //};
             }
         }
 
@@ -161,6 +133,8 @@ namespace _20260330
         // 8個のThumbを正しい位置に並べる際も、finalSize（対象要素のサイズ）を基準に一括配置します。
         protected override Size ArrangeOverride(Size finalSize)
         {
+            if (HT.Count == 0) { return finalSize; }
+
             // Q 1度の動作に2回ArrangeOverrideが処理されているのはなんで？
             // A 1回目：子要素（Thumb等）の再配置
             // 2回目：子要素の再配置により親要素（AdornerElement）の再配置が必要

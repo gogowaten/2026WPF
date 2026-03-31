@@ -1,0 +1,58 @@
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="clr-namespace:_20260331">
+
+
+  <Style TargetType="{x:Type local:CustomThumb}">
+    <Setter Property="Template">
+      <Setter.Value>
+        <ControlTemplate TargetType="{x:Type local:CustomThumb}">
+          <ContentPresenter Content="{TemplateBinding MyContent}"/>
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+  </Style>
+  
+  
+  
+  <DataTemplate DataType="{x:Type local:GeoShapeData}">
+    <Canvas Width="{Binding ElementName=geoShape, Path=ActualWidth}"
+            Height="{Binding ElementName=geoShape, Path=ActualHeight}"
+            Background="{Binding Background}">
+      <local:GeoShape x:Name="geoShape"
+                    Points="{Binding Points}"
+                    Stroke="{Binding Stroke}"
+                    StrokeThickness="{Binding StrokeThickness}"
+                    Fill="{Binding Fill}"
+                    StrokeEndLineCap="{Binding EndLineCap}"
+                    StrokeStartLineCap="{Binding StartLineCap}"
+                    StrokeLineJoin="{Binding LineJoin}"
+                    StrokeMiterLimit="{Binding MiterLimit}"                    
+                    IsOffset="{Binding IsOffset}"
+                    RenderBounds="{Binding Bounds, Mode=OneWayToSource}"
+                    OriginRenderBounds="{Binding OriginBounds, Mode=OneWayToSource}"
+                    />
+    </Canvas>
+  </DataTemplate>
+
+
+
+  <Style TargetType="{x:Type local:DataThumb}">
+    <Setter Property="ThumbData" Value="{Binding }"/>
+    <Setter Property="Canvas.Left" Value="{Binding X}"/>
+    <Setter Property="Canvas.Top" Value="{Binding Y}"/>
+    <Setter Property="Template">
+      <Setter.Value>
+        <ControlTemplate TargetType="{x:Type local:DataThumb}">
+          <ContentPresenter Content="{Binding }"/>
+          <!--<Canvas Width="{Binding Width}" Height="{Binding Height}" Background="Red">
+            <ContentPresenter Content="{Binding}"/>
+          </Canvas>-->
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+  </Style>
+
+
+</ResourceDictionary>
