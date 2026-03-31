@@ -34,7 +34,7 @@ namespace _20260330_03_ResizeAdorner8handle
         }
 
 
-        //Thumbの移動、対象要素のサイズ変更
+        // Thumbの移動、対象要素のサイズ変更
         private void OnResize(object sender, DragDeltaEventArgs e)
         {
             if (sender is not Thumb thumb || AdornedElement is not FrameworkElement element) { return; }

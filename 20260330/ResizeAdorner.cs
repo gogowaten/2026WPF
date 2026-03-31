@@ -18,22 +18,76 @@ namespace _20260330
             Left, Right, Top, Bottom,
             TopLeft, TopRight, BottomLeft, BottomRight
         }
-                
+
         private readonly VisualCollection _visualChildren;
         private readonly Dictionary<ResizeDirection, Thumb> HT = [];
+        private readonly ToolTip _sizeTip;
 
         public ResizeAdorner(UIElement adornedElement) : base(adornedElement)
         {
             _visualChildren = new VisualCollection(this);
 
+            // ハンドルThumbの生成
             foreach (ResizeDirection item in Enum.GetValues<ResizeDirection>())
             {
                 HT.Add(item, CreateThumb(item, Cursors.Hand));
             }
+
+            // ToolTipを対象要素につける
+            _sizeTip = new()
+            {
+                Placement = PlacementMode.Top,
+                PlacementTarget = adornedElement,
+                HorizontalOffset = 0,
+                VerticalOffset = 10,
+            };
         }
 
 
-        // Thumbの移動、対象要素のサイズ変更
+        //// Thumbの移動、対象要素のサイズ変更
+        //private void OnResize(object sender, DragDeltaEventArgs e)
+        //{
+        //    if (sender is not Thumb thumb || AdornedElement is not FrameworkElement element) { return; }
+
+        //    var dir = (ResizeDirection)thumb.Tag;
+        //    double deltaX = e.HorizontalChange;
+        //    double deltaY = e.VerticalChange;
+
+        //    // 横方向の計算
+        //    if (dir is ResizeDirection.Left or ResizeDirection.TopLeft or ResizeDirection.BottomLeft)
+        //    {
+        //        // 左要素の変更時は、横幅と同時に位置も移動させる
+        //        double newWidth = element.Width - deltaX;
+        //        if (newWidth > 10)
+        //        {
+        //            element.Width = newWidth;
+        //            Canvas.SetLeft(element, Canvas.GetLeft(element) + deltaX);
+        //        }
+        //    }
+        //    else if (dir is ResizeDirection.Right or ResizeDirection.BottomRight or ResizeDirection.TopRight)
+        //    {
+        //        if (element.Width + deltaX > 10) { element.Width += deltaX; }
+        //    }
+
+        //    // 縦方向の計算
+        //    if (dir is ResizeDirection.Top or ResizeDirection.TopLeft or ResizeDirection.TopRight)
+        //    {
+        //        double newHeight = element.Height - deltaY;
+        //        if (newHeight > 10)
+        //        {
+        //            element.Height = newHeight;
+        //            Canvas.SetTop(element, Canvas.GetTop(element) + deltaY);
+        //        }
+        //    }
+        //    else if (dir is ResizeDirection.Bottom or ResizeDirection.BottomLeft or ResizeDirection.BottomRight)
+        //    {
+        //        if (element.Height + deltaY > 10) element.Height += deltaY;
+        //    }
+
+        //    UpdateToolTipText();
+        //}
+
+        //Thumbの移動、対象要素のサイズ変更
         private void OnResize(object sender, DragDeltaEventArgs e)
         {
             if (sender is not Thumb thumb || AdornedElement is not FrameworkElement element) { return; }
@@ -45,32 +99,60 @@ namespace _20260330
             // 横方向の計算
             if (dir is ResizeDirection.Left or ResizeDirection.TopLeft or ResizeDirection.BottomLeft)
             {
-                // 左要素の変更時は、横幅と同時に位置も移動させる
+                // 左要素の変更時は、横幅と左位置も変更する
+                // サイズは、10未満にならないようにする
                 double newWidth = element.Width - deltaX;
-                if (newWidth > 10)
+                if (newWidth < 10)
                 {
-                    element.Width = newWidth;
-                    Canvas.SetLeft(element, Canvas.GetLeft(element) + deltaX);
+                    newWidth = 10;
+                    deltaX = element.Width - 10;// 要素の左位置はリサイズ前の幅から計算する
                 }
+                element.Width = newWidth; // リサイズ
+                Canvas.SetLeft(element, Canvas.GetLeft(element) + deltaX);
             }
             else if (dir is ResizeDirection.Right or ResizeDirection.BottomRight or ResizeDirection.TopRight)
             {
-                if (element.Width + deltaX > 10) { element.Width += deltaX; }
+                if (element.Width + deltaX < 10) { element.Width = 10; }
+                else { element.Width += deltaX; }
             }
 
             // 縦方向の計算
             if (dir is ResizeDirection.Top or ResizeDirection.TopLeft or ResizeDirection.TopRight)
             {
                 double newHeight = element.Height - deltaY;
-                if (newHeight > 10)
+                if (newHeight < 10)
                 {
-                    element.Height = newHeight;
-                    Canvas.SetTop(element, Canvas.GetTop(element) + deltaY);
+                    newHeight = 10;
+                    deltaY = element.Height - 10;
                 }
+                element.Height = newHeight;
+                Canvas.SetTop(element, Canvas.GetTop(element) + deltaY);
             }
             else if (dir is ResizeDirection.Bottom or ResizeDirection.BottomLeft or ResizeDirection.BottomRight)
             {
-                if (element.Height + deltaY > 10) element.Height += deltaY;
+                if (element.Height + deltaY < 10) { element.Height = 10; }
+                else { element.Height += deltaY; }
+            }
+
+            UpdateToolTipText();
+        }
+
+
+        private void UpdateToolTipText()
+        {
+            if (AdornedElement is FrameworkElement element)
+            {
+                //_sizeTip.Content = $"{(int)element.Width} x {(int)element.Height}";
+                _sizeTip.Content = new StackPanel
+                {
+                    Orientation = Orientation.Horizontal,
+                    Children = {
+        new TextBlock { Text = "幅: ", Foreground = Brushes.Gray },
+        new TextBlock { Text = $"{(int)element.Width}", FontWeight = FontWeights.Bold },
+        new TextBlock { Text = "  高: ", Foreground = Brushes.Gray, Margin = new Thickness(5,0,0,0) },
+        new TextBlock { Text = $"{(int)element.Height}", FontWeight = FontWeights.Bold }
+    }
+                };
             }
         }
 
@@ -116,8 +198,21 @@ namespace _20260330
                 Cursor = cursor
             };
             thumb.DragDelta += OnResize;
+            thumb.DragStarted += OnResizeStarted;
+            thumb.DragCompleted += OnResizeCompleted;
             _visualChildren.Add(thumb);
             return thumb;
+        }
+
+        private void OnResizeCompleted(object sender, DragCompletedEventArgs e)
+        {
+            _sizeTip.IsOpen = false;
+        }
+
+        private void OnResizeStarted(object sender, DragStartedEventArgs e)
+        {
+            _sizeTip.IsOpen = true;
+            UpdateToolTipText();
         }
 
 
