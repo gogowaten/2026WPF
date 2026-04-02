@@ -17,6 +17,20 @@ using System.Windows.Shapes;
 namespace _20260331
 {
 
+    public class TGeoLine : ContentControl
+    {
+        static TGeoLine()
+        {
+            DefaultStyleKeyProperty.OverrideMetadata(typeof(TGeoLine), new FrameworkPropertyMetadata(typeof(TGeoLine)));
+        }
+        public TGeoLine()
+        {
+            
+        }
+
+      
+    }
+
     [ContentProperty(nameof(MyContent))]
     public class CustomThumb : Thumb
     {
@@ -25,6 +39,7 @@ namespace _20260331
             DefaultStyleKeyProperty.OverrideMetadata(typeof(CustomThumb), new FrameworkPropertyMetadata(typeof(CustomThumb)));
         }
 
+        #region 依存関係プロパティ
 
         public object MyContent
         {
@@ -35,7 +50,49 @@ namespace _20260331
             DependencyProperty.Register(nameof(MyContent), typeof(object), typeof(CustomThumb), new PropertyMetadata(null));
 
 
+        public bool IsDragMove
+        {
+            get { return (bool)GetValue(IsDragMoveProperty); }
+            set { SetValue(IsDragMoveProperty, value); }
+        }
+        public static readonly DependencyProperty IsDragMoveProperty =
+            DependencyProperty.Register(nameof(IsDragMove), typeof(bool), typeof(CustomThumb), new FrameworkPropertyMetadata(false, OnMyIsDragMoveChanged));
+        private static void OnMyIsDragMoveChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            if (d is CustomThumb thumb)
+            {
+                if (e.NewValue is bool isMove && isMove)
+                {
+                    if (double.IsNaN(Canvas.GetLeft(thumb)))
+                    {
+                        Canvas.SetLeft(thumb, 0);
+                        Canvas.SetTop(thumb, 0);
+                    }
+                    thumb.DragDelta += Thumb_DragDelta;
+                }
+                else
+                {
+                    thumb.DragDelta -= Thumb_DragDelta;
+                }
+            }
+        }
 
+        private static void Thumb_DragDelta(object sender, DragDeltaEventArgs e)
+        {
+            if (sender is CustomThumb thumb)
+            {
+                Canvas.SetLeft(thumb, Canvas.GetLeft(thumb) + e.HorizontalChange);
+                Canvas.SetTop(thumb, Canvas.GetTop(thumb) + e.VerticalChange);
+            }
+        }
+
+        #endregion 依存関係プロパティ
+
+        // コンストラクタ
+        public CustomThumb()
+        {
+
+        }
     }
 
 

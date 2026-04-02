@@ -4,6 +4,34 @@
     xmlns:local="clr-namespace:_20260331">
 
 
+
+  <DataTemplate DataType="{x:Type local:GeoLineData}">
+    <local:GeoLine x:Name="GeoLine"
+                   MyPoints="{Binding Points}"
+                   Stroke="{Binding Stroke}"
+                   StrokeThickness="{Binding StrokeThickness}"
+                   Fill="{Binding Fill}"
+                   StrokeEndLineCap="{Binding EndLineCap}"
+                   StrokeStartLineCap="{Binding StartLineCap}"
+                   StrokeLineJoin="{Binding LineJoin}"
+                   StrokeMiterLimit="{Binding MiterLimit}"
+                   MyIsOffset="{Binding IsOffset}"
+                   MyGeometryBounds="{Binding OriginBounds}"
+                   />
+  </DataTemplate>
+
+  <Style TargetType="{x:Type local:TGeoLine}">
+    <Setter Property="Template">
+      <Setter.Value>
+        <ControlTemplate TargetType="{x:Type local:TGeoLine}">
+          <ContentControl Content="{Binding}"/>
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+  </Style>
+
+  
+  
   <Style TargetType="{x:Type local:CustomThumb}">
     <Setter Property="Template">
       <Setter.Value>

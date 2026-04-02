@@ -3,6 +3,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Documents;
+using System.Windows.Ink;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
@@ -16,12 +17,28 @@ namespace _20260331
     /// </summary>
     public partial class MainWindow : Window
     {
-        public GeoShapeData MyData { get; set; }
+        //public GeoShapeData MyData { get; set; }
+        public GeoLineData MyData { get; set; }
         public MainWindow()
         {
             InitializeComponent();
-            MyData = new();
+            MyData = TestGeoLineData();
             DataContext = this;
+        }
+        private GeoLineData TestGeoLineData()
+        {
+            GeoLineData data = new()
+            {
+                Background = Brushes.DeepSkyBlue,
+                //Fill = Brushes.DeepSkyBlue;
+                Stroke = Brushes.Gold,
+                StrokeThickness = 20,
+                Points = [(new Point(50, 70)),
+                        (new Point(250, 150)),
+                        (new Point(50, 250)),
+                        (new Point(50, 200)),],
+            };
+            return data;
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)
@@ -48,6 +65,19 @@ namespace _20260331
 
         private void Button_Click_2(object sender, RoutedEventArgs e)
         {
+            MyData.IsOffset = !MyData.IsOffset;
+        }
+
+        private void Button_Click_PointChange(object sender, RoutedEventArgs e)
+        {
+            if (MyData.Points.Count == 0) { return; }
+            //MyShape.MyPoints[0] = new Point();
+            MyData.Points[0] = new Point();
+        }
+
+        private void Button_Click_ChangeOffset(object sender, RoutedEventArgs e)
+        {
+            //MyShape.MyIsOffset = !MyShape.MyIsOffset;
             MyData.IsOffset = !MyData.IsOffset;
         }
     }

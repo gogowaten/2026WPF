@@ -1,6 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Text;
 using System.Windows;
 using System.Windows.Ink;
@@ -9,8 +10,40 @@ using System.Xml.Linq;
 
 namespace _20260331
 {
+    public partial class GeoLineData : ShapeData
+    {
+        public GeoLineData()
+        {
+            Name = "FromGeoLineData";
+        }
+
+        [ObservableProperty] private PointCollection _points = [];
+        //[ObservableProperty] private ObservableCollection<Point> _points = [];
+        [ObservableProperty] private PenLineCap _endLineCap;
+        [ObservableProperty] private PenLineCap _startLineCap;
+        [ObservableProperty] private double _miterLimit = 1.0;
+        [ObservableProperty] private PenLineJoin _lineJoin;
+        [ObservableProperty] private bool _isOffset;
+
+    }
+
+
+
     public partial class GeoShapeData : ShapeData
     {
+        [ObservableProperty] private double _xRender;
+        [ObservableProperty] private double _yRender;
+        [ObservableProperty] private double _widthRender;
+        [ObservableProperty] private double _heightRender;
+        [ObservableProperty] private PointCollection _points = [];
+        //[ObservableProperty] private ObservableCollection<Point> _points = [];
+        [ObservableProperty] private PenLineCap _endLineCap;
+        [ObservableProperty] private PenLineCap _startLineCap;
+        [ObservableProperty] private double _miterLimit = 1.0;
+        [ObservableProperty] private PenLineJoin _lineJoin;
+        [ObservableProperty] private bool _isOffset;
+
+
         public GeoShapeData()
         {
             Name = "GeoShapeData";
@@ -19,6 +52,7 @@ namespace _20260331
             //IsOffset = true;
             Test();
         }
+
 
         private void Test()
         {
@@ -32,13 +66,7 @@ namespace _20260331
             Points.Add(new Point(50, 200));
         }
 
-        [ObservableProperty] private PointCollection _points = [];
-        //[ObservableProperty] private ObservableCollection<Point> _points = [];
-        [ObservableProperty] private PenLineCap _endLineCap;
-        [ObservableProperty] private PenLineCap _startLineCap;
-        [ObservableProperty] private double _miterLimit = 1.0;
-        [ObservableProperty] private PenLineJoin _lineJoin;
-        [ObservableProperty] private bool _isOffset;
+
         partial void OnIsOffsetChanged(bool value)
         {
             if (value)
@@ -67,6 +95,7 @@ namespace _20260331
         [ObservableProperty] private double _height;
         [ObservableProperty] private string _name = string.Empty;
         [ObservableProperty] private Brush? _background;
+        // Rectを使うのは良くない、バラしたほうがパフォーマンスも良い
         [ObservableProperty] private Rect _bounds = new();
         [ObservableProperty] private Rect _originBounds = new();
     }
