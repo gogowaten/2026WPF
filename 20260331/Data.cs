@@ -31,10 +31,6 @@ namespace _20260331
 
     public partial class GeoShapeData : ShapeData
     {
-        [ObservableProperty] private double _xRender;
-        [ObservableProperty] private double _yRender;
-        [ObservableProperty] private double _widthRender;
-        [ObservableProperty] private double _heightRender;
         [ObservableProperty] private PointCollection _points = [];
         //[ObservableProperty] private ObservableCollection<Point> _points = [];
         [ObservableProperty] private PenLineCap _endLineCap;
@@ -83,6 +79,11 @@ namespace _20260331
     }
     public abstract partial class ShapeData : Data
     {
+        [ObservableProperty] private double _xRender;
+        [ObservableProperty] private double _yRender;
+        [ObservableProperty] private double _widthRender;
+        [ObservableProperty] private double _heightRender;
+
         [ObservableProperty] private Brush? _fill;
         [ObservableProperty] private double _strokeThickness = 1.0;
         [ObservableProperty] private Brush? _stroke;

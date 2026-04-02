@@ -16,6 +16,7 @@ namespace _20260331
         // Geometryのキャッシュを持つことで余計な更新処理を省くことができる、
         // けど、更新のタイミングを制御する必要が出てくる
         private Geometry? _cachedGeometry;
+        public Rect MyGeometryBounds;
 
         #region テスト中依存関係プロパティ
 
@@ -40,13 +41,13 @@ namespace _20260331
         #endregion テスト中依存関係プロパティ
         #region 依存関係プロパティ
 
-        public Rect MyGeometryBounds
-        {
-            get { return (Rect)GetValue(MyGeometryBoundsProperty); }
-            set { SetValue(MyGeometryBoundsProperty, value); }
-        }
-        public static readonly DependencyProperty MyGeometryBoundsProperty =
-            DependencyProperty.Register(nameof(MyGeometryBounds), typeof(Rect), typeof(GeoLine), new PropertyMetadata(null));
+        //public Rect MyGeometryBounds
+        //{
+        //    get { return (Rect)GetValue(MyGeometryBoundsProperty); }
+        //    set { SetValue(MyGeometryBoundsProperty, value); }
+        //}
+        //public static readonly DependencyProperty MyGeometryBoundsProperty =
+        //    DependencyProperty.Register(nameof(MyGeometryBounds), typeof(Rect), typeof(GeoLine), new PropertyMetadata(null));
 
         public Pen MyStrokePen
         {
@@ -73,7 +74,7 @@ namespace _20260331
         }
         // AffectsMeasure必須
         public static readonly DependencyProperty MyPointsProperty =
-            DependencyProperty.Register(nameof(MyPoints), typeof(PointCollection), typeof(GeoLine), new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.AffectsMeasure, OnPointCollectionChanged));
+            DependencyProperty.Register(nameof(MyPoints), typeof(PointCollection), typeof(GeoLine), new FrameworkPropertyMetadata(new PointCollection(), FrameworkPropertyMetadataOptions.AffectsMeasure, OnPointCollectionChanged));
 
         private static void OnPointCollectionChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -93,7 +94,6 @@ namespace _20260331
         {
             SetMyBind();
             Loaded += GeoLine_Loaded;
-            
         }
 
         private void MyPoints_Changed(object? sender, EventArgs e)

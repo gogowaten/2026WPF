@@ -16,7 +16,9 @@
                    StrokeLineJoin="{Binding LineJoin}"
                    StrokeMiterLimit="{Binding MiterLimit}"
                    MyIsOffset="{Binding IsOffset}"
-                   MyGeometryBounds="{Binding OriginBounds}"
+                   local:BoundsObserver.Observe="True"
+                   local:BoundsObserver.ObservedWidth="{Binding WidthRender, Mode=OneWayToSource}"
+                   local:BoundsObserver.ObservedHeight="{Binding HeightRender, Mode=OneWayToSource}"
                    />
   </DataTemplate>
 
@@ -30,8 +32,8 @@
     </Setter>
   </Style>
 
-  
-  
+
+
   <Style TargetType="{x:Type local:CustomThumb}">
     <Setter Property="Template">
       <Setter.Value>
@@ -41,9 +43,9 @@
       </Setter.Value>
     </Setter>
   </Style>
-  
-  
-  
+
+
+
   <DataTemplate DataType="{x:Type local:GeoShapeData}">
     <Canvas Width="{Binding ElementName=geoShape, Path=ActualWidth}"
             Height="{Binding ElementName=geoShape, Path=ActualHeight}"

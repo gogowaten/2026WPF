@@ -60,7 +60,8 @@
       <TextBlock Text="{Binding Width, StringFormat='Width = {0:0}'}"/>
       <TextBlock Text="{Binding StrokeThickness, StringFormat='StrokeThickness = {0:0}'}"/>
       <Slider Value="{Binding StrokeThickness}" Minimum="1" Maximum="50"/>
-      
+      <TextBlock Text="{Binding WidthRender, StringFormat='WidthRender = {0:0}'}"/>
+
       <StackPanel Grid.Column="1" DataContext="{Binding ElementName=MyThumb}">
         <Button Content="ChangeOffset" Click="Button_Click_2"/>
         <TextBlock Text="{Binding ThumbData}"/>
