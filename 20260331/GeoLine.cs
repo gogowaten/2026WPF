@@ -17,6 +17,7 @@ namespace _20260331
         // けど、更新のタイミングを制御する必要が出てくる
         private Geometry? _cachedGeometry;
         public Rect MyGeometryBounds;
+        private GeoLineData? MyData;
 
         #region テスト中依存関係プロパティ
 
@@ -94,6 +95,12 @@ namespace _20260331
         {
             SetMyBind();
             Loaded += GeoLine_Loaded;
+            SizeChanged += GeoLine_SizeChanged;
+        }
+
+        private void GeoLine_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            UpdateMyGeomrtryBounds();
         }
 
         private void MyPoints_Changed(object? sender, EventArgs e)
@@ -103,10 +110,23 @@ namespace _20260331
             InvalidateVisual();
         }
 
+        private void MyPoints_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+        {
+            _cachedGeometry = null;
+            UpdateMyGeomrtryBounds();
+            InvalidateVisual();
+        }
+
         private void GeoLine_Loaded(object sender, RoutedEventArgs e)
         {
             MyPoints.Changed += MyPoints_Changed;
+            //MyPoints.CollectionChanged += MyPoints_CollectionChanged;
             //UpdateMyGeomrtryBounds();
+            if(DataContext is GeoLineData data)
+            {
+                MyPoints = data.Points;
+                MyData = data;
+            }
         }
 
         private void SetMyBind()
@@ -176,8 +196,13 @@ namespace _20260331
 
         public void UpdateMyGeomrtryBounds()
         {
-
             MyGeometryBounds = DefiningGeometry.GetRenderBounds(MyStrokePen);
+            if(MyGeometryBounds == Rect.Empty)
+            {
+                MyGeometryBounds = new Rect();
+            }
+            MyData?.WidthRender=MyGeometryBounds.Width;
+            MyData?.HeightRender=MyGeometryBounds.Height;
         }
     }
 
