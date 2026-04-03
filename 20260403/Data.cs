@@ -87,6 +87,7 @@ namespace _20260403
     //}
     public abstract partial class ShapeData : Data
     {
+        //[ObservableProperty] private Size _actualSize;
         [ObservableProperty] private double _xRender;
         [ObservableProperty] private double _yRender;
         [ObservableProperty] private double _widthRender;

@@ -7,8 +7,9 @@
  
   
   
-  <DataTemplate DataType="{x:Type local:GeoLineData}">
+  <!--<DataTemplate DataType="{x:Type local:GeoLineData}">
     <local:GeoLine x:Name="GeoLine"
+                   
                    MyPoints="{Binding Points}"
                    Stroke="{Binding Stroke}"
                    StrokeThickness="{Binding StrokeThickness}"
@@ -19,9 +20,46 @@
                    StrokeMiterLimit="{Binding MiterLimit}"
                    MyIsOffset="{Binding IsOffset}"
                    />
-  </DataTemplate>
+  </DataTemplate>-->
   
   <Style TargetType="{x:Type local:CustomThumb}">
+    <Setter Property="MyData" Value="{Binding}"/>
+    <Setter Property="Canvas.Left" Value="{Binding X}"/>
+    <Setter Property="Canvas.Top" Value="{Binding Y}"/>
+    <Setter Property="IsCanDragMove" Value="{Binding IsCanDragMove}"/>
+    <Setter Property="Template">
+      <Setter.Value>
+        <ControlTemplate TargetType="{x:Type local:CustomThumb}">
+          <Grid>
+            <local:GeoLine x:Name="GeoLine"
+                   
+                   MyPoints="{Binding Points}"
+                   Stroke="{Binding Stroke}"
+                   StrokeThickness="{Binding StrokeThickness}"
+                   Fill="{Binding Fill}"
+                   StrokeEndLineCap="{Binding EndLineCap}"
+                   StrokeStartLineCap="{Binding StartLineCap}"
+                   StrokeLineJoin="{Binding LineJoin}"
+                   StrokeMiterLimit="{Binding MiterLimit}"
+                   MyIsOffset="{Binding IsOffset}"
+                   />
+
+            <Border BorderBrush="Orange" BorderThickness="1"
+                    Width="{Binding ElementName=GeoLine, Path=ActualWidth}"
+                    Height="{Binding ElementName=GeoLine, Path=ActualHeight}"/>
+            
+            <Border BorderBrush="Blue" BorderThickness="1"
+                    Width="{Binding ElementName=GeoLine, Path=MyActualSize.Width}"
+                    Height="{Binding ElementName=GeoLine, Path=MyActualSize.Height}"/>
+            
+          </Grid>
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+  </Style>
+  
+  
+  <!--<Style TargetType="{x:Type local:CustomThumb}">
     <Setter Property="MyData" Value="{Binding}"/>
     <Setter Property="Canvas.Left" Value="{Binding X}"/>
     <Setter Property="Canvas.Top" Value="{Binding Y}"/>
@@ -34,15 +72,12 @@
             <Border BorderBrush="Orange" BorderThickness="1"
                     Width="{Binding ElementName=content, Path=ActualWidth}"
                     Height="{Binding ElementName=content, Path=ActualHeight}"/>
-            
-            <Border BorderBrush="Blue" BorderThickness="1"
-                    Width="{Binding Path=WidthRender}"
-                    Height="{Binding Path=HeightRender}"/>
-            
           </Grid>
         </ControlTemplate>
       </Setter.Value>
     </Setter>
-  </Style>
+  </Style>-->
+  
+  
 
 </ResourceDictionary>

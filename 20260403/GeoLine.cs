@@ -17,7 +17,7 @@ namespace _20260403
     public class GeoLine : Shape
     {
         private Geometry? _cachedGeometry;
-        public Rect MyGeometryBounds { get; set; }
+        //public Rect MyGeometryBounds { get; set; }
 
         protected override Geometry DefiningGeometry
         {
@@ -41,6 +41,22 @@ namespace _20260403
         }
 
         #region 依存関係プロパティ
+
+        public Size MyActualSize
+        {
+            get { return (Size)GetValue(MyActualSizeProperty); }
+            set { SetValue(MyActualSizeProperty, value); }
+        }
+        public static readonly DependencyProperty MyActualSizeProperty =
+            DependencyProperty.Register(nameof(MyActualSize), typeof(Size), typeof(GeoLine), new PropertyMetadata(null));
+
+        public Rect MyGeometryBounds
+        {
+            get { return (Rect)GetValue(MyGeometryBoundsProperty); }
+            set { SetValue(MyGeometryBoundsProperty, value); }
+        }
+        public static readonly DependencyProperty MyGeometryBoundsProperty =
+            DependencyProperty.Register(nameof(MyGeometryBounds), typeof(Rect), typeof(GeoLine), new PropertyMetadata(null));
 
         public bool MyIsOffset
         {
@@ -72,7 +88,7 @@ namespace _20260403
             {
                 // オフセット表示のときにBoundsも変更すると、常に左上が(0,0)になるけど、
                 // 見た目上の頂点座標が変化してしまうことになるので、一長一短
-                //geo.MyGeometryBounds = geo.DefiningGeometry.GetRenderBounds(geo.MyStrokePen);
+                geo.MyGeometryBounds = geo.DefiningGeometry.GetRenderBounds(geo.MyStrokePen);
 
             }
         }
@@ -157,15 +173,36 @@ namespace _20260403
         public GeoLine()
         {
             SetMyBind();
+            Loaded += GeoLine_Loaded;
         }
 
+        private void GeoLine_Loaded(object sender, RoutedEventArgs e)
+        {
+            if (DataContext is GeoLineData geo)
+            {
+                var neko = geo;
+            }
+        }
+
+        private void SetMyBind()
+        {
+            MultiBinding mb = new() { Converter = new ConvStrokePen() };
+            mb.Bindings.Add(new Binding() { Source = this, Path = new PropertyPath(StrokeThicknessProperty) });
+            mb.Bindings.Add(new Binding() { Source = this, Path = new PropertyPath(StrokeMiterLimitProperty) });
+            mb.Bindings.Add(new Binding() { Source = this, Path = new PropertyPath(StrokeEndLineCapProperty) });
+            mb.Bindings.Add(new Binding() { Source = this, Path = new PropertyPath(StrokeStartLineCapProperty) });
+            mb.Bindings.Add(new Binding() { Source = this, Path = new PropertyPath(StrokeLineJoinProperty) });
+            SetBinding(MyStrokePenProperty, mb);
+
+            SetBinding(MyActualSizeProperty, new Binding() { Source = this, Path = new PropertyPath(MyGeometryBoundsProperty), Converter = new ConvBoundsSize() });
+        }
+
+        #endregion コンストラクタ
+
+        #region オーバーライド
 
         protected override void OnRender(DrawingContext drawingContext)
         {
-            var neko = this.ActualWidth;
-            var inu = this.Width;
-            var uma = this.DesiredSize;
-
             // オフセット表示の場合はTranslateTransformで変形したものを描画
             if (MyIsOffset)
             {
@@ -173,8 +210,7 @@ namespace _20260403
             }
             base.OnRender(drawingContext);
         }
-
-        #endregion コンストラクタ
+        #endregion オーバーライド
 
         #region privateメソッド
         private static PathGeometry MakeLineGeometry(IEnumerable<Point> pc)
@@ -188,22 +224,35 @@ namespace _20260403
             return geo;
         }
 
-        private void SetMyBind()
-        {
-            MultiBinding mb = new() { Converter = new ConvStrokePen() };
-            mb.Bindings.Add(new Binding() { Source = this, Path = new PropertyPath(StrokeThicknessProperty) });
-            mb.Bindings.Add(new Binding() { Source = this, Path = new PropertyPath(StrokeMiterLimitProperty) });
-            mb.Bindings.Add(new Binding() { Source = this, Path = new PropertyPath(StrokeEndLineCapProperty) });
-            mb.Bindings.Add(new Binding() { Source = this, Path = new PropertyPath(StrokeStartLineCapProperty) });
-            mb.Bindings.Add(new Binding() { Source = this, Path = new PropertyPath(StrokeLineJoinProperty) });
-            SetBinding(MyStrokePenProperty, mb);
-        }
+
         #endregion privateメソッド
 
         #region publicメソッド
 
 
         #endregion publicメソッド
+    }
+
+
+
+
+    public class ConvBoundsSize : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            var r = (Rect)value;
+            if (r == Rect.Empty) { return new Size(); }
+
+            double w = r.Right; if (r.Left < 0) { w -= r.Left; }
+            double h = r.Bottom; if (r.Top < 0) { h -= r.Top; }
+            Size s = new(w, h);
+            return s;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
     }
 
     public class ConvStrokePen : IMultiValueConverter

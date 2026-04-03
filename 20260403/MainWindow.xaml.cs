@@ -45,7 +45,7 @@ namespace _20260403
         {
             if (MyData.Points.Count > 0)
             {
-                MyData.Points[0] = new Point(10, 10);
+                MyData.Points[0] = new Point(-10, 10);
             }
         }
 
