@@ -119,11 +119,14 @@ namespace _20260331
 
         private void GeoLine_Loaded(object sender, RoutedEventArgs e)
         {
+            
             MyPoints.Changed += MyPoints_Changed;
             //MyPoints.CollectionChanged += MyPoints_CollectionChanged;
             //UpdateMyGeomrtryBounds();
             if(DataContext is GeoLineData data)
             {
+                // PointCollection型のバインドは普通のバインドだといまいちで
+                // 直接代入したほうが期待通りの動作になることが多いので、ここでそうしている
                 MyPoints = data.Points;
                 MyData = data;
             }
