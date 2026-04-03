@@ -92,21 +92,10 @@ namespace _20260403
             if(DataContext is GeoLineData data)
             {
                 MyData = data;
-                ////data.Points.Changed += Points_Changed;
-                //data.Points.CollectionChanged += Points_CollectionChanged;
             }
         }
 
-        private void Points_Changed(object? sender, EventArgs e)
-        {
-            // ここは来る
-        }
-
-        //private void Points_CollectionChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
-        //{
-        //    // ここは来る
-        //    Debug.WriteLine("customThumb.CollectionChanged");
-        //}
+      
 
 
 

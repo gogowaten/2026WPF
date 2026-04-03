@@ -16,16 +16,9 @@ namespace _20260403
         public GeoLineData()
         {
             Name = "FromGeoLineData";
-            //Points.Changed += Points_Changed;
-            //Points.CollectionChanged += Points_CollectionChanged;
-            
         }
 
-        private void Points_CollectionChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
-        {
-            // 来ない
-        }
-
+        
         private void Points_Changed(object? sender, EventArgs e)
         {
             throw new NotImplementedException();
@@ -38,15 +31,8 @@ namespace _20260403
         [ObservableProperty] private double _miterLimit = 1.0;
         [ObservableProperty] private PenLineJoin _lineJoin;
         [ObservableProperty] private bool _isOffset;
+        [ObservableProperty] private bool _isCanDragMove;
 
-        //partial void OnPointsChanged(ObservableCollection<Point> value)
-        //{
-        //    // 来ない
-        //}
-        //partial void OnPointsChanged(PointCollection value)
-        //{
-        //    // 来ない
-        //}
     }
 
 

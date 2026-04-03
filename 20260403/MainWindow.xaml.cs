@@ -67,5 +67,15 @@ namespace _20260403
             var elementDC = MyElement.DataContext;
             //var elementMyData = MyElement.MyData;
         }
+
+        private void Button_Click_PointsClear(object sender, RoutedEventArgs e)
+        {
+            MyData.Points.Clear();
+        }
+
+        private void Button_Click_ChangeCanDragMove(object sender, RoutedEventArgs e)
+        {
+            MyData.IsCanDragMove = !MyData.IsCanDragMove;
+        }
     }
 }

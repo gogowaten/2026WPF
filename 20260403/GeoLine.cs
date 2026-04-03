@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Globalization;
 using System.Runtime.CompilerServices;
@@ -62,7 +63,19 @@ namespace _20260403
             set { SetValue(MyStrokePenProperty, value); }
         }
         public static readonly DependencyProperty MyStrokePenProperty =
-            DependencyProperty.Register(nameof(MyStrokePen), typeof(Pen), typeof(GeoLine), new PropertyMetadata(null, OnPointCollectionChanged));
+            DependencyProperty.Register(nameof(MyStrokePen), typeof(Pen), typeof(GeoLine), new PropertyMetadata(null, OnMyStrokePenChanged));
+
+        private static void OnMyStrokePenChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            // pen変更時の処理
+            if (d is GeoLine geo)
+            {
+                // オフセット表示のときにBoundsも変更すると、常に左上が(0,0)になるけど、
+                // 見た目上の頂点座標が変化してしまうことになるので、一長一短
+                //geo.MyGeometryBounds = geo.DefiningGeometry.GetRenderBounds(geo.MyStrokePen);
+
+            }
+        }
 
 
         //public ObservableCollection<Point> MyPoints
@@ -74,6 +87,13 @@ namespace _20260403
         //public static readonly DependencyProperty MyPointsProperty =
         //    DependencyProperty.Register(nameof(MyPoints), typeof(ObservableCollection<Point>), typeof(GeoLine), new FrameworkPropertyMetadata(null, OnPointCollectionChanged));
 
+        /// <summary>
+        /// Pointsの型はPointCollectionでもObservableCollectionのどちらでも同じ結果で
+        /// ObservableでPointの追加をしても通知はされないのは、依存関係プロパティでのCollectionは
+        /// Collection自体が変化したときだけ通知される仕様、なのでPoint追加で通知したいときは
+        /// コールバックの中からCollectionのChangedイベントを購読するようにすればいい
+        /// コールバックはPoint追加では呼ばれないけど、起動時には必ず呼ばれるから
+        /// </summary>
         public PointCollection MyPoints
         {
             get { return (PointCollection)GetValue(MyPointsProperty); }
@@ -87,10 +107,13 @@ namespace _20260403
         {
             if (d is GeoLine geo)
             {
+                // 古いCollectionのイベント購読を解除(メモリリーク防止)
                 if (e.OldValue is PointCollection oldCollection)
                 {
                     oldCollection.Changed -= geo.PointCollection_Changed;
                 }
+
+                // 新しいCollectionのイベントを購読を開始
                 if (e.NewValue is PointCollection newCollection)
                 {
                     newCollection.Changed += geo.PointCollection_Changed;
@@ -121,6 +144,7 @@ namespace _20260403
 
         private void Points_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
         {
+
             // キャッシュクリアしてから再描画
             _cachedGeometry = null;
             //InvalidateMeasure();
@@ -133,37 +157,15 @@ namespace _20260403
         public GeoLine()
         {
             SetMyBind();
-            //Loaded += GeoLine_Loaded;
-            //SizeChanged += GeoLine_SizeChanged;
-            //
-            Loaded += GeoLine_Loaded;
         }
 
-        private void GeoLine_Loaded(object sender, RoutedEventArgs e)
-        {
-            //MyPoints.CollectionChanged += MyPoints_CollectionChanged;
-        }
 
-        //private void MyPoints_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
-        //{
-        //    Debug.WriteLine("GeoLineCollectionChanged");
-
-        //}
-
-        //private void MyPoints_Changed(object? sender, EventArgs e)
-        //{
-
-        //}
-
-        //private void GeoLine_Loaded(object sender, RoutedEventArgs e)
-        //{
-        //    if (DataContext is GeoLine geoLine)
-        //    {
-        //        MyPoints = geoLine.MyPoints;
-        //    }
-        //}
         protected override void OnRender(DrawingContext drawingContext)
         {
+            var neko = this.ActualWidth;
+            var inu = this.Width;
+            var uma = this.DesiredSize;
+
             // オフセット表示の場合はTranslateTransformで変形したものを描画
             if (MyIsOffset)
             {
@@ -175,7 +177,7 @@ namespace _20260403
         #endregion コンストラクタ
 
         #region privateメソッド
-        private PathGeometry MakeLineGeometry(IEnumerable<Point> pc)
+        private static PathGeometry MakeLineGeometry(IEnumerable<Point> pc)
         {
             if (!pc.Any()) { return new PathGeometry(); }
 
@@ -199,10 +201,8 @@ namespace _20260403
         #endregion privateメソッド
 
         #region publicメソッド
-        public void ChangeOffset()
-        {
 
-        }
+
         #endregion publicメソッド
     }
 
