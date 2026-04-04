@@ -18,7 +18,7 @@
       
       <local:GeoCanvas x:Name="MyElement" DataContext="{Binding MyData}"/>
     </Canvas>
-
+    
     <StackPanel Grid.Column="1">
       <Button Content="Change Offset" Click="Button_Click_ChangeOffset"/>
       <Button Content="Change CanDragMove" Click="Button_Click_ChangeCanDragMove"/>
@@ -29,11 +29,19 @@
       <Button Content="PointsClear" Click="Button_Click_PointsClear"/>
       
       <StackPanel DataContext="{Binding MyData}">
-        <TextBlock Text="{Binding IsOffset}"/>
+        <TextBlock Text="{Binding IsOffset, StringFormat='IsOffset = {0}'}"/>
+        <TextBlock Text="{Binding IsCanDragMove, StringFormat='IsCanDragMove = {0}'}"/>
         <TextBlock Text="{Binding StrokeThickness, StringFormat='StrokeThickness = {0:0}'}"/>
         <Slider Value="{Binding StrokeThickness}" Minimum="1" Maximum="50"/>
-        <TextBlock Text="{Binding IsCanDragMove, StringFormat='IsCanDragMove = {0}'}"/>
+        <TextBlock Text="{Binding X, StringFormat='X = {0: 0.0}'}"/>
+        <TextBlock Text="{Binding Width, StringFormat='Width = {0: 0.0}'}"/>
+        <TextBlock Text="{Binding WidthRender, StringFormat='WidthRender = {0: 0.0}'}"/>
         <TextBlock Text="{Binding ActualSize, StringFormat='ActualSize = {0: 0.0}'}"/>
+        <TextBlock Text="{Binding MyActualWidth, StringFormat='MyActualWidth = {0: 0.0}'}"/>
+        <TextBlock Text="{Binding BoundsLeft, StringFormat='BoundsLeft = {0: 0.0}'}"/>
+        <!--<TextBlock Text="{Binding (local:ShapeData.MyAAA), StringFormat='MyActualWidth = {0: 0.0}'}"/>-->
+        
+        <!--<TextBlock local:ShapeData.MyAAA="2"/>-->
       </StackPanel>
       
       <StackPanel DataContext="{Binding ElementName=MyElement, Path=MyGeoData}">

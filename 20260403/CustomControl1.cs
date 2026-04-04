@@ -89,13 +89,13 @@ namespace _20260403
 
         private void CustomThumb_Loaded(object sender, RoutedEventArgs e)
         {
-            if(DataContext is GeoLineData data)
+            if (DataContext is GeoLineData data)
             {
                 MyData = data;
             }
         }
 
-      
+
 
 
 
@@ -127,6 +127,7 @@ namespace _20260403
             {
                 Canvas.SetLeft(thumb, Canvas.GetLeft(thumb) + e.HorizontalChange);
                 Canvas.SetTop(thumb, Canvas.GetTop(thumb) + e.VerticalChange);
+                e.Handled = true;
             }
         }
         #endregion ドラッグ移動

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CommunityToolkit.Mvvm.Input;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
@@ -8,6 +9,7 @@ using System.Globalization;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Media;
 using System.Windows.Shapes;
@@ -29,18 +31,50 @@ namespace _20260403
                 if (MyPoints is null || MyPoints.Count < 2)
                 {
                     _cachedGeometry = null;
-                    MyGeometryBounds = new Rect();
+
+                    //MyGeometryBounds = new Rect();
+                    //MyActualSize = new Size();
+                    //MyActualWidth = 0.0;
+                    UpdateMySize();
+
                     return Geometry.Empty;
                 }
 
                 PathGeometry geo = MakeLineGeometry(MyPoints);
                 _cachedGeometry = geo;
-                MyGeometryBounds = geo.GetRenderBounds(MyStrokePen);
+                //MyGeometryBounds = geo.GetRenderBounds(MyStrokePen);
+                //MyActualWidth = MyGeometryBounds.Width;
+                //MyActualSize = MyGeometryBounds.Size;
+                UpdateMySize();
                 return geo;
             }
         }
 
         #region 依存関係プロパティ
+
+        public GeoLineData MyData
+        {
+            get { return (GeoLineData)GetValue(MyDataProperty); }
+            set { SetValue(MyDataProperty, value); }
+        }
+        public static readonly DependencyProperty MyDataProperty =
+            DependencyProperty.Register(nameof(MyData), typeof(GeoLineData), typeof(GeoLine), new PropertyMetadata(null));
+
+        //public double MyActualHeight
+        //{
+        //    get { return (double)GetValue(MyActualHeightProperty); }
+        //    set { SetValue(MyActualHeightProperty, value); }
+        //}
+        //public static readonly DependencyProperty MyActualHeightProperty =
+        //    DependencyProperty.Register(nameof(MyActualHeight), typeof(double), typeof(GeoLine), new PropertyMetadata(0.0));
+
+        //public double MyActualWidth
+        //{
+        //    get { return (double)GetValue(MyActualWidthProperty); }
+        //    set { SetValue(MyActualWidthProperty, value); }
+        //}
+        //public static readonly DependencyProperty MyActualWidthProperty =
+        //    DependencyProperty.Register(nameof(MyActualWidth), typeof(double), typeof(GeoLine), new PropertyMetadata(0.0));
 
         public Size MyActualSize
         {
@@ -86,9 +120,28 @@ namespace _20260403
             // pen変更時の処理
             if (d is GeoLine geo)
             {
+
                 // オフセット表示のときにBoundsも変更すると、常に左上が(0,0)になるけど、
                 // 見た目上の頂点座標が変化してしまうことになるので、一長一短
                 geo.MyGeometryBounds = geo.DefiningGeometry.GetRenderBounds(geo.MyStrokePen);
+                
+                geo.UpdateMySize();
+
+                //if (geo.MyGeometryBounds.IsEmpty)
+                //{
+                //    geo.MyActualWidth = 0;
+                //    geo.MyActualSize = new Size();
+                //    ShapeData.SetMyAAA(geo, 0);
+                //}
+                //else
+                //{
+                //    geo.MyActualWidth = geo.MyGeometryBounds.Width;
+                //    geo.MyActualSize = geo.MyGeometryBounds.Size;
+
+                //    geo.MyData.MyActualWidth = geo.MyActualWidth;
+                //    geo.MyData.MyActualHeight = geo.MyGeometryBounds.Width;
+
+                //}
 
             }
         }
@@ -173,14 +226,15 @@ namespace _20260403
         public GeoLine()
         {
             SetMyBind();
+            MyData = new();
             Loaded += GeoLine_Loaded;
         }
 
         private void GeoLine_Loaded(object sender, RoutedEventArgs e)
         {
-            if (DataContext is GeoLineData geo)
+            if (DataContext is GeoLineData data)
             {
-                var neko = geo;
+                MyData = data;
             }
         }
 
@@ -194,7 +248,9 @@ namespace _20260403
             mb.Bindings.Add(new Binding() { Source = this, Path = new PropertyPath(StrokeLineJoinProperty) });
             SetBinding(MyStrokePenProperty, mb);
 
-            SetBinding(MyActualSizeProperty, new Binding() { Source = this, Path = new PropertyPath(MyGeometryBoundsProperty), Converter = new ConvBoundsSize() });
+            //SetBinding(MyActualSizeProperty, new Binding() { Source = this, Path = new PropertyPath(MyGeometryBoundsProperty), Converter = new ConvBoundsSize() });
+
+            //SetBinding(MyActualWidthProperty, new Binding() { Source = this, Path = new PropertyPath(MyGeometryBoundsProperty), Converter = new ConvBoundsWidth() });
         }
 
         #endregion コンストラクタ
@@ -213,6 +269,49 @@ namespace _20260403
         #endregion オーバーライド
 
         #region privateメソッド
+        private void UpdateMySize()
+        {
+            //Rect bounds = DefiningGeometry.GetRenderBounds(MyStrokePen);
+            if(_cachedGeometry is null)
+            {
+                MySizeReset();
+                return;
+            }
+            Rect bounds = _cachedGeometry.GetRenderBounds(MyStrokePen);
+            if (bounds.IsEmpty || _cachedGeometry is null)
+            {
+                MySizeReset();
+                return;
+            }
+
+            if (MyData is null) { return; }
+
+            MyGeometryBounds = bounds;
+            double w = bounds.Width;
+            if (bounds.Left < 0) { w -= bounds.Left; }
+            MyData.MyActualWidth = w;
+            double h = bounds.Height;
+            if (bounds.Top < 0) { h -= bounds.Top; }
+            MyData.MyActualHeight = h;
+
+            MyData.BoundsTop = bounds.Top;
+            MyData.BoundsLeft = bounds.Left;
+        }
+
+        private void MySizeReset()
+        {
+
+            MyGeometryBounds = new();
+            MyActualSize = new();
+            if(MyData is null) { return; }
+
+            MyData.ActualSize = new();
+            MyData.MyActualWidth = 0;
+            MyData.MyActualHeight = 0;
+            MyData.BoundsLeft = 0;
+            MyData.BoundsTop = 0;
+        }
+
         private static PathGeometry MakeLineGeometry(IEnumerable<Point> pc)
         {
             if (!pc.Any()) { return new PathGeometry(); }
@@ -230,30 +329,49 @@ namespace _20260403
         #region publicメソッド
 
 
+        public Size GetBoundsSize()
+        {
+            return MyGeometryBounds.Size;
+        }
         #endregion publicメソッド
     }
 
 
+    //public class ConvBoundsWidth : IValueConverter
+    //{
+    //    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+    //    {
+    //        var r = (Rect)value;
+    //        if (r == Rect.Empty) { return new Size(); }
 
+    //        double w = r.Right; if (r.Left < 0) { w -= r.Left; }
+    //        return w;
+    //    }
 
-    public class ConvBoundsSize : IValueConverter
-    {
-        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            var r = (Rect)value;
-            if (r == Rect.Empty) { return new Size(); }
+    //    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+    //    {
+    //        throw new NotImplementedException();
+    //    }
+    //}
 
-            double w = r.Right; if (r.Left < 0) { w -= r.Left; }
-            double h = r.Bottom; if (r.Top < 0) { h -= r.Top; }
-            Size s = new(w, h);
-            return s;
-        }
+    //public class ConvBoundsSize : IValueConverter
+    //{
+    //    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+    //    {
+    //        var r = (Rect)value;
+    //        if (r == Rect.Empty) { return new Size(); }
 
-        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            throw new NotImplementedException();
-        }
-    }
+    //        double w = r.Right; if (r.Left < 0) { w -= r.Left; }
+    //        double h = r.Bottom; if (r.Top < 0) { h -= r.Top; }
+    //        Size s = new(w, h);
+    //        return s;
+    //    }
+
+    //    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+    //    {
+    //        throw new NotImplementedException();
+    //    }
+    //}
 
     public class ConvStrokePen : IMultiValueConverter
     {

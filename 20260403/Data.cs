@@ -18,7 +18,7 @@ namespace _20260403
             Name = "FromGeoLineData";
         }
 
-        
+
         private void Points_Changed(object? sender, EventArgs e)
         {
             throw new NotImplementedException();
@@ -87,7 +87,11 @@ namespace _20260403
     //}
     public abstract partial class ShapeData : Data
     {
-        //[ObservableProperty] private Size _actualSize;
+        [ObservableProperty] private double _boundsLeft;
+        [ObservableProperty] private double _boundsTop;
+        [ObservableProperty] private double _myActualWidth;
+        [ObservableProperty] private double _myActualHeight;
+        [ObservableProperty] private Size _actualSize;
         [ObservableProperty] private double _xRender;
         [ObservableProperty] private double _yRender;
         [ObservableProperty] private double _widthRender;
@@ -96,6 +100,21 @@ namespace _20260403
         [ObservableProperty] private Brush? _fill;
         [ObservableProperty] private double _strokeThickness = 1.0;
         [ObservableProperty] private Brush? _stroke;
+
+
+        public static readonly DependencyProperty MyAAAProperty =
+            DependencyProperty.RegisterAttached("MyAAA", typeof(double), typeof(ShapeData), new PropertyMetadata(0.0, OnMyAAAChanged));
+        private static void OnMyAAAChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            if (d is GeoLine shape)
+            {
+
+            }
+        }
+        public static double GetMyAAA(DependencyObject obj) => (double)obj.GetValue(MyAAAProperty);
+
+        public static void SetMyAAA(DependencyObject obj, double value) => obj.SetValue(MyAAAProperty, value);
+
     }
     public abstract partial class Data : ObservableObject
     {
