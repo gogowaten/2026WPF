@@ -123,25 +123,9 @@ namespace _20260403
 
                 // オフセット表示のときにBoundsも変更すると、常に左上が(0,0)になるけど、
                 // 見た目上の頂点座標が変化してしまうことになるので、一長一短
-                geo.MyGeometryBounds = geo.DefiningGeometry.GetRenderBounds(geo.MyStrokePen);
+                //geo.MyGeometryBounds = geo.DefiningGeometry.GetRenderBounds(geo.MyStrokePen);
                 
                 geo.UpdateMySize();
-
-                //if (geo.MyGeometryBounds.IsEmpty)
-                //{
-                //    geo.MyActualWidth = 0;
-                //    geo.MyActualSize = new Size();
-                //    ShapeData.SetMyAAA(geo, 0);
-                //}
-                //else
-                //{
-                //    geo.MyActualWidth = geo.MyGeometryBounds.Width;
-                //    geo.MyActualSize = geo.MyGeometryBounds.Size;
-
-                //    geo.MyData.MyActualWidth = geo.MyActualWidth;
-                //    geo.MyData.MyActualHeight = geo.MyGeometryBounds.Width;
-
-                //}
 
             }
         }
@@ -211,14 +195,14 @@ namespace _20260403
             InvalidateVisual();
         }
 
-        private void Points_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
-        {
+        //private void Points_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+        //{
 
-            // キャッシュクリアしてから再描画
-            _cachedGeometry = null;
-            //InvalidateMeasure();
-            InvalidateVisual();
-        }
+        //    // キャッシュクリアしてから再描画
+        //    _cachedGeometry = null;
+        //    //InvalidateMeasure();
+        //    InvalidateVisual();
+        //}
         #endregion 依存関係プロパティ
 
 
@@ -296,6 +280,10 @@ namespace _20260403
 
             MyData.BoundsTop = bounds.Top;
             MyData.BoundsLeft = bounds.Left;
+            MyData.BoundsWidth = bounds.Width;
+            MyData.BoundsHeight = bounds.Height;
+            MyData.ActualHeight = ActualHeight;
+            MyData.ActualWidth = ActualWidth;
         }
 
         private void MySizeReset()
@@ -310,6 +298,10 @@ namespace _20260403
             MyData.MyActualHeight = 0;
             MyData.BoundsLeft = 0;
             MyData.BoundsTop = 0;
+            MyData.BoundsWidth = 0;
+            MyData.BoundsHeight = 0;
+            MyData.ActualHeight = ActualHeight;
+            MyData.ActualWidth = ActualWidth;
         }
 
         private static PathGeometry MakeLineGeometry(IEnumerable<Point> pc)

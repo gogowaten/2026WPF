@@ -89,13 +89,15 @@ namespace _20260403
     {
         [ObservableProperty] private double _boundsLeft;
         [ObservableProperty] private double _boundsTop;
+        [ObservableProperty] private double _boundsWidth;
+        [ObservableProperty] private double _boundsHeight;
         [ObservableProperty] private double _myActualWidth;
         [ObservableProperty] private double _myActualHeight;
+        [ObservableProperty] private double _actualWidth;
+        [ObservableProperty] private double _actualHeight;
         [ObservableProperty] private Size _actualSize;
         [ObservableProperty] private double _xRender;
         [ObservableProperty] private double _yRender;
-        [ObservableProperty] private double _widthRender;
-        [ObservableProperty] private double _heightRender;
 
         [ObservableProperty] private Brush? _fill;
         [ObservableProperty] private double _strokeThickness = 1.0;

@@ -34,9 +34,10 @@ namespace _20260403
                 Stroke = Brushes.Gold,
                 StrokeThickness = 20,
                 Points = [(new Point(50, 70)),
-                        (new Point(250, 150)),
+                        (new Point(100, 150)),
                         (new Point(50, 250)),
                         (new Point(50, 200)),],
+                MiterLimit = 10,
             };
             return data;
         }
@@ -45,7 +46,7 @@ namespace _20260403
         {
             if (MyData.Points.Count > 0)
             {
-                MyData.Points[0] = new Point(-10, 10);
+                MyData.Points[1] = new Point(-10, 10);
             }
         }
 
@@ -56,8 +57,8 @@ namespace _20260403
 
         private void Button_Click_AddPoints(object sender, RoutedEventArgs e)
         {
-            MyData.Points.Add(new Point(250, 150));
-            MyData.Points.Add(new Point(50, 250));
+            MyData.Points.Add(new Point(150, 200));
+            MyData.Points.Add(new Point(30, 100));
             MyData.Points.Add(new Point(50, 200));
         }
 

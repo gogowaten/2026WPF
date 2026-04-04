@@ -39,9 +39,8 @@
         <TextBlock Text="{Binding ActualSize, StringFormat='ActualSize = {0: 0.0}'}"/>
         <TextBlock Text="{Binding MyActualWidth, StringFormat='MyActualWidth = {0: 0.0}'}"/>
         <TextBlock Text="{Binding BoundsLeft, StringFormat='BoundsLeft = {0: 0.0}'}"/>
-        <!--<TextBlock Text="{Binding (local:ShapeData.MyAAA), StringFormat='MyActualWidth = {0: 0.0}'}"/>-->
         
-        <!--<TextBlock local:ShapeData.MyAAA="2"/>-->
+        
       </StackPanel>
       
       <StackPanel DataContext="{Binding ElementName=MyElement, Path=MyGeoData}">

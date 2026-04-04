@@ -27,9 +27,6 @@
     <Setter Property="Canvas.Left" Value="{Binding X}"/>
     <Setter Property="Canvas.Top" Value="{Binding Y}"/>
     <Setter Property="IsCanDragMove" Value="{Binding IsCanDragMove}"/>
-    <Setter Property="Background" Value="Red"/>
-    <Setter Property="Width" Value="100"/>
-    <Setter Property="Height" Value="100"/>
     <Setter Property="Template">
       <Setter.Value>
         <ControlTemplate TargetType="{x:Type local:CustomThumb}">
@@ -47,27 +44,29 @@
                            MyIsOffset="{Binding IsOffset}"
                            MyActualSize="{Binding ActualSize, Mode=OneWayToSource}"
                            
-                           local:SizeObserver.Observe="True"
-                           local:SizeObserver.ObservedWidth="{Binding Width, Mode=OneWayToSource}"
-                           local:SizeObserver.ObservedHeight="{Binding Height, Mode=OneWayToSource}"
-                           local:SizeObserver.ObservedWidthRender="{Binding WidthRender, Mode=OneWayToSource}"
-                           local:SizeObserver.ObservedHeightRender="{Binding HeightRender, Mode=OneWayToSource}"
+                        
                            />
-            
 
-            <Border BorderBrush="Orange" BorderThickness="1"
-                    Width="{Binding ElementName=GeoLine, Path=ActualWidth}"
-                    Height="{Binding ElementName=GeoLine, Path=ActualHeight}"/>
 
-            <Border BorderBrush="Blue" BorderThickness="1"
+            <Border Background="Black" BorderThickness="4" Opacity="0.2"
+                    Width="{Binding Path=ActualWidth}"
+                    Height="{Binding Path=ActualHeight}"/>
+
+            <Border Background="YellowGreen" BorderThickness="3" Opacity="0.2"
                     Width="{Binding  MyActualWidth}"
                     Height="{Binding MyActualHeight}"
                     Canvas.Left="0"
                     Canvas.Top="0"/>
 
-            <Border BorderBrush="YellowGreen" BorderThickness="1"
+            <Border Background="LimeGreen" BorderThickness="2" Opacity="0.2"
                     Width="{Binding MyActualWidth}"
                     Height="{Binding MyActualHeight}"
+                    Canvas.Left="{Binding BoundsLeft}"
+                    Canvas.Top="{Binding BoundsTop}"/>
+
+            <Border Background="Green" BorderThickness="2" Opacity="0.2"
+                    Width="{Binding BoundsWidth}"
+                    Height="{Binding BoundsHeight}"
                     Canvas.Left="{Binding BoundsLeft}"
                     Canvas.Top="{Binding BoundsTop}"/>
 
