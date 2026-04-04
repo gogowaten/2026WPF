@@ -42,33 +42,39 @@
                            StrokeLineJoin="{Binding LineJoin}"
                            StrokeMiterLimit="{Binding MiterLimit}"
                            MyIsOffset="{Binding IsOffset}"
-                           MyActualSize="{Binding ActualSize, Mode=OneWayToSource}"
                            
-                        
                            />
 
 
-            <Border Background="Black" BorderThickness="4" Opacity="0.2"
-                    Width="{Binding Path=ActualWidth}"
-                    Height="{Binding Path=ActualHeight}"/>
+            <Border BorderBrush="Black" BorderThickness="2" Opacity="0.8"
+                    Width="{Binding BoundsWidth}"
+                    Height="{Binding BoundsHeight}"
+                    Canvas.Left="0"
+                    Canvas.Top="0"/>
 
-            <Border Background="YellowGreen" BorderThickness="3" Opacity="0.2"
+            <Border BorderBrush="Cyan" BorderThickness="1" Opacity="0.8"
                     Width="{Binding  MyActualWidth}"
                     Height="{Binding MyActualHeight}"
                     Canvas.Left="0"
                     Canvas.Top="0"/>
 
-            <Border Background="LimeGreen" BorderThickness="2" Opacity="0.2"
+            <Border BorderBrush="DarkViolet" BorderThickness="1" Opacity="0.8"
                     Width="{Binding MyActualWidth}"
                     Height="{Binding MyActualHeight}"
                     Canvas.Left="{Binding BoundsLeft}"
                     Canvas.Top="{Binding BoundsTop}"/>
 
-            <Border Background="Green" BorderThickness="2" Opacity="0.2"
+            <Border BorderBrush="Red" BorderThickness="1" Opacity="0.8"
                     Width="{Binding BoundsWidth}"
                     Height="{Binding BoundsHeight}"
                     Canvas.Left="{Binding BoundsLeft}"
                     Canvas.Top="{Binding BoundsTop}"/>
+            
+            <Border BorderBrush="Yellow" BorderThickness="1" Opacity="0.9"
+                    Width="{Binding GeoWidth}"
+                    Height="{Binding GeoHeight}"
+                    Canvas.Left="{Binding GeoLeft}"
+                    Canvas.Top="{Binding GeoTop}"/>
 
           </Canvas>
         </ControlTemplate>

@@ -29,9 +29,9 @@ namespace _20260403
         {
             GeoLineData data = new()
             {
-                Background = Brushes.DeepSkyBlue,
+                Background = Brushes.Lavender,
                 //Fill = Brushes.DeepSkyBlue;
-                Stroke = Brushes.Gold,
+                Stroke = Brushes.Orchid,
                 StrokeThickness = 20,
                 Points = [(new Point(50, 70)),
                         (new Point(100, 150)),

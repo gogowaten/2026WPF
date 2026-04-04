@@ -95,7 +95,15 @@ namespace _20260403
         [ObservableProperty] private double _myActualHeight;
         [ObservableProperty] private double _actualWidth;
         [ObservableProperty] private double _actualHeight;
-        [ObservableProperty] private Size _actualSize;
+        
+        // 確認用
+        [ObservableProperty] private double _geoLeft;
+        [ObservableProperty] private double _geoTop;
+        [ObservableProperty] private double _geoWidth;
+        [ObservableProperty] private double _geoHeight;
+        // 確認用
+
+        //[ObservableProperty] private Size _actualSize;
         [ObservableProperty] private double _xRender;
         [ObservableProperty] private double _yRender;
 

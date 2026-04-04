@@ -1,4 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.Input;
+using Microsoft.VisualBasic;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -26,25 +27,23 @@ namespace _20260403
             get
             {
                 // キャッシュが在ればそれを返して終わる
-                if (_cachedGeometry is not null) { return _cachedGeometry; }
+                if (_cachedGeometry is not null)
+                {
+                    return _cachedGeometry;
+                }
 
                 if (MyPoints is null || MyPoints.Count < 2)
                 {
                     _cachedGeometry = null;
 
-                    //MyGeometryBounds = new Rect();
-                    //MyActualSize = new Size();
-                    //MyActualWidth = 0.0;
                     UpdateMySize();
+                    //InvalidateVisual();
 
                     return Geometry.Empty;
                 }
 
                 PathGeometry geo = MakeLineGeometry(MyPoints);
                 _cachedGeometry = geo;
-                //MyGeometryBounds = geo.GetRenderBounds(MyStrokePen);
-                //MyActualWidth = MyGeometryBounds.Width;
-                //MyActualSize = MyGeometryBounds.Size;
                 UpdateMySize();
                 return geo;
             }
@@ -60,29 +59,6 @@ namespace _20260403
         public static readonly DependencyProperty MyDataProperty =
             DependencyProperty.Register(nameof(MyData), typeof(GeoLineData), typeof(GeoLine), new PropertyMetadata(null));
 
-        //public double MyActualHeight
-        //{
-        //    get { return (double)GetValue(MyActualHeightProperty); }
-        //    set { SetValue(MyActualHeightProperty, value); }
-        //}
-        //public static readonly DependencyProperty MyActualHeightProperty =
-        //    DependencyProperty.Register(nameof(MyActualHeight), typeof(double), typeof(GeoLine), new PropertyMetadata(0.0));
-
-        //public double MyActualWidth
-        //{
-        //    get { return (double)GetValue(MyActualWidthProperty); }
-        //    set { SetValue(MyActualWidthProperty, value); }
-        //}
-        //public static readonly DependencyProperty MyActualWidthProperty =
-        //    DependencyProperty.Register(nameof(MyActualWidth), typeof(double), typeof(GeoLine), new PropertyMetadata(0.0));
-
-        public Size MyActualSize
-        {
-            get { return (Size)GetValue(MyActualSizeProperty); }
-            set { SetValue(MyActualSizeProperty, value); }
-        }
-        public static readonly DependencyProperty MyActualSizeProperty =
-            DependencyProperty.Register(nameof(MyActualSize), typeof(Size), typeof(GeoLine), new PropertyMetadata(null));
 
         public Rect MyGeometryBounds
         {
@@ -119,14 +95,8 @@ namespace _20260403
         {
             // pen変更時の処理
             if (d is GeoLine geo)
-            {
-
-                // オフセット表示のときにBoundsも変更すると、常に左上が(0,0)になるけど、
-                // 見た目上の頂点座標が変化してしまうことになるので、一長一短
-                //geo.MyGeometryBounds = geo.DefiningGeometry.GetRenderBounds(geo.MyStrokePen);
-                
-                geo.UpdateMySize();
-
+            {  
+                geo.UpdateMySize(); // 必須、描画更新も兼ねている
             }
         }
 
@@ -192,17 +162,14 @@ namespace _20260403
         {
             // キャッシュクリアしてから再描画
             _cachedGeometry = null;
-            InvalidateVisual();
+            InvalidateMeasure(); // ほぼ完璧、図形のActualが更新されないけど、使わないので問題ない
+            //InvalidateVisual(); // これでは不足、サイズが更新されない
+            //InvalidateArrange(); // 全く足りない、図形自体すら再描画されない
+            //UpdateLayout(); // 全く足りない、図形自体すら再描画されない
+            //InvalidateMeasure();
+
         }
 
-        //private void Points_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
-        //{
-
-        //    // キャッシュクリアしてから再描画
-        //    _cachedGeometry = null;
-        //    //InvalidateMeasure();
-        //    InvalidateVisual();
-        //}
         #endregion 依存関係プロパティ
 
 
@@ -219,6 +186,8 @@ namespace _20260403
             if (DataContext is GeoLineData data)
             {
                 MyData = data;
+                UpdateMySize();
+                InvalidateVisual();
             }
         }
 
@@ -232,9 +201,6 @@ namespace _20260403
             mb.Bindings.Add(new Binding() { Source = this, Path = new PropertyPath(StrokeLineJoinProperty) });
             SetBinding(MyStrokePenProperty, mb);
 
-            //SetBinding(MyActualSizeProperty, new Binding() { Source = this, Path = new PropertyPath(MyGeometryBoundsProperty), Converter = new ConvBoundsSize() });
-
-            //SetBinding(MyActualWidthProperty, new Binding() { Source = this, Path = new PropertyPath(MyGeometryBoundsProperty), Converter = new ConvBoundsWidth() });
         }
 
         #endregion コンストラクタ
@@ -248,19 +214,25 @@ namespace _20260403
             {
                 drawingContext.PushTransform(new TranslateTransform(-MyGeometryBounds.Left, -MyGeometryBounds.Top));
             }
+            if (MyData is GeoLineData data && data.Background is not null)
+            {
+                drawingContext.DrawRectangle(data.Background, null, new Rect(MyData.BoundsLeft, MyData.BoundsTop, MyData.BoundsWidth, MyData.BoundsHeight));
+            }
             base.OnRender(drawingContext);
         }
         #endregion オーバーライド
 
+
         #region privateメソッド
         private void UpdateMySize()
         {
-            //Rect bounds = DefiningGeometry.GetRenderBounds(MyStrokePen);
-            if(_cachedGeometry is null)
+
+            if (_cachedGeometry is null)
             {
                 MySizeReset();
                 return;
             }
+
             Rect bounds = _cachedGeometry.GetRenderBounds(MyStrokePen);
             if (bounds.IsEmpty || _cachedGeometry is null)
             {
@@ -284,16 +256,23 @@ namespace _20260403
             MyData.BoundsHeight = bounds.Height;
             MyData.ActualHeight = ActualHeight;
             MyData.ActualWidth = ActualWidth;
+
+            MyData.GeoHeight = _cachedGeometry.Bounds.Height;
+            MyData.GeoLeft=_cachedGeometry.Bounds.Left;
+            MyData.GeoTop = _cachedGeometry.Bounds.Top;
+            MyData.GeoWidth = _cachedGeometry.Bounds.Width;
+
+            InvalidateVisual(); // あったほうが良い、ないとたまに図形が更新されない時がある
         }
 
         private void MySizeReset()
         {
 
             MyGeometryBounds = new();
-            MyActualSize = new();
-            if(MyData is null) { return; }
+            //MyActualSize = new();
+            if (MyData is null) { return; }
 
-            MyData.ActualSize = new();
+            //MyData.ActualSize = new();
             MyData.MyActualWidth = 0;
             MyData.MyActualHeight = 0;
             MyData.BoundsLeft = 0;
@@ -302,6 +281,10 @@ namespace _20260403
             MyData.BoundsHeight = 0;
             MyData.ActualHeight = ActualHeight;
             MyData.ActualWidth = ActualWidth;
+            MyData.GeoWidth = 0;
+            MyData.GeoHeight = 0;
+            MyData.GeoLeft= 0;
+            MyData.GeoTop = 0;
         }
 
         private static PathGeometry MakeLineGeometry(IEnumerable<Point> pc)

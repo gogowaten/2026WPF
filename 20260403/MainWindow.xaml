@@ -12,7 +12,7 @@
       <ColumnDefinition Width="240"/>
     </Grid.ColumnDefinitions>
 
-    <Canvas x:Name="MyCanvas">
+    <Canvas x:Name="MyCanvas" UseLayoutRounding="True">
       
       <!--<local:CustomThumb x:Name="MyElement" DataContext="{Binding MyData}"/>-->
       
@@ -35,8 +35,8 @@
         <Slider Value="{Binding StrokeThickness}" Minimum="1" Maximum="50"/>
         <TextBlock Text="{Binding X, StringFormat='X = {0: 0.0}'}"/>
         <TextBlock Text="{Binding Width, StringFormat='Width = {0: 0.0}'}"/>
-        <TextBlock Text="{Binding WidthRender, StringFormat='WidthRender = {0: 0.0}'}"/>
-        <TextBlock Text="{Binding ActualSize, StringFormat='ActualSize = {0: 0.0}'}"/>
+        <TextBlock Text="{Binding BoundsWidth, StringFormat='BoundsWidth = {0: 0.0}'}"/>
+        <TextBlock Text="{Binding ActualWidth, StringFormat='ActualWidth = {0: 0.0}'}"/>
         <TextBlock Text="{Binding MyActualWidth, StringFormat='MyActualWidth = {0: 0.0}'}"/>
         <TextBlock Text="{Binding BoundsLeft, StringFormat='BoundsLeft = {0: 0.0}'}"/>
         

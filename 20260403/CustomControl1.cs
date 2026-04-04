@@ -16,33 +16,6 @@ using System.Windows.Shapes;
 
 namespace _20260403
 {
-    //public class GeoCanvas : Canvas
-    //{
-    //    static GeoCanvas()
-    //    {
-    //        DefaultStyleKeyProperty.OverrideMetadata(typeof(GeoCanvas), new FrameworkPropertyMetadata(typeof(GeoCanvas)));
-    //    }
-
-
-    //    public GeoLineData MyGeoData
-    //    {
-    //        get { return (GeoLineData)GetValue(MyGeoDataProperty); }
-    //        set { SetValue(MyGeoDataProperty, value); }
-    //    }
-    //    public static readonly DependencyProperty MyGeoDataProperty =
-    //        DependencyProperty.Register(nameof(MyGeoData), typeof(GeoLineData), typeof(GeoCanvas), new PropertyMetadata(null));
-
-
-    //    public GeoCanvas()
-    //    {
-    //        Loaded += GeoCanvas_Loaded;
-    //    }
-
-    //    private void GeoCanvas_Loaded(object sender, RoutedEventArgs e)
-    //    {
-    //        throw new NotImplementedException();
-    //    }
-    //}
 
     [ContentProperty(nameof(MyContent))]
     public class CustomThumb : Thumb
@@ -79,6 +52,27 @@ namespace _20260403
         public static readonly DependencyProperty IsCanDragMoveProperty =
             DependencyProperty.Register(nameof(IsCanDragMove), typeof(bool), typeof(CustomThumb), new FrameworkPropertyMetadata(false, OnMyIsDragMoveChanged));
 
+        // DragDeltaの付け外し
+        private static void OnMyIsDragMoveChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            if (d is CustomThumb thumb)
+            {
+                if (e.NewValue is bool isMove && isMove)
+                {
+                    if (double.IsNaN(Canvas.GetLeft(thumb)))
+                    {
+                        Canvas.SetLeft(thumb, 0);
+                        Canvas.SetTop(thumb, 0);
+                    }
+                    thumb.DragDelta += Thumb_DragDelta;
+                }
+                else
+                {
+                    thumb.DragDelta -= Thumb_DragDelta;
+                }
+            }
+        }
+
         #endregion 依存関係プロパティ
 
         // コンストラクタ
@@ -101,34 +95,16 @@ namespace _20260403
 
         #region ドラッグ移動
 
-        private static void OnMyIsDragMoveChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            if (d is CustomThumb thumb)
-            {
-                if (e.NewValue is bool isMove && isMove)
-                {
-                    if (double.IsNaN(Canvas.GetLeft(thumb)))
-                    {
-                        Canvas.SetLeft(thumb, 0);
-                        Canvas.SetTop(thumb, 0);
-                    }
-                    thumb.DragDelta += Thumb_DragDelta;
-                }
-                else
-                {
-                    thumb.DragDelta -= Thumb_DragDelta;
-                }
-            }
-        }
 
         private static void Thumb_DragDelta(object sender, DragDeltaEventArgs e)
         {
             if (sender is CustomThumb thumb)
             {
-                Canvas.SetLeft(thumb, Canvas.GetLeft(thumb) + e.HorizontalChange);
-                Canvas.SetTop(thumb, Canvas.GetTop(thumb) + e.VerticalChange);
+                thumb.MyData.X += e.HorizontalChange;
+                thumb.MyData.Y += e.VerticalChange;
                 e.Handled = true;
             }
+
         }
         #endregion ドラッグ移動
 
