@@ -17,12 +17,31 @@ namespace _20260311
     public partial class MainWindow : Window
     {
         public RootData MyDataVM { get; set; } = new();
+        public GeoLineData2 MyData { get; set; } = null!;
 
         public MainWindow()
         {
             InitializeComponent();
+            MyData = GeoLineData2();
             this.DataContext = this;
-            
+        }
+
+        private GeoLineData2 GeoLineData2()
+        {
+            GeoLineData2 data = new GeoLineData2()
+            {
+                Background = Brushes.Lavender,
+                //Fill = Brushes.DeepSkyBlue;
+                Stroke = Brushes.Orchid,
+                StrokeThickness = 20,
+                Points = [(new Point(50, 70)),
+                        (new Point(100, 150)),
+                        (new Point(50, 250)),
+                        (new Point(50, 200)),],
+                MiterLimit = 10,
+                Width=200,Height=200,
+            };
+            return data;
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)
@@ -58,6 +77,10 @@ namespace _20260311
             }
         }
 
-        
+        private void Check_Click(object sender, RoutedEventArgs e)
+        {
+            var data = MyData;
+            //var edata = MyTestElement.MyGeoData;
+        }
     }
 }

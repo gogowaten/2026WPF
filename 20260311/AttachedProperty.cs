@@ -12,37 +12,37 @@ namespace _20260311
 {
 
     #region テスト図形用、RenderBoundsを計算して取得
-    public static class RenderBoundsObserverTest
-    {
+    //public static class RenderBoundsObserverTest
+    //{
 
-        public static readonly DependencyProperty ObserveProperty =
-            DependencyProperty.RegisterAttached("Observe", typeof(bool), typeof(RenderBoundsObserverTest), new FrameworkPropertyMetadata(OnObserveChanged));
-        public static bool GetObserve(DependencyObject obj) => (bool)obj.GetValue(ObserveProperty);
-        public static void SetObserve(DependencyObject obj, bool value) => obj.SetValue(ObserveProperty, value);
+    //    public static readonly DependencyProperty ObserveProperty =
+    //        DependencyProperty.RegisterAttached("Observe", typeof(bool), typeof(RenderBoundsObserverTest), new FrameworkPropertyMetadata(OnObserveChanged));
+    //    public static bool GetObserve(DependencyObject obj) => (bool)obj.GetValue(ObserveProperty);
+    //    public static void SetObserve(DependencyObject obj, bool value) => obj.SetValue(ObserveProperty, value);
 
-        private static void OnObserveChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            if(d is Shape shape)
-            {
-                if ((bool)e.NewValue)
-                {
-                    shape.SizeChanged += Shape_SizeChanged;
-                }
-                else
-                {
-                    shape.SizeChanged -= Shape_SizeChanged;
-                }
-            }
-        }
+    //    private static void OnObserveChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    //    {
+    //        if(d is Shape shape)
+    //        {
+    //            if ((bool)e.NewValue)
+    //            {
+    //                shape.SizeChanged += Shape_SizeChanged;
+    //            }
+    //            else
+    //            {
+    //                shape.SizeChanged -= Shape_SizeChanged;
+    //            }
+    //        }
+    //    }
 
-        private static void Shape_SizeChanged(object sender, SizeChangedEventArgs e)
-        {
-            if(sender is  GeoLine geoLine)
-            {
-                geoLine.UpdateRenderBounds();
-            }
-        }
-    }
+    //    private static void Shape_SizeChanged(object sender, SizeChangedEventArgs e)
+    //    {
+    //        if(sender is  GeoLine geoLine)
+    //        {
+    //            geoLine.UpdateRenderBounds();
+    //        }
+    //    }
+    //}
     #endregion テスト図形用、RenderBoundsを計算して取得
 
 

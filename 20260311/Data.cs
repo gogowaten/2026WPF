@@ -84,6 +84,18 @@ namespace _20260311
             DataList.Add(textBlockData);
             DataList.Add(new PolylineData() { Name = "ボリライン", X = 0, Y = 0, StrokeThickness = 50, Stroke = Brushes.MediumPurple });
             DataList.Add(new GeoShapeData() { Name = "ベジェ曲線", X = 100, Y = 100, Stroke = Brushes.MediumAquamarine, StrokeThickness = 20.0, Points = [new Point(50, 70), new Point(250, 150), new Point(50, 250), new Point(50, 200), new Point(50, 150), new Point(150, 100), new Point(250, 250),], StrokeEndLineCap = PenLineCap.Round , Background = Brushes.Gray});
+            DataList.Add(new GeoLineData2()
+            {
+                Background = Brushes.Lavender,
+                //Fill = Brushes.DeepSkyBlue;
+                Stroke = Brushes.Orchid,
+                StrokeThickness = 20,
+                Points = [(new Point(50, 70)),
+                        (new Point(100, 150)),
+                        (new Point(50, 250)),
+                        (new Point(50, 200)),],
+                MiterLimit = 10,
+            });
 
 
 
@@ -814,6 +826,46 @@ namespace _20260311
     }
 
     #region 図形
+
+    public partial class GeoLineData2 : GeoShapeData2
+    {
+
+        [ObservableProperty] private PenLineCap _endLineCap;
+        [ObservableProperty] private PenLineCap _startLineCap;
+        [ObservableProperty] private double _miterLimit = 1.0;
+        [ObservableProperty] private PenLineJoin _lineJoin;
+        [ObservableProperty] private bool _isOffset;
+        [ObservableProperty] private bool _isCanDragMove;
+
+        public GeoLineData2() { Name = "FromGeoLineData2"; }
+    }
+
+    public abstract partial class GeoShapeData2 : ShapeData
+    {
+        [ObservableProperty] private PointCollection _points = [];
+
+        // Geometry.GetRenderBoundsより
+        [ObservableProperty] private double _boundsLeft;
+        [ObservableProperty] private double _boundsTop;
+        [ObservableProperty] private double _boundsWidth;
+        [ObservableProperty] private double _boundsHeight;
+
+        // 見た目上＋Actualの最大値
+        [ObservableProperty] private double _myActualWidth;
+        [ObservableProperty] private double _myActualHeight;
+
+        // 確認用
+        [ObservableProperty] private double _actualWidth;
+        [ObservableProperty] private double _actualHeight;
+        [ObservableProperty] private double _geoLeft;
+        [ObservableProperty] private double _geoTop;
+        [ObservableProperty] private double _geoWidth;
+        [ObservableProperty] private double _geoHeight;
+        // 確認用
+
+    }
+
+
     public partial class GeoShapeData : ShapeData
     {
         [ObservableProperty] private PointCollection _points = [];
@@ -839,15 +891,15 @@ namespace _20260311
         }
     }
 
-    //public partial class GeoLineData : ShapeData
-    //{
-    //    [ObservableProperty] private PointCollection _points = [];
-    //    [ObservableProperty] private PenLineCap _strokeEndLineCap = PenLineCap.Flat;
-    //    [ObservableProperty] private PenLineCap _strokeStartLineCap = PenLineCap.Flat;
-    //    [ObservableProperty] private PenLineJoin _strokeLineJoin = PenLineJoin.Miter;
-    //    [ObservableProperty] private double _strokeMiterLimit =1.0;
+    public partial class GeoLineData : ShapeData
+    {
+        [ObservableProperty] private PointCollection _points = [];
+        [ObservableProperty] private PenLineCap _strokeEndLineCap = PenLineCap.Flat;
+        [ObservableProperty] private PenLineCap _strokeStartLineCap = PenLineCap.Flat;
+        [ObservableProperty] private PenLineJoin _strokeLineJoin = PenLineJoin.Miter;
+        [ObservableProperty] private double _strokeMiterLimit = 1.0;
 
-    //}
+    }
 
     public partial class PolylineData : ShapeData
     {

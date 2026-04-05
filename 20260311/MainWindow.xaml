@@ -27,9 +27,12 @@
     <!--<local:GeoLine x:Name="MyLine" Stroke="DeepSkyBlue" StrokeThickness="30"
               Points="50,70 250,150 50,250 50,200 50,150 150,100 250,250"
               StrokeEndLineCap="Triangle"/>-->
+    
+    <!--<local:GeoCanvas x:Name="MyTestElement" MyGeoData="{Binding MyData}"/>-->
+    
 
     <StackPanel Grid.Column="1" DataContext="{Binding MyDataVM}">
-      
+      <Button x:Name="Check" Content="Check" Click="Check_Click"/>
       <TextBlock Text="{Binding CurrentItem.FontSize, StringFormat='FontSize = {0:0.0}'}"/>
       <Slider Value="{Binding CurrentItem.FontSize}" Minimum="10" Maximum="100"/>
       <Slider Value="{Binding CurrentItem.StrokeThickness}" Minimum="10" Maximum="100"/>

@@ -18,7 +18,100 @@ using System.Windows.Shapes;
 namespace _20260311
 {
 
+    [ContentProperty(nameof(MyContent))]
+    public class CustomThumbForInternal : Thumb
+    {
+        static CustomThumbForInternal()
+        {
+            DefaultStyleKeyProperty.OverrideMetadata(typeof(CustomThumbForInternal), new FrameworkPropertyMetadata(typeof(CustomThumbForInternal)));
+        }
 
+        #region 依存関係プロパティ
+
+        public Data MyData
+        {
+            get { return (Data)GetValue(MyDataProperty); }
+            set { SetValue(MyDataProperty, value); }
+        }
+        public static readonly DependencyProperty MyDataProperty =
+            DependencyProperty.Register(nameof(MyData), typeof(Data), typeof(CustomThumbForInternal), new PropertyMetadata(null));
+
+        public FrameworkElement MyContent
+        {
+            get { return (FrameworkElement)GetValue(MyContentProperty); }
+            set { SetValue(MyContentProperty, value); }
+        }
+        public static readonly DependencyProperty MyContentProperty =
+            DependencyProperty.Register(nameof(MyContent), typeof(FrameworkElement), typeof(CustomThumbForInternal), new PropertyMetadata(null));
+
+
+        public bool IsCanDragMove
+        {
+            get { return (bool)GetValue(IsCanDragMoveProperty); }
+            set { SetValue(IsCanDragMoveProperty, value); }
+        }
+        public static readonly DependencyProperty IsCanDragMoveProperty =
+            DependencyProperty.Register(nameof(IsCanDragMove), typeof(bool), typeof(CustomThumbForInternal), new FrameworkPropertyMetadata(false, OnMyIsDragMoveChanged));
+
+        // DragDeltaの付け外し
+        private static void OnMyIsDragMoveChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            if (d is CustomThumbForInternal thumb)
+            {
+                if (e.NewValue is bool isMove && isMove)
+                {
+                    if (double.IsNaN(Canvas.GetLeft(thumb)))
+                    {
+                        Canvas.SetLeft(thumb, 0);
+                        Canvas.SetTop(thumb, 0);
+                    }
+                    thumb.DragDelta += Thumb_DragDelta;
+                }
+                else
+                {
+                    thumb.DragDelta -= Thumb_DragDelta;
+                }
+            }
+        }
+
+        #endregion 依存関係プロパティ
+
+        // コンストラクタ
+        public CustomThumbForInternal()
+        {
+            Loaded += CustomThumbForInternal_Loaded;
+        }
+
+        private void CustomThumbForInternal_Loaded(object sender, RoutedEventArgs e)
+        {
+            if (DataContext is GeoLineData2 data)
+            {
+                MyData = data;
+            }
+        }
+
+
+
+
+
+        #region ドラッグ移動
+
+
+        private static void Thumb_DragDelta(object sender, DragDeltaEventArgs e)
+        {
+            if (sender is CustomThumbForInternal thumb)
+            {
+                thumb.MyData.X += e.HorizontalChange;
+                thumb.MyData.Y += e.VerticalChange;
+                e.Handled = true;
+            }
+
+        }
+        #endregion ドラッグ移動
+
+
+
+    }
 
 
 
