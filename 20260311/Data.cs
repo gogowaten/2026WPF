@@ -95,6 +95,8 @@ namespace _20260311
                         (new Point(50, 250)),
                         (new Point(50, 200)),],
                 MiterLimit = 10,
+                IsCanDragMove = false,
+                IsOffset = true
             });
 
 
@@ -843,6 +845,8 @@ namespace _20260311
     public abstract partial class GeoShapeData2 : ShapeData
     {
         [ObservableProperty] private PointCollection _points = [];
+        [ObservableProperty] private double _internalX;
+        [ObservableProperty] private double _internalY;
 
         // Geometry.GetRenderBoundsより
         [ObservableProperty] private double _boundsLeft;

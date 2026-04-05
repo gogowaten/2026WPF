@@ -28,13 +28,13 @@ namespace _20260311
 
         #region 依存関係プロパティ
 
-        public Data MyData
+        public GeoShapeData2 MyData
         {
-            get { return (Data)GetValue(MyDataProperty); }
+            get { return (GeoShapeData2)GetValue(MyDataProperty); }
             set { SetValue(MyDataProperty, value); }
         }
         public static readonly DependencyProperty MyDataProperty =
-            DependencyProperty.Register(nameof(MyData), typeof(Data), typeof(CustomThumbForInternal), new PropertyMetadata(null));
+            DependencyProperty.Register(nameof(MyData), typeof(GeoShapeData2), typeof(CustomThumbForInternal), new PropertyMetadata(null));
 
         public FrameworkElement MyContent
         {
@@ -101,8 +101,8 @@ namespace _20260311
         {
             if (sender is CustomThumbForInternal thumb)
             {
-                thumb.MyData.X += e.HorizontalChange;
-                thumb.MyData.Y += e.VerticalChange;
+                thumb.MyData.InternalX += e.HorizontalChange;
+                thumb.MyData.InternalY += e.VerticalChange;
                 e.Handled = true;
             }
 
@@ -112,6 +112,10 @@ namespace _20260311
 
 
     }
+
+
+
+
 
 
 

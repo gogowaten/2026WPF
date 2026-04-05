@@ -5,11 +5,12 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:_20260311" d:DataContext="{d:DesignInstance Type=local:MainWindow}"
         mc:Ignorable="d"
-        Title="MainWindow" Height="667" Width="654">
+        Title="MainWindow" Height="667" Width="854">
 
   <Grid>
     <Grid.ColumnDefinitions>
       <ColumnDefinition/>
+      <ColumnDefinition Width="200"/>
       <ColumnDefinition Width="200"/>
     </Grid.ColumnDefinitions>
 
@@ -29,10 +30,36 @@
               StrokeEndLineCap="Triangle"/>-->
     
     <!--<local:GeoCanvas x:Name="MyTestElement" MyGeoData="{Binding MyData}"/>-->
-    
 
     <StackPanel Grid.Column="1" DataContext="{Binding MyDataVM}">
+      <TextBlock Text="{Binding Width, StringFormat=RootWidth {0}}"/>
+      <TextBlock Text="{Binding ClickedItem.Name, StringFormat=クリック {0}}"/>
+      <TextBlock Text="{Binding ClickedItem.IsSelectable, StringFormat=クリック.選択可能 {0}}"/>
+      <TextBlock Text="{Binding EditingGroup.Name, StringFormat=編集モード {0}}"/>
+      <TextBlock Text="{Binding SelectedItems.Count, StringFormat=選択Item数 {0}}"/>
+      <StackPanel DataContext="{Binding CurrentItem}">
+        <TextBlock Text="{Binding Name, StringFormat=今Name {0}}"/>
+        <TextBlock Text="{Binding IsSelectable, StringFormat=今.選択可能 {0:0.0}}"/>
+        <TextBlock Text="{Binding Width, StringFormat=今.Width {0:0}}"/>
+        <TextBlock Text="{Binding X, StringFormat=X {0}}"/>
+        <TextBlock Text="{Binding Y, StringFormat=Y {0}}"/>
+        <TextBlock Text="{Binding Z, StringFormat=Z {0:0}}"/>
+        <TextBlock Text="{Binding InternalX, StringFormat='InternalX {0: 0}'}"/>
+        <TextBlock Text="{Binding InternalY, StringFormat='InternalY {0: 0}'}"/>
+        <TextBlock Text="{Binding OriginBounds, StringFormat='OriBounds {0: 0}'}"/>
+        <TextBlock Text="{Binding BoundsLeft, StringFormat='BoundsLeft {0: 0}'}"/>
+        <TextBlock Text="{Binding BoundsTop, StringFormat='BoundsTop {0: 0}'}"/>
+        <TextBlock Text="{Binding BoundsWidth, StringFormat='BoundsWidth {0: 0}'}"/>
+        <TextBlock Text="{Binding BoundsHeight, StringFormat='BoundsHeight {0: 0}'}"/>
+        <TextBlock Text="{Binding Points, StringFormat='PC ={0: 0; -0; 0}'}" TextWrapping="Wrap"/>
+
+      </StackPanel>
+    </StackPanel>
+
+    <StackPanel Grid.Column="2" DataContext="{Binding MyDataVM}">
       <Button x:Name="Check" Content="Check" Click="Check_Click"/>
+      <Button Content="geoLineChangeOffset" Click="Button_Click_geoLineChangeOffset"/>
+      <Button Content="geoLineChangeCanMove" Click="Button_Click_geoLineChangeMove"/>
       <TextBlock Text="{Binding CurrentItem.FontSize, StringFormat='FontSize = {0:0.0}'}"/>
       <Slider Value="{Binding CurrentItem.FontSize}" Minimum="10" Maximum="100"/>
       <Slider Value="{Binding CurrentItem.StrokeThickness}" Minimum="10" Maximum="100"/>
@@ -49,15 +76,6 @@
       <Button Content="グループ化" Command="{Binding AddGroupFromSelectedItemsCommand}"/>
       <Button Content="グループ解除" Command="{Binding UnGroupCommand}"/>
       <!--<Button Content="右へ10移動" Command="{Binding ToRightCommand}"/>-->
-      <TextBlock Text="{Binding Width, StringFormat=RootWidth {0}}"/>
-      <TextBlock Text="{Binding CurrentItem.Name, StringFormat=今 {0}}"/>
-      <TextBlock Text="{Binding CurrentItem.IsSelectable, StringFormat=今.選択可能 {0:0.0}}"/>
-      <TextBlock Text="{Binding CurrentItem.Z, StringFormat=今.Z {0:0}}"/>
-      <TextBlock Text="{Binding CurrentItem.Width, StringFormat=今.Width {0:0}}"/>
-      <TextBlock Text="{Binding ClickedItem.Name, StringFormat=クリック {0}}"/>
-      <TextBlock Text="{Binding ClickedItem.IsSelectable, StringFormat=クリック.選択可能 {0}}"/>
-      <TextBlock Text="{Binding EditingGroup.Name, StringFormat=編集モード {0}}"/>
-      <TextBlock Text="{Binding SelectedItems.Count, StringFormat=選択Item数 {0}}"/>
       <Viewbox Height="30">
         <ContentPresenter Content="{Binding CurrentItem}"/>
       </Viewbox>

@@ -40,6 +40,8 @@ namespace _20260311
                         (new Point(50, 200)),],
                 MiterLimit = 10,
                 Width=200,Height=200,
+                //IsOffset = true,
+                //IsCanDragMove = true,
             };
             return data;
         }
@@ -79,8 +81,24 @@ namespace _20260311
 
         private void Check_Click(object sender, RoutedEventArgs e)
         {
-            var data = MyData;
+            var data = MyDataVM;
             //var edata = MyTestElement.MyGeoData;
+        }
+
+        private void Button_Click_geoLineChangeOffset(object sender, RoutedEventArgs e)
+        {
+            if(MyDataVM.CurrentItem is GeoLineData2 data)
+            {
+                data.IsOffset = !data.IsOffset;
+            }
+        }
+
+        private void Button_Click_geoLineChangeMove(object sender, RoutedEventArgs e)
+        {
+            if (MyDataVM.CurrentItem is GeoLineData2 data)
+            {
+                data.IsCanDragMove = !data.IsCanDragMove;
+            }
         }
     }
 }
