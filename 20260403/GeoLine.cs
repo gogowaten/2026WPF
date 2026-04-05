@@ -186,6 +186,7 @@ namespace _20260403
             if (DataContext is GeoLineData data)
             {
                 MyData = data;
+                //MyPoints = data.Points;
                 UpdateMySize();
                 InvalidateVisual();
             }
