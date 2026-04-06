@@ -28,6 +28,8 @@ namespace _20260406
         [ObservableProperty] private PenLineJoin _lineJoin;
         [ObservableProperty] private bool _isOffset;
         [ObservableProperty] private bool _isCanDragMove;
+        //[ObservableProperty] private double _pPWidth;
+        //[ObservableProperty] private double _pPHeight;
 
     }
 

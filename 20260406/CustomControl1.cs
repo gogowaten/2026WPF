@@ -66,14 +66,6 @@ namespace _20260406
 
 
 
-        //public static readonly DependencyProperty IsCanDragMoveProperty =
-        //    DependencyProperty.RegisterAttached("IsCanDragMove", typeof(bool), typeof(GeoThumb), new PropertyMetadata(false, OnMyIsDragMoveChanged));
-
-        //public static bool GetIsCanDragMove(DependencyObject obj) => (bool)obj.GetValue(IsCanDragMoveProperty);
-
-        //public static void SetIsCanDragMove(DependencyObject obj, bool value) => obj.SetValue(IsCanDragMoveProperty, value);
-
-
         // ドラッグ移動切り替え
         public bool IsCanDragMove
         {
@@ -96,13 +88,17 @@ namespace _20260406
                         Canvas.SetTop(thumb, 0);
                     }
                     thumb.DragDelta += Thumb_DragDelta;
+                    thumb.DragCompleted += Thumb_DragCompleted;
                 }
                 else
                 {
                     thumb.DragDelta -= Thumb_DragDelta;
+                    thumb.DragCompleted -= Thumb_DragCompleted;
                 }
             }
         }
+
+
         #endregion 依存関係プロパティ
 
         public GeoThumb()
@@ -133,6 +129,39 @@ namespace _20260406
             }
 
         }
+
+        private static void Thumb_DragCompleted(object sender, DragCompletedEventArgs e)
+        {
+            if (sender is GeoThumb thumb)
+            {
+                // 移動完了時、DataのWidthとheightを更新する
+                // この値はParentのThumbのサイズとバインドしている
+                var data = thumb.MyGeoData;
+                data.Width = data.BoundsWidth + data.InternalX;
+                data.Height = data.BoundsHeight + data.InternalY;
+
+                if (data.X > 0) { data.Width -= data.X; }
+                if (data.Y > 0) { data.Height -= data.Y; }
+
+
+                // 移動後座標がマイナスになったときは、0にしたいので、
+                // その分ParentThumbを逆に移動させる
+                if (data.InternalX < 0)
+                {
+                    data.Width = data.BoundsWidth; // ParentThumbのサイズは図形と同じになるはず
+                    data.X += data.InternalX; // ParentThumbを逆側に移動させてから
+                    data.InternalX = 0; // 自身の座標
+                    //data.X = 0; // ParentThumbがマイナス座標になったときの処理はRootで行うはず
+                }
+                if (data.InternalY < 0)
+                {
+                    data.Height = data.BoundsHeight;
+                    data.Y += data.InternalY;
+                    data.InternalY = 0;
+                }
+            }
+        }
+
         #endregion ドラッグ移動
 
 

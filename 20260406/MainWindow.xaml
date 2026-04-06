@@ -28,23 +28,28 @@
       </GroupBox>
     </StackPanel>
     <StackPanel Grid.Column="2">
-      <StackPanel DataContext="{Binding MyData}">
-        <Button Content="Check" Click="Button_Click_Check"/>
-        <Button Content="ChangeGeoDragMove" Click="Button_Click_ChangeDragMove"/>
-        <TextBlock Text="{Binding Name, StringFormat='Name = {0}'}"/>
-        <TextBlock Text="{Binding Points, StringFormat='Points = {0: 0}'}" TextWrapping="Wrap"/>
-        <TextBlock Text="{Binding InternalX, StringFormat='InternalX = {0:0}'}"/>
-        <TextBlock Text="{Binding InternalY, StringFormat='InternalY = {0:0}'}"/>
-        <TextBlock Text="{Binding X, StringFormat='X = {0:0}'}"/>
-        <TextBlock Text="{Binding Y, StringFormat='X = {0:0}'}"/>
-        <TextBlock Text="{Binding BoundsHeight, StringFormat='BoundsHeight = {0:0}'}"/>
-        <TextBlock Text="{Binding MyActualHeight, StringFormat='MyActualHeight = {0:0}'}"/>
-        <TextBlock Text="{Binding BoundsWidth, StringFormat='BoundsWidth = {0:0}'}"/>
-        <TextBlock Text="{Binding MyActualWidth, StringFormat='MyActualWidth = {0:0}'}"/>
-        <TextBlock Text="{Binding BoundsLeft, StringFormat='BoundsLeft = {0:0}'}"/>
-        <TextBlock Text="{Binding BoundsTop, StringFormat='BoundsTop = {0:0}'}"/>
-      </StackPanel>
-      
+      <Button Content="Check" Click="Button_Click_Check"/>
+      <Button Content="ChangeGeoDragMove" Click="Button_Click_ChangeDragMove"/>
+      <GroupBox Header="MyData">
+        <StackPanel DataContext="{Binding MyData}">
+          <TextBlock Text="{Binding Name, StringFormat='Name = {0}'}"/>
+          <TextBlock Text="{Binding Points, StringFormat='Points = {0: 0}'}" TextWrapping="Wrap"/>
+          <TextBlock Text="{Binding InternalX, StringFormat='InternalX = {0:0}'}"/>
+          <TextBlock Text="{Binding InternalY, StringFormat='InternalY = {0:0}'}"/>
+          <TextBlock Text="{Binding X, StringFormat='X = {0:0}'}"/>
+          <TextBlock Text="{Binding Y, StringFormat='X = {0:0}'}"/>
+          <TextBlock Text="{Binding BoundsHeight, StringFormat='BoundsHeight = {0:0}'}"/>
+          <TextBlock Text="{Binding MyActualHeight, StringFormat='MyActualHeight = {0:0}'}"/>
+          <TextBlock Text="{Binding BoundsWidth, StringFormat='BoundsWidth = {0:0}'}"/>
+          <TextBlock Text="{Binding ActualWidth, StringFormat='ActualWidth = {0:0}'}"/>
+          <TextBlock Text="{Binding Width, StringFormat='Width = {0:0}'}"/>
+          <TextBlock Text="{Binding GeoWidth, StringFormat='GeoWidth = {0:0}'}"/>
+          <!--<TextBlock Text="{Binding PPWidth, StringFormat='PPWidth = {0:0}'}"/>-->
+          <TextBlock Text="{Binding MyActualWidth, StringFormat='MyActualWidth = {0:0}'}"/>
+          <TextBlock Text="{Binding BoundsLeft, StringFormat='BoundsLeft = {0:0}'}"/>
+          <TextBlock Text="{Binding BoundsTop, StringFormat='BoundsTop = {0:0}'}"/>
+        </StackPanel>
+      </GroupBox>
     </StackPanel>
   </Grid>
 </Window>

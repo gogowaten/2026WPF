@@ -8,10 +8,14 @@
   <Style TargetType="{x:Type local:TestThumb}">
     <Setter Property="Canvas.Left" Value="{Binding X}"/>
     <Setter Property="Canvas.Top" Value="{Binding Y}"/>
+    <Setter Property="Width" Value="{Binding Width}"/>
+    <Setter Property="Height" Value="{Binding Height}"/>
     <Setter Property="Template">
       <Setter.Value>
         <ControlTemplate TargetType="{x:Type local:TestThumb}">
-          <Canvas>
+          <Canvas Width="{Binding Width}"
+                  Height="{Binding Height}"
+                  Background="Gold">
             <local:GeoThumb/>
           </Canvas>
         </ControlTemplate>

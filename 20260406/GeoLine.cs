@@ -165,9 +165,11 @@ namespace _20260406
             if (DataContext is GeoLineData data)
             {
                 MyData = data;
-                //MyPoints = data.Points;
                 UpdateMySize();
                 InvalidateVisual();
+                //
+                data.Width = data.BoundsWidth + data.InternalX - data.X;
+                data.Height = data.BoundsHeight + data.InternalY - data.Y;
             }
         }
 
