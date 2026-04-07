@@ -267,6 +267,8 @@ namespace _20260406
             MyData.GeoHeight = 0;
             MyData.GeoLeft = 0;
             MyData.GeoTop = 0;
+            MyData.Width = 0;
+            MyData.Height = 0;
         }
 
         private static PathGeometry MakeLineGeometry(IEnumerable<Point> pc)
