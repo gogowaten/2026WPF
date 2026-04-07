@@ -151,7 +151,7 @@ namespace _20260406
                     data.Width = data.BoundsWidth; // ParentThumbのサイズは図形と同じになるはず
                     data.X += data.InternalX; // ParentThumbを逆側に移動させてから
                     data.InternalX = 0; // 自身の座標
-                    //data.X = 0; // ParentThumbがマイナス座標になったときの処理はRootで行うはず
+                                        //data.X = 0; // ParentThumbがマイナス座標になったときの処理はRootで行うはず
                 }
                 if (data.InternalY < 0)
                 {
