@@ -231,14 +231,17 @@ namespace _20260407
             MyData.BoundsWidth = bounds.Width;
             MyData.BoundsHeight = bounds.Height;
 
-            var w = bounds.X + bounds.Width;
-            if (w < 0)
+            
+            var right = bounds.Right;
+            if (bounds.Left < 0)
             {
-                MyData.Width += w;
+                MyData.X = bounds.Left;
+                MyData.Width = bounds.Width;
             }
             else
             {
-                MyData.Width = w;
+                MyData.X = 0;
+                MyData.Width = bounds.Left + bounds.Width;
             }
 
             InvalidateVisual(); // あったほうが良い、ないとたまに図形が更新されない時がある
