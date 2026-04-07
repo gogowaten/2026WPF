@@ -191,6 +191,9 @@ namespace _20260311
                 //MyPoints = data.Points;
                 UpdateMySize();
                 InvalidateVisual();
+                //
+                data.Width = data.BoundsWidth + data.InternalX - data.X;
+                data.Height = data.BoundsHeight + data.InternalY - data.Y;
             }
         }
 
@@ -265,8 +268,8 @@ namespace _20260311
             MyData.GeoTop = _cachedGeometry.Bounds.Top;
             MyData.GeoWidth = _cachedGeometry.Bounds.Width;
 
-            MyData.Width = bounds.Width;
-            MyData.Height = bounds.Height;
+            //MyData.Width = bounds.Width;
+            //MyData.Height = bounds.Height;
 
             InvalidateVisual(); // あったほうが良い、ないとたまに図形が更新されない時がある
         }
@@ -291,6 +294,8 @@ namespace _20260311
             MyData.GeoHeight = 0;
             MyData.GeoLeft = 0;
             MyData.GeoTop = 0;
+            MyData.Width = 0;
+            MyData.Height = 0;
         }
 
         private static PathGeometry MakeLineGeometry(IEnumerable<Point> pc)

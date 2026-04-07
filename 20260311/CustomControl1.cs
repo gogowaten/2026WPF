@@ -66,10 +66,12 @@ namespace _20260311
                         Canvas.SetTop(thumb, 0);
                     }
                     thumb.DragDelta += Thumb_DragDelta;
+                    thumb.DragCompleted += Thumb_DragCompleted;
                 }
                 else
                 {
                     thumb.DragDelta -= Thumb_DragDelta;
+                    thumb.DragCompleted -= Thumb_DragCompleted;
                 }
             }
         }
@@ -105,7 +107,38 @@ namespace _20260311
                 thumb.MyData.InternalY += e.VerticalChange;
                 e.Handled = true;
             }
+        }
 
+        private static void Thumb_DragCompleted(object sender, DragCompletedEventArgs e)
+        {
+            if (sender is CustomThumbForInternal thumb)
+            {
+                // 移動完了時、DataのWidthとheightを更新する
+                // この値はParentのThumbのサイズとバインドしている
+                var data = thumb.MyData;
+                data.Width = data.BoundsWidth + data.InternalX;
+                data.Height = data.BoundsHeight + data.InternalY;
+
+                if (data.X > 0) { data.Width -= data.X; }
+                if (data.Y > 0) { data.Height -= data.Y; }
+
+
+                // 移動後座標がマイナスになったときは、0にしたいので、
+                // その分ParentThumbを逆に移動させる
+                if (data.InternalX < 0)
+                {
+                    data.Width = data.BoundsWidth; // ParentThumbのサイズは図形と同じになるはず
+                    data.X += data.InternalX; // ParentThumbを逆側に移動させてから
+                    data.InternalX = 0; // 自身の座標
+                                        //data.X = 0; // ParentThumbがマイナス座標になったときの処理はRootで行うはず
+                }
+                if (data.InternalY < 0)
+                {
+                    data.Height = data.BoundsHeight;
+                    data.Y += data.InternalY;
+                    data.InternalY = 0;
+                }
+            }
         }
         #endregion ドラッグ移動
 
