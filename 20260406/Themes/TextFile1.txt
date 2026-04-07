@@ -1,0 +1,5 @@
+﻿DataThumb
+	Canvas
+		InternalThumb
+			GeoLine
+InternalThumbの移動後にサイズ計算、DataThumbのサイズを位置を適切な値にするまでできた

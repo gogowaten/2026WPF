@@ -268,8 +268,11 @@ namespace _20260311
             MyData.GeoTop = _cachedGeometry.Bounds.Top;
             MyData.GeoWidth = _cachedGeometry.Bounds.Width;
 
-            //MyData.Width = bounds.Width;
-            //MyData.Height = bounds.Height;
+            if (MyData.IsOffset)
+            {
+                MyData.Width = bounds.Width;
+                MyData.Height = bounds.Height;
+            }
 
             InvalidateVisual(); // あったほうが良い、ないとたまに図形が更新されない時がある
         }

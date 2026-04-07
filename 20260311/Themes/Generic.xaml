@@ -23,8 +23,9 @@
     <Setter Property="Template">
       <Setter.Value>
         <ControlTemplate TargetType="{x:Type local:CustomThumbForInternal}">
-          <Canvas x:Name="InternalCanvas" Width="{Binding Width}"
-                  Height="{Binding Height}">
+          <Canvas x:Name="InternalCanvas"
+                  
+                  >
             <local:GeoLine x:Name="GeoLine"
                            
                            MyPoints="{Binding Points}"

@@ -30,6 +30,7 @@
     <StackPanel Grid.Column="2">
       <Button Content="Check" Click="Button_Click_Check"/>
       <Button Content="ChangeGeoDragMove" Click="Button_Click_ChangeDragMove"/>
+      <Slider Value="{Binding MyData.StrokeThickness}" Minimum="10" Maximum="50"/>
       <GroupBox Header="MyData">
         <StackPanel DataContext="{Binding MyData}">
           <TextBlock Text="{Binding Name, StringFormat='Name = {0}'}"/>
