@@ -30,19 +30,19 @@
     <StackPanel Grid.Column="2">
       <Button Content="Check" Click="Button_Click_Check"/>
       <Button Content="ChangeGeoDragMove" Click="Button_Click_ChangeDragMove"/>
-      <Slider Value="{Binding MyData.StrokeThickness}" Minimum="10" Maximum="50"/>
+      <Slider Value="{Binding MyData.StrokeThickness}" Minimum="10" Maximum="100" SmallChange="10" LargeChange="10"/>
       <Button Content="Thickness+10" Click="Button_Click_Thickness10"/>
       <GroupBox Header="MyData">
         <StackPanel DataContext="{Binding MyData}">
           <TextBlock Text="{Binding Name, StringFormat='Name = {0}'}"/>
           <TextBlock Text="{Binding Points, StringFormat='Points = {0: 0}'}" TextWrapping="Wrap"/>
-          <TextBlock Text="{Binding InternalX, StringFormat='InternalX = {0:0}'}"/>
-          <TextBlock Text="{Binding InternalY, StringFormat='InternalY = {0:0}'}"/>
           <TextBlock Text="{Binding X, StringFormat='X = {0:0}'}"/>
-          <TextBlock Text="{Binding Y, StringFormat='X = {0:0}'}"/>
-          <TextBlock Text="{Binding BoundsHeight, StringFormat='BoundsHeight = {0:0}'}"/>
-          <TextBlock Text="{Binding BoundsWidth, StringFormat='BoundsWidth = {0:0}'}"/>
+          <TextBlock Text="{Binding InternalX, StringFormat='InternalX = {0:0}'}"/>
           <TextBlock Text="{Binding Width, StringFormat='Width = {0:0}'}"/>
+          <TextBlock Text="{Binding BoundsWidth, StringFormat='BoundsWidth = {0:0}'}"/>
+          <TextBlock Text="{Binding InternalY, StringFormat='InternalY = {0:0}'}"/>
+          <TextBlock Text="{Binding Y, StringFormat='Y = {0:0}'}"/>
+          <TextBlock Text="{Binding BoundsHeight, StringFormat='BoundsHeight = {0:0}'}"/>
           <TextBlock Text="{Binding BoundsLeft, StringFormat='BoundsLeft = {0:0}'}"/>
           <TextBlock Text="{Binding BoundsTop, StringFormat='BoundsTop = {0:0}'}"/>
         </StackPanel>

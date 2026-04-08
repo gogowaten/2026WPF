@@ -28,11 +28,11 @@ namespace _20260407
         {
             GeoLineData data = new()
             {
-                Points = [new Point(-10, 0), new Point(-10, 100)],
-                //Points = [new Point(100, 0), new Point(100, 100)],
+                //Points = [new Point(-10, 0), new Point(-10, 100)],
+                Points = [new Point(100, 0), new Point(100, 100)],
                 //Points = [new Point(20, 30), new Point(120, 10), new Point(10, 100)],
                 Stroke = new SolidColorBrush(Color.FromArgb(100, 200, 0, 0)),
-                StrokeThickness = 20,
+                StrokeThickness = 100,
                 Background = new SolidColorBrush(Color.FromArgb(100, 200, 200, 100)),// Brushes.Gainsboro,
                 IsCanDragMove = true,
                 IsOffset = true,

@@ -168,8 +168,8 @@ namespace _20260407
                 UpdateMySize();
                 InvalidateVisual();
                 //
-                data.Width = data.BoundsWidth + data.InternalX - data.X;
-                data.Height = data.BoundsHeight + data.InternalY - data.Y;
+                //data.Width = data.BoundsWidth + data.InternalX - data.X;
+                //data.Height = data.BoundsHeight + data.InternalY - data.Y;
             }
         }
 
@@ -231,18 +231,17 @@ namespace _20260407
             MyData.BoundsWidth = bounds.Width;
             MyData.BoundsHeight = bounds.Height;
 
-            
             var right = bounds.Right;
+
+            //MyData.X += 0;
+            MyData.Width = bounds.Width + bounds.Left;
+
             if (bounds.Left < 0)
             {
                 MyData.X = bounds.Left;
-                MyData.Width = bounds.Width;
+                MyData.Width = bounds.Width +MyData.InternalX;
             }
-            else
-            {
-                MyData.X = 0;
-                MyData.Width = bounds.Left + bounds.Width;
-            }
+            
 
             InvalidateVisual(); // あったほうが良い、ないとたまに図形が更新されない時がある
         }
