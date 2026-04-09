@@ -1,17 +1,20 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Windows;
+using System.Windows.Controls.Primitives;
 using System.Windows.Markup;
 using System.Windows.Media;
+using System.Windows.Shapes;
 using System.Xml.Linq;
 
 namespace _20260409
 {
     public partial class GeoLineData : ShapeData
     {
-        private Geometry? _cachedGeometry;
+        //private Geometry? _cachedGeometry;
         public Rect MyGeometryBounds { get; set; }
 
         public GeoLineData()
@@ -19,8 +22,10 @@ namespace _20260409
             Name = "FromGeoLineData";
         }
 
-        [ObservableProperty] private Geometry _myGeometry = Geometry.Empty;
-        [ObservableProperty] private PointCollection _myPoints = [];
+        //[ObservableProperty] private Geometry _myGeometry = Geometry.Empty;
+        //[ObservableProperty] private Geometry _myOffGeometry = Geometry.Empty;
+        [ObservableProperty] private PointCollection? _myPoints;
+        //[ObservableProperty] private PointCollection? _myOffsetPoints;
         [ObservableProperty] private Pen _strokePen = null!;
         [ObservableProperty] private PenLineCap _endLineCap;
         [ObservableProperty] private PenLineCap _startLineCap;
@@ -29,6 +34,8 @@ namespace _20260409
         [ObservableProperty] private bool _isOffset;
         [ObservableProperty] private bool _isCanDragMove;
         [ObservableProperty] private double _strokeThickness = 1.0;
+        //[ObservableProperty] private Thumb? _parentPath;
+
 
         #region StrokePen更新
 
@@ -53,7 +60,7 @@ namespace _20260409
             UpdatePen();
         }
 
-        private void UpdatePen()
+        public void UpdatePen()
         {
             StrokePen = new Pen(Stroke, StrokeThickness)
             {
@@ -63,99 +70,112 @@ namespace _20260409
                 LineJoin = LineJoin,
 
             };
-            UpdateGeometry();
+            //UpdateGeometry();
         }
 
         #endregion StrokePen更新
 
-        partial void OnMyPointsChanged(PointCollection value)
-        {
-            UpdateGeometry();            
-        }
+        //partial void OnMyGeometryChanged(Geometry? oldValue, Geometry newValue)
+        //{
+        //    TranslateTransform tt = new(-MyGeometryBounds.X, -MyGeometryBounds.Y);
+        //    MyOffGeometry = MyGeometry.Clone();
+        //    MyOffGeometry.Transform = tt;
+        //}
 
-        private void UpdateGeometry()
-        {
-            if (_cachedGeometry is not null)
-            {
+        //partial void OnMyPointsChanged(PointCollection? oldValue, PointCollection? newValue)
+        //{
+        //    oldValue?.Changed -= MyPoints_Changed;
+        //    newValue?.Changed += MyPoints_Changed;
+        //}
 
-            }
+        //private void MyPoints_Changed(object? sender, EventArgs e)
+        //{
+        //    UpdateGeometry();
+        //}
 
-            if (MyPoints.Count < 2)
-            {
-                _cachedGeometry = null;
-                MyGeometry = Geometry.Empty;
-                UpdateMySize();
-                return;
-            }
+        //private void UpdateGeometry()
+        //{
+        //    if (_cachedGeometry is not null)
+        //    {
 
-            PathGeometry geo = MakeLineGeometry(MyPoints);
-            _cachedGeometry = geo;
-            UpdateMySize();
-            MyGeometry = geo;
+        //    }
 
-        }
+        //    if (MyPoints is null || MyPoints.Count < 2)
+        //    {
+        //        _cachedGeometry = null;
+        //        MyGeometry = Geometry.Empty;
+        //        UpdateMySize();
+        //        return;
+        //    }
 
-        private void UpdateMySize()
-        {
+        //    PathGeometry geo = MakeLineGeometry(MyPoints);
+        //    _cachedGeometry = geo;
+        //    UpdateMySize();
+        //    MyGeometry = geo;
 
-            if (_cachedGeometry is null)
-            {
-                MySizeReset();
-                return;
-            }
+        //}
 
-            //if (MyData is null)
-            //{
-            //    return;
-            //}
+        //private void UpdateMySize()
+        //{
 
-            //Rect bounds = _cachedGeometry.GetRenderBounds(MyStrokePen);
-            Rect bounds = _cachedGeometry.GetRenderBounds(StrokePen);
-            if (bounds.IsEmpty || _cachedGeometry is null)
-            {
-                MySizeReset();
-                return;
-            }
+        //    if (_cachedGeometry is null)
+        //    {
+        //        MySizeReset();
+        //        return;
+        //    }
 
-            //if (MyData is null) { return; }
+        //    //if (MyData is null)
+        //    //{
+        //    //    return;
+        //    //}
 
-            var diffLeft = bounds.Left - MyGeometryBounds.Left;
-            MyGeometryBounds = bounds;
-            //double w = bounds.Width;
-            //if (bounds.Left < 0) { w -= bounds.Left; }
-            //MyData.MyActualWidth = w;
-            //double h = bounds.Height;
-            //if (bounds.Top < 0) { h -= bounds.Top; }
-            //MyData.MyActualHeight = h;
+        //    //Rect bounds = _cachedGeometry.GetRenderBounds(MyStrokePen);
+        //    Rect bounds = _cachedGeometry.GetRenderBounds(StrokePen);
+        //    if (bounds.IsEmpty || _cachedGeometry is null)
+        //    {
+        //        MySizeReset();
+        //        return;
+        //    }
 
-            BoundsTop = bounds.Top;
-            BoundsLeft = bounds.Left;
-            BoundsWidth = bounds.Width;
-            BoundsHeight = bounds.Height;
-                        
-            if (IsOffset)
-            {
-                Width = bounds.Width + InternalX;
-                Height = bounds.Height + InternalY;
-            }
+        //    //if (MyData is null) { return; }
 
-            //MyData.Width = bounds.Width + bounds.Left;
-            //MyData.InternalX += diffLeft;
+        //    var diffLeft = bounds.Left - MyGeometryBounds.Left;
+        //    MyGeometryBounds = bounds;
+        //    //double w = bounds.Width;
+        //    //if (bounds.Left < 0) { w -= bounds.Left; }
+        //    //MyData.MyActualWidth = w;
+        //    //double h = bounds.Height;
+        //    //if (bounds.Top < 0) { h -= bounds.Top; }
+        //    //MyData.MyActualHeight = h;
 
-            //if (bounds.Left < 0)
-            //{
-            //    MyData.Width = bounds.Width;
-            //}
+        //    BoundsTop = bounds.Top;
+        //    BoundsLeft = bounds.Left;
+        //    BoundsWidth = bounds.Width;
+        //    BoundsHeight = bounds.Height;
 
-            //InvalidateVisual(); // あったほうが良い、ないとたまに図形が更新されない時がある
-            
-        }
+        //    if (IsOffset)
+        //    {
+        //        Width = bounds.Width + InternalX;
+        //        Height = bounds.Height + InternalY;
+        //    }
+
+        //    //MyData.Width = bounds.Width + bounds.Left;
+        //    //MyData.InternalX += diffLeft;
+
+        //    //if (bounds.Left < 0)
+        //    //{
+        //    //    MyData.Width = bounds.Width;
+        //    //}
+
+        //    //InvalidateVisual(); // あったほうが良い、ないとたまに図形が更新されない時がある
+
+        //}
 
         private void MySizeReset()
         {
 
             MyGeometryBounds = new();
-            
+
             //if (MyData is null) { return; }
 
             BoundsLeft = 0;
@@ -177,6 +197,41 @@ namespace _20260409
             return geo;
         }
 
+        //[RelayCommand]
+        //public void Offset()
+        //{
+        //    if (MyPoints is null) { return; }
+        //    //if (IsOffset)
+        //    //{
+        //    //    IsOffset = false;
+        //    //    for (int i = 0; i < MyPoints.Count; i++)
+        //    //    {
+        //    //        MyPoints[i] = new Point(MyPoints[i].X - MyGeometryBounds.Left, MyPoints[i].Y - MyGeometryBounds.Top);
+        //    //    }
+        //    //}
+        //    //else
+        //    //{
+        //    //    IsOffset = true;
+        //    //    for (int i = 0; i < MyPoints.Count; i++)
+        //    //    {
+        //    //        MyPoints[i] = new Point(MyPoints[i].X + MyGeometryBounds.Left, MyPoints[i].Y + MyGeometryBounds.Top);
+        //    //    }
+        //    //}
+
+        //    //for (int i = 0; i < MyPoints.Count; i++)
+        //    //{
+        //    //    MyPoints[i] = new Point(MyPoints[i].X - MyGeometryBounds.Left, MyPoints[i].Y - MyGeometryBounds.Top);
+        //    //}
+
+        //    if (IsOffset) { 
+        //    MyGeometry = MyOffGeometry;
+        //    }
+        //    else
+        //    {
+
+        //    }
+
+        //}
     }
 
 

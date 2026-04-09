@@ -12,26 +12,31 @@
       <ColumnDefinition Width="200"/>
     </Grid.ColumnDefinitions>
 
-    <!--<Canvas x:Name="MyCanvas">
-      <Path Stroke="Red" StrokeThickness="10">
-        <Path.Data>
-          <PathGeometry>
-            <PathGeometry.Figures>
-              <PathFigure StartPoint="0,0">
-                <PolyLineSegment Points="100,0"/>
-              </PathFigure>
-            </PathGeometry.Figures>
-          </PathGeometry>
-        </Path.Data>
-      </Path>-->
+    <Canvas x:Name="MyCanvas">
 
-      <Path x:Name="MyShape" Stroke="{Binding MyPG.Stroke}" StrokeThickness="{Binding MyPG.StrokeThickness}" Data="{Binding MyPG.MyGeometry}"/>
-      <!--<Path x:Name="MyShape" Stroke="Blue" StrokeThickness="20" Data="{Binding MyPG}"/>--><!--
-    </Canvas>-->
+      <!--<Path x:Name="MyShape" DataContext="{Binding MyPG}" Stroke="{Binding Stroke}" StrokeThickness="{Binding StrokeThickness}" Data="{Binding MyGeometry}"/>-->
+      
+      <!--<local:GeoThumb x:Name="MyShape" DataContext="{Binding MyPG}"/>-->
+      
+      <local:DataThumb x:Name="MyShape" DataContext="{Binding MyPG}"/>
+    </Canvas>
 
     <StackPanel Grid.Column="1">
       <Button Content="Check" Click="Button_Click"/>
       <Slider Value="{Binding MyPG.StrokeThickness}" SmallChange="20" LargeChange="20" Minimum="20" Maximum="100"/>
+      <!--<Button Content="offset" Command="{Binding MyPG.OffsetCommand}"/>-->
+      <Button Content="addPoint" Click="Button_Click_Add"/>
+      <GroupBox DataContext="{Binding MyPG}">
+        <StackPanel>
+          <TextBlock Text="{Binding StrokeThickness, StringFormat='StrokeThickness = {0}'}"/>
+          <TextBlock Text="{Binding Width, StringFormat='Width = {0}'}"/>
+          <TextBlock Text="{Binding Height, StringFormat='Height = {0}'}"/>
+          <TextBlock Text="{Binding InternalX, StringFormat='InternalX = {0}'}"/>
+          <TextBlock Text="{Binding X, StringFormat='X = {0}'}"/>
+          <TextBlock Text="{Binding BoundsWidth, StringFormat='BoundsWidth = {0}'}"/>
+          <TextBlock Text="{Binding MyPoints, StringFormat='Points = {0: 0; -0; 0}'}"/>
+        </StackPanel>
+      </GroupBox>
     </StackPanel>
   </Grid>
 </Window>

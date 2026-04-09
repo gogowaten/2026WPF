@@ -16,7 +16,7 @@ namespace _20260409
     /// </summary>
     public partial class MainWindow : Window
     {
-        //public Geometry MyPG { get; set; }
+        //public Geometry MyPGAAA { get; set; }
         public GeoLineData MyPG { get; set; }
         //public PathGeometry MyPG { get; set; }
         
@@ -25,7 +25,7 @@ namespace _20260409
         {
             InitializeComponent();
             MyPG = CreateData();
-            //MyPG = AAA();
+            //MyPGAAA = AAA();
             DataContext = this;
         }
 
@@ -50,9 +50,8 @@ namespace _20260409
                 //Fill = Brushes.DeepSkyBlue;
                 Stroke = Brushes.Orchid,
                 StrokeThickness = 20,
-                MyPoints = [(new Point(50, 0)),
-                        (new Point(50, 100)),],
-                //Points = [(new Point(50, 70)),
+                MyPoints = [(new Point(50, 0)), (new Point(50, 100)),],
+                //MyPoints = [(new Point(50, 70)),
                 //        (new Point(100, 150)),
                 //        (new Point(50, 250)),
                 //        (new Point(50, 200)),],
@@ -65,8 +64,16 @@ namespace _20260409
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            var neko = MyShape.Data;
+            var data = MyPG;
+            //MyShape.InvalidateVisual();
+            //MyShape.InvalidateMeasure();
+            //MyShape.InvalidateArrange();
+            //MyShape.UpdateLayout();
+        }
 
+        private void Button_Click_Add(object sender, RoutedEventArgs e)
+        {
+            MyPG.MyPoints?.Add(new Point(0, 10));
         }
     }
 }
