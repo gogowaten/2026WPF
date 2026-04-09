@@ -62,7 +62,8 @@
       <Button Content="geoLineChangeCanMove" Click="Button_Click_geoLineChangeMove"/>
       <TextBlock Text="{Binding CurrentItem.FontSize, StringFormat='FontSize = {0:0.0}'}"/>
       <Slider Value="{Binding CurrentItem.FontSize}" Minimum="10" Maximum="100"/>
-      <Slider Value="{Binding CurrentItem.StrokeThickness}" Minimum="10" Maximum="100"/>
+      <Slider Value="{Binding CurrentItem.StrokeThickness}" Minimum="20" Maximum="100"
+              SmallChange="20" LargeChange="20"/>
       <Button Content="test" Click="Button_Click"/>
       <Button Content="updateSize" Command="{Binding UpdateSizeCommand}"/>
       <Button Content="GeoShapeChangeOffset" Command="{Binding ChangeGeoShapeOffsetCommand}"/>

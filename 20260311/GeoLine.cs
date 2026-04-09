@@ -178,7 +178,7 @@ namespace _20260311
         #region コンストラクタ
         public GeoLine()
         {
-            SetMyBind();
+            //SetMyBind();
             MyData = new();
             Loaded += GeoLine_Loaded;
         }
@@ -192,22 +192,22 @@ namespace _20260311
                 UpdateMySize();
                 InvalidateVisual();
                 //
-                data.Width = data.BoundsWidth + data.InternalX - data.X;
-                data.Height = data.BoundsHeight + data.InternalY - data.Y;
+                //data.Width = data.BoundsWidth + data.InternalX - data.X;
+                //data.Height = data.BoundsHeight + data.InternalY - data.Y;
             }
         }
 
-        private void SetMyBind()
-        {
-            MultiBinding mb = new() { Converter = new ConvStrokePen() };
-            mb.Bindings.Add(new Binding() { Source = this, Path = new PropertyPath(StrokeThicknessProperty) });
-            mb.Bindings.Add(new Binding() { Source = this, Path = new PropertyPath(StrokeMiterLimitProperty) });
-            mb.Bindings.Add(new Binding() { Source = this, Path = new PropertyPath(StrokeEndLineCapProperty) });
-            mb.Bindings.Add(new Binding() { Source = this, Path = new PropertyPath(StrokeStartLineCapProperty) });
-            mb.Bindings.Add(new Binding() { Source = this, Path = new PropertyPath(StrokeLineJoinProperty) });
-            SetBinding(MyStrokePenProperty, mb);
+        //private void SetMyBind()
+        //{
+        //    MultiBinding mb = new() { Converter = new ConvStrokePen()};
+        //    mb.Bindings.Add(new Binding() { Source = this, Path = new PropertyPath(StrokeThicknessProperty) });
+        //    mb.Bindings.Add(new Binding() { Source = this, Path = new PropertyPath(StrokeMiterLimitProperty) });
+        //    mb.Bindings.Add(new Binding() { Source = this, Path = new PropertyPath(StrokeEndLineCapProperty) });
+        //    mb.Bindings.Add(new Binding() { Source = this, Path = new PropertyPath(StrokeStartLineCapProperty) });
+        //    mb.Bindings.Add(new Binding() { Source = this, Path = new PropertyPath(StrokeLineJoinProperty) });
+        //    SetBinding(MyStrokePenProperty, mb);
 
-        }
+        //}
 
         #endregion コンストラクタ
 
@@ -239,15 +239,22 @@ namespace _20260311
                 return;
             }
 
-            Rect bounds = _cachedGeometry.GetRenderBounds(MyStrokePen);
+            if(MyData is null)
+            {
+                return;
+            }
+
+            //Rect bounds = _cachedGeometry.GetRenderBounds(MyStrokePen);
+            Rect bounds = _cachedGeometry.GetRenderBounds(MyData.TestPen);
             if (bounds.IsEmpty || _cachedGeometry is null)
             {
                 MySizeReset();
                 return;
             }
 
-            if (MyData is null) { return; }
+            //if (MyData is null) { return; }
 
+            var diffLeft = bounds.Left - MyGeometryBounds.Left;
             MyGeometryBounds = bounds;
             double w = bounds.Width;
             if (bounds.Left < 0) { w -= bounds.Left; }
@@ -270,9 +277,17 @@ namespace _20260311
 
             if (MyData.IsOffset)
             {
-                MyData.Width = bounds.Width;
-                MyData.Height = bounds.Height;
+                MyData.Width = bounds.Width + MyData.InternalX;
+                MyData.Height = bounds.Height + MyData.InternalY;
             }
+
+            //MyData.Width = bounds.Width + bounds.Left;
+            //MyData.InternalX += diffLeft;
+
+            //if (bounds.Left < 0)
+            //{
+            //    MyData.Width = bounds.Width;
+            //}
 
             InvalidateVisual(); // あったほうが良い、ないとたまに図形が更新されない時がある
         }

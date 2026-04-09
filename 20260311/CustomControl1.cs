@@ -119,8 +119,8 @@ namespace _20260311
                 data.Width = data.BoundsWidth + data.InternalX;
                 data.Height = data.BoundsHeight + data.InternalY;
 
-                if (data.X > 0) { data.Width -= data.X; }
-                if (data.Y > 0) { data.Height -= data.Y; }
+                //if (data.X > 0) { data.Width -= data.X; }
+                //if (data.Y > 0) { data.Height -= data.Y; }
 
 
                 // 移動後座標がマイナスになったときは、0にしたいので、

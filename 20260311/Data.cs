@@ -11,6 +11,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
 using System.Windows.Media;
 using System.Windows.Shapes;
 using System.Xml.Linq;
@@ -83,17 +84,19 @@ namespace _20260311
             TextBlockData textBlockData = new() { Name = "Text1", X = 0, Y = 0, Text = "Text1", FontSize = 30 };
             DataList.Add(textBlockData);
             DataList.Add(new PolylineData() { Name = "ボリライン", X = 0, Y = 0, StrokeThickness = 50, Stroke = Brushes.MediumPurple });
-            DataList.Add(new GeoShapeData() { Name = "ベジェ曲線", X = 100, Y = 100, Stroke = Brushes.MediumAquamarine, StrokeThickness = 20.0, Points = [new Point(50, 70), new Point(250, 150), new Point(50, 250), new Point(50, 200), new Point(50, 150), new Point(150, 100), new Point(250, 250),], StrokeEndLineCap = PenLineCap.Round , Background = Brushes.Gray});
+            DataList.Add(new GeoShapeData() { Name = "ベジェ曲線", X = 100, Y = 100, Stroke = Brushes.MediumAquamarine, StrokeThickness = 20.0, Points = [new Point(50, 70), new Point(250, 150), new Point(50, 250), new Point(50, 200), new Point(50, 150), new Point(150, 100), new Point(250, 250),], StrokeEndLineCap = PenLineCap.Round, Background = Brushes.Gray });
             DataList.Add(new GeoLineData2()
             {
                 Background = Brushes.Lavender,
                 //Fill = Brushes.DeepSkyBlue;
                 Stroke = Brushes.Orchid,
                 StrokeThickness = 20,
-                Points = [(new Point(50, 70)),
-                        (new Point(100, 150)),
-                        (new Point(50, 250)),
-                        (new Point(50, 200)),],
+                Points = [(new Point(50, 0)),
+                        (new Point(50, 100)),],
+                //Points = [(new Point(50, 70)),
+                //        (new Point(100, 150)),
+                //        (new Point(50, 250)),
+                //        (new Point(50, 200)),],
                 MiterLimit = 10,
                 IsCanDragMove = false,
                 IsOffset = true
@@ -147,7 +150,7 @@ namespace _20260311
             {
                 newValue.IsCurrent = true;
                 UnGroupCommand.NotifyCanExecuteChanged();
-                if(newValue is GeoShapeData geo)
+                if (newValue is GeoShapeData geo)
                 {
                     CanChageGeoShapeData();
                 }
@@ -839,7 +842,49 @@ namespace _20260311
         [ObservableProperty] private bool _isOffset;
         [ObservableProperty] private bool _isCanDragMove;
 
-        public GeoLineData2() { Name = "FromGeoLineData2"; }
+        [ObservableProperty] private Pen? _testPen;
+        [ObservableProperty] private double _strokeThickness;
+        
+
+
+        public GeoLineData2()
+        {
+            Name = "FromGeoLineData2";
+            
+        }
+        partial void OnEndLineCapChanged(PenLineCap value)
+        {
+            UpdatePen();
+        }
+        partial void OnStartLineCapChanged(PenLineCap value)
+        {
+            UpdatePen();
+        }
+        partial void OnMiterLimitChanged(double value)
+        {
+            UpdatePen();
+        }
+        partial void OnLineJoinChanged(PenLineJoin value)
+        {
+            UpdatePen();
+        }
+        partial void OnStrokeThicknessChanged(double value)
+        {
+            UpdatePen();
+        }
+        
+        private void UpdatePen()
+        {
+            TestPen = new Pen(Stroke, StrokeThickness)
+            {
+                EndLineCap = EndLineCap,
+                StartLineCap = StartLineCap,
+                MiterLimit = MiterLimit,
+                LineJoin = LineJoin,
+                
+            };
+        }
+        
     }
 
     public abstract partial class GeoShapeData2 : ShapeData
@@ -903,6 +948,8 @@ namespace _20260311
         [ObservableProperty] private PenLineJoin _strokeLineJoin = PenLineJoin.Miter;
         [ObservableProperty] private double _strokeMiterLimit = 1.0;
 
+        
+
     }
 
     public partial class PolylineData : ShapeData
@@ -912,6 +959,7 @@ namespace _20260311
             StrokeThickness = 20;
             Stroke = Brushes.Red;
             Points = new PointCollection([new Point(), new Point(100, 0)]);
+            
         }
         [ObservableProperty] private PointCollection _points = [];
     }
@@ -926,6 +974,7 @@ namespace _20260311
         [ObservableProperty] private Brush? _fill;
         [ObservableProperty] private Brush _stroke = new SolidColorBrush(Color.FromArgb(200, 0, 250, 200));
         [ObservableProperty] private double _strokeThickness = 1.0;
+         
     }
     #endregion 図形
 
