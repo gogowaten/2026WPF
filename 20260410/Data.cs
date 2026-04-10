@@ -67,6 +67,17 @@ namespace _20260410
 
         #endregion StrokePen更新
 
+        public void OffsetPoints()
+        {
+            for (int i = 0; i < MyPoints?.Count; i++)
+            {
+                MyPoints[i] = new Point(MyPoints[i].X - Bounds.X, MyPoints[i].Y - Bounds.Y);
+            }
+            // 一番上のThumb座標用
+            //X += Bounds.X;
+            //Y += Bounds.Y;
+        }
+
         public Rect OnUpdateBounds(Geometry? _cachedGeometry)
         {
             if (_cachedGeometry is null)

@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using _20260410.Themes;
+using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -30,7 +31,7 @@ namespace _20260410
             {
                 MyPoints = [new Point(80, 0), new Point(80, 100)],
                 Stroke = Brushes.LimeGreen,
-                StrokeThickness = 20,
+                StrokeThickness = 100,
                 Background = Brushes.CadetBlue,
                 Fill = Brushes.Silver,
                 IsOffset = true,
@@ -41,7 +42,7 @@ namespace _20260410
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-
+            var neko = MyData;
         }
 
         private void Button_Click_1(object sender, RoutedEventArgs e)
@@ -63,6 +64,16 @@ namespace _20260410
         private void Button_Click_Add2(object sender, RoutedEventArgs e)
         {
             MyData.MyPoints?.Add(new Point(-40, -20));
+        }
+
+        private void Button_Click_PointsOffset(object sender, RoutedEventArgs e)
+        {
+            MyData.OffsetPoints();
+        }
+
+        private void Button_Click_Resize(object sender, RoutedEventArgs e)
+        {
+            ResizeAdorner.AddResizeAdorner(MyThumb);
         }
     }
 }

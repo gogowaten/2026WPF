@@ -171,7 +171,7 @@ namespace _20260410
             }
         }
 
-     
+
 
         #endregion コンストラクタ
 
@@ -180,7 +180,8 @@ namespace _20260410
         protected override void OnRender(DrawingContext drawingContext)
         {
             // オフセット表示の場合はTranslateTransformで変形したものを描画
-            if (MyIsOffset)
+            if (MyData.IsOffset)
+            //if (MyIsOffset)
             {
                 //drawingContext.PushTransform(new TranslateTransform(-MyData.Bounds.Left, -MyData.Bounds.Top));
                 drawingContext.PushTransform(new TranslateTransform(-MyGeometryBounds.Left, -MyGeometryBounds.Top));
@@ -215,6 +216,15 @@ namespace _20260410
         public Size GetBoundsSize()
         {
             return MyGeometryBounds.Size;
+        }
+
+        // 全Pointを左上にオフセット移動させる
+        public void OffsetPoints()
+        {
+            for (int i = 0; i < MyPoints.Count; i++)
+            {
+                MyPoints[i] = new Point(MyPoints[i].X - MyGeometryBounds.X, MyPoints[i].Y - MyGeometryBounds.Y);
+            }
         }
         #endregion publicメソッド
     }
