@@ -4,6 +4,37 @@
     xmlns:local="clr-namespace:_20260410">
 
 
+  <!--<Style TargetType="{x:Type local:GeoThumb}">
+    <Setter Property="Canvas.Left" Value="{Binding MyData.InternalX}"/>
+    <Setter Property="Canvas.Top" Value="{Binding MyData.InternalY}"/>
+    <Setter Property="Template">
+      <Setter.Value>
+        <ControlTemplate TargetType="{x:Type local:GeoThumb}">
+          <Border Background="MediumSlateBlue"
+                  BorderBrush="{TemplateBinding BorderBrush}"
+                  BorderThickness="{TemplateBinding BorderThickness}"
+                  Width="{Binding Bounds.Width}"
+                  Height="{Binding Bounds.Height}"
+                  >
+            <local:GeoLine 
+                           MyPoints="{Binding MyData.MyPoints}"
+                           Fill="{Binding MyData.Fill}"
+                           Stroke="{Binding MyData.Stroke}"
+                           StrokeThickness="{Binding MyData.StrokeThickness}"
+                           StrokeEndLineCap="{Binding MyData.EndLineCap}"
+                           StrokeStartLineCap="{Binding MyData.StartLineCap}"
+                           StrokeLineJoin="{Binding MyData.LineJoin}"
+                           StrokeMiterLimit="{Binding MyData.MiterLimit}"
+                           MyIsOffset="{Binding MyData.IsOffset}"
+                           MyStrokePen="{Binding MyData.StrokePen}"
+                           />
+          </Border>
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+  </Style>-->
+  
+
   <Style TargetType="{x:Type local:GeoThumb}">
     <Setter Property="Canvas.Left" Value="{Binding InternalX}"/>
     <Setter Property="Canvas.Top" Value="{Binding InternalY}"/>
@@ -28,14 +59,20 @@
                            MyIsOffset="{Binding IsOffset}"
                            MyStrokePen="{Binding StrokePen}"
                            />
-            <!--<local:GeoLine Data="{Binding MyGeometry}"
-                  Stroke="{Binding Stroke}"
-                  StrokeThickness="{Binding StrokeThickness}"
-                  
-                  />-->
           </Border>
         </ControlTemplate>
       </Setter.Value>
     </Setter>
   </Style>
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
 </ResourceDictionary>

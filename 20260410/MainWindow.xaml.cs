@@ -32,7 +32,7 @@ namespace _20260410
                 Stroke = Brushes.LimeGreen,
                 StrokeThickness = 20,
                 Background = Brushes.CadetBlue,
-                Fill = Brushes.Gray,
+                Fill = Brushes.Silver,
                 IsOffset = true,
                 IsCanDragMove = true,
             };
@@ -42,6 +42,27 @@ namespace _20260410
         private void Button_Click(object sender, RoutedEventArgs e)
         {
 
+        }
+
+        private void Button_Click_1(object sender, RoutedEventArgs e)
+        {
+            MyData?.MyPoints?.Add(new Point(0, 10));
+            MyData?.MyPoints?.Add(new Point(100, 30));
+        }
+
+        private void Button_Click_Clear(object sender, RoutedEventArgs e)
+        {
+            MyData.MyPoints?.Clear();
+        }
+
+        private void Button_Click_ChangePoint(object sender, RoutedEventArgs e)
+        {
+            MyData.MyPoints?[0] = new Point();
+        }
+
+        private void Button_Click_Add2(object sender, RoutedEventArgs e)
+        {
+            MyData.MyPoints?.Add(new Point(-40, -20));
         }
     }
 }

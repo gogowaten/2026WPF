@@ -10,36 +10,44 @@
     <Grid.ColumnDefinitions>
       <ColumnDefinition/>
       <ColumnDefinition Width="200"/>
+      <ColumnDefinition Width="200"/>
     </Grid.ColumnDefinitions>
 
     <Canvas x:Name="MyCanvas">
       <local:GeoThumb x:Name="MyThumb" DataContext="{Binding MyData}"/>
     </Canvas>
 
-    <StackPanel Grid.Column="1">
+    <GroupBox Grid.Column="1" Header="MyData" DataContext="{Binding MyData}">
+      <StackPanel>
+        <TextBlock Text="{Binding MyPoints, StringFormat='Points = {0: 0; -0; 0}'}"/>
+        <TextBlock Text="{Binding X, StringFormat='X = {0: 0; -0; 0}'}"/>
+        <TextBlock Text="{Binding Y, StringFormat='Y = {0: 0; -0; 0}'}"/>
+        <TextBlock Text="{Binding InternalX, StringFormat='InternalX = {0: 0; -0; 0}'}"/>
+        <TextBlock Text="{Binding InternalY, StringFormat='InternalY = {0: 0; -0; 0}'}"/>
+        <TextBlock Text="{Binding Width, StringFormat='Width = {0: 0; -0; 0}'}"/>
+        <TextBlock Text="{Binding Height, StringFormat='Height = {0: 0; -0; 0}'}"/>
+        <TextBlock Text="{Binding Bounds, StringFormat='Bounds = {0: 0; -0; 0}'}"/>
+        <TextBlock Text="{Binding BoundsWidth, StringFormat='BoundsWidth = {0: 0; -0; 0}'}"/>
+        <TextBlock Text="{Binding IsOffset, StringFormat='IsOffset = {0: 0; -0; 0}'}"/>
+        <TextBlock Text="{Binding IsCanDragMove, StringFormat='IsCanDragMove = {0: 0; -0; 0}'}"/>
+      </StackPanel>
+    </GroupBox>
+    <StackPanel Grid.Column="2">
       <Button Content="Check" Click="Button_Click"/>
+      <Button Content="Add" Click="Button_Click_1"/>
+      <Button Content="Add2" Click="Button_Click_Add2"/>
+      <Button Content="Clear" Click="Button_Click_Clear"/>
+      <Button Content="Point0の座標変更" Click="Button_Click_ChangePoint"/>
       <Slider Value="{Binding MyData.StrokeThickness}" Minimum="20" Maximum="100"
               SmallChange="20" LargeChange="20"/>
-      <GroupBox Header="MyData" DataContext="{Binding MyData}">
-        <StackPanel>
-          <TextBlock Text="{Binding MyPoints, StringFormat='Points = {0: 0; -0; 0}'}"/>
-          <TextBlock Text="{Binding X, StringFormat='X = {0: 0; -0; 0}'}"/>
-          <TextBlock Text="{Binding Y, StringFormat='Y = {0: 0; -0; 0}'}"/>
-          <TextBlock Text="{Binding InternalX, StringFormat='InternalX = {0: 0; -0; 0}'}"/>
-          <TextBlock Text="{Binding InternalY, StringFormat='InternalY = {0: 0; -0; 0}'}"/>
-          <TextBlock Text="{Binding Width, StringFormat='Width = {0: 0; -0; 0}'}"/>
-          <TextBlock Text="{Binding Height, StringFormat='Height = {0: 0; -0; 0}'}"/>
-          <TextBlock Text="{Binding Bounds, StringFormat='Bounds = {0: 0; -0; 0}'}"/>
-          <TextBlock Text="{Binding BoundsWidth, StringFormat='BoundsWidth = {0: 0; -0; 0}'}"/>
-          <TextBlock Text="{Binding IsOffset, StringFormat='IsOffset = {0: 0; -0; 0}'}"/>
-          <TextBlock Text="{Binding IsCanDragMove, StringFormat='IsCanDragMove = {0: 0; -0; 0}'}"/>
-        </StackPanel>
-      </GroupBox>
+
       <GroupBox Header="Thumb" DataContext="{Binding ElementName=MyThumb}">
         <StackPanel>
           <TextBlock Text="{Binding ActualWidth, StringFormat='ActualWidth = {0: 0; -0; 0}'}"/>
           <TextBlock Text="{Binding Width, StringFormat='Width = {0: 0; -0; 0}'}"/>
           <TextBlock Text="{Binding (Canvas.Left), StringFormat='CanvasLeft = {0: 0; -0; 0}'}"/>
+          <TextBlock Text="{Binding MyData, StringFormat='MyData = {0: 0; -0; 0}'}"/>
+          <TextBlock Text="{Binding DataContext, StringFormat='DataContext = {0: 0; -0; 0}'}"/>
         </StackPanel>
       </GroupBox>
     </StackPanel>

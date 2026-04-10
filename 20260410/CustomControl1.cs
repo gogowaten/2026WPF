@@ -48,12 +48,12 @@ namespace _20260410
 
         private void GeoThumb_Loaded(object sender, RoutedEventArgs e)
         {
+
             if (DataContext is GeoLineData data)
             {
                 MyData = data;
-                //MyData.ParentPath = this;
-                MyData.UpdatePen();
             }
+            //MyData.UpdatePen();
         }
     }
 
