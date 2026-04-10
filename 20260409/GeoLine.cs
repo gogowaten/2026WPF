@@ -210,8 +210,9 @@ namespace _20260409
                 return;
             }
 
-            //Rect bounds = _cachedGeometry.GetRenderBounds(MyStrokePen);
-            Rect bounds = _cachedGeometry.GetRenderBounds(MyData.StrokePen);
+            var neko = MyStrokePen;
+            Rect bounds = _cachedGeometry.GetRenderBounds(MyStrokePen);
+            //Rect bounds = _cachedGeometry.GetRenderBounds(MyData.StrokePen);
             if (bounds.IsEmpty || _cachedGeometry is null)
             {
                 MySizeReset();
@@ -220,10 +221,12 @@ namespace _20260409
 
             if (MyData is null) { return; }
 
-            //var diffLeft = bounds.Left - MyGeometryBounds.Left;
-            //var diffTop = bounds.Top - MyGeometryBounds.Top;
-            MyData.InternalX += bounds.Left - MyGeometryBounds.Left;
-            MyData.InternalY += bounds.Top - MyGeometryBounds.Top; 
+            var diffLeft = bounds.Left - MyGeometryBounds.Left;
+            var diffTop = bounds.Top - MyGeometryBounds.Top;
+            MyData.InternalX += diffLeft;
+            MyData.InternalY += diffTop;
+            //MyData.InternalX += bounds.Left - MyGeometryBounds.Left;
+            //MyData.InternalY += bounds.Top - MyGeometryBounds.Top; 
 
 
             MyData.BoundsTop = bounds.Top;
@@ -234,8 +237,10 @@ namespace _20260409
 
             if (MyData.IsOffset)
             {
-                MyData.Width = bounds.Width + MyData.InternalX;
-                MyData.Height = bounds.Height + MyData.InternalY;
+                //MyData.Width = bounds.Width + MyData.InternalX;
+                //MyData.Height = bounds.Height + MyData.InternalY;
+                MyData.Width = MyData.InternalX + bounds.Width;
+                MyData.Height = MyData.InternalY + bounds.Height;
             }
             //MyData.Width = bounds.Width + bounds.Left;
             //MyData.Height = bounds.Height + bounds.Top;

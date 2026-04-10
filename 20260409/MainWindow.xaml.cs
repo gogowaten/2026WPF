@@ -49,8 +49,8 @@ namespace _20260409
                 Background = Brushes.Lavender,
                 //Fill = Brushes.DeepSkyBlue;
                 Stroke = Brushes.Orchid,
-                StrokeThickness = 20,
-                MyPoints = [(new Point(50, 0)), (new Point(50, 100)),],
+                StrokeThickness = 100,
+                MyPoints = [(new Point(80, 0)), (new Point(80, 100)),],
                 //MyPoints = [(new Point(50, 70)),
                 //        (new Point(100, 150)),
                 //        (new Point(50, 250)),
