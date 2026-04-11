@@ -14,8 +14,14 @@
     </Grid.ColumnDefinitions>
 
     <Canvas x:Name="MyCanvas">
-      <local:GeoThumb x:Name="MyThumb" DataContext="{Binding MyData}"/>
-      <local:GeoLine MyPoints="0,0 100,10" Stroke="Red" StrokeThickness="10" MyIsOffset="True"/>
+      <local:GeoCanvas x:Name="MyGeoCanvas" DataContext="{Binding MyData}"
+                       Width="{Binding Width, Mode=TwoWay}"
+                       Height="{Binding Height, Mode=TwoWay}"
+                       Background="SaddleBrown">
+        <local:GeoThumb x:Name="MyThumb"/>
+      </local:GeoCanvas>
+      <!--<local:GeoThumb x:Name="MyThumb" DataContext="{Binding MyData}"/>-->
+      <!--<local:GeoLine MyPoints="0,0 100,10" Stroke="Red" StrokeThickness="10" MyIsOffset="True"/>-->
     </Canvas>
 
     <GroupBox Grid.Column="1" Header="MyData" DataContext="{Binding MyData}">
@@ -40,7 +46,8 @@
       <Button Content="Clear" Click="Button_Click_Clear"/>
       <Button Content="Point0の座標変更" Click="Button_Click_ChangePoint"/>
       <Button Content="PointのOffset" Click="Button_Click_PointsOffset"/>
-      <Button Content="Resize" Click="Button_Click_Resize"/>
+      <Button Content="ResizeAdd" Click="Button_Click_Resize"/>
+      <Button Content="ResizeRemove" Click="Button_Click_ResizeEnd"/>
       <Slider Value="{Binding MyData.StrokeThickness}" Minimum="20" Maximum="100"
               SmallChange="20" LargeChange="20"/>
 

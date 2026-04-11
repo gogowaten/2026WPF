@@ -8,7 +8,7 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 
-namespace _20260410.Themes
+namespace _20260410
 {
     public class ResizeAdorner : Adorner
     {
@@ -143,6 +143,11 @@ namespace _20260410.Themes
                 if (adorners is null || adorners.Length == 0)
                 {
                     layer.Add(new ResizeAdorner(element));
+                    if (double.IsNaN(Canvas.GetLeft(element)))
+                    {
+                        Canvas.SetLeft(element, 0);
+                        Canvas.SetTop(element, 0);
+                    }
                 }
             }
         }

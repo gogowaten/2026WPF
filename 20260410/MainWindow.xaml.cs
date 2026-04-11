@@ -1,5 +1,4 @@
-﻿using _20260410.Themes;
-using System.Text;
+﻿using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -73,7 +72,12 @@ namespace _20260410
 
         private void Button_Click_Resize(object sender, RoutedEventArgs e)
         {
-            ResizeAdorner.AddResizeAdorner(MyThumb);
+            ResizeAdorner.AddResizeAdorner(MyGeoCanvas);
+        }
+
+        private void Button_Click_ResizeEnd(object sender, RoutedEventArgs e)
+        {
+            ResizeAdorner.RemoveResizeAdorner(MyGeoCanvas);
         }
     }
 }
