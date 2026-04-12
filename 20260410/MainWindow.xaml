@@ -17,6 +17,7 @@
       <local:GeoCanvas x:Name="MyGeoCanvas" DataContext="{Binding MyData}"
                        Width="{Binding Width, Mode=TwoWay}"
                        Height="{Binding Height, Mode=TwoWay}"
+                       ClipToBounds="True"
                        Background="SaddleBrown">
         <local:GeoThumb x:Name="MyThumb"/>
       </local:GeoCanvas>

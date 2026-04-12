@@ -1,6 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing.Drawing2D;
 using System.Text;
 using System.Windows;
@@ -457,5 +458,10 @@ namespace _20260410
         //// Rectを使うのは良くない、バラしたほうがパフォーマンスも良い
         //[ObservableProperty] private Rect _bounds = new();
         //[ObservableProperty] private Rect _originBounds = new();
+
+        partial void OnXChanged(double oldValue, double newValue)
+        {
+            Debug.WriteLine($"x changed {oldValue} to {newValue}");
+        }
     }
 }
