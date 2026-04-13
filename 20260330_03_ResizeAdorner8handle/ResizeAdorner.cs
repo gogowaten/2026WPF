@@ -138,6 +138,8 @@ namespace _20260330_03_ResizeAdorner8handle
         /// <param name="element">サイズ変更アドーナを追加する UI 要素。null は指定できません。</param>
         public static void AddResizeAdorner(UIElement element)
         {
+            if(element is null) {  return; }
+
             if (AdornerLayer.GetAdornerLayer(element) is AdornerLayer layer)
             {
                 var adorners = layer.GetAdorners(element);
@@ -159,6 +161,8 @@ namespace _20260330_03_ResizeAdorner8handle
         public static int RemoveResizeAdorner(UIElement element)
         {
             int result = 0;
+            if (element is null) { return result; }
+
             if (AdornerLayer.GetAdornerLayer(element) is AdornerLayer layer)
             {
                 if (layer.GetAdorners(element) is Adorner[] ados)
