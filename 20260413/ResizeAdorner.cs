@@ -135,8 +135,10 @@ namespace _20260413
         /// 要素はビジュアルツリーの一部であり、関連付けられたアドーナレイヤーを持っている必要があります。
         /// </remarks>
         /// <param name="element">サイズ変更アドーナを追加する UI 要素。null は指定できません。</param>
-        public static void AddResizeAdorner(UIElement element)
+        public static void AddResizeAdorner(UIElement? element)
         {
+            if(element is null) {  return; }
+
             if (AdornerLayer.GetAdornerLayer(element) is AdornerLayer layer)
             {
                 var adorners = layer.GetAdorners(element);
@@ -160,9 +162,12 @@ namespace _20260413
         /// </remarks>
         /// <param name="element">アドナーを削除する UI 要素。null は指定できません。</param>
         /// <returns>削除されたAdornerの個数を返す</returns>
-        public static int RemoveResizeAdorner(UIElement element)
+        public static int RemoveResizeAdorner(UIElement? element)
         {
+
             int result = 0;
+            if (element is null) { return result; }
+
             if (AdornerLayer.GetAdornerLayer(element) is AdornerLayer layer)
             {
                 if (layer.GetAdorners(element) is Adorner[] ados)

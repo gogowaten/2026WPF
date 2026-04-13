@@ -13,22 +13,28 @@
     </Grid.ColumnDefinitions>
 
     <Canvas x:Name="MyCanvas">
-      <Thumb x:Name="MyCanvasThumb" Canvas.Left="30" Canvas.Top="10">
-        <Thumb.Template>
-          <ControlTemplate>
-            <Canvas x:Name="MyIntrenalCanvas"
-                    Background="Red" Width="100" Height="100">
-              
-            </Canvas>
-          </ControlTemplate>
-        </Thumb.Template>
-      </Thumb>
+      <local:CanvasThumb x:Name="MyCanvasThumb" Canvas.Left="30" Canvas.Top="10">
+        
+      </local:CanvasThumb>
+
+      <local:CanvasThumb2 x:Name="MyCanvasThumb2" Canvas.Left="150" Canvas.Top="30"
+                          Width="100" Height="100"/>
     </Canvas>
 
     <StackPanel Grid.Column="1">
+      <Button Content="AddResizeHnadle" Click="Button_Click_Add"/>
+      <Button Content="RemoveResizeHnadle" Click="Button_Click_Remove"/>
       <GroupBox Header="CanvasThumb" DataContext="{Binding ElementName=MyCanvasThumb}">
         <StackPanel>
           <TextBlock Text="{Binding ActualHeight, StringFormat='ActualHeight ={0:0}'}"/>
+          <TextBlock Text="{Binding Height, StringFormat='Height ={0:0}'}"/>
+        </StackPanel>
+      </GroupBox>
+      
+      <GroupBox Header="CanvasThumb2" DataContext="{Binding ElementName=MyCanvasThumb2}">
+        <StackPanel>
+          <TextBlock Text="{Binding ActualHeight, StringFormat='ActualHeight ={0:0}'}"/>
+          <TextBlock Text="{Binding Height, StringFormat='Height ={0:0}'}"/>
         </StackPanel>
       </GroupBox>
       

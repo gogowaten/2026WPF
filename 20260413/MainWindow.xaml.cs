@@ -20,5 +20,17 @@ namespace _20260413
         {
             InitializeComponent();
         }
+
+        private void Button_Click_Add(object sender, RoutedEventArgs e)
+        {
+            MyCanvasThumb.AddResizeAdorner();
+            ResizeAdorner.AddResizeAdorner(MyCanvasThumb2);
+        }
+        private void Button_Click_Remove(object sender, RoutedEventArgs e)
+        {
+            MyCanvasThumb.RemoveResizeAdorner();
+            _ = ResizeAdorner.RemoveResizeAdorner(MyCanvasThumb2);
+        }
+
     }
 }
