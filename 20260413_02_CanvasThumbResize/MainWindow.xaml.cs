@@ -23,11 +23,11 @@ namespace _20260413_02_CanvasThumbResize
 
         private void Button_Click_Add(object sender, RoutedEventArgs e)
         {
-            ResizeAdorner.AddResizeAdorner(MyCanvasThumb2);
+            ResizeAdorner.AddResizeAdorner(MyCanvasThumb);
         }
         private void Button_Click_Remove(object sender, RoutedEventArgs e)
         {
-            _ = ResizeAdorner.RemoveResizeAdorner(MyCanvasThumb2);
+            _ = ResizeAdorner.RemoveResizeAdorner(MyCanvasThumb);
         }
 
     }

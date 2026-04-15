@@ -15,29 +15,25 @@ using System.Windows.Shapes;
 namespace _20260413_02_CanvasThumbResize
 {
     /// <summary>
-    /// Thumb自体をリサイズした時TemplateのCanvasはどうなる？
-    /// まず、Thumbにサイズを指定する必要がある。もし無指定の場合は
-    /// ハンドルを移動させてもサイズはNaNから変化しないし、これはreSizeAdornerの仕様にしている
-    /// で、サイズ指定してからハンドル移動するとリサイズされる
-    /// けど、中のCanvasはリサイズされないので、中央揃えの表示になる
+    /// Generic.xamlでCanvasのサイズをTemplateBindingにするだけで良かったみたい
     /// </summary>
-    public class CanvasThumb2 : Thumb
+    public class CanvasThumb : Thumb
     {
-        static CanvasThumb2()
+        static CanvasThumb()
         {
-            DefaultStyleKeyProperty.OverrideMetadata(typeof(CanvasThumb2), new FrameworkPropertyMetadata(typeof(CanvasThumb2)));
+            DefaultStyleKeyProperty.OverrideMetadata(typeof(CanvasThumb), new FrameworkPropertyMetadata(typeof(CanvasThumb)));
         }
-        public CanvasThumb2()
+        public CanvasThumb()
         {
+            DragDelta += CanvasThumb_DragDelta;
+        }
+
+        private void CanvasThumb_DragDelta(object sender, DragDeltaEventArgs e)
+        {
+            Canvas.SetLeft(this, Canvas.GetLeft(this) + e.HorizontalChange);
+            Canvas.SetTop(this, Canvas.GetTop(this) + e.VerticalChange);
 
         }
     }
 
-    public class CustomControl1 : Control
-    {
-        static CustomControl1()
-        {
-            DefaultStyleKeyProperty.OverrideMetadata(typeof(CustomControl1), new FrameworkPropertyMetadata(typeof(CustomControl1)));
-        }
-    }
 }

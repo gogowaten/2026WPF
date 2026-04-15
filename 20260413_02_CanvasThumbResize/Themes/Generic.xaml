@@ -4,11 +4,14 @@
     xmlns:local="clr-namespace:_20260413_02_CanvasThumbResize">
 
 
-  <Style TargetType="{x:Type local:CanvasThumb2}">
+  <Style TargetType="{x:Type local:CanvasThumb}">
     <Setter Property="Template">
       <Setter.Value>
-        <ControlTemplate TargetType="{x:Type local:CanvasThumb2}">
-          <Canvas x:Name="PART_Panel" Width="100" Height="100" Background="Salmon"/>
+        <ControlTemplate TargetType="{x:Type local:CanvasThumb}">
+          <Canvas x:Name="PART_Panel"
+                  Width="{TemplateBinding Width}"
+                  Height="{TemplateBinding Height}"
+                  Background="Salmon"/>
         </ControlTemplate>
       </Setter.Value>
     </Setter>

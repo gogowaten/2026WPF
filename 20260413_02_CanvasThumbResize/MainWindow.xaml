@@ -13,7 +13,7 @@
     </Grid.ColumnDefinitions>
 
     <Canvas x:Name="MyCanvas">
-      <local:CanvasThumb2 x:Name="MyCanvasThumb2" Canvas.Left="150" Canvas.Top="30"
+      <local:CanvasThumb x:Name="MyCanvasThumb" Canvas.Left="150" Canvas.Top="30"
                           Width="100" Height="100"/>
     </Canvas>
 
@@ -27,12 +27,12 @@
         </StackPanel>
       </GroupBox>
 
-      <GroupBox Header="CanvasThumb2" DataContext="{Binding ElementName=MyCanvasThumb2}">
+      <!--<GroupBox Header="CanvasThumb2" DataContext="{Binding ElementName=MyCanvasThumb2}">
         <StackPanel>
           <TextBlock Text="{Binding ActualHeight, StringFormat='ActualHeight ={0:0}'}"/>
           <TextBlock Text="{Binding Height, StringFormat='Height ={0:0}'}"/>
         </StackPanel>
-      </GroupBox>
+      </GroupBox>-->
 
     </StackPanel>
   </Grid>
