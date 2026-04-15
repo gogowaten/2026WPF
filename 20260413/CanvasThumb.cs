@@ -27,6 +27,11 @@ namespace _20260413
             DragDelta += CanvasThumb_DragDelta;
         }
 
+        public void RemoveResizeHndle()
+        {
+            ResizeAdorner.RemoveResizeAdorner(this);
+        }
+
         public void AddResizeHandle()
         {
             ResizeAdorner? adorner = ResizeAdorner.AddResizeAdorner(this);

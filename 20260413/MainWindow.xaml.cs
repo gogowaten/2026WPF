@@ -24,11 +24,10 @@ namespace _20260413
         private void Button_Click_Add(object sender, RoutedEventArgs e)
         {
             MyCanvasThumb.AddResizeHandle();
-            //ResizeAdorner.AddResizeAdorner(MyCanvasThumb);
         }
         private void Button_Click_Remove(object sender, RoutedEventArgs e)
         {
-            _ = ResizeAdorner.RemoveResizeAdorner(MyCanvasThumb);
+            MyCanvasThumb.RemoveResizeHndle();
         }
 
     }
