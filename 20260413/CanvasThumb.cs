@@ -14,79 +14,58 @@ using System.Windows.Shapes;
 
 namespace _20260413
 {
-    /// <summary>
-    /// Thumb自体をリサイズした時TemplateのCanvasはどうなる？
-    /// まず、Thumbにサイズを指定する必要がある。もし無指定の場合は
-    /// ハンドルを移動させてもサイズはNaNから変化しないし、これはreSizeAdornerの仕様にしている
-    /// で、サイズ指定してからハンドル移動するとリサイズされる
-    /// けど、中のCanvasはリサイズされないので、中央揃えの表示になる
-    /// </summary>
-    public class CanvasThumb2 : Thumb
-    {
-        static CanvasThumb2()
-        {
-            DefaultStyleKeyProperty.OverrideMetadata(typeof(CanvasThumb2), new FrameworkPropertyMetadata(typeof(CanvasThumb2)));
-        }
-        public CanvasThumb2()
-        {
-
-        }
-    }
-
-
-
-
-
-
     public class CanvasThumb : Thumb
     {
-
-        public Canvas MyTemplateCanvas
-        {
-            get { return (Canvas)GetValue(MyTemplateCanvasProperty); }
-            set { SetValue(MyTemplateCanvasProperty, value); }
-        }
-        public static readonly DependencyProperty MyTemplateCanvasProperty =
-            DependencyProperty.Register(nameof(MyTemplateCanvas), typeof(Canvas), typeof(CanvasThumb), new PropertyMetadata(null));
+        private Canvas MyTemplateCanvas = null!;
 
         static CanvasThumb()
         {
             DefaultStyleKeyProperty.OverrideMetadata(typeof(CanvasThumb), new FrameworkPropertyMetadata(typeof(CanvasThumb)));
         }
-
         public CanvasThumb()
         {
+            DragDelta += CanvasThumb_DragDelta;
+        }
 
+        public void AddResizeHandle()
+        {
+            ResizeAdorner? adorner = ResizeAdorner.AddResizeAdorner(this);
+            adorner?.LeftLocateChanged += Adorner_LeftLocateChanged;
+            adorner?.TopLocateChanged += CanvasThumb_TopLocateChanged;
+        }
+
+        private void CanvasThumb_TopLocateChanged(object? sender, double e)
+        {
+            foreach (var item in MyTemplateCanvas.Children.OfType<UIElement>())
+            {
+                Canvas.SetTop(item, Canvas.GetTop(item) - e);
+            }
+        }
+
+        private void Adorner_LeftLocateChanged(object? sender, double e)
+        {
+            IEnumerable<UIElement> items = MyTemplateCanvas.Children.OfType<UIElement>();
+            foreach (UIElement item in items)
+            {
+                Canvas.SetLeft(item, Canvas.GetLeft(item) - e);
+            }
         }
 
         public override void OnApplyTemplate()
         {
             base.OnApplyTemplate();
-            if (GetTemplateChild("PART_Panel") is Canvas panel)
+            if (GetTemplateChild("PART_Canvas") is Canvas canvas)
             {
-                MyTemplateCanvas = panel;
+                MyTemplateCanvas = canvas;
             }
+            else { throw new Exception(); }
         }
 
-        public void AddResizeAdorner2()
+        private void CanvasThumb_DragDelta(object sender, DragDeltaEventArgs e)
         {
-            ResizeAdorner? ado = ResizeAdorner.AddResizeAdorner2(MyTemplateCanvas);
-            ado?.LeftLocateChanged += Ado_LeftLocateChanged;
-
-
+            Canvas.SetLeft(this, Canvas.GetLeft(this) + e.HorizontalChange);
+            Canvas.SetTop(this, Canvas.GetTop(this) + e.VerticalChange);
         }
-
-        private void Ado_LeftLocateChanged(object? sender, double e)
-        {
-            Canvas.SetLeft(MyTemplateCanvas, Canvas.GetLeft(MyTemplateCanvas) + e);
-        }
-
-        public void AddResizeAdorner()
-        {
-            ResizeAdorner.AddResizeAdorner(MyTemplateCanvas);
-
-        }
-
-        public void RemoveResizeAdorner() => ResizeAdorner.RemoveResizeAdorner(MyTemplateCanvas);
     }
+
 }

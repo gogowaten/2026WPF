@@ -11,32 +11,11 @@ using System.Windows.Media;
 
 namespace _20260413
 {
-    //public class LocateChangeEventArgs : EventArgs
-    //{
-    //    public double ChangedValue { get; }
-
-    //    public LocateChangeEventArgs(double delta)
-    //    {
-    //        ChangedValue = delta;
-    //    }
-    //}
-
-
+   
     public class ResizeAdorner : Adorner
     {
-        //public event EventHandler<LocateChangeEventArgs>? LeftChanged;
-        //public event EventHandler<LocateChangeEventArgs>? TopChanged;
         public event EventHandler<double>? LeftLocateChanged;
-
-
-        //protected virtual void OnTopChanged(LocateChangeEventArgs e)
-        //{
-        //    TopChanged?.Invoke(this, e);
-        //}
-        //protected virtual void OnLeftChanged(LocateChangeEventArgs e)
-        //{
-        //    LeftChanged?.Invoke(this, e);
-        //}
+        public event EventHandler<double>? TopLocateChanged;
 
         public enum ResizeDirection
         {
@@ -80,9 +59,8 @@ namespace _20260413
                     deltaX = element.Width - 10;// 要素の左位置はリサイズ前の幅から計算する
                 }
                 element.Width = newWidth; // リサイズ
-                var neko = Canvas.GetLeft(element);
-                Canvas.SetLeft(element, Canvas.GetLeft(element) + deltaX);
-                LeftLocateChanged?.Invoke(this, deltaX);
+                Canvas.SetLeft(element, Canvas.GetLeft(element) + deltaX); // X座標変更
+                LeftLocateChanged?.Invoke(this, deltaX); // X座標変更通知用
             }
             else if (dir is ResizeDirection.Right or ResizeDirection.BottomRight or ResizeDirection.TopRight)
             {
@@ -101,6 +79,7 @@ namespace _20260413
                 }
                 element.Height = newHeight;
                 Canvas.SetTop(element, Canvas.GetTop(element) + deltaY);
+                TopLocateChanged?.Invoke(this, deltaY);
             }
             else if (dir is ResizeDirection.Bottom or ResizeDirection.BottomLeft or ResizeDirection.BottomRight)
             {
@@ -163,25 +142,7 @@ namespace _20260413
         /// 要素はビジュアルツリーの一部であり、関連付けられたアドーナレイヤーを持っている必要があります。
         /// </remarks>
         /// <param name="element">サイズ変更アドーナを追加する UI 要素。null は指定できません。</param>
-        public static void AddResizeAdorner(UIElement? element)
-        {
-            if (element is null) { return; }
-
-            if (AdornerLayer.GetAdornerLayer(element) is AdornerLayer layer)
-            {
-                var adorners = layer.GetAdorners(element);
-                if (adorners is null || adorners.Length == 0)
-                {
-                    layer.Add(new ResizeAdorner(element));
-                    if (double.IsNaN(Canvas.GetLeft(element)))
-                    {
-                        Canvas.SetLeft(element, 0);
-                        Canvas.SetTop(element, 0);
-                    }
-                }
-            }
-        }
-        public static ResizeAdorner? AddResizeAdorner2(UIElement? element)
+        public static ResizeAdorner? AddResizeAdorner(UIElement? element)
         {
             if (element is null) { return null; }
 
@@ -202,6 +163,35 @@ namespace _20260413
             }
             return null;
         }
+
+
+        ///// <summary>
+        ///// 指定された UI 要素に、サイズ変更アドーナがまだ存在しない場合に、追加します。
+        ///// </summary>
+        ///// <remarks>このメソッドは、指定された要素にサイズ変更アドーナが既に存在するかどうかを確認してから、新しいアドーナを追加します。
+        ///// 要素はビジュアルツリーの一部であり、関連付けられたアドーナレイヤーを持っている必要があります。
+        ///// </remarks>
+        ///// <param name="element">サイズ変更アドーナを追加する UI 要素。null は指定できません。</param>
+        //public static void AddResizeAdorner(UIElement? element)
+        //{
+        //    if (element is null) { return; }
+
+        //    if (AdornerLayer.GetAdornerLayer(element) is AdornerLayer layer)
+        //    {
+        //        var adorners = layer.GetAdorners(element);
+        //        if (adorners is null || adorners.Length == 0)
+        //        {
+        //            layer.Add(new ResizeAdorner(element));
+        //            if (double.IsNaN(Canvas.GetLeft(element)))
+        //            {
+        //                Canvas.SetLeft(element, 0);
+        //                Canvas.SetTop(element, 0);
+        //            }
+        //        }
+        //    }
+        //}
+
+
 
         /// <summary>
         /// 指定された UI 要素から、すべてのアドナーを削除します。

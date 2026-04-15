@@ -4,24 +4,23 @@
     xmlns:local="clr-namespace:_20260413">
 
 
-  <Style TargetType="{x:Type local:CanvasThumb2}">
-    <Setter Property="Template">
-      <Setter.Value>
-        <ControlTemplate TargetType="{x:Type local:CanvasThumb2}">
-          <Canvas x:Name="PART_Panel" Width="{TemplateBinding Width}" Height="{TemplateBinding Height}" Background="Salmon"/>
-        </ControlTemplate>
-      </Setter.Value>
-    </Setter>
-  </Style>
+
 
   <Style TargetType="{x:Type local:CanvasThumb}">
     <Setter Property="Template">
       <Setter.Value>
         <ControlTemplate TargetType="{x:Type local:CanvasThumb}">
-          <Canvas x:Name="PART_Panel" Width="100" Height="100" Background="Gold"
-               />
+          <Canvas x:Name="PART_Canvas"
+                  Width="{TemplateBinding Width}"
+                  Height="{TemplateBinding Height}"
+                  Background="Salmon">
+            <Ellipse Width="30" Height="30" Canvas.Left="20" Canvas.Top="20" Fill="Gold"/>
+            <Ellipse Width="30" Height="30" Canvas.Left="70" Canvas.Top="70" Fill="NavajoWhite"/>
+          </Canvas>
         </ControlTemplate>
       </Setter.Value>
     </Setter>
   </Style>
+
+
 </ResourceDictionary>
