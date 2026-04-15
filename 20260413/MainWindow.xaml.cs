@@ -23,6 +23,7 @@ namespace _20260413
 
         private void Button_Click_Add(object sender, RoutedEventArgs e)
         {
+            //MyCanvasThumb.AddResizeAdorner2();
             MyCanvasThumb.AddResizeAdorner();
             ResizeAdorner.AddResizeAdorner(MyCanvasThumb2);
         }

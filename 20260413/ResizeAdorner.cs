@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
@@ -10,8 +11,33 @@ using System.Windows.Media;
 
 namespace _20260413
 {
+    //public class LocateChangeEventArgs : EventArgs
+    //{
+    //    public double ChangedValue { get; }
+
+    //    public LocateChangeEventArgs(double delta)
+    //    {
+    //        ChangedValue = delta;
+    //    }
+    //}
+
+
     public class ResizeAdorner : Adorner
     {
+        //public event EventHandler<LocateChangeEventArgs>? LeftChanged;
+        //public event EventHandler<LocateChangeEventArgs>? TopChanged;
+        public event EventHandler<double>? LeftLocateChanged;
+
+
+        //protected virtual void OnTopChanged(LocateChangeEventArgs e)
+        //{
+        //    TopChanged?.Invoke(this, e);
+        //}
+        //protected virtual void OnLeftChanged(LocateChangeEventArgs e)
+        //{
+        //    LeftChanged?.Invoke(this, e);
+        //}
+
         public enum ResizeDirection
         {
             Left, Right, Top, Bottom,
@@ -54,7 +80,9 @@ namespace _20260413
                     deltaX = element.Width - 10;// 要素の左位置はリサイズ前の幅から計算する
                 }
                 element.Width = newWidth; // リサイズ
+                var neko = Canvas.GetLeft(element);
                 Canvas.SetLeft(element, Canvas.GetLeft(element) + deltaX);
+                LeftLocateChanged?.Invoke(this, deltaX);
             }
             else if (dir is ResizeDirection.Right or ResizeDirection.BottomRight or ResizeDirection.TopRight)
             {
@@ -137,7 +165,7 @@ namespace _20260413
         /// <param name="element">サイズ変更アドーナを追加する UI 要素。null は指定できません。</param>
         public static void AddResizeAdorner(UIElement? element)
         {
-            if(element is null) {  return; }
+            if (element is null) { return; }
 
             if (AdornerLayer.GetAdornerLayer(element) is AdornerLayer layer)
             {
@@ -152,6 +180,27 @@ namespace _20260413
                     }
                 }
             }
+        }
+        public static ResizeAdorner? AddResizeAdorner2(UIElement? element)
+        {
+            if (element is null) { return null; }
+
+            if (AdornerLayer.GetAdornerLayer(element) is AdornerLayer layer)
+            {
+                var adorners = layer.GetAdorners(element);
+                if (adorners is null || adorners.Length == 0)
+                {
+                    ResizeAdorner me = new(element);
+                    layer.Add(me);
+                    if (double.IsNaN(Canvas.GetLeft(element)))
+                    {
+                        Canvas.SetLeft(element, 0);
+                        Canvas.SetTop(element, 0);
+                    }
+                    return me;
+                }
+            }
+            return null;
         }
 
         /// <summary>

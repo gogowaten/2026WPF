@@ -62,15 +62,29 @@ namespace _20260413
         public override void OnApplyTemplate()
         {
             base.OnApplyTemplate();
-            if(GetTemplateChild("PART_Panel") is Canvas panel)
+            if (GetTemplateChild("PART_Panel") is Canvas panel)
             {
                 MyTemplateCanvas = panel;
             }
         }
 
+        public void AddResizeAdorner2()
+        {
+            ResizeAdorner? ado = ResizeAdorner.AddResizeAdorner2(MyTemplateCanvas);
+            ado?.LeftLocateChanged += Ado_LeftLocateChanged;
+
+
+        }
+
+        private void Ado_LeftLocateChanged(object? sender, double e)
+        {
+            Canvas.SetLeft(MyTemplateCanvas, Canvas.GetLeft(MyTemplateCanvas) + e);
+        }
+
         public void AddResizeAdorner()
         {
             ResizeAdorner.AddResizeAdorner(MyTemplateCanvas);
+
         }
 
         public void RemoveResizeAdorner() => ResizeAdorner.RemoveResizeAdorner(MyTemplateCanvas);
