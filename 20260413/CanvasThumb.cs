@@ -17,6 +17,7 @@ namespace _20260413
     public class CanvasThumb : Thumb
     {
         private Canvas MyTemplateCanvas = null!;
+        public ResizeAdorner MyResizeAdorner { get; set; }
 
         static CanvasThumb()
         {
@@ -24,18 +25,51 @@ namespace _20260413
         }
         public CanvasThumb()
         {
+            MyResizeAdorner = new ResizeAdorner(this);
+            Loaded += CanvasThumb_Loaded;
             DragDelta += CanvasThumb_DragDelta;
         }
 
+        private void CanvasThumb_Loaded(object sender, RoutedEventArgs e)
+        {
+            if (AdornerLayer.GetAdornerLayer(this) is AdornerLayer layer)
+            {
+                //MyResizeAdorner.SetBinding(ResizeAdorner.ResizeHandleSizeProperty, new Binding() { Source = this, Path = new PropertyPath(ResizeHandleSize) });
+                layer.Add(MyResizeAdorner);
+                Binding b = new();
+                b.Source = this;
+                b.Path = new PropertyPath(ResizeHandleSizeProperty);
+                b.Mode = BindingMode.TwoWay;
+                BindingOperations.SetBinding(MyResizeAdorner, ResizeAdorner.ResizeHandleSizeProperty, b);
+                MyResizeAdorner.LeftLocateChanged += CanvasThumb_LeftLocateChanged;
+                MyResizeAdorner.TopLocateChanged += CanvasThumb_TopLocateChanged;
+            }
+        }
+
+        #region プロパティ
+
+        public double ResizeHandleSize
+        {
+            get { return (double)GetValue(ResizeHandleSizeProperty); }
+            set { SetValue(ResizeHandleSizeProperty, value); }
+        }
+        public static readonly DependencyProperty ResizeHandleSizeProperty =
+            DependencyProperty.Register(nameof(ResizeHandleSize), typeof(double), typeof(CanvasThumb), new PropertyMetadata(20.0));
+
+        #endregion プロパティ
+
+
         public void RemoveResizeHndle()
         {
+
             ResizeAdorner.RemoveResizeAdorner(this);
+
         }
 
         public void AddResizeHandle()
         {
             ResizeAdorner? adorner = ResizeAdorner.AddResizeAdorner(this);
-            adorner?.LeftLocateChanged += Adorner_LeftLocateChanged;
+            adorner?.LeftLocateChanged += CanvasThumb_LeftLocateChanged;
             adorner?.TopLocateChanged += CanvasThumb_TopLocateChanged;
         }
 
@@ -47,7 +81,7 @@ namespace _20260413
             }
         }
 
-        private void Adorner_LeftLocateChanged(object? sender, double e)
+        private void CanvasThumb_LeftLocateChanged(object? sender, double e)
         {
             IEnumerable<UIElement> items = MyTemplateCanvas.Children.OfType<UIElement>();
             foreach (UIElement item in items)

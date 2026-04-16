@@ -25,6 +25,8 @@
         <StackPanel>
           <TextBlock Text="{Binding ActualHeight, StringFormat='ActualHeight ={0:0}'}"/>
           <TextBlock Text="{Binding Height, StringFormat='Height ={0:0}'}"/>
+          <TextBlock Text="{Binding MyResizeAdorner.ResizeHandleSize}"/>
+          <Slider Value="{Binding MyResizeAdorner.ResizeHandleSize}" Minimum="10" Maximum="50"/>
         </StackPanel>
       </GroupBox>
 

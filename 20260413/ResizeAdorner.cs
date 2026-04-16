@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Documents;
@@ -15,10 +11,42 @@ namespace _20260413
     public class ResizeAdorner : Adorner
     {
 
-        public event EventHandler<double>? LeftLocateChanged;
-        public event EventHandler<double>? TopLocateChanged;
+        private readonly VisualCollection _visualChildren;
+        private readonly Dictionary<ResizeDirection, Thumb> HT = [];
+        private double ResizeHandleHalfSize { get; set; } // 計算用：ハンドルサイズの半分
+        private Size InternalResizeHandleSize { get; set; } // 計算用
 
-        private record ResizeMatrix(double WidthF, double LeftF, double HeightF, double TopF);
+        #region コンストラクタと初期化系
+
+        public ResizeAdorner(UIElement adornedElement) : base(adornedElement)
+        {
+            _visualChildren = new VisualCollection(this);
+            ResizeHandleHalfSize = ResizeHandleSize / 2.0;
+            InternalResizeHandleSize = new Size(ResizeHandleSize, ResizeHandleSize);
+
+            // 8つのハンドルThumbを作成
+            foreach (ResizeDirection item in Enum.GetValues<ResizeDirection>())
+            {
+                HT.Add(item, CreateResizeHandleThumb(item, Cursors.Hand));
+            }
+        }
+
+        private Thumb CreateResizeHandleThumb(ResizeDirection direction, Cursor cursor)
+        {
+            var thumb = new Thumb()
+            {
+                Background = Brushes.White,
+                BorderBrush = Brushes.DodgerBlue,
+                BorderThickness = new Thickness(1),
+                Tag = direction,
+                Cursor = cursor
+            };
+            thumb.DragDelta += OnResize;
+            _visualChildren.Add(thumb);
+            thumb.SetBinding(WidthProperty, nameof(ResizeHandleSizeProperty));
+            thumb.SetBinding(HeightProperty, nameof(ResizeHandleSizeProperty));
+            return thumb;
+        }
 
         private static readonly Dictionary<ResizeDirection, ResizeMatrix> ResizePolicies = new()
         {   
@@ -33,25 +61,51 @@ namespace _20260413
             {ResizeDirection.BottomRight,   new ResizeMatrix( 1,      0,       1,      0) },
         };
 
+        #endregion コンストラクタと初期化系
+
+        private record ResizeMatrix(double WidthF, double LeftF, double HeightF, double TopF);
+
         public enum ResizeDirection
         {
             Left, Right, Top, Bottom,
             TopLeft, TopRight, BottomLeft, BottomRight
         }
 
-        private readonly VisualCollection _visualChildren;
-        private readonly Dictionary<ResizeDirection, Thumb> HT = [];
+        #region プロパティ
 
-        public ResizeAdorner(UIElement adornedElement) : base(adornedElement)
+        // 最小サイズ値
+        public double ElementResizeMinSize
         {
-            _visualChildren = new VisualCollection(this);
+            get { return (double)GetValue(ElementMinSizeProperty); }
+            set { SetValue(ElementMinSizeProperty, value); }
+        }
+        public static readonly DependencyProperty ElementMinSizeProperty =
+            DependencyProperty.Register(nameof(ElementResizeMinSize), typeof(double), typeof(ResizeAdorner), new PropertyMetadata(10.0));
 
-            // 8つのハンドルThumbを作成
-            foreach (ResizeDirection item in Enum.GetValues<ResizeDirection>())
+        // ハンドルサイズ
+        public double ResizeHandleSize
+        {
+            get { return (double)GetValue(ResizeHandleSizeProperty); }
+            set { SetValue(ResizeHandleSizeProperty, value); }
+        }
+        public static readonly DependencyProperty ResizeHandleSizeProperty =
+            DependencyProperty.Register(nameof(ResizeHandleSize), typeof(double), typeof(ResizeAdorner), new FrameworkPropertyMetadata(10.0, FrameworkPropertyMetadataOptions.AffectsArrange, OnResizeHnadleSize));
+
+        private static void OnResizeHnadleSize(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            if (d is ResizeAdorner resizeAdorner)
             {
-                HT.Add(item, CreateThumb(item, Cursors.Hand));
+                double value = (double)e.NewValue;
+                resizeAdorner.ResizeHandleHalfSize = value / 2.0;
+                resizeAdorner.InternalResizeHandleSize = new Size(value, value);
             }
         }
+
+        #endregion プロパティ
+        
+
+        public event EventHandler<double>? LeftLocateChanged;
+        public event EventHandler<double>? TopLocateChanged;
 
 
         // Thumbの移動、対象要素のサイズ変更
@@ -69,10 +123,10 @@ namespace _20260413
                 // サイズは、10未満にならないようにする
                 double deltaX = e.HorizontalChange;
                 double newWidth = element.Width + (deltaX * policy.WidthF);
-                if (newWidth < 10)
+                if (newWidth < ElementResizeMinSize)
                 {
-                    deltaX = (10 - element.Width) * policy.WidthF;
-                    newWidth = 10;
+                    deltaX = (ElementResizeMinSize - element.Width) * policy.WidthF;
+                    newWidth = ElementResizeMinSize;
                 }
 
                 element.Width = newWidth; // リサイズ
@@ -90,10 +144,10 @@ namespace _20260413
                 double deltaY = e.VerticalChange;
                 double newHeight = element.Height + (deltaY * policy.HeightF);
 
-                if (newHeight < 10)
+                if (newHeight < ElementResizeMinSize)
                 {
-                    deltaY = (10 - element.Height) * policy.HeightF;
-                    newHeight = 10;
+                    deltaY = (ElementResizeMinSize - element.Height) * policy.HeightF;
+                    newHeight = ElementResizeMinSize;
                 }
 
                 element.Height = newHeight;
@@ -115,42 +169,54 @@ namespace _20260413
             // A 1回目：子要素（Thumb等）の再配置
             // 2回目：子要素の再配置により親要素（AdornerElement）の再配置が必要
 
-            double r = 5; // ハンドルThumbの半径
+            double r = ResizeHandleHalfSize; // ハンドルThumbの半径
+            Size s = InternalResizeHandleSize; // ハンドルサイズ
             double w = finalSize.Width;
             double h = finalSize.Height;
 
-            HT[ResizeDirection.TopLeft].Arrange(new Rect(-r, -r, 10, 10));
-            HT[ResizeDirection.TopRight].Arrange(new Rect(w - r, -r, 10, 10));
-            HT[ResizeDirection.BottomLeft].Arrange(new Rect(-r, h - r, 10, 10));
-            HT[ResizeDirection.BottomRight].Arrange(new Rect(w - r, h - r, 10, 10));
+            HT[ResizeDirection.TopLeft].Arrange(new Rect(new Point(-r, -r), s));
+            HT[ResizeDirection.TopRight].Arrange(new Rect(new Point(w - r, -r), s));
+            HT[ResizeDirection.BottomLeft].Arrange(new Rect(new Point(-r, h - r), s));
+            HT[ResizeDirection.BottomRight].Arrange(new Rect(new Point(w - r, h - r), s));
 
             double halfW = w / 2.0;
             double halfH = h / 2.0;
-            HT[ResizeDirection.Top].Arrange(new Rect(halfW - r, -r, 10, 10));
-            HT[ResizeDirection.Left].Arrange(new Rect(-r, halfH - r, 10, 10));
-            HT[ResizeDirection.Right].Arrange(new Rect(w - r, halfH - r, 10, 10));
-            HT[ResizeDirection.Bottom].Arrange(new Rect(halfW - r, h - r, 10, 10));
+            HT[ResizeDirection.Top].Arrange(new Rect(new Point(halfW - r, -r), s));
+            HT[ResizeDirection.Left].Arrange(new Rect(new Point(-r, halfH - r), s));
+            HT[ResizeDirection.Right].Arrange(new Rect(new Point(w - r, halfH - r), s));
+            HT[ResizeDirection.Bottom].Arrange(new Rect(new Point(halfW - r, h - r), s));
 
             return finalSize;
             //return base.ArrangeOverride(finalSize);
         }
 
-        private Thumb CreateThumb(ResizeDirection direction, Cursor cursor)
-        {
-            var thumb = new Thumb()
-            {
-                Width = 10,
-                Height = 10,
-                Background = Brushes.White,
-                BorderBrush = Brushes.DodgerBlue,
-                BorderThickness = new Thickness(1),
-                Tag = direction,
-                Cursor = cursor
-            };
-            thumb.DragDelta += OnResize;
-            _visualChildren.Add(thumb);
-            return thumb;
-        }
+        //// 配置の決定（Thumbを右下に配置）
+        //// 8個のThumbを正しい位置に並べる際も、finalSize（対象要素のサイズ）を基準に一括配置します。
+        //protected override Size ArrangeOverride(Size finalSize)
+        //{
+        //    // Q 1度の動作に2回ArrangeOverrideが処理されているのはなんで？
+        //    // A 1回目：子要素（Thumb等）の再配置
+        //    // 2回目：子要素の再配置により親要素（AdornerElement）の再配置が必要
+
+        //    double r = _resizeHandleHalfSize; // ハンドルThumbの半径
+        //    double w = finalSize.Width;
+        //    double h = finalSize.Height;
+
+        //    HT[ResizeDirection.TopLeft].Arrange(new Rect(-r, -r, 10, 10));
+        //    HT[ResizeDirection.TopRight].Arrange(new Rect(w - r, -r, 10, 10));
+        //    HT[ResizeDirection.BottomLeft].Arrange(new Rect(-r, h - r, 10, 10));
+        //    HT[ResizeDirection.BottomRight].Arrange(new Rect(w - r, h - r, 10, 10));
+
+        //    double halfW = w / 2.0;
+        //    double halfH = h / 2.0;
+        //    HT[ResizeDirection.Top].Arrange(new Rect(halfW - r, -r, 10, 10));
+        //    HT[ResizeDirection.Left].Arrange(new Rect(-r, halfH - r, 10, 10));
+        //    HT[ResizeDirection.Right].Arrange(new Rect(w - r, halfH - r, 10, 10));
+        //    HT[ResizeDirection.Bottom].Arrange(new Rect(halfW - r, h - r, 10, 10));
+
+        //    return finalSize;
+        //    //return base.ArrangeOverride(finalSize);
+        //}
 
 
         /// <summary>
@@ -181,9 +247,6 @@ namespace _20260413
             }
             return null;
         }
-
-
-
 
 
         /// <summary>
