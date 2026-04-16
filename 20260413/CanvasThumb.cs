@@ -29,12 +29,12 @@ namespace _20260413
 
         public void RemoveResizeHndle()
         {
-            ResizeAdorner2.RemoveResizeAdorner2(this);
+            ResizeAdorner.RemoveResizeAdorner(this);
         }
 
         public void AddResizeHandle()
         {
-            ResizeAdorner2? adorner = ResizeAdorner2.AddResizeAdorner2(this);
+            ResizeAdorner? adorner = ResizeAdorner.AddResizeAdorner(this);
             adorner?.LeftLocateChanged += Adorner_LeftLocateChanged;
             adorner?.TopLocateChanged += CanvasThumb_TopLocateChanged;
         }
