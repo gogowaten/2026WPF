@@ -23,11 +23,11 @@ namespace _20260413
 
         private void Button_Click_Add(object sender, RoutedEventArgs e)
         {
-            MyCanvasThumb.AddResizeHandle();
+            MyCanvasThumb.VisibleResizeHandle();
         }
         private void Button_Click_Remove(object sender, RoutedEventArgs e)
         {
-            MyCanvasThumb.RemoveResizeHndle();
+            MyCanvasThumb.HiddenResizeHndle();
         }
 
     }

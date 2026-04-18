@@ -26,25 +26,44 @@ namespace _20260413
         public CanvasThumb()
         {
             MyResizeAdorner = new ResizeAdorner(this);
-            Loaded += CanvasThumb_Loaded;
+            Loaded += (s, e) => { InitResizeAdorner(); };
             DragDelta += CanvasThumb_DragDelta;
+            InitResizeAdorner();
         }
 
-        private void CanvasThumb_Loaded(object sender, RoutedEventArgs e)
+
+
+        private void InitResizeAdorner()
         {
             if (AdornerLayer.GetAdornerLayer(this) is AdornerLayer layer)
             {
-                //MyResizeAdorner.SetBinding(ResizeAdorner.ResizeHandleSizeProperty, new Binding() { Source = this, Path = new PropertyPath(ResizeHandleSize) });
                 layer.Add(MyResizeAdorner);
-                Binding b = new();
-                b.Source = this;
-                b.Path = new PropertyPath(ResizeHandleSizeProperty);
-                b.Mode = BindingMode.TwoWay;
-                BindingOperations.SetBinding(MyResizeAdorner, ResizeAdorner.ResizeHandleSizeProperty, b);
+                MyResizeAdorner.Visibility = Visibility.Collapsed;
+
                 MyResizeAdorner.LeftLocateChanged += CanvasThumb_LeftLocateChanged;
                 MyResizeAdorner.TopLocateChanged += CanvasThumb_TopLocateChanged;
+
+                MyResizeAdorner.SetBinding(ResizeAdorner.ResizeHandleSizeProperty, new Binding() { Source = this, Path = new PropertyPath(ResizeHandleSizeProperty) });
             }
         }
+
+        //private void InitResizeAdorner()
+        //{
+        //    if (AdornerLayer.GetAdornerLayer(this) is AdornerLayer layer)
+        //    {
+        //        //MyResizeAdorner.SetBinding(ResizeAdorner.ResizeHandleSizeProperty, new Binding() { Source = this, Path = new PropertyPath(ResizeHandleSize) });
+        //        layer.Add(MyResizeAdorner);
+        //        Binding b = new();
+        //        b.Source = this;
+        //        b.Path = new PropertyPath(ResizeHandleSizeProperty);
+        //        b.Mode = BindingMode.TwoWay;
+        //        BindingOperations.SetBinding(MyResizeAdorner, ResizeAdorner.ResizeHandleSizeProperty, b);
+
+        //        MyResizeAdorner.LeftLocateChanged += CanvasThumb_LeftLocateChanged;
+        //        MyResizeAdorner.TopLocateChanged += CanvasThumb_TopLocateChanged;
+        //    }
+        //}
+
 
         #region プロパティ
 
@@ -59,18 +78,14 @@ namespace _20260413
         #endregion プロパティ
 
 
-        public void RemoveResizeHndle()
+        public void HiddenResizeHndle()
         {
-
-            ResizeAdorner.RemoveResizeAdorner(this);
-
+            MyResizeAdorner.Visibility = Visibility.Collapsed;
         }
 
-        public void AddResizeHandle()
+        public void VisibleResizeHandle()
         {
-            ResizeAdorner? adorner = ResizeAdorner.AddResizeAdorner(this);
-            adorner?.LeftLocateChanged += CanvasThumb_LeftLocateChanged;
-            adorner?.TopLocateChanged += CanvasThumb_TopLocateChanged;
+            MyResizeAdorner.Visibility = Visibility.Visible;
         }
 
         private void CanvasThumb_TopLocateChanged(object? sender, double e)
