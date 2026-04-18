@@ -12,9 +12,9 @@ namespace _20260413
     {
 
         private readonly VisualCollection _visualChildren;
-        private readonly Dictionary<ResizeDirection, Thumb> HT = [];
+        private readonly Dictionary<ResizeDirection, Thumb> HT = []; // リサイズハンドル群
         private double ResizeHandleHalfSize { get; set; } // 計算用：ハンドルサイズの半分
-        private Size InternalResizeHandleSize { get; set; } // 計算用
+        private Size InternalResizeHandleSize { get; set; } // 計算用：ハンドルサイズ
 
         #region コンストラクタと初期化系
 
@@ -73,7 +73,7 @@ namespace _20260413
 
         #region プロパティ
 
-        // 最小サイズ値
+        // リサイズ対象の最小サイズ値
         public double ElementResizeMinSize
         {
             get { return (double)GetValue(ElementMinSizeProperty); }
@@ -120,7 +120,7 @@ namespace _20260413
             if (policy.WidthF != 0)
             {
                 // 左要素の変更時は、横幅と左位置も変更する
-                // サイズは、10未満にならないようにする
+                // サイズは、最小サイズ未満にならないようにする
                 double deltaX = e.HorizontalChange;
                 double newWidth = element.Width + (deltaX * policy.WidthF);
                 if (newWidth < ElementResizeMinSize)
@@ -190,33 +190,6 @@ namespace _20260413
             //return base.ArrangeOverride(finalSize);
         }
 
-        //// 配置の決定（Thumbを右下に配置）
-        //// 8個のThumbを正しい位置に並べる際も、finalSize（対象要素のサイズ）を基準に一括配置します。
-        //protected override Size ArrangeOverride(Size finalSize)
-        //{
-        //    // Q 1度の動作に2回ArrangeOverrideが処理されているのはなんで？
-        //    // A 1回目：子要素（Thumb等）の再配置
-        //    // 2回目：子要素の再配置により親要素（AdornerElement）の再配置が必要
-
-        //    double r = _resizeHandleHalfSize; // ハンドルThumbの半径
-        //    double w = finalSize.Width;
-        //    double h = finalSize.Height;
-
-        //    HT[ResizeDirection.TopLeft].Arrange(new Rect(-r, -r, 10, 10));
-        //    HT[ResizeDirection.TopRight].Arrange(new Rect(w - r, -r, 10, 10));
-        //    HT[ResizeDirection.BottomLeft].Arrange(new Rect(-r, h - r, 10, 10));
-        //    HT[ResizeDirection.BottomRight].Arrange(new Rect(w - r, h - r, 10, 10));
-
-        //    double halfW = w / 2.0;
-        //    double halfH = h / 2.0;
-        //    HT[ResizeDirection.Top].Arrange(new Rect(halfW - r, -r, 10, 10));
-        //    HT[ResizeDirection.Left].Arrange(new Rect(-r, halfH - r, 10, 10));
-        //    HT[ResizeDirection.Right].Arrange(new Rect(w - r, halfH - r, 10, 10));
-        //    HT[ResizeDirection.Bottom].Arrange(new Rect(halfW - r, h - r, 10, 10));
-
-        //    return finalSize;
-        //    //return base.ArrangeOverride(finalSize);
-        //}
 
 
         /// <summary>
