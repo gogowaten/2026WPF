@@ -13,7 +13,12 @@
     </Grid.ColumnDefinitions>
 
     <Canvas x:Name="MyCanvas">
-      <local:GeoLine x:Name="MyElement" DataContext="{Binding}" Stroke="{Binding Stroke}"/>
+      <local:GeoLine x:Name="MyElement" DataContext="{Binding}"
+                     Stroke="{Binding Stroke}"
+                     StrokeThickness="{Binding StrokeThickness}"
+                     Fill="{Binding Fill}"
+                     MyPoints="{Binding MyPoints}"
+                     />
 
     </Canvas>
 
@@ -32,10 +37,12 @@
 
           <TextBlock Text="{Binding ActualHeight, StringFormat='ActualHeight = {0: 0; -0; 0}'}" TextWrapping="Wrap"/>
           <TextBlock Text="{Binding DesiredSize, StringFormat='DesiredSize = {0: 0; -0; 0}'}" TextWrapping="Wrap"/>
+          <TextBlock Text="{Binding MyIsOffset, StringFormat='MyIsOffset = {0: 0; -0; 0}'}" TextWrapping="Wrap"/>
           
         </StackPanel>
       </GroupBox>
       <Button Content="AddPoints" Click="Button_Click_AddPoint"/>
+      <Button Content="Vertex" Click="Button_Click_Vertex"/>
     </StackPanel>
   </Grid>
 </Window>

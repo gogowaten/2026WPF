@@ -29,7 +29,7 @@ namespace _20260419
         {
             GeoLineData data = new()
             {
-                MyPoints = [new Point(), new Point(20, 100)],
+                MyPoints = [new Point(20, 20), new Point(40, 120)],
                 Stroke = Brushes.Green,
                 StrokeThickness = 20,
                 IsOffset = true,
@@ -43,7 +43,16 @@ namespace _20260419
 
         private void Button_Click_AddPoint(object sender, RoutedEventArgs e)
         {
-            MyElement.MyPoints.Add(new Point(50, 10));
+            MyElement.MyPoints.Add(new Point(70, 30));
+        }
+
+        private void Button_Click_Vertex(object sender, RoutedEventArgs e)
+        {
+            if(AdornerLayer.GetAdornerLayer(MyElement) is AdornerLayer layer)
+            {
+                VertexAdorner adorner = new(MyElement);
+                layer.Add(adorner);
+            }
         }
     }
 }

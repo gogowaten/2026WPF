@@ -155,7 +155,7 @@ namespace _20260419
             {
                 MyData = data;
                 MyGeometryBounds = data.OnUpdateBounds(_cachedGeometry);
-                MyPoints = data.MyPoints;
+                //MyPoints = data.MyPoints;
                 //InvalidateMeasure();
                 InvalidateVisual();
             }
