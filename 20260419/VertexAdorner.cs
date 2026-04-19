@@ -17,6 +17,7 @@ namespace _20260419
         private readonly VisualCollection _visualChildren;
         private readonly List<Thumb> _handleThumbs = new();
         private readonly GeoLine _adornedElement;
+        
 
         public VertexAdorner(UIElement adornedElement) : base(adornedElement)
         {
@@ -51,9 +52,9 @@ namespace _20260419
             int id = (int)((Thumb)sender).Tag;
             Point p = _adornedElement.MyPoints[id];
             _adornedElement.MyPoints[id] = new Point(p.X + e.HorizontalChange, p.Y + e.VerticalChange);
-
             //_adornedElement.InvalidateVisual();
             //InvalidateArrange();
+            e.Handled = true;
         }
 
         protected override Size ArrangeOverride(Size finalSize)

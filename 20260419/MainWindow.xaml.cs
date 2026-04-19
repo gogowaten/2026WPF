@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using Microsoft.VisualBasic;
+using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -29,10 +30,10 @@ namespace _20260419
         {
             GeoLineData data = new()
             {
-                MyPoints = [new Point(20, 20), new Point(40, 120)],
+                MyPoints = [new Point(40, 20), new Point(60, 140)],
                 Stroke = Brushes.Green,
                 StrokeThickness = 20,
-                IsOffset = true,
+                IsOffset = false,
                 Background = Brushes.Gold,
                 Fill = Brushes.DeepSkyBlue,
                 IsCanDragMove = true,
@@ -43,16 +44,29 @@ namespace _20260419
 
         private void Button_Click_AddPoint(object sender, RoutedEventArgs e)
         {
-            MyElement.MyPoints.Add(new Point(70, 30));
+            MyData.MyPoints?.Add(new Point(90, 50));
+            //MyElement.MyPoints.Add(new Point(70, 30));
         }
 
         private void Button_Click_Vertex(object sender, RoutedEventArgs e)
         {
-            if(AdornerLayer.GetAdornerLayer(MyElement) is AdornerLayer layer)
+            
+            if(AdornerLayer.GetAdornerLayer(MyElement.MyGeoLine) is AdornerLayer layer)
             {
-                VertexAdorner adorner = new(MyElement);
+                VertexAdorner adorner = new(MyElement.MyGeoLine);
                 layer.Add(adorner);
             }
+            
+            //if(AdornerLayer.GetAdornerLayer(MyElement) is AdornerLayer layer)
+            //{
+            //    VertexAdorner adorner = new(MyElement);
+            //    layer.Add(adorner);
+            //}
+        }
+
+        private void Button_Click_IsOffset(object sender, RoutedEventArgs e)
+        {
+            MyData.IsOffset = !MyData.IsOffset;
         }
     }
 }

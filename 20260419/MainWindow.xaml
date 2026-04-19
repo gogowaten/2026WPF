@@ -13,36 +13,37 @@
     </Grid.ColumnDefinitions>
 
     <Canvas x:Name="MyCanvas">
-      <local:GeoLine x:Name="MyElement" DataContext="{Binding}"
+      <!--<local:GeoLine x:Name="MyElement" DataContext="{Binding}"
                      Stroke="{Binding Stroke}"
                      StrokeThickness="{Binding StrokeThickness}"
                      Fill="{Binding Fill}"
                      MyPoints="{Binding MyPoints}"
-                     />
-
+                     />-->
+      <local:GeoThumb x:Name="MyElement" DataContext="{Binding}"/>
     </Canvas>
 
     <StackPanel Grid.Column="1">
       <GroupBox Header="MyData" DataContext="{Binding}">
         <StackPanel>
           <TextBlock Text="{Binding MyPoints, StringFormat='Points = {0: 0; -0; 0}'}" TextWrapping="Wrap"/>
+          <TextBlock Text="{Binding StrokeThickness, StringFormat='StrokeThickness = {0:0}'}"/>
+          <TextBlock Text="{Binding MyPoints, StringFormat='Points = {0: 0; -0; 0}'}" TextWrapping="Wrap"/>
+          <TextBlock Text="{Binding Bounds, StringFormat='MyGeometryBounds = {0: 0; -0; 0}'}" TextWrapping="Wrap"/>
+
+          <TextBlock Text="{Binding MyIsOffset, StringFormat='MyIsOffset = {0: 0; -0; 0}'}" TextWrapping="Wrap"/>
+          
         </StackPanel>
       </GroupBox>
       <GroupBox Header="GeoLine" DataContext="{Binding ElementName=MyElement}">
         <StackPanel>
           <TextBlock Text="{Binding }"/>
-          <TextBlock Text="{Binding StrokeThickness, StringFormat='StrokeThickness = {0:0}'}"/>
-          <TextBlock Text="{Binding MyPoints, StringFormat='Points = {0: 0; -0; 0}'}" TextWrapping="Wrap"/>
-          <TextBlock Text="{Binding MyGeometryBounds, StringFormat='MyGeometryBounds = {0: 0; -0; 0}'}" TextWrapping="Wrap"/>
-
           <TextBlock Text="{Binding ActualHeight, StringFormat='ActualHeight = {0: 0; -0; 0}'}" TextWrapping="Wrap"/>
           <TextBlock Text="{Binding DesiredSize, StringFormat='DesiredSize = {0: 0; -0; 0}'}" TextWrapping="Wrap"/>
-          <TextBlock Text="{Binding MyIsOffset, StringFormat='MyIsOffset = {0: 0; -0; 0}'}" TextWrapping="Wrap"/>
-          
         </StackPanel>
       </GroupBox>
       <Button Content="AddPoints" Click="Button_Click_AddPoint"/>
       <Button Content="Vertex" Click="Button_Click_Vertex"/>
+      <Button Content="IsOffset" Click="Button_Click_IsOffset"/>
     </StackPanel>
   </Grid>
 </Window>

@@ -15,7 +15,12 @@
     <Canvas x:Name="MyCanvas">
       <local:CanvasThumb x:Name="MyCanvasThumb"
                          Canvas.Left="150" Canvas.Top="30"
-                         Width="100" Height="100"/>
+                         Width="100" Height="100">
+        <local:CanvasThumb.RenderTransform>
+          <RotateTransform Angle="20"/>
+        </local:CanvasThumb.RenderTransform>
+      </local:CanvasThumb>
+      
     </Canvas>
 
     <StackPanel Grid.Column="1">
