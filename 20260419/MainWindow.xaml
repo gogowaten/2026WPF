@@ -1,0 +1,41 @@
+﻿<Window x:Class="_20260419.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:_20260419" d:DataContext="{d:DesignInstance Type=local:GeoLineData}"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="367" Width="654">
+  <Grid>
+    <Grid.ColumnDefinitions>
+      <ColumnDefinition/>
+      <ColumnDefinition Width="200"/>
+    </Grid.ColumnDefinitions>
+
+    <Canvas x:Name="MyCanvas">
+      <local:GeoLine x:Name="MyElement" DataContext="{Binding}" Stroke="{Binding Stroke}"/>
+
+    </Canvas>
+
+    <StackPanel Grid.Column="1">
+      <GroupBox Header="MyData" DataContext="{Binding}">
+        <StackPanel>
+          <TextBlock Text="{Binding MyPoints, StringFormat='Points = {0: 0; -0; 0}'}" TextWrapping="Wrap"/>
+        </StackPanel>
+      </GroupBox>
+      <GroupBox Header="GeoLine" DataContext="{Binding ElementName=MyElement}">
+        <StackPanel>
+          <TextBlock Text="{Binding }"/>
+          <TextBlock Text="{Binding StrokeThickness, StringFormat='StrokeThickness = {0:0}'}"/>
+          <TextBlock Text="{Binding MyPoints, StringFormat='Points = {0: 0; -0; 0}'}" TextWrapping="Wrap"/>
+          <TextBlock Text="{Binding MyGeometryBounds, StringFormat='MyGeometryBounds = {0: 0; -0; 0}'}" TextWrapping="Wrap"/>
+
+          <TextBlock Text="{Binding ActualHeight, StringFormat='ActualHeight = {0: 0; -0; 0}'}" TextWrapping="Wrap"/>
+          <TextBlock Text="{Binding DesiredSize, StringFormat='DesiredSize = {0: 0; -0; 0}'}" TextWrapping="Wrap"/>
+          
+        </StackPanel>
+      </GroupBox>
+      <Button Content="AddPoints" Click="Button_Click_AddPoint"/>
+    </StackPanel>
+  </Grid>
+</Window>
