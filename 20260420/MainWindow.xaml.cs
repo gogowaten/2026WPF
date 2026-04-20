@@ -45,18 +45,6 @@ namespace _20260420
         {
             var elementData = MyElement.DataContext;
             var neko = MyData;
-            //MyElement.Measure(MyData.GeometryBounds.Size);
-
-            //MyData.RefreshWidthHeight();
-            //MyElement.InvalidateVisual();
-            //MyElement.InvalidateMeasure();
-            //MyElement.InvalidateArrange();
-            //MyElement.UpdateLayout();
-            //MyElement.MyGeoLine.InvalidateVisual();
-            //MyElement.MyGeoLine.InvalidateMeasure();
-            //MyData.MyPoints?.Add(new Point(3,3));
-            //MyData.MyPoints?.RemoveAt(2);
-
         }
 
         private void Button_Click_Add(object sender, RoutedEventArgs e)

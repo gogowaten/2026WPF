@@ -27,19 +27,12 @@ namespace _20260420
         }
 
         [ObservableProperty] private PointCollection? _myPoints;
-        //[ObservableProperty] private Pen _strokePen = null!;
         [ObservableProperty] private PenLineCap _endLineCap;
         [ObservableProperty] private PenLineCap _startLineCap;
         [ObservableProperty] private double _miterLimit = 10.0;
         [ObservableProperty] private PenLineJoin _lineJoin;
-        //[ObservableProperty] private bool _isOffset;
         [ObservableProperty] private bool _isCanDragMove;
         [ObservableProperty] private double _strokeThickness = 1.0;
-        //[ObservableProperty] private Rect _geometryBounds = new();
-        //[ObservableProperty] private double _geometryWidth;
-        //[ObservableProperty] private double _geometryHeight;
-        //[ObservableProperty] private double _geometryLeft;
-        //[ObservableProperty] private double _geometryTop;
 
 
 
