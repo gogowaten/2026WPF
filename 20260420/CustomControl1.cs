@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Reflection;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
@@ -57,16 +59,9 @@ namespace _20260420
             set { SetValue(MyDataProperty, value); }
         }
         public static readonly DependencyProperty MyDataProperty = DependencyProperty.Register(
-                nameof(MyData), typeof(GeoLineData), typeof(GeoThumb), new PropertyMetadata(null, OnMyDataChanged));
+                nameof(MyData), typeof(GeoLineData), typeof(GeoThumb), new PropertyMetadata(null));
 
-        private static void OnMyDataChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            if (d is GeoThumb gt && e.NewValue is GeoLineData data)
-            {
-                //gt.MyGeoLine.UpdateGeometryBounds();
-                
-            }
-        }
+     
         #endregion プロパティ
 
 
@@ -86,12 +81,17 @@ namespace _20260420
             if (DataContext is GeoLineData data)
             {
                 MyData = data;
+                //this.Measure(MyData.GeometryBounds.Size);
                 //MyData.RefreshWidthHeight();
                 //MyData.UpdateGeometrySize();
                 //InvalidateMeasure(); // 効果なし
                 //InvalidateVisual();
             }
             //MyData.UpdatePen();
+        }
+        private void Test()
+        {
+            Debug.WriteLine("Test");
         }
     }
 

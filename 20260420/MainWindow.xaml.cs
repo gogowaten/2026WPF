@@ -35,7 +35,7 @@ namespace _20260420
                 StrokeThickness = 20,
                 Background = Brushes.CadetBlue,
                 Fill = Brushes.Silver,
-                IsOffset = true,
+                //IsOffset = true,
                 IsCanDragMove = true,
             };
             return data;
@@ -45,6 +45,8 @@ namespace _20260420
         {
             var elementData = MyElement.DataContext;
             var neko = MyData;
+            //MyElement.Measure(MyData.GeometryBounds.Size);
+
             //MyData.RefreshWidthHeight();
             //MyElement.InvalidateVisual();
             //MyElement.InvalidateMeasure();
@@ -65,6 +67,11 @@ namespace _20260420
         private void Button_Click_Clear(object sender, RoutedEventArgs e)
         {
             MyData.MyPoints?.Clear();
+        }
+
+        private void Button_Click_StrokeColor(object sender, RoutedEventArgs e)
+        {
+            MyData.Stroke = Brushes.Red;
         }
     }
 }

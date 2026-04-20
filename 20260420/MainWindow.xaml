@@ -21,6 +21,7 @@
       <Button Content="Check" Click="Button_Click_Check"/>
       <Button Content="Add" Click="Button_Click_Add"/>
       <Button Content="Clear" Click="Button_Click_Clear"/>
+      <Button Content="StrokeColor" Click="Button_Click_StrokeColor"/>
       <GroupBox Header="Data" DataContext="{Binding MyData}">
         <StackPanel>
           <TextBlock Text="{Binding GeometryBounds, StringFormat='GeometryBounds = {0: 0; -0; 0}'}"/>

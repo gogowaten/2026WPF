@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
+using System.Reflection;
 using System.Text;
 using System.Windows;
 using System.Windows.Data;
@@ -20,6 +22,9 @@ namespace _20260420
         {
             get
             {
+#if DEBUG
+                Debug.WriteLine($"{MethodBase.GetCurrentMethod()?.ReflectedType?.Name}__{MethodBase.GetCurrentMethod()?.Name}");
+#endif
                 // キャッシュが在ればそれを返して終わる
                 if (_cachedGeometry is not null)
                 {
@@ -29,53 +34,43 @@ namespace _20260420
                 if (MyPoints is null || MyPoints.Count < 2)
                 {
                     _cachedGeometry = null;
-                    //MyGeometryBounds = MyData.OnUpdateBounds(_cachedGeometry);
-                    MyGeometryBounds = new Rect();
+                    //MyGeometryBounds = new Rect();
                     return Geometry.Empty;
                 }
 
                 PathGeometry geo = MakeLineGeometry(MyPoints);
                 _cachedGeometry = geo;
-                UpdateGeometryBounds();
                 //MyGeometryBounds = _cachedGeometry.GetRenderBounds(MyStrokePen);
-                //MyGeometryBounds = MyData.OnUpdateBounds(_cachedGeometry);
                 return geo;
             }
         }
 
         #region 依存関係プロパティ
 
-        //public GeoLineData MyData
+     
+
+        //public Rect MyGeometryBounds
         //{
-        //    get { return (GeoLineData)GetValue(MyDataProperty); }
-        //    set { SetValue(MyDataProperty, value); }
+        //    get { return (Rect)GetValue(MyGeometryBoundsProperty); }
+        //    set { SetValue(MyGeometryBoundsProperty, value); }
         //}
-        //public static readonly DependencyProperty MyDataProperty =
-        //    DependencyProperty.Register(nameof(MyData), typeof(GeoLineData), typeof(GeoLine), new PropertyMetadata(null));
+        //public static readonly DependencyProperty MyGeometryBoundsProperty =
+        //    DependencyProperty.Register(nameof(MyGeometryBounds), typeof(Rect), typeof(GeoLine), new PropertyMetadata(null));
 
-
-        public Rect MyGeometryBounds
-        {
-            get { return (Rect)GetValue(MyGeometryBoundsProperty); }
-            set { SetValue(MyGeometryBoundsProperty, value); }
-        }
-        public static readonly DependencyProperty MyGeometryBoundsProperty =
-            DependencyProperty.Register(nameof(MyGeometryBounds), typeof(Rect), typeof(GeoLine), new PropertyMetadata(null));
-
-        public bool MyIsOffset
-        {
-            get { return (bool)GetValue(MyIsOffsetProperty); }
-            set { SetValue(MyIsOffsetProperty, value); }
-        }
-        public static readonly DependencyProperty MyIsOffsetProperty =
-            DependencyProperty.Register(nameof(MyIsOffset), typeof(bool), typeof(GeoLine), new PropertyMetadata(false, OnMyIsOffsetChanged));
-        private static void OnMyIsOffsetChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            if (d is GeoLine geo)
-            {
-                geo.InvalidateVisual(); // 再描画
-            }
-        }
+        //public bool MyIsOffset
+        //{
+        //    get { return (bool)GetValue(MyIsOffsetProperty); }
+        //    set { SetValue(MyIsOffsetProperty, value); }
+        //}
+        //public static readonly DependencyProperty MyIsOffsetProperty =
+        //    DependencyProperty.Register(nameof(MyIsOffset), typeof(bool), typeof(GeoLine), new PropertyMetadata(false, OnMyIsOffsetChanged));
+        //private static void OnMyIsOffsetChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        //{
+        //    if (d is GeoLine geo)
+        //    {
+        //        geo.InvalidateVisual(); // 再描画
+        //    }
+        //}
 
         public Pen MyStrokePen
         {
@@ -136,10 +131,10 @@ namespace _20260420
             // キャッシュクリアしてから再描画
             _cachedGeometry = null;
             InvalidateMeasure(); // ほぼ完璧、図形のActualが更新されないけど、使わないので問題ない
+            
             //InvalidateVisual(); // これでは不足、サイズが更新されない
             //InvalidateArrange(); // 全く足りない、図形自体すら再描画されない
             //UpdateLayout(); // 全く足りない、図形自体すら再描画されない
-            //InvalidateMeasure();
 
         }
 
@@ -150,9 +145,6 @@ namespace _20260420
         public GeoLine()
         {
             SetMyBind();
-            //MyData = new();
-            Loaded += GeoLine_Loaded;
-
         }
 
         private void SetMyBind()
@@ -169,7 +161,8 @@ namespace _20260420
 
         private void GeoLine_Loaded(object sender, RoutedEventArgs e)
         {
-            UpdateGeometryBounds();
+            //UpdateGeometryBounds();
+            
             //if (DataContext is GeoLineData data)
             //{
             //    //MyData = data;
@@ -186,36 +179,36 @@ namespace _20260420
 
         #region オーバーライド
 
-        protected override void OnRender(DrawingContext drawingContext)
-        {
-            // オフセット表示の場合はTranslateTransformで変形したものを描画
-            if (MyIsOffset)
-            {
-                //drawingContext.PushTransform(new TranslateTransform(-MyData.Bounds.Left, -MyData.Bounds.Top));
-                drawingContext.PushTransform(new TranslateTransform(-MyGeometryBounds.Left, -MyGeometryBounds.Top));
-            }
-            //if (MyData is GeoLineData data && data.Background is not null)
-            //{
-            //    drawingContext.DrawRectangle(data.Background, null, new Rect(MyData.BoundsLeft, MyData.BoundsTop, MyData.BoundsWidth, MyData.BoundsHeight));
-            //}
-            base.OnRender(drawingContext);
-        }
+        //protected override void OnRender(DrawingContext drawingContext)
+        //{
+        //    // オフセット表示の場合はTranslateTransformで変形したものを描画
+        //    if (MyIsOffset)
+        //    {
+        //        //drawingContext.PushTransform(new TranslateTransform(-MyData.Bounds.Left, -MyData.Bounds.Top));
+        //        drawingContext.PushTransform(new TranslateTransform(-MyGeometryBounds.Left, -MyGeometryBounds.Top));
+        //    }
+        //    //if (MyData is GeoLineData data && data.Background is not null)
+        //    //{
+        //    //    drawingContext.DrawRectangle(data.Background, null, new Rect(MyData.BoundsLeft, MyData.BoundsTop, MyData.BoundsWidth, MyData.BoundsHeight));
+        //    //}
+        //    base.OnRender(drawingContext);
+        //}
         #endregion オーバーライド
 
-        public void UpdateGeometryBounds()
-        {
-            if (_cachedGeometry is null)
-            {
-                MyGeometryBounds = Rect.Empty;
-                //MyGeometryBounds = new Rect();
-            }
-            else
-            {
-                var bounds = _cachedGeometry.GetRenderBounds(MyStrokePen);
-                MyGeometryBounds = bounds;
-                //MyGeometryBounds = _cachedGeometry.GetRenderBounds(MyStrokePen);
-            }
-        }
+        //public void UpdateGeometryBounds()
+        //{
+        //    if (_cachedGeometry is null)
+        //    {
+        //        MyGeometryBounds = Rect.Empty;
+        //        //MyGeometryBounds = new Rect();
+        //    }
+        //    else
+        //    {
+               
+        //        MyGeometryBounds = _cachedGeometry.GetRenderBounds(MyStrokePen);
+        //    }
+
+        //}
 
 
 

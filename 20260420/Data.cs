@@ -1,8 +1,10 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing.Drawing2D;
 using System.Globalization;
+using System.Reflection;
 using System.Text;
 using System.Windows;
 using System.Windows.Data;
@@ -19,149 +21,42 @@ namespace _20260420
         public GeoLineData()
         {
             Name = "FromGeoLineData";
+#if DEBUG
+            Debug.WriteLine($"{MethodBase.GetCurrentMethod()?.ReflectedType?.Name}__{MethodBase.GetCurrentMethod()?.Name}");
+#endif
         }
 
         [ObservableProperty] private PointCollection? _myPoints;
-        [ObservableProperty] private Pen _strokePen = null!;
+        //[ObservableProperty] private Pen _strokePen = null!;
         [ObservableProperty] private PenLineCap _endLineCap;
         [ObservableProperty] private PenLineCap _startLineCap;
         [ObservableProperty] private double _miterLimit = 10.0;
         [ObservableProperty] private PenLineJoin _lineJoin;
-        [ObservableProperty] private bool _isOffset;
+        //[ObservableProperty] private bool _isOffset;
         [ObservableProperty] private bool _isCanDragMove;
         [ObservableProperty] private double _strokeThickness = 1.0;
-        [ObservableProperty] private Rect _geometryBounds = new();
-        [ObservableProperty] private double _geometryWidth;
-        [ObservableProperty] private double _geometryHeight;
-        [ObservableProperty] private double _geometryLeft;
-        [ObservableProperty] private double _geometryTop;
+        //[ObservableProperty] private Rect _geometryBounds = new();
+        //[ObservableProperty] private double _geometryWidth;
+        //[ObservableProperty] private double _geometryHeight;
+        //[ObservableProperty] private double _geometryLeft;
+        //[ObservableProperty] private double _geometryTop;
 
 
 
-        #region StrokePen更新
-        partial void OnGeometryBoundsChanged(Rect oldValue, Rect newValue)
-        {
-            var diffLeft = newValue.Left - oldValue.Left;
-            var diffTop = newValue.Top - oldValue.Top;
-            InternalX += diffLeft;
-            InternalY += diffTop;
-
-            GeometryWidth = newValue.Width;
-            GeometryHeight = newValue.Height;
-
-        }
-
-        //public void RefreshWidthHeight()
+    
+        //partial void OnGeometryBoundsChanged(Rect oldValue, Rect newValue)
         //{
-        //    // 値を代入せず、通知だけを強制的に発行する
-        //    OnPropertyChanged(nameof(GeometryWidth));
-        //    OnPropertyChanged(nameof(GeometryHeight));
-            
-        //}
-
-        //public void UpdateGeometrySize()
-        //{
-        //    GeometryWidth = GeometryBounds.Width + 1;
-        //    GeometryHeight = GeometryBounds.Height + 1;
-        //}
-
-        partial void OnEndLineCapChanged(PenLineCap value)
-        {
-            UpdatePen();
-        }
-        partial void OnStartLineCapChanged(PenLineCap value)
-        {
-            UpdatePen();
-        }
-        partial void OnMiterLimitChanged(double value)
-        {
-            UpdatePen();
-        }
-        partial void OnLineJoinChanged(PenLineJoin value)
-        {
-            UpdatePen();
-        }
-        partial void OnStrokeThicknessChanged(double value)
-        {
-            UpdatePen();
-        }
-
-        public void UpdatePen()
-        {
-            //StrokePen.EndLineCap = EndLineCap;
-            //StrokePen.StartLineCap = StartLineCap;
-            //StrokePen.MiterLimit = MiterLimit;
-            //StrokePen.LineJoin = LineJoin;
-
-            StrokePen = new Pen(Stroke, StrokeThickness)
-            {
-                EndLineCap = EndLineCap,
-                StartLineCap = StartLineCap,
-                MiterLimit = MiterLimit,
-                LineJoin = LineJoin,
-            };
-        }
-
-        #endregion StrokePen更新
-
-
-
-        //public Rect OnUpdateBounds(Geometry? _cachedGeometry)
-        //{
-        //    if (_cachedGeometry is null)
-        //    {
-        //        MySizeReset();
-        //        return new Rect();
-        //    }
-
-        //    Rect geoBounds = _cachedGeometry.GetRenderBounds(StrokePen);
-        //    if (geoBounds.IsEmpty || _cachedGeometry is null)
-        //    {
-        //        MySizeReset();
-        //        return geoBounds;
-        //    }
-
-
-        //    var diffLeft = geoBounds.Left - Bounds.Left;
-        //    var diffTop = geoBounds.Top - Bounds.Top;
+        //    var diffLeft = newValue.Left - oldValue.Left;
+        //    var diffTop = newValue.Top - oldValue.Top;
         //    InternalX += diffLeft;
         //    InternalY += diffTop;
 
-        //    BoundsTop = geoBounds.Top;
-        //    BoundsLeft = geoBounds.Left;
-        //    BoundsWidth = geoBounds.Width;
-        //    BoundsHeight = geoBounds.Height;
-        //    Bounds = geoBounds;
+        //    GeometryWidth = newValue.Width;
+        //    GeometryHeight = newValue.Height;
 
-        //    if (IsOffset)
-        //    {
-        //        Width = InternalX + geoBounds.Width;
-        //        Height = InternalY + geoBounds.Height;
-        //    }
-
-        //    if (geoBounds.Left < 0)
-        //    {
-        //        Width = geoBounds.Width;
-        //        Height = geoBounds.Height;
-        //    }
-
-        //    Bounds = geoBounds;
-        //    return geoBounds;
         //}
 
-        //private void MySizeReset()
-        //{
 
-        //    Bounds = new();
-
-        //    BoundsLeft = 0;
-        //    BoundsTop = 0;
-        //    BoundsWidth = 0;
-        //    BoundsHeight = 0;
-
-        //    Width = 0;
-        //    Height = 0;
-        //}
 
     }
 
