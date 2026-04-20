@@ -19,7 +19,7 @@
                      Fill="{Binding Fill}"
                      MyPoints="{Binding MyPoints}"
                      />-->
-      <local:GeoThumb x:Name="MyElement" DataContext="{Binding}"/>
+      <local:GeoThumb x:Name="MyElement" DataContext="{Binding}" Canvas.Left="100" Canvas.Top="50"/>
     </Canvas>
 
     <StackPanel Grid.Column="1">
@@ -41,6 +41,7 @@
           <TextBlock Text="{Binding DesiredSize, StringFormat='DesiredSize = {0: 0; -0; 0}'}" TextWrapping="Wrap"/>
         </StackPanel>
       </GroupBox>
+      <Button Content="Check" Click="Button_Click_Check"/>
       <Button Content="AddPoints" Click="Button_Click_AddPoint"/>
       <Button Content="Vertex" Click="Button_Click_Vertex"/>
       <Button Content="IsOffset" Click="Button_Click_IsOffset"/>

@@ -68,5 +68,10 @@ namespace _20260419
         {
             MyData.IsOffset = !MyData.IsOffset;
         }
+
+        private void Button_Click_Check(object sender, RoutedEventArgs e)
+        {
+            var po = MyData.MyPoints;
+        }
     }
 }
