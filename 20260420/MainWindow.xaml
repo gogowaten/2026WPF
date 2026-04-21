@@ -15,7 +15,9 @@
       <!--<local:GeoLine MyPoints="0,0 100,100" Stroke="Red"/>-->
       <local:GeoThumb x:Name="MyElement" DataContext="{Binding MyData}"
                       />
-      <local:CanvasThumb Width="200" Height="200"/>
+      <local:CanvasThumb x:Name="MyElement2" Width="200" Height="200">
+        
+      </local:CanvasThumb>
     </Canvas>
 
     <StackPanel Grid.Column="1">

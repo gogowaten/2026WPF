@@ -45,6 +45,7 @@ namespace _20260420
         {
             var elementData = MyElement.DataContext;
             var neko = MyData;
+            MyElement2.VisibleResizeHandle();
         }
 
         private void Button_Click_Add(object sender, RoutedEventArgs e)

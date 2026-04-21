@@ -35,10 +35,6 @@ namespace _20260420
 
         }
 
-        private void CanvasThumb_DragDelta(object sender, DragDeltaEventArgs e)
-        {
-            throw new NotImplementedException();
-        }
 
         private void InitResizeAdorner()
         {
@@ -55,6 +51,18 @@ namespace _20260420
             }
         }
 
+        public override void OnApplyTemplate()
+        {
+            base.OnApplyTemplate();
+            if (GetTemplateChild("PART_Canvas") is Canvas canvas)
+            {
+                MyTemplateCanvas = canvas;
+            }
+            else
+            {
+                throw new InvalidOperationException("TemplateのCanvasが見つからない");
+            }
+        }
 
         public double ResizeHandeleSize
         {
@@ -62,19 +70,43 @@ namespace _20260420
             set { SetValue(ResizeHandeleSizeProperty, value); }
         }
         public static readonly DependencyProperty ResizeHandeleSizeProperty =
-            DependencyProperty.Register(nameof(ResizeHandeleSize), typeof(double), typeof(CanvasThumb), new PropertyMetadata(12.0));
+            DependencyProperty.Register(nameof(ResizeHandeleSize), typeof(double),
+                typeof(CanvasThumb), new PropertyMetadata(12.0));
 
+        public void HiddenResizeHndle()
+        {
+            MyResizeAdorner.Visibility = Visibility.Collapsed;
+        }
 
+        public void VisibleResizeHandle()
+        {
+            MyResizeAdorner.Visibility = Visibility.Visible;
+        }
 
 
         private void CanvasThumb_TopLocateChanged(object? sender, double e)
         {
-            throw new NotImplementedException();
+            foreach (var item in MyTemplateCanvas.Children.OfType<UIElement>())
+            {
+                Canvas.SetTop(item, Canvas.GetTop(item) - e);
+            }
         }
 
         private void CanvasThumb_LeftLocateChanged(object? sender, double e)
         {
-            throw new NotImplementedException();
+            IEnumerable<UIElement> items = MyTemplateCanvas.Children.OfType<UIElement>();
+            foreach (UIElement item in items)
+            {
+                Canvas.SetLeft(item, Canvas.GetLeft(item) - e);
+            }
+        }
+
+      
+
+        private void CanvasThumb_DragDelta(object sender, DragDeltaEventArgs e)
+        {
+            Canvas.SetLeft(this, Canvas.GetLeft(this) + e.HorizontalChange);
+            Canvas.SetTop(this, Canvas.GetTop(this) + e.VerticalChange);
         }
     }
 
