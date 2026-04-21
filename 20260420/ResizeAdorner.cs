@@ -52,8 +52,6 @@ namespace _20260420
             };
             thumb.DragDelta += OnResize;
             _visualChildren.Add(thumb);
-            thumb.SetBinding(WidthProperty, nameof(ResizeHandleSizeProperty));
-            thumb.SetBinding(HeightProperty, nameof(ResizeHandleSizeProperty));
             return thumb;
         }
 
