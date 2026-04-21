@@ -38,7 +38,7 @@ namespace _20260420
 
         private void InitResizeAdorner()
         {
-            if(AdornerLayer.GetAdornerLayer(this) is AdornerLayer layer)
+            if (AdornerLayer.GetAdornerLayer(this) is AdornerLayer layer)
             {
                 layer.Add(MyResizeAdorner);
                 MyResizeAdorner.Visibility = Visibility.Collapsed;
@@ -47,7 +47,7 @@ namespace _20260420
                 MyResizeAdorner.TopLocateChanged += CanvasThumb_TopLocateChanged;
 
                 MyResizeAdorner.SetBinding(ResizeAdorner.ResizeHandleSizeProperty,
-                    new Binding() { Source = this ,Path = new PropertyPath(ResizeHandeleSizeProperty)});
+                    new Binding() { Source = this, Path = new PropertyPath(ResizeHandeleSizeProperty) });
             }
         }
 
@@ -72,6 +72,18 @@ namespace _20260420
         public static readonly DependencyProperty ResizeHandeleSizeProperty =
             DependencyProperty.Register(nameof(ResizeHandeleSize), typeof(double),
                 typeof(CanvasThumb), new PropertyMetadata(12.0));
+
+        public void ChangeResizeHandleVisible()
+        {
+            if (MyResizeAdorner.Visibility == Visibility.Visible)
+            {
+                MyResizeAdorner.Visibility = Visibility.Collapsed;
+            }
+            else
+            {
+                MyResizeAdorner.Visibility = Visibility.Visible;
+            }
+        }
 
         public void HiddenResizeHndle()
         {
@@ -101,7 +113,7 @@ namespace _20260420
             }
         }
 
-      
+
 
         private void CanvasThumb_DragDelta(object sender, DragDeltaEventArgs e)
         {
@@ -158,7 +170,7 @@ namespace _20260420
         public static readonly DependencyProperty MyDataProperty = DependencyProperty.Register(
                 nameof(MyData), typeof(GeoLineData), typeof(GeoThumb), new PropertyMetadata(null));
 
-     
+
         #endregion プロパティ
 
 

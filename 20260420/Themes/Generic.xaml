@@ -8,7 +8,9 @@
     <Setter Property="Template">
       <Setter.Value>
         <ControlTemplate TargetType="{x:Type local:CanvasThumb}">
-          <Canvas x:Name="PART_Canvas" Background="Red"/>
+          <Canvas x:Name="PART_Canvas" Background="Red">
+            <local:GeoThumb/>
+          </Canvas>
         </ControlTemplate>
       </Setter.Value>
     </Setter>
@@ -17,8 +19,8 @@
 
 
   <Style TargetType="{x:Type local:GeoThumb}">
-    <Setter Property="Canvas.Left" Value="{Binding InternalX}"/>
-    <Setter Property="Canvas.Top" Value="{Binding InternalY}"/>
+    <Setter Property="Canvas.Left" Value="{Binding InternalX, Mode=TwoWay}"/>
+    <Setter Property="Canvas.Top" Value="{Binding InternalY, Mode=TwoWay}"/>
     
     <Setter Property="Template">
       <Setter.Value>

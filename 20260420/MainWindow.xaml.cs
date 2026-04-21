@@ -45,7 +45,6 @@ namespace _20260420
         {
             var elementData = MyElement.DataContext;
             var neko = MyData;
-            MyElement2.VisibleResizeHandle();
         }
 
         private void Button_Click_Add(object sender, RoutedEventArgs e)
@@ -61,6 +60,11 @@ namespace _20260420
         private void Button_Click_StrokeColor(object sender, RoutedEventArgs e)
         {
             MyData.Stroke = Brushes.Red;
+        }
+
+        private void Button_Click_ChangeResize(object sender, RoutedEventArgs e)
+        {
+            MyElement.ChangeResizeHandleVisible();
         }
     }
 }
