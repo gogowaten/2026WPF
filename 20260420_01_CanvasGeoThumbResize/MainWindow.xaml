@@ -1,0 +1,57 @@
+﻿<Window x:Class="_20260420_01_CanvasGeoThumbResize.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:_20260420_01_CanvasGeoThumbResize" d:DataContext="{d:DesignInstance Type=local:MainWindow}"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="367" Width="654">
+  <Grid>
+    <Grid.ColumnDefinitions>
+      <ColumnDefinition/>
+      <ColumnDefinition Width="200"/>
+    </Grid.ColumnDefinitions>
+
+    <Canvas x:Name="MyCanvas">
+      <!--<local:GeoLine MyPoints="0,0 100,100" Stroke="Red"/>-->
+      <!--<local:GeoThumb x:Name="MyElement" DataContext="{Binding MyData}"/>-->
+
+      <local:CanvasThumb x:Name="MyElement" DataContext="{Binding MyData}" Width="200" Height="200"/>
+
+    </Canvas>
+
+    <StackPanel Grid.Column="1">
+      <Button Content="Check" Click="Button_Click_Check"/>
+      <Button Content="Add" Click="Button_Click_Add"/>
+      <Button Content="Clear" Click="Button_Click_Clear"/>
+      <Button Content="StrokeColor" Click="Button_Click_StrokeColor"/>
+      <Button Content="ChangeResize" Click="Button_Click_ChangeResize"/>
+      <Slider Value="{Binding ElementName=MyElement, Path=ResizeHandleSize}"
+              Minimum="10" Maximum="50" SmallChange="10" LargeChange="10"/>
+
+      <GroupBox Header="Data" DataContext="{Binding MyData}">
+        <StackPanel>
+          <!--<TextBlock Text="{Binding GeometryBounds, StringFormat='GeometryBounds = {0: 0; -0; 0}'}"/>-->
+          <!--<TextBlock Text="{Binding GeometryWidth, StringFormat='GeometryWidth = {0: 0; -0; 0}'}"/>-->
+          <TextBlock Text="{Binding BoundsWidth, StringFormat='BoundsWidth = {0: 0; -0; 0}'}"/>
+          <TextBlock Text="{Binding InternalX, StringFormat='InternalX = {0: 0; -0; 0}'}"/>
+        </StackPanel>
+      </GroupBox>
+
+      <GroupBox Header="MyElementData" DataContext="{Binding ElementName=MyElement}">
+        <StackPanel>
+          <!--<TextBlock Text="{Binding GeometryBounds, StringFormat='GeometryBounds = {0: 0; -0; 0}'}"/>
+          <TextBlock Text="{Binding GeometryWidth, StringFormat='GeometryWidth = {0: 0; -0; 0}'}"/>-->
+        </StackPanel>
+      </GroupBox>
+
+      <GroupBox Header="MyElement" DataContext="{Binding ElementName=MyElement}">
+        <StackPanel>
+          <TextBlock Text="{Binding ActualWidth, StringFormat='ActualWidth = {0: 0; -0; 0}'}"/>
+          <TextBlock Text="{Binding Width, StringFormat='Width = {0: 0; -0; 0}'}"/>
+        </StackPanel>
+      </GroupBox>
+
+    </StackPanel>
+  </Grid>
+</Window>

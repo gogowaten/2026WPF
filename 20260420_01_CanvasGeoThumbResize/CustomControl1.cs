@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Reflection;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
@@ -14,10 +13,8 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace _20260420
+namespace _20260420_01_CanvasGeoThumbResize
 {
-
-
     public class CanvasThumb : Thumb
     {
         private Canvas MyTemplateCanvas = null!;
@@ -203,6 +200,7 @@ namespace _20260420
             Debug.WriteLine("Test");
         }
     }
+
 
 
 
