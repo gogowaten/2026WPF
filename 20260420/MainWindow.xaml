@@ -15,6 +15,7 @@
       <!--<local:GeoLine MyPoints="0,0 100,100" Stroke="Red"/>-->
       <local:GeoThumb x:Name="MyElement" DataContext="{Binding MyData}"
                       />
+      <local:CanvasThumb Width="200" Height="200"/>
     </Canvas>
 
     <StackPanel Grid.Column="1">
@@ -24,8 +25,8 @@
       <Button Content="StrokeColor" Click="Button_Click_StrokeColor"/>
       <GroupBox Header="Data" DataContext="{Binding MyData}">
         <StackPanel>
-          <TextBlock Text="{Binding GeometryBounds, StringFormat='GeometryBounds = {0: 0; -0; 0}'}"/>
-          <TextBlock Text="{Binding GeometryWidth, StringFormat='GeometryWidth = {0: 0; -0; 0}'}"/>
+          <!--<TextBlock Text="{Binding GeometryBounds, StringFormat='GeometryBounds = {0: 0; -0; 0}'}"/>-->
+          <!--<TextBlock Text="{Binding GeometryWidth, StringFormat='GeometryWidth = {0: 0; -0; 0}'}"/>-->
           <TextBlock Text="{Binding BoundsWidth, StringFormat='BoundsWidth = {0: 0; -0; 0}'}"/>
           <TextBlock Text="{Binding InternalX, StringFormat='InternalX = {0: 0; -0; 0}'}"/>
         </StackPanel>
@@ -33,8 +34,8 @@
       
       <GroupBox Header="MyElementData" DataContext="{Binding ElementName=MyElement, Path=MyData}">
         <StackPanel>
-          <TextBlock Text="{Binding GeometryBounds, StringFormat='GeometryBounds = {0: 0; -0; 0}'}"/>
-          <TextBlock Text="{Binding GeometryWidth, StringFormat='GeometryWidth = {0: 0; -0; 0}'}"/>
+          <!--<TextBlock Text="{Binding GeometryBounds, StringFormat='GeometryBounds = {0: 0; -0; 0}'}"/>
+          <TextBlock Text="{Binding GeometryWidth, StringFormat='GeometryWidth = {0: 0; -0; 0}'}"/>-->
         </StackPanel>
       </GroupBox>
             

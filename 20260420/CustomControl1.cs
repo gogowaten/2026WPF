@@ -16,6 +16,71 @@ using System.Windows.Shapes;
 
 namespace _20260420
 {
+
+
+    public class CanvasThumb : Thumb
+    {
+        private Canvas MyTemplateCanvas = null!;
+        public ResizeAdorner MyResizeAdorner { get; set; }
+
+        static CanvasThumb()
+        {
+            DefaultStyleKeyProperty.OverrideMetadata(typeof(CanvasThumb), new FrameworkPropertyMetadata(typeof(CanvasThumb)));
+        }
+        public CanvasThumb()
+        {
+            MyResizeAdorner = new(this);
+            Loaded += (s, e) => { InitResizeAdorner(); };
+            DragDelta += CanvasThumb_DragDelta;
+
+        }
+
+        private void CanvasThumb_DragDelta(object sender, DragDeltaEventArgs e)
+        {
+            throw new NotImplementedException();
+        }
+
+        private void InitResizeAdorner()
+        {
+            if(AdornerLayer.GetAdornerLayer(this) is AdornerLayer layer)
+            {
+                layer.Add(MyResizeAdorner);
+                MyResizeAdorner.Visibility = Visibility.Collapsed;
+
+                MyResizeAdorner.LeftLocateChanged += CanvasThumb_LeftLocateChanged;
+                MyResizeAdorner.TopLocateChanged += CanvasThumb_TopLocateChanged;
+
+                MyResizeAdorner.SetBinding(ResizeAdorner.ResizeHandleSizeProperty,
+                    new Binding() { Source = this ,Path = new PropertyPath(ResizeHandeleSizeProperty)});
+            }
+        }
+
+
+        public double ResizeHandeleSize
+        {
+            get { return (double)GetValue(ResizeHandeleSizeProperty); }
+            set { SetValue(ResizeHandeleSizeProperty, value); }
+        }
+        public static readonly DependencyProperty ResizeHandeleSizeProperty =
+            DependencyProperty.Register(nameof(ResizeHandeleSize), typeof(double), typeof(CanvasThumb), new PropertyMetadata(12.0));
+
+
+
+
+        private void CanvasThumb_TopLocateChanged(object? sender, double e)
+        {
+            throw new NotImplementedException();
+        }
+
+        private void CanvasThumb_LeftLocateChanged(object? sender, double e)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+
+
+
     public class GeoThumb : Thumb
     {
 

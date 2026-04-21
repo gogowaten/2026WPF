@@ -4,7 +4,15 @@
     xmlns:local="clr-namespace:_20260420">
 
 
-
+  <Style TargetType="{x:Type local:CanvasThumb}">
+    <Setter Property="Template">
+      <Setter.Value>
+        <ControlTemplate TargetType="{x:Type local:CanvasThumb}">
+          <Canvas Background="Red"/>
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+  </Style>
 
 
 

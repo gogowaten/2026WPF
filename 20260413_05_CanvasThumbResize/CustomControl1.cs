@@ -28,7 +28,6 @@ namespace _20260413_05_CanvasThumbResize
             MyResizeAdorner = new ResizeAdorner(this);
             Loaded += (s, e) => { InitResizeAdorner(); };
             DragDelta += CanvasThumb_DragDelta;
-            InitResizeAdorner();
         }
 
 
@@ -46,24 +45,6 @@ namespace _20260413_05_CanvasThumbResize
                 MyResizeAdorner.SetBinding(ResizeAdorner.ResizeHandleSizeProperty, new Binding() { Source = this, Path = new PropertyPath(ResizeHandleSizeProperty) });
             }
         }
-
-        //private void InitResizeAdorner()
-        //{
-        //    if (AdornerLayer.GetAdornerLayer(this) is AdornerLayer layer)
-        //    {
-        //        //MyResizeAdorner.SetBinding(ResizeAdorner.ResizeHandleSizeProperty, new Binding() { Source = this, Path = new PropertyPath(ResizeHandleSize) });
-        //        layer.Add(MyResizeAdorner);
-        //        Binding b = new();
-        //        b.Source = this;
-        //        b.Path = new PropertyPath(ResizeHandleSizeProperty);
-        //        b.Mode = BindingMode.TwoWay;
-        //        BindingOperations.SetBinding(MyResizeAdorner, ResizeAdorner.ResizeHandleSizeProperty, b);
-
-        //        MyResizeAdorner.LeftLocateChanged += CanvasThumb_LeftLocateChanged;
-        //        MyResizeAdorner.TopLocateChanged += CanvasThumb_TopLocateChanged;
-        //    }
-        //}
-
 
         #region プロパティ
 
