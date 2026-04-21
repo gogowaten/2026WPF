@@ -25,6 +25,13 @@ namespace _20260413_05_CanvasThumbResize
             _visualChildren = new VisualCollection(this);
             ResizeHandleHalfSize = ResizeHandleSize / 2.0;
             InternalResizeHandleSize = new Size(ResizeHandleSize, ResizeHandleSize);
+            
+            // 対象要素の座標が未指定のときは0を指定する
+            if (double.IsNaN(Canvas.GetLeft(adornedElement)))
+            {
+                Canvas.SetLeft(adornedElement, 0);
+                Canvas.SetTop(adornedElement, 0);
+            }
 
             // 8つのハンドルThumbを作成
             foreach (ResizeDirection item in Enum.GetValues<ResizeDirection>())
