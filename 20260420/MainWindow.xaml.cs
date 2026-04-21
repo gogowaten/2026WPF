@@ -31,7 +31,7 @@ namespace _20260420
             {
                 MyPoints = [new Point(80, 0), new Point(80, 100), new Point(2, 2)],
                 //MyPoints = [new Point(80, 0), new Point(80, 100)],
-                Stroke = Brushes.LimeGreen,
+                Stroke = Brushes.Plum,
                 StrokeThickness = 20,
                 Background = Brushes.CadetBlue,
                 Fill = Brushes.Silver,
@@ -59,7 +59,7 @@ namespace _20260420
 
         private void Button_Click_StrokeColor(object sender, RoutedEventArgs e)
         {
-            MyData.Stroke = Brushes.Red;
+            MyData.Stroke = Brushes.SlateBlue;
         }
 
         private void Button_Click_ChangeResize(object sender, RoutedEventArgs e)
