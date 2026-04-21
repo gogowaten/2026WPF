@@ -36,8 +36,10 @@
         </StackPanel>
       </GroupBox>
       
-      <GroupBox Header="MyElementData" DataContext="{Binding ElementName=MyElement, Path=MyData}">
+      <GroupBox Header="MyElementData" DataContext="{Binding ElementName=MyElement}">
         <StackPanel>
+          <Slider Value="{Binding ResizeHandleSize}"
+                  Minimum="10" Maximum="50" SmallChange="10" LargeChange="10"/>
           <!--<TextBlock Text="{Binding GeometryBounds, StringFormat='GeometryBounds = {0: 0; -0; 0}'}"/>
           <TextBlock Text="{Binding GeometryWidth, StringFormat='GeometryWidth = {0: 0; -0; 0}'}"/>-->
         </StackPanel>

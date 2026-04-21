@@ -34,19 +34,6 @@ namespace _20260420_01_CanvasGeoThumbResize
 
 
 
-        //partial void OnGeometryBoundsChanged(Rect oldValue, Rect newValue)
-        //{
-        //    var diffLeft = newValue.Left - oldValue.Left;
-        //    var diffTop = newValue.Top - oldValue.Top;
-        //    InternalX += diffLeft;
-        //    InternalY += diffTop;
-
-        //    GeometryWidth = newValue.Width;
-        //    GeometryHeight = newValue.Height;
-
-        //}
-
-
 
     }
 
