@@ -64,7 +64,12 @@ namespace _20260420
 
         private void Button_Click_ChangeResize(object sender, RoutedEventArgs e)
         {
-            MyElement.ChangeResizeHandleVisible();
+            //MyElement.ChangeResizeHandleVisible();
+        }
+
+        private void Button_Click_VertexHandle(object sender, RoutedEventArgs e)
+        {
+            MyElement.MyGeoLine.ShowVertexAdorner();
         }
     }
 }

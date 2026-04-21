@@ -2,15 +2,12 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Drawing.Drawing2D;
 using System.Globalization;
 using System.Reflection;
 using System.Text;
 using System.Windows;
 using System.Windows.Data;
-using System.Windows.Ink;
 using System.Windows.Media;
-using System.Windows.Media.Media3D;
 using System.Xml.Linq;
 
 namespace _20260420
@@ -33,21 +30,8 @@ namespace _20260420
         [ObservableProperty] private PenLineJoin _lineJoin;
         [ObservableProperty] private bool _isCanDragMove;
         [ObservableProperty] private double _strokeThickness = 1.0;
+        [ObservableProperty] private bool _isVisibleVertexHandles;
 
-
-
-    
-        //partial void OnGeometryBoundsChanged(Rect oldValue, Rect newValue)
-        //{
-        //    var diffLeft = newValue.Left - oldValue.Left;
-        //    var diffTop = newValue.Top - oldValue.Top;
-        //    InternalX += diffLeft;
-        //    InternalY += diffTop;
-
-        //    GeometryWidth = newValue.Width;
-        //    GeometryHeight = newValue.Height;
-
-        //}
 
 
 

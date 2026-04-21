@@ -13,9 +13,9 @@
 
     <Canvas x:Name="MyCanvas">
       <!--<local:GeoLine MyPoints="0,0 100,100" Stroke="Red"/>-->
-      <!--<local:GeoThumb x:Name="MyElement" DataContext="{Binding MyData}"/>-->
+      <local:GeoThumb x:Name="MyElement" DataContext="{Binding MyData}"/>
 
-      <local:CanvasThumb x:Name="MyElement" DataContext="{Binding MyData}" Width="200" Height="200"/>
+      <!--<local:CanvasThumb x:Name="MyElement" DataContext="{Binding MyData}" Width="200" Height="200"/>-->
 
     </Canvas>
 
@@ -25,7 +25,7 @@
       <Button Content="Clear" Click="Button_Click_Clear"/>
       <Button Content="StrokeColor" Click="Button_Click_StrokeColor"/>
       <Button Content="ChangeResize" Click="Button_Click_ChangeResize"/>
-      
+      <Button Content="頂点移動用ハンドル" Click="Button_Click_VertexHandle"/>
       
       <GroupBox Header="Data" DataContext="{Binding MyData}">
         <StackPanel>
@@ -40,8 +40,8 @@
         <StackPanel>
           <Slider Value="{Binding ResizeHandleSize}"
                   Minimum="10" Maximum="50" SmallChange="10" LargeChange="10"/>
-          <!--<TextBlock Text="{Binding GeometryBounds, StringFormat='GeometryBounds = {0: 0; -0; 0}'}"/>
-          <TextBlock Text="{Binding GeometryWidth, StringFormat='GeometryWidth = {0: 0; -0; 0}'}"/>-->
+          
+          
         </StackPanel>
       </GroupBox>
             

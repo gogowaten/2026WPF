@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Text;
 using System.Windows;
 using System.Windows.Data;
+using System.Windows.Documents;
 using System.Windows.Media;
 using System.Windows.Shapes;
 
@@ -16,6 +17,8 @@ namespace _20260420
     /// </summary>
     public class GeoLine : Shape
     {
+        private VertexAdorner2? _vertexAdorner2; // 頂点移動用ハンドル
+        //private VertexAdorner? _vertexAdorner; // 頂点移動用ハンドル
         private Geometry? _cachedGeometry;
 
         protected override Geometry DefiningGeometry
@@ -47,30 +50,7 @@ namespace _20260420
 
         #region 依存関係プロパティ
 
-     
 
-        //public Rect MyGeometryBounds
-        //{
-        //    get { return (Rect)GetValue(MyGeometryBoundsProperty); }
-        //    set { SetValue(MyGeometryBoundsProperty, value); }
-        //}
-        //public static readonly DependencyProperty MyGeometryBoundsProperty =
-        //    DependencyProperty.Register(nameof(MyGeometryBounds), typeof(Rect), typeof(GeoLine), new PropertyMetadata(null));
-
-        //public bool MyIsOffset
-        //{
-        //    get { return (bool)GetValue(MyIsOffsetProperty); }
-        //    set { SetValue(MyIsOffsetProperty, value); }
-        //}
-        //public static readonly DependencyProperty MyIsOffsetProperty =
-        //    DependencyProperty.Register(nameof(MyIsOffset), typeof(bool), typeof(GeoLine), new PropertyMetadata(false, OnMyIsOffsetChanged));
-        //private static void OnMyIsOffsetChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        //{
-        //    if (d is GeoLine geo)
-        //    {
-        //        geo.InvalidateVisual(); // 再描画
-        //    }
-        //}
 
         public Pen MyStrokePen
         {
@@ -131,11 +111,15 @@ namespace _20260420
             // キャッシュクリアしてから再描画
             _cachedGeometry = null;
             InvalidateMeasure(); // ほぼ完璧、図形のActualが更新されないけど、使わないので問題ない
-            
+
             //InvalidateVisual(); // これでは不足、サイズが更新されない
             //InvalidateArrange(); // 全く足りない、図形自体すら再描画されない
             //UpdateLayout(); // 全く足りない、図形自体すら再描画されない
 
+            // 頂点移動用ハンドルの配置更新
+            //_vertexAdorner?.UpdateHandles(); // これはあかん
+            _vertexAdorner2?.InvalidateArrange();
+            //_vertexAdorner?.InvalidateArrange();
         }
 
         #endregion 依存関係プロパティ
@@ -159,20 +143,6 @@ namespace _20260420
         }
 
 
-        private void GeoLine_Loaded(object sender, RoutedEventArgs e)
-        {
-            //UpdateGeometryBounds();
-            
-            //if (DataContext is GeoLineData data)
-            //{
-            //    //MyData = data;
-            //    MyGeometryBounds = data.OnUpdateBounds(_cachedGeometry);
-            //    //MyPoints = data.MyPoints;
-            //    //InvalidateMeasure();
-            //    InvalidateVisual();
-            //}
-        }
-
 
 
         #endregion コンストラクタ
@@ -195,21 +165,31 @@ namespace _20260420
         //}
         #endregion オーバーライド
 
-        //public void UpdateGeometryBounds()
-        //{
-        //    if (_cachedGeometry is null)
-        //    {
-        //        MyGeometryBounds = Rect.Empty;
-        //        //MyGeometryBounds = new Rect();
-        //    }
-        //    else
-        //    {
-               
-        //        MyGeometryBounds = _cachedGeometry.GetRenderBounds(MyStrokePen);
-        //    }
+        #region publicメソッド
 
-        //}
+        public void ShowVertexAdorner()
+        {
+            if (AdornerLayer.GetAdornerLayer(this) is AdornerLayer layer)
+            {
+                _vertexAdorner2 = new VertexAdorner2(this);
+                //_vertexAdorner = new VertexAdorner(this);
+                layer.Add(_vertexAdorner2);
+                //layer.Add(_vertexAdorner);
+            }
+        }
 
+        public void HideVertexAdorner()
+        {
+            if (AdornerLayer.GetAdornerLayer(this) is AdornerLayer layer)
+            {
+                layer.Remove(_vertexAdorner2);
+                _vertexAdorner2 = null;
+                //layer.Remove(_vertexAdorner);
+                //_vertexAdorner = null;
+            }
+        }
+
+        #endregion publicメソッド
 
 
         #region privateメソッド
@@ -227,14 +207,6 @@ namespace _20260420
 
         #endregion privateメソッド
 
-        #region publicメソッド
-
-
-        //public Size GetBoundsSize()
-        //{
-        //    return MyGeometryBounds.Size;
-        //}
-        #endregion publicメソッド
     }
 
 

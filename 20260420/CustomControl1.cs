@@ -127,7 +127,7 @@ namespace _20260420
 
     public class GeoThumb : Thumb
     {
-
+        
 
         static GeoThumb()
         {
@@ -186,22 +186,12 @@ namespace _20260420
 
         private void GeoThumb_Loaded(object sender, RoutedEventArgs e)
         {
-
             if (DataContext is GeoLineData data)
             {
                 MyData = data;
-                //this.Measure(MyData.GeometryBounds.Size);
-                //MyData.RefreshWidthHeight();
-                //MyData.UpdateGeometrySize();
-                //InvalidateMeasure(); // 効果なし
-                //InvalidateVisual();
             }
-            //MyData.UpdatePen();
         }
-        private void Test()
-        {
-            Debug.WriteLine("Test");
-        }
+      
     }
 
 
