@@ -9,7 +9,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace _20260420
+namespace _20260420_02_VertexHandle_GeoThumb
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
@@ -63,27 +63,20 @@ namespace _20260420
             MyData.Stroke = Brushes.SlateBlue;
         }
 
-        private void Button_Click_ChangeResize(object sender, RoutedEventArgs e)
-        {
-            //MyElement.ChangeResizeHandleVisible();
-        }
-
+     
         private void Button_Click_VertexHandle(object sender, RoutedEventArgs e)
         {
-            MyElement.ShowVertexAdorner();
-            //MyElement.MyGeoLine.ShowVertexAdorner();
+            MyElement.MyGeoLine.ShowVertexAdorner();
         }
 
         private void Button_Click_VertexHandleHide(object sender, RoutedEventArgs e)
         {
-            MyElement.HideVertexAdorner();
-            //MyElement.MyGeoLine.HideVertexAdorner();
+            MyElement.MyGeoLine.HideVertexAdorner();
         }
 
         private void Button_Click_UpdateVertexHandles(object sender, RoutedEventArgs e)
         {
-            MyElement.UpdateVertexHandles();
-            //MyElement.MyGeoLine.UpdateVertexHandles();
+            MyElement.MyGeoLine.UpdateVertexHandles();
         }
     }
 }

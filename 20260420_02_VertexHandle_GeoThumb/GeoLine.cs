@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Globalization;
-using System.Reflection;
 using System.Text;
 using System.Windows;
 using System.Windows.Data;
@@ -10,13 +8,11 @@ using System.Windows.Documents;
 using System.Windows.Media;
 using System.Windows.Shapes;
 
-namespace _20260420
+namespace _20260420_02_VertexHandle_GeoThumb
 {
-    /// <summary>
-    /// GeoLineDataとは疎結合にしたい
-    /// </summary>
     public class GeoLine : Shape
     {
+        private VertexAdorner2? _vertexAdorner2; // 頂点移動用ハンドル
         //private VertexAdorner? _vertexAdorner; // 頂点移動用ハンドル
         private Geometry? _cachedGeometry;
 
@@ -36,11 +32,13 @@ namespace _20260420
                 if (MyPoints is null || MyPoints.Count < 2)
                 {
                     _cachedGeometry = null;
+                    //MyGeometryBounds = new Rect();
                     return Geometry.Empty;
                 }
 
                 PathGeometry geo = MakeLineGeometry(MyPoints);
                 _cachedGeometry = geo;
+                //MyGeometryBounds = _cachedGeometry.GetRenderBounds(MyStrokePen);
                 return geo;
             }
         }
@@ -115,6 +113,8 @@ namespace _20260420
 
             // 頂点移動用ハンドルの配置更新
             //_vertexAdorner?.UpdateHandles(); // これはあかん
+            //_vertexAdorner2?.InvalidateArrange();
+            //_vertexAdorner?.InvalidateArrange();
         }
 
         #endregion 依存関係プロパティ
@@ -161,28 +161,32 @@ namespace _20260420
         #endregion オーバーライド
 
         #region publicメソッド
-        //public void UpdateVertexHandles()
-        //{
-        //    _vertexAdorner?.UpdateHandles();
-        //}
+        public void UpdateVertexHandles()
+        {
+            _vertexAdorner2?.UpdateHandles();
+        }
 
-        //public void ShowVertexAdorner()
-        //{
-        //    if (AdornerLayer.GetAdornerLayer(this) is AdornerLayer layer)
-        //    {
-        //        _vertexAdorner = new VertexAdorner(this);
-        //        layer.Add(_vertexAdorner);
-        //    }
-        //}
+        public void ShowVertexAdorner()
+        {
+            if (AdornerLayer.GetAdornerLayer(this) is AdornerLayer layer)
+            {
+                _vertexAdorner2 = new VertexAdorner2(this);
+                //_vertexAdorner = new VertexAdorner(this);
+                layer.Add(_vertexAdorner2);
+                //layer.Add(_vertexAdorner);
+            }
+        }
 
-        //public void HideVertexAdorner()
-        //{
-        //    if (AdornerLayer.GetAdornerLayer(this) is AdornerLayer layer && _vertexAdorner is not null)
-        //    {
-        //        layer.Remove(_vertexAdorner);
-        //        _vertexAdorner = null;
-        //    }
-        //}
+        public void HideVertexAdorner()
+        {
+            if (AdornerLayer.GetAdornerLayer(this) is AdornerLayer layer && _vertexAdorner2 is not null)
+            {
+                layer.Remove(_vertexAdorner2);
+                _vertexAdorner2 = null;
+                //layer.Remove(_vertexAdorner);
+                //_vertexAdorner = null;
+            }
+        }
 
         #endregion publicメソッド
 

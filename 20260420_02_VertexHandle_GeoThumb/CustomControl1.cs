@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Reflection;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
@@ -14,10 +12,8 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace _20260420
+namespace _20260420_02_VertexHandle_GeoThumb
 {
-
-
     public class CanvasThumb : Thumb
     {
         private Canvas MyTemplateCanvas = null!;
@@ -127,7 +123,6 @@ namespace _20260420
 
     public class GeoThumb : Thumb
     {
-        private VertexAdorner? _vertexAdorner; // 頂点移動用ハンドル
 
 
         static GeoThumb()
@@ -156,14 +151,6 @@ namespace _20260420
 
         #region プロパティ
 
-        public double MyShapeVertexHandleSize
-        {
-            get { return (double)GetValue(MyShapeVertexHandleSizeProperty); }
-            set { SetValue(MyShapeVertexHandleSizeProperty, value); }
-        }
-        public static readonly DependencyProperty MyShapeVertexHandleSizeProperty =
-            DependencyProperty.Register(nameof(MyShapeVertexHandleSize), typeof(double), typeof(GeoThumb), new PropertyMetadata(12.0));
-
         public GeoLine MyGeoLine
         {
             get { return (GeoLine)GetValue(MyGeoLineProperty); }
@@ -181,29 +168,7 @@ namespace _20260420
 
 
         #endregion プロパティ
-        public void UpdateVertexHandles()
-        {
-            _vertexAdorner?.UpdateHandles();
-        }
 
-        public void ShowVertexAdorner()
-        {
-            if (AdornerLayer.GetAdornerLayer(MyGeoLine) is AdornerLayer layer)
-            {
-                _vertexAdorner = new VertexAdorner(MyGeoLine);
-                _vertexAdorner.SetBinding(VertexAdorner.MyHandleSizeProperty, new Binding() { Source = this, Path = new PropertyPath(MyShapeVertexHandleSizeProperty) });
-                layer.Add(_vertexAdorner);
-            }
-        }
-
-        public void HideVertexAdorner()
-        {
-            if (AdornerLayer.GetAdornerLayer(MyGeoLine) is AdornerLayer layer && _vertexAdorner is not null)
-            {
-                layer.Remove(_vertexAdorner);
-                _vertexAdorner = null;
-            }
-        }
 
         private void GeoThumb_DragDelta(object sender, DragDeltaEventArgs e)
         {
@@ -222,9 +187,17 @@ namespace _20260420
                 MyData = data;
             }
         }
-      
+
     }
 
 
 
+
+public class CustomControl1 : Control
+    {
+        static CustomControl1()
+        {
+            DefaultStyleKeyProperty.OverrideMetadata(typeof(CustomControl1), new FrameworkPropertyMetadata(typeof(CustomControl1)));
+        }
+    }
 }
