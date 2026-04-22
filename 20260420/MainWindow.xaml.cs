@@ -50,6 +50,7 @@ namespace _20260420
         private void Button_Click_Add(object sender, RoutedEventArgs e)
         {
             MyData.MyPoints?.Add(new Point(150, 50));
+            MyData.MyPoints?.Add(new Point(-20, 60));
         }
 
         private void Button_Click_Clear(object sender, RoutedEventArgs e)
@@ -70,6 +71,11 @@ namespace _20260420
         private void Button_Click_VertexHandle(object sender, RoutedEventArgs e)
         {
             MyElement.MyGeoLine.ShowVertexAdorner();
+        }
+
+        private void Button_Click_VertexHandleHide(object sender, RoutedEventArgs e)
+        {
+            MyElement.MyGeoLine.HideVertexAdorner();
         }
     }
 }

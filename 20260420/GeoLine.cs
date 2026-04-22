@@ -25,9 +25,9 @@ namespace _20260420
         {
             get
             {
-#if DEBUG
-                Debug.WriteLine($"{MethodBase.GetCurrentMethod()?.ReflectedType?.Name}__{MethodBase.GetCurrentMethod()?.Name}");
-#endif
+                //#if DEBUG
+                //                Debug.WriteLine($"{MethodBase.GetCurrentMethod()?.ReflectedType?.Name}__{MethodBase.GetCurrentMethod()?.Name}");
+                //#endif
                 // キャッシュが在ればそれを返して終わる
                 if (_cachedGeometry is not null)
                 {
@@ -110,15 +110,15 @@ namespace _20260420
         {
             // キャッシュクリアしてから再描画
             _cachedGeometry = null;
-            InvalidateMeasure(); // ほぼ完璧、図形のActualが更新されないけど、使わないので問題ない
+            InvalidateVisual(); // 再描画？これだけでは不足、サイズが更新されない、図形によっては再描画にならない
+            InvalidateMeasure(); // サイズ更新、図形のActualが更新されないけど、使わないので問題ない
 
-            //InvalidateVisual(); // これでは不足、サイズが更新されない
             //InvalidateArrange(); // 全く足りない、図形自体すら再描画されない
             //UpdateLayout(); // 全く足りない、図形自体すら再描画されない
 
             // 頂点移動用ハンドルの配置更新
             //_vertexAdorner?.UpdateHandles(); // これはあかん
-            _vertexAdorner2?.InvalidateArrange();
+            //_vertexAdorner2?.InvalidateArrange();
             //_vertexAdorner?.InvalidateArrange();
         }
 
@@ -180,7 +180,7 @@ namespace _20260420
 
         public void HideVertexAdorner()
         {
-            if (AdornerLayer.GetAdornerLayer(this) is AdornerLayer layer)
+            if (AdornerLayer.GetAdornerLayer(this) is AdornerLayer layer && _vertexAdorner2 is not null)
             {
                 layer.Remove(_vertexAdorner2);
                 _vertexAdorner2 = null;

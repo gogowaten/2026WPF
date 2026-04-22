@@ -20,7 +20,6 @@ namespace _20260420
 
         private readonly VisualCollection _visuals;
         private readonly GeoLine _adornedElement;
-        private readonly ObservableCollection<Thumb> MyThumbs;
         private readonly Canvas MyCanvas;
 
         public VertexAdorner2(UIElement adornedElement) : base(adornedElement)
@@ -28,12 +27,7 @@ namespace _20260420
             _adornedElement = (GeoLine)adornedElement;
             _visuals = new(this);
             MyCanvas = new Canvas();
-            MyThumbs = [];
             _visuals.Add(MyCanvas);
-            //MyCanvas.Background = Brushes.Red;
-            //MyCanvas.Width = 200;
-            //MyCanvas.Height = 200;
-
 
             // 頂点の数だけハンドルを作成
             UpdateHandles();
@@ -64,7 +58,6 @@ namespace _20260420
 
                 thumb.DragDelta += Thumb_DragDelta;
                 _ = MyCanvas.Children.Add(thumb);
-                MyThumbs.Add(thumb);
             }
         }
 
@@ -78,6 +71,9 @@ namespace _20260420
                     Point p = points[index];
                     // 頂点座標を更新
                     points[index] = new Point(p.X + e.HorizontalChange, p.Y + e.VerticalChange);
+                    SyncThumbPosition(index, points[index]);
+                    //Canvas.SetLeft(thumb, p.X - 5 + e.HorizontalChange);
+                    //Canvas.SetTop(thumb, p.Y - 5 + e.VerticalChange);
                 }
                 e.Handled = true;
             }
@@ -89,7 +85,14 @@ namespace _20260420
             return base.ArrangeOverride(finalSize);
         }
 
-      
+        
+        private void SyncThumbPosition(int index, Point p)
+        {
+            var thumb = MyCanvas.Children[index] as Thumb;
+            Canvas.SetLeft(thumb, p.X - 5);
+            Canvas.SetTop(thumb, p.Y - 5);
+        }
+
     }
 
 

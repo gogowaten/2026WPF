@@ -25,22 +25,22 @@
       <Button Content="Clear" Click="Button_Click_Clear"/>
       <Button Content="StrokeColor" Click="Button_Click_StrokeColor"/>
       <Button Content="ChangeResize" Click="Button_Click_ChangeResize"/>
-      <Button Content="頂点移動用ハンドル" Click="Button_Click_VertexHandle"/>
+      <Button Content="頂点ハンドル" Click="Button_Click_VertexHandle"/>
+      <Button Content="頂点ハンドル非表示" Click="Button_Click_VertexHandleHide"/>
       
       <GroupBox Header="Data" DataContext="{Binding MyData}">
         <StackPanel>
-          <!--<TextBlock Text="{Binding GeometryBounds, StringFormat='GeometryBounds = {0: 0; -0; 0}'}"/>-->
-          <!--<TextBlock Text="{Binding GeometryWidth, StringFormat='GeometryWidth = {0: 0; -0; 0}'}"/>-->
           <TextBlock Text="{Binding BoundsWidth, StringFormat='BoundsWidth = {0: 0; -0; 0}'}"/>
           <TextBlock Text="{Binding InternalX, StringFormat='InternalX = {0: 0; -0; 0}'}"/>
+          <TextBlock Text="{Binding MyPoints, StringFormat='InternalX = {0: 0; -0; 0}'}" TextWrapping="Wrap"/>
         </StackPanel>
       </GroupBox>
-      
-      <GroupBox Header="MyElementData" DataContext="{Binding ElementName=MyElement}">
+
+      <GroupBox Header="MyElement_MyGeoLine" DataContext="{Binding ElementName=MyElement, Path=MyGeoLine}">
         <StackPanel>
           <Slider Value="{Binding ResizeHandleSize}"
                   Minimum="10" Maximum="50" SmallChange="10" LargeChange="10"/>
-          
+          <TextBlock Text="{Binding ActualWidth, StringFormat='ActualWidth = {0: 0; -0; 0}'}"/>
           
         </StackPanel>
       </GroupBox>
