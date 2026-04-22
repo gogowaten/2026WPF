@@ -77,5 +77,10 @@ namespace _20260420
         {
             MyElement.MyGeoLine.HideVertexAdorner();
         }
+
+        private void Button_Click_UpdateVertexHandles(object sender, RoutedEventArgs e)
+        {
+            MyElement.MyGeoLine.UpdateVertexHandles();
+        }
     }
 }

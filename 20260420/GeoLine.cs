@@ -166,6 +166,10 @@ namespace _20260420
         #endregion オーバーライド
 
         #region publicメソッド
+        public void UpdateVertexHandles()
+        {
+            _vertexAdorner2?.UpdateHandles();
+        }
 
         public void ShowVertexAdorner()
         {

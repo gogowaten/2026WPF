@@ -27,6 +27,7 @@
       <Button Content="ChangeResize" Click="Button_Click_ChangeResize"/>
       <Button Content="頂点ハンドル" Click="Button_Click_VertexHandle"/>
       <Button Content="頂点ハンドル非表示" Click="Button_Click_VertexHandleHide"/>
+      <Button Content="頂点ハンドル更新" Click="Button_Click_UpdateVertexHandles"/>
       
       <GroupBox Header="Data" DataContext="{Binding MyData}">
         <StackPanel>

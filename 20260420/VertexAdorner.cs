@@ -52,7 +52,7 @@ namespace _20260420
                     Cursor = Cursors.Hand,
                     Tag = i // インデックスを保持
                 };
-
+                                
                 Canvas.SetLeft(thumb, points[i].X - 5);
                 Canvas.SetTop(thumb, points[i].Y - 5);
 
@@ -71,9 +71,8 @@ namespace _20260420
                     Point p = points[index];
                     // 頂点座標を更新
                     points[index] = new Point(p.X + e.HorizontalChange, p.Y + e.VerticalChange);
+                    // ハンドル位置更新
                     SyncThumbPosition(index, points[index]);
-                    //Canvas.SetLeft(thumb, p.X - 5 + e.HorizontalChange);
-                    //Canvas.SetTop(thumb, p.Y - 5 + e.VerticalChange);
                 }
                 e.Handled = true;
             }
@@ -93,6 +92,7 @@ namespace _20260420
             Canvas.SetTop(thumb, p.Y - 5);
         }
 
+    
     }
 
 
