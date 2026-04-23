@@ -18,7 +18,7 @@
       <!--<local:GeoThumb x:Name="MyElement" DataContext="{Binding MyData}"/>-->
 
       <local:CanvasThumb x:Name="MyElement" DataContext="{Binding MyData}" Width="200" Height="200"/>
-      
+
     </Canvas>
 
     <StackPanel Grid.Column="1">
@@ -30,32 +30,34 @@
       <Button Content="頂点ハンドル" Click="Button_Click_VertexHandle"/>
       <Button Content="頂点ハンドル非表示" Click="Button_Click_VertexHandleHide"/>
       <Button Content="頂点ハンドル更新" Click="Button_Click_UpdateVertexHandles"/>
-      
+
       <GroupBox Header="Data" DataContext="{Binding MyData}">
         <StackPanel>
           <TextBlock Text="{Binding BoundsWidth, StringFormat='BoundsWidth = {0: 0; -0; 0}'}"/>
           <TextBlock Text="{Binding InternalX, StringFormat='InternalX = {0: 0; -0; 0}'}"/>
           <TextBlock Text="{Binding MyPoints, StringFormat='InternalX = {0: 0; -0; 0}'}" TextWrapping="Wrap"/>
+          <TextBlock Text="{Binding VertexHandleSize, StringFormat='VertexHandleSize = {0: 0; -0; 0}'}"/>
+          <Slider Value="{Binding VertexHandleSize}" Minimum="10" Maximum="50" SmallChange="10" LargeChange="10"/>
         </StackPanel>
       </GroupBox>
 
-      <GroupBox Header="MyElement_MyGeoLine" DataContext="{Binding ElementName=MyElement, Path=MyGeoLine}">
+      <GroupBox Header="MyElement_MyGeoLine" DataContext="{Binding ElementName=MyElement}">
         <StackPanel>
           <TextBlock Text="{Binding ActualWidth, StringFormat='ActualWidth = {0: 0; -0; 0}'}"/>
-          
         </StackPanel>
       </GroupBox>
-            
+
       <GroupBox Header="MyElement" DataContext="{Binding ElementName=MyElement}">
         <StackPanel>
           <TextBlock Text="{Binding ActualWidth, StringFormat='ActualWidth = {0: 0; -0; 0}'}"/>
           <TextBlock Text="{Binding Width, StringFormat='Width = {0: 0; -0; 0}'}"/>
-          <TextBlock Text="{Binding MyShapeVertexHandleSize, StringFormat='MyShapeVertexHandleSize = {0: 0; -0; 0}'}"/>
-          <Slider Value="{Binding MyShapeVertexHandleSize}"
+          <TextBlock Text="{Binding ResizeHandleSize, StringFormat='ResizeHandleSize = {0: 0; -0; 0}'}"/>
+          <Slider Value="{Binding ResizeHandleSize}"
         Minimum="10" Maximum="50" SmallChange="10" LargeChange="10"/>
+          
         </StackPanel>
       </GroupBox>
-      
+
     </StackPanel>
   </Grid>
 </Window>

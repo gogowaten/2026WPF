@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Globalization;
+using System.IO.Packaging;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
@@ -24,6 +25,7 @@ namespace _20260420
         private readonly GeoLine _adornedElement;
         private readonly Canvas MyCanvas;
         private double MyHandleOffset;
+        private PointCollection MyGeoPoints;
 
         public VertexAdorner(UIElement adornedElement) : base(adornedElement)
         {
@@ -32,6 +34,14 @@ namespace _20260420
             MyCanvas = new Canvas();
             _visuals.Add(MyCanvas);
             MyHandleOffset = MyHandleSize / 2.0;
+            if(_adornedElement is GeoLine geo)
+            {
+                MyGeoPoints = geo.MyPoints;
+            }
+            else
+            {
+                throw new InvalidOperationException("図形のPointsが見つからない");
+            }
 
             // 頂点の数だけハンドルを作成
             UpdateHandles();
@@ -55,7 +65,7 @@ namespace _20260420
             {
                 // ハンドルサイズ変更に伴う変更、オフセット、全ハンドルの座標
                 ador.MyHandleOffset = (double)e.NewValue / 2.0;
-                var points = ador._adornedElement.MyPoints;
+                var points = ador.MyGeoPoints;
                 for (int i = 0; i < points.Count; i++)
                 {
                     ador.SyncThumbPosition(i, points[i]);
@@ -69,10 +79,10 @@ namespace _20260420
         {
             MyCanvas.Children.Clear();
 
-            var points = _adornedElement.MyPoints;
-            if (points == null) { return; }
+            //var points = _adornedElement.MyPoints;
+            if (MyGeoPoints == null) { return; }
 
-            for (int i = 0; i < points.Count; i++)
+            for (int i = 0; i < MyGeoPoints.Count; i++)
             {
                 var thumb = new FlatHandle()
                 {
@@ -86,8 +96,8 @@ namespace _20260420
                 thumb.SetBinding(WidthProperty, new Binding() { Source = this, Path = new PropertyPath(MyHandleSizeProperty) });
                 thumb.SetBinding(HeightProperty, new Binding() { Source = this, Path = new PropertyPath(MyHandleSizeProperty) });
 
-                thumb.MyLeft = points[i].X - MyHandleOffset;
-                thumb.MyTop = points[i].Y - MyHandleOffset;
+                thumb.MyLeft = MyGeoPoints[i].X - MyHandleOffset;
+                thumb.MyTop = MyGeoPoints[i].Y - MyHandleOffset;
 
                 thumb.DragDelta += Thumb_DragDelta;
                 _ = MyCanvas.Children.Add(thumb);
@@ -98,14 +108,14 @@ namespace _20260420
         {
             if (sender is Thumb thumb && thumb.Tag is int index)
             {
-                var points = _adornedElement.MyPoints;
-                if (points != null && index < points.Count)
+                //var points = _adornedElement.MyPoints;
+                if (MyGeoPoints != null && index < MyGeoPoints.Count)
                 {
-                    Point p = points[index];
+                    Point p = MyGeoPoints[index];
                     // 頂点座標を更新
-                    points[index] = new Point(p.X + e.HorizontalChange, p.Y + e.VerticalChange);
+                    MyGeoPoints[index] = new Point(p.X + e.HorizontalChange, p.Y + e.VerticalChange);
                     // ハンドル位置更新
-                    SyncThumbPosition(index, points[index]);
+                    SyncThumbPosition(index, MyGeoPoints[index]);
                 }
                 e.Handled = true;
             }
@@ -129,22 +139,6 @@ namespace _20260420
         }
     }
 
-
-
-    //public class ConvOffsetHandle : IMultiValueConverter
-    //{
-    //    public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
-    //    {
-    //        double size = (double)values[0];
-    //        double left = (double)values[1];
-    //        return left + (size / 2.0);
-    //    }
-
-    //    public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
-    //    {
-    //        throw new NotImplementedException();
-    //    }
-    //}
 
 
 }

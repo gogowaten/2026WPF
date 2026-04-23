@@ -44,6 +44,7 @@
     <Setter Property="Canvas.Left" Value="{Binding InternalX, Mode=TwoWay}"/>
     <Setter Property="Canvas.Top" Value="{Binding InternalY, Mode=TwoWay}"/>
     <Setter Property="MyVisibleVertexHandle" Value="{Binding RelativeSource={RelativeSource Mode=Self}, Path=MyData.IsVisibleVertexHandles}"/>
+    <Setter Property="MyShapeVertexHandleSize" Value="{Binding RelativeSource={RelativeSource Mode=Self}, Path=MyData.VertexHandleSize, Mode=TwoWay}"/>
 
     <Setter Property="Template">
       <Setter.Value>

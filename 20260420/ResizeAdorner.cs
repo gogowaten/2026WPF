@@ -110,10 +110,11 @@ namespace _20260420
 
         #endregion プロパティ
 
-
+        #region イベント
+        
         public event EventHandler<double>? LeftLocateChanged;
         public event EventHandler<double>? TopLocateChanged;
-
+        #endregion イベント
 
         // Thumbの移動、対象要素のサイズ変更
         private void OnResize(object sender, DragDeltaEventArgs e)

@@ -127,6 +127,14 @@ namespace _20260420
 
         #region パブリックメソッド
 
+        public void UpdateVertexHandle()
+        {
+            if (MyInternalUIElement is GeoThumb gt)
+            {
+                gt.UpdateVertexHandles();
+            }
+        }
+
         public void ChangeResizeHandleVisible()
         {
             if (MyResizeAdorner.Visibility == Visibility.Visible)
@@ -156,13 +164,13 @@ namespace _20260420
         // リサイズハンドルの移動でCanvasの座標が変更される時には、
         // 中の要素をその場に留めるために反対方向に移動させる
         private void ResizeHandle_TopLocateChanged(object? sender, double e)
-        {            
+        {
             Canvas.SetTop(MyInternalUIElement, Canvas.GetTop(MyInternalUIElement) - e);
         }
 
         private void ResizeHandle_LeftLocateChanged(object? sender, double e)
         {
-    
+
             Canvas.SetLeft(MyInternalUIElement, Canvas.GetLeft(MyInternalUIElement) - e);
         }
 
@@ -236,7 +244,7 @@ namespace _20260420
             }
         }
 
-
+        // 頂点ハンドルサイズ
         public double MyShapeVertexHandleSize
         {
             get { return (double)GetValue(MyShapeVertexHandleSizeProperty); }

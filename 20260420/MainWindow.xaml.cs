@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Collections.ObjectModel;
+using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -17,13 +18,16 @@ namespace _20260420
     public partial class MainWindow : Window
     {
         public GeoLineData MyData { get; set; }
-
+        public ObservableCollection<Point> MyPoints { get; set; } = [];
         public MainWindow()
         {
             InitializeComponent();
             MyData = CreateData();
             DataContext = this;
+
+
         }
+
 
         private GeoLineData CreateData()
         {
@@ -45,17 +49,21 @@ namespace _20260420
         {
             var elementData = MyElement.DataContext;
             var neko = MyData;
+            MyPoints.Add(new Point());
+            MyPoints[0] = new Point(1, 1);
         }
 
         private void Button_Click_Add(object sender, RoutedEventArgs e)
         {
             MyData.MyPoints?.Add(new Point(150, 50));
             MyData.MyPoints?.Add(new Point(-20, 60));
+            MyElement.UpdateVertexHandle();
         }
 
         private void Button_Click_Clear(object sender, RoutedEventArgs e)
         {
             MyData.MyPoints?.Clear();
+            MyElement.UpdateVertexHandle();
         }
 
         private void Button_Click_StrokeColor(object sender, RoutedEventArgs e)
