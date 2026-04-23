@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Globalization;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
@@ -36,7 +37,7 @@ namespace _20260420
             UpdateHandles();
         }
 
-        
+
 
         #region プロパティ
 
@@ -52,7 +53,13 @@ namespace _20260420
         {
             if (d is VertexAdorner ador)
             {
+                // ハンドルサイズ変更に伴う変更、オフセット、全ハンドルの座標
                 ador.MyHandleOffset = (double)e.NewValue / 2.0;
+                var points = ador._adornedElement.MyPoints;
+                for (int i = 0; i < points.Count; i++)
+                {
+                    ador.SyncThumbPosition(i, points[i]);
+                }
             }
         }
 
@@ -67,7 +74,7 @@ namespace _20260420
 
             for (int i = 0; i < points.Count; i++)
             {
-                var thumb = new Thumb()
+                var thumb = new FlatHandle()
                 {
                     Background = Brushes.Red,
                     BorderBrush = Brushes.White,
@@ -79,9 +86,8 @@ namespace _20260420
                 thumb.SetBinding(WidthProperty, new Binding() { Source = this, Path = new PropertyPath(MyHandleSizeProperty) });
                 thumb.SetBinding(HeightProperty, new Binding() { Source = this, Path = new PropertyPath(MyHandleSizeProperty) });
 
-
-                Canvas.SetLeft(thumb, points[i].X - MyHandleOffset);
-                Canvas.SetTop(thumb, points[i].Y - MyHandleOffset);
+                thumb.MyLeft = points[i].X - MyHandleOffset;
+                thumb.MyTop = points[i].Y - MyHandleOffset;
 
                 thumb.DragDelta += Thumb_DragDelta;
                 _ = MyCanvas.Children.Add(thumb);
@@ -114,15 +120,31 @@ namespace _20260420
 
         private void SyncThumbPosition(int index, Point p)
         {
-            var thumb = MyCanvas.Children[index] as Thumb;
-            Canvas.SetLeft(thumb, p.X - MyHandleOffset);
-            Canvas.SetTop(thumb, p.Y - MyHandleOffset);
+            if (MyCanvas.Children[index] is FlatHandle thumb)
+            {
+                thumb.MyLeft = p.X - MyHandleOffset;
+                thumb.MyTop = p.Y - MyHandleOffset;
+            }
+
         }
-
-
     }
 
 
+
+    //public class ConvOffsetHandle : IMultiValueConverter
+    //{
+    //    public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
+    //    {
+    //        double size = (double)values[0];
+    //        double left = (double)values[1];
+    //        return left + (size / 2.0);
+    //    }
+
+    //    public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
+    //    {
+    //        throw new NotImplementedException();
+    //    }
+    //}
 
 
 }

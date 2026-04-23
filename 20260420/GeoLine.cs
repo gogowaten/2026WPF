@@ -27,6 +27,7 @@ namespace _20260420
                 //#if DEBUG
                 //                Debug.WriteLine($"{MethodBase.GetCurrentMethod()?.ReflectedType?.Name}__{MethodBase.GetCurrentMethod()?.Name}");
                 //#endif
+
                 // キャッシュが在ればそれを返して終わる
                 if (_cachedGeometry is not null)
                 {

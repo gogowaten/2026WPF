@@ -65,25 +65,25 @@ namespace _20260420
 
         private void Button_Click_ChangeResize(object sender, RoutedEventArgs e)
         {
-            //MyElement.ChangeResizeHandleVisible();
+            MyElement.ChangeResizeHandleVisible();
         }
 
         private void Button_Click_VertexHandle(object sender, RoutedEventArgs e)
         {
-            MyElement.ShowVertexAdorner();
-            //MyElement.MyGeoLine.ShowVertexAdorner();
+            //MyElement.ShowVertexAdorner();
+            MyData.IsVisibleVertexHandles= true;
         }
 
         private void Button_Click_VertexHandleHide(object sender, RoutedEventArgs e)
         {
-            MyElement.HideVertexAdorner();
-            //MyElement.MyGeoLine.HideVertexAdorner();
+            //MyElement.HideVertexAdorner();
+            MyData.IsVisibleVertexHandles = false;
         }
 
         private void Button_Click_UpdateVertexHandles(object sender, RoutedEventArgs e)
         {
-            MyElement.UpdateVertexHandles();
-            //MyElement.MyGeoLine.UpdateVertexHandles();
+            //MyElement.UpdateVertexHandles();
+            
         }
     }
 }

@@ -18,10 +18,48 @@ namespace _20260420
 {
 
 
+
+    public class FlatHandle : Thumb
+    {
+        static FlatHandle()
+        {
+            DefaultStyleKeyProperty.OverrideMetadata(typeof(FlatHandle), new FrameworkPropertyMetadata(typeof(FlatHandle)));
+        }
+        public FlatHandle()
+        {
+
+        }
+
+
+        public double MyLeft
+        {
+            get { return (double)GetValue(MyLeftProperty); }
+            set { SetValue(MyLeftProperty, value); }
+        }
+        public static readonly DependencyProperty MyLeftProperty =
+            DependencyProperty.Register(nameof(MyLeft), typeof(double), typeof(FlatHandle), new PropertyMetadata(0.0));
+
+        public double MyTop
+        {
+            get { return (double)GetValue(MyTopProperty); }
+            set { SetValue(MyTopProperty, value); }
+        }
+        public static readonly DependencyProperty MyTopProperty =
+            DependencyProperty.Register(nameof(MyTop), typeof(double), typeof(FlatHandle), new PropertyMetadata(0.0));
+
+
+
+    }
+
+
+
     public class CanvasThumb : Thumb
     {
         private Canvas MyTemplateCanvas = null!;
         public ResizeAdorner MyResizeAdorner { get; set; }
+        private UIElement MyInternalUIElement = null!;
+
+        #region コンストラクタ
 
         static CanvasThumb()
         {
@@ -43,8 +81,8 @@ namespace _20260420
                 layer.Add(MyResizeAdorner);
                 MyResizeAdorner.Visibility = Visibility.Collapsed;
 
-                MyResizeAdorner.LeftLocateChanged += CanvasThumb_LeftLocateChanged;
-                MyResizeAdorner.TopLocateChanged += CanvasThumb_TopLocateChanged;
+                MyResizeAdorner.LeftLocateChanged += ResizeHandle_LeftLocateChanged;
+                MyResizeAdorner.TopLocateChanged += ResizeHandle_TopLocateChanged;
 
                 MyResizeAdorner.SetBinding(ResizeAdorner.ResizeHandleSizeProperty,
                     new Binding() { Source = this, Path = new PropertyPath(ResizeHandleSizeProperty) });
@@ -57,12 +95,25 @@ namespace _20260420
             if (GetTemplateChild("PART_Canvas") is Canvas canvas)
             {
                 MyTemplateCanvas = canvas;
+                if (MyTemplateCanvas.Children[0] is UIElement element)
+                {
+                    MyInternalUIElement = MyTemplateCanvas.Children[0];
+                }
+                else
+                {
+                    throw new InvalidOperationException("中の要素が見つからない");
+                }
             }
             else
             {
                 throw new InvalidOperationException("TemplateのCanvasが見つからない");
             }
         }
+        #endregion コンストラクタ
+
+        #region プロパティ
+
+
 
         public double ResizeHandleSize
         {
@@ -72,6 +123,9 @@ namespace _20260420
         public static readonly DependencyProperty ResizeHandleSizeProperty =
             DependencyProperty.Register(nameof(ResizeHandleSize), typeof(double),
                 typeof(CanvasThumb), new PropertyMetadata(12.0));
+        #endregion プロパティ
+
+        #region パブリックメソッド
 
         public void ChangeResizeHandleVisible()
         {
@@ -95,22 +149,21 @@ namespace _20260420
             MyResizeAdorner.Visibility = Visibility.Visible;
         }
 
+        #endregion パブリックメソッド
 
-        private void CanvasThumb_TopLocateChanged(object? sender, double e)
-        {
-            foreach (var item in MyTemplateCanvas.Children.OfType<UIElement>())
-            {
-                Canvas.SetTop(item, Canvas.GetTop(item) - e);
-            }
+        #region プライベートメソッド
+
+        // リサイズハンドルの移動でCanvasの座標が変更される時には、
+        // 中の要素をその場に留めるために反対方向に移動させる
+        private void ResizeHandle_TopLocateChanged(object? sender, double e)
+        {            
+            Canvas.SetTop(MyInternalUIElement, Canvas.GetTop(MyInternalUIElement) - e);
         }
 
-        private void CanvasThumb_LeftLocateChanged(object? sender, double e)
+        private void ResizeHandle_LeftLocateChanged(object? sender, double e)
         {
-            IEnumerable<UIElement> items = MyTemplateCanvas.Children.OfType<UIElement>();
-            foreach (UIElement item in items)
-            {
-                Canvas.SetLeft(item, Canvas.GetLeft(item) - e);
-            }
+    
+            Canvas.SetLeft(MyInternalUIElement, Canvas.GetLeft(MyInternalUIElement) - e);
         }
 
 
@@ -120,6 +173,7 @@ namespace _20260420
             Canvas.SetLeft(this, Canvas.GetLeft(this) + e.HorizontalChange);
             Canvas.SetTop(this, Canvas.GetTop(this) + e.VerticalChange);
         }
+        #endregion プライベートメソッド
     }
 
 
@@ -129,6 +183,7 @@ namespace _20260420
     {
         private VertexAdorner? _vertexAdorner; // 頂点移動用ハンドル
 
+        #region コンストラクタ
 
         static GeoThumb()
         {
@@ -153,8 +208,34 @@ namespace _20260420
                 throw new InvalidOperationException("GeoLineが見つからん");
             }
         }
+        #endregion コンストラクタ
 
         #region プロパティ
+
+        // 頂点ハンドルの表示切り替え
+        public bool MyVisibleVertexHandle
+        {
+            get { return (bool)GetValue(MyVisibleVertexHandleProperty); }
+            set { SetValue(MyVisibleVertexHandleProperty, value); }
+        }
+        public static readonly DependencyProperty MyVisibleVertexHandleProperty =
+            DependencyProperty.Register(nameof(MyVisibleVertexHandle), typeof(bool), typeof(GeoThumb), new PropertyMetadata(false, OnMyVisibleVertexHandle));
+
+        private static void OnMyVisibleVertexHandle(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            if (d is GeoThumb thumb)
+            {
+                if ((bool)e.NewValue)
+                {
+                    thumb.ShowVertexHandle();
+                }
+                else
+                {
+                    thumb.HideVertexHandle();
+                }
+            }
+        }
+
 
         public double MyShapeVertexHandleSize
         {
@@ -181,12 +262,14 @@ namespace _20260420
 
 
         #endregion プロパティ
+
+
         public void UpdateVertexHandles()
         {
             _vertexAdorner?.UpdateHandles();
         }
 
-        public void ShowVertexAdorner()
+        public void ShowVertexHandle()
         {
             if (AdornerLayer.GetAdornerLayer(MyGeoLine) is AdornerLayer layer)
             {
@@ -196,7 +279,7 @@ namespace _20260420
             }
         }
 
-        public void HideVertexAdorner()
+        public void HideVertexHandle()
         {
             if (AdornerLayer.GetAdornerLayer(MyGeoLine) is AdornerLayer layer && _vertexAdorner is not null)
             {
@@ -222,7 +305,7 @@ namespace _20260420
                 MyData = data;
             }
         }
-      
+
     }
 
 

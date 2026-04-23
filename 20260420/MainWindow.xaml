@@ -3,8 +3,10 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:_20260420" d:DataContext="{d:DesignInstance Type=local:MainWindow}"
-        mc:Ignorable="d"        Title="MainWindow" Height="467" Width="654">
+        xmlns:local="clr-namespace:_20260420"
+        d:DataContext="{d:DesignInstance Type=local:MainWindow}"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="467" Width="654">
   <Grid>
     <Grid.ColumnDefinitions>
       <ColumnDefinition/>
@@ -13,10 +15,10 @@
 
     <Canvas x:Name="MyCanvas">
       <!--<local:GeoLine MyPoints="0,0 100,100" Stroke="Red"/>-->
-      <local:GeoThumb x:Name="MyElement" DataContext="{Binding MyData}"/>
+      <!--<local:GeoThumb x:Name="MyElement" DataContext="{Binding MyData}"/>-->
 
-      <!--<local:CanvasThumb x:Name="MyElement" DataContext="{Binding MyData}" Width="200" Height="200"/>-->
-
+      <local:CanvasThumb x:Name="MyElement" DataContext="{Binding MyData}" Width="200" Height="200"/>
+      
     </Canvas>
 
     <StackPanel Grid.Column="1">
@@ -39,8 +41,6 @@
 
       <GroupBox Header="MyElement_MyGeoLine" DataContext="{Binding ElementName=MyElement, Path=MyGeoLine}">
         <StackPanel>
-          <Slider Value="{Binding ResizeHandleSize}"
-                  Minimum="10" Maximum="50" SmallChange="10" LargeChange="10"/>
           <TextBlock Text="{Binding ActualWidth, StringFormat='ActualWidth = {0: 0; -0; 0}'}"/>
           
         </StackPanel>
