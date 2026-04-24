@@ -18,133 +18,306 @@ using System.Windows.Shapes;
 namespace _20260311
 {
 
-    [ContentProperty(nameof(MyContent))]
-    public class CustomThumbForInternal : Thumb
+
+    public class GeoThumb : Thumb
     {
-        static CustomThumbForInternal()
+        private VertexAdorner? _vertexAdorner; // 頂点移動用ハンドル
+
+        #region コンストラクタ
+
+        static GeoThumb()
         {
-            DefaultStyleKeyProperty.OverrideMetadata(typeof(CustomThumbForInternal), new FrameworkPropertyMetadata(typeof(CustomThumbForInternal)));
+            DefaultStyleKeyProperty.OverrideMetadata(typeof(GeoThumb), new FrameworkPropertyMetadata(typeof(GeoThumb)));
         }
 
-        #region 依存関係プロパティ
-
-        public GeoShapeData2 MyData
+        public GeoThumb()
         {
-            get { return (GeoShapeData2)GetValue(MyDataProperty); }
-            set { SetValue(MyDataProperty, value); }
+            Loaded += GeoThumb_Loaded;
+            DragDelta += GeoThumb_DragDelta;
         }
-        public static readonly DependencyProperty MyDataProperty =
-            DependencyProperty.Register(nameof(MyData), typeof(GeoShapeData2), typeof(CustomThumbForInternal), new PropertyMetadata(null));
 
-        public FrameworkElement MyContent
+        public override void OnApplyTemplate()
         {
-            get { return (FrameworkElement)GetValue(MyContentProperty); }
-            set { SetValue(MyContentProperty, value); }
-        }
-        public static readonly DependencyProperty MyContentProperty =
-            DependencyProperty.Register(nameof(MyContent), typeof(FrameworkElement), typeof(CustomThumbForInternal), new PropertyMetadata(null));
-
-
-        public bool IsCanDragMove
-        {
-            get { return (bool)GetValue(IsCanDragMoveProperty); }
-            set { SetValue(IsCanDragMoveProperty, value); }
-        }
-        public static readonly DependencyProperty IsCanDragMoveProperty =
-            DependencyProperty.Register(nameof(IsCanDragMove), typeof(bool), typeof(CustomThumbForInternal), new FrameworkPropertyMetadata(false, OnMyIsDragMoveChanged));
-
-        // DragDeltaの付け外し
-        private static void OnMyIsDragMoveChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            if (d is CustomThumbForInternal thumb)
+            base.OnApplyTemplate();
+            if (GetTemplateChild("PART_GeoLine") is GeoLine geo)
             {
-                if (e.NewValue is bool isMove && isMove)
+                MyGeoLine = geo;
+            }
+            else
+            {
+                throw new InvalidOperationException("GeoLineが見つからん");
+            }
+        }
+        #endregion コンストラクタ
+
+        #region プロパティ
+
+        // 頂点ハンドルの表示切り替え
+        public bool MyVisibleVertexHandle
+        {
+            get { return (bool)GetValue(MyVisibleVertexHandleProperty); }
+            set { SetValue(MyVisibleVertexHandleProperty, value); }
+        }
+        public static readonly DependencyProperty MyVisibleVertexHandleProperty =
+            DependencyProperty.Register(nameof(MyVisibleVertexHandle), typeof(bool), typeof(GeoThumb), new PropertyMetadata(false, OnMyVisibleVertexHandle));
+
+        private static void OnMyVisibleVertexHandle(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            if (d is GeoThumb thumb)
+            {
+                if ((bool)e.NewValue)
                 {
-                    if (double.IsNaN(Canvas.GetLeft(thumb)))
-                    {
-                        Canvas.SetLeft(thumb, 0);
-                        Canvas.SetTop(thumb, 0);
-                    }
-                    thumb.DragDelta += Thumb_DragDelta;
-                    thumb.DragCompleted += Thumb_DragCompleted;
+                    thumb.ShowVertexHandle();
                 }
                 else
                 {
-                    thumb.DragDelta -= Thumb_DragDelta;
-                    thumb.DragCompleted -= Thumb_DragCompleted;
+                    thumb.HideVertexHandle();
                 }
             }
         }
 
-        #endregion 依存関係プロパティ
-
-        // コンストラクタ
-        public CustomThumbForInternal()
+        // 頂点ハンドルサイズ
+        public double MyShapeVertexHandleSize
         {
-            Loaded += CustomThumbForInternal_Loaded;
+            get { return (double)GetValue(MyShapeVertexHandleSizeProperty); }
+            set { SetValue(MyShapeVertexHandleSizeProperty, value); }
+        }
+        public static readonly DependencyProperty MyShapeVertexHandleSizeProperty =
+            DependencyProperty.Register(nameof(MyShapeVertexHandleSize), typeof(double), typeof(GeoThumb), new PropertyMetadata(12.0));
+
+        public GeoLine MyGeoLine
+        {
+            get { return (GeoLine)GetValue(MyGeoLineProperty); }
+            set { SetValue(MyGeoLineProperty, value); }
+        }
+        public static readonly DependencyProperty MyGeoLineProperty =
+            DependencyProperty.Register(nameof(MyGeoLine), typeof(GeoLine), typeof(GeoThumb), new PropertyMetadata(null));
+        public GeoLineData MyData
+        {
+            get { return (GeoLineData)GetValue(MyDataProperty); }
+            set { SetValue(MyDataProperty, value); }
+        }
+        public static readonly DependencyProperty MyDataProperty = DependencyProperty.Register(
+                nameof(MyData), typeof(GeoLineData), typeof(GeoThumb), new PropertyMetadata(null));
+
+
+        #endregion プロパティ
+
+
+        public void UpdateVertexHandles()
+        {
+            _vertexAdorner?.UpdateHandles();
         }
 
-        private void CustomThumbForInternal_Loaded(object sender, RoutedEventArgs e)
+        public void ShowVertexHandle()
         {
-            if (DataContext is GeoLineData2 data)
+            if (AdornerLayer.GetAdornerLayer(MyGeoLine) is AdornerLayer layer)
+            {
+                _vertexAdorner = new VertexAdorner(MyGeoLine);
+                _vertexAdorner.SetBinding(VertexAdorner.MyHandleSizeProperty, new Binding() { Source = this, Path = new PropertyPath(MyShapeVertexHandleSizeProperty) });
+                layer.Add(_vertexAdorner);
+            }
+        }
+
+        public void HideVertexHandle()
+        {
+            if (AdornerLayer.GetAdornerLayer(MyGeoLine) is AdornerLayer layer && _vertexAdorner is not null)
+            {
+                layer.Remove(_vertexAdorner);
+                _vertexAdorner = null;
+            }
+        }
+
+        private void GeoThumb_DragDelta(object sender, DragDeltaEventArgs e)
+        {
+            if (MyData is not null)
+            {
+                MyData.InternalX += e.HorizontalChange;
+                MyData.InternalY += e.VerticalChange;
+                e.Handled = true;
+            }
+        }
+
+        private void GeoThumb_Loaded(object sender, RoutedEventArgs e)
+        {
+            if (DataContext is GeoLineData data)
             {
                 MyData = data;
             }
         }
 
+    }
 
 
-
-
-        #region ドラッグ移動
-
-
-        private static void Thumb_DragDelta(object sender, DragDeltaEventArgs e)
+    public class FlatHandle : Thumb
+    {
+        static FlatHandle()
         {
-            if (sender is CustomThumbForInternal thumb)
-            {
-                thumb.MyData.InternalX += e.HorizontalChange;
-                thumb.MyData.InternalY += e.VerticalChange;
-                e.Handled = true;
-            }
+            DefaultStyleKeyProperty.OverrideMetadata(typeof(FlatHandle), new FrameworkPropertyMetadata(typeof(FlatHandle)));
+        }
+        public FlatHandle()
+        {
+
         }
 
-        private static void Thumb_DragCompleted(object sender, DragCompletedEventArgs e)
+
+        public Brush MyFillBrush
         {
-            if (sender is CustomThumbForInternal thumb)
-            {
-                // 移動完了時、DataのWidthとheightを更新する
-                // この値はParentのThumbのサイズとバインドしている
-                var data = thumb.MyData;
-                data.Width = data.BoundsWidth + data.InternalX;
-                data.Height = data.BoundsHeight + data.InternalY;
-
-                //if (data.X > 0) { data.Width -= data.X; }
-                //if (data.Y > 0) { data.Height -= data.Y; }
-
-
-                // 移動後座標がマイナスになったときは、0にしたいので、
-                // その分ParentThumbを逆に移動させる
-                if (data.InternalX < 0)
-                {
-                    data.Width = data.BoundsWidth; // ParentThumbのサイズは図形と同じになるはず
-                    data.X += data.InternalX; // ParentThumbを逆側に移動させてから
-                    data.InternalX = 0; // 自身の座標
-                                        //data.X = 0; // ParentThumbがマイナス座標になったときの処理はRootで行うはず
-                }
-                if (data.InternalY < 0)
-                {
-                    data.Height = data.BoundsHeight;
-                    data.Y += data.InternalY;
-                    data.InternalY = 0;
-                }
-            }
+            get { return (Brush)GetValue(MyFillBrushProperty); }
+            set { SetValue(MyFillBrushProperty, value); }
         }
-        #endregion ドラッグ移動
+        public static readonly DependencyProperty MyFillBrushProperty =
+            DependencyProperty.Register(nameof(MyFillBrush), typeof(Brush), typeof(FlatHandle), new PropertyMetadata(Brushes.Transparent));
+
+        public double MyLeft
+        {
+            get { return (double)GetValue(MyLeftProperty); }
+            set { SetValue(MyLeftProperty, value); }
+        }
+        public static readonly DependencyProperty MyLeftProperty =
+            DependencyProperty.Register(nameof(MyLeft), typeof(double), typeof(FlatHandle), new PropertyMetadata(0.0));
+
+        public double MyTop
+        {
+            get { return (double)GetValue(MyTopProperty); }
+            set { SetValue(MyTopProperty, value); }
+        }
+        public static readonly DependencyProperty MyTopProperty =
+            DependencyProperty.Register(nameof(MyTop), typeof(double), typeof(FlatHandle), new PropertyMetadata(0.0));
 
 
 
     }
+
+
+
+    //[ContentProperty(nameof(MyContent))]
+    //public class CustomThumbForInternal : Thumb
+    //{
+    //    static CustomThumbForInternal()
+    //    {
+    //        DefaultStyleKeyProperty.OverrideMetadata(typeof(CustomThumbForInternal), new FrameworkPropertyMetadata(typeof(CustomThumbForInternal)));
+    //    }
+
+    //    #region 依存関係プロパティ
+
+    //    public GeoShapeData2 MyData
+    //    {
+    //        get { return (GeoShapeData2)GetValue(MyDataProperty); }
+    //        set { SetValue(MyDataProperty, value); }
+    //    }
+    //    public static readonly DependencyProperty MyDataProperty =
+    //        DependencyProperty.Register(nameof(MyData), typeof(GeoShapeData2), typeof(CustomThumbForInternal), new PropertyMetadata(null));
+
+    //    public FrameworkElement MyContent
+    //    {
+    //        get { return (FrameworkElement)GetValue(MyContentProperty); }
+    //        set { SetValue(MyContentProperty, value); }
+    //    }
+    //    public static readonly DependencyProperty MyContentProperty =
+    //        DependencyProperty.Register(nameof(MyContent), typeof(FrameworkElement), typeof(CustomThumbForInternal), new PropertyMetadata(null));
+
+
+    //    public bool IsCanDragMove
+    //    {
+    //        get { return (bool)GetValue(IsCanDragMoveProperty); }
+    //        set { SetValue(IsCanDragMoveProperty, value); }
+    //    }
+    //    public static readonly DependencyProperty IsCanDragMoveProperty =
+    //        DependencyProperty.Register(nameof(IsCanDragMove), typeof(bool), typeof(CustomThumbForInternal), new FrameworkPropertyMetadata(false, OnMyIsDragMoveChanged));
+
+    //    // DragDeltaの付け外し
+    //    private static void OnMyIsDragMoveChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    //    {
+    //        if (d is CustomThumbForInternal thumb)
+    //        {
+    //            if (e.NewValue is bool isMove && isMove)
+    //            {
+    //                if (double.IsNaN(Canvas.GetLeft(thumb)))
+    //                {
+    //                    Canvas.SetLeft(thumb, 0);
+    //                    Canvas.SetTop(thumb, 0);
+    //                }
+    //                thumb.DragDelta += Thumb_DragDelta;
+    //                thumb.DragCompleted += Thumb_DragCompleted;
+    //            }
+    //            else
+    //            {
+    //                thumb.DragDelta -= Thumb_DragDelta;
+    //                thumb.DragCompleted -= Thumb_DragCompleted;
+    //            }
+    //        }
+    //    }
+
+    //    #endregion 依存関係プロパティ
+
+    //    // コンストラクタ
+    //    public CustomThumbForInternal()
+    //    {
+    //        Loaded += CustomThumbForInternal_Loaded;
+    //    }
+
+    //    private void CustomThumbForInternal_Loaded(object sender, RoutedEventArgs e)
+    //    {
+    //        if (DataContext is GeoLineData2 data)
+    //        {
+    //            MyData = data;
+    //        }
+    //    }
+
+
+
+
+
+    //    #region ドラッグ移動
+
+
+    //    private static void Thumb_DragDelta(object sender, DragDeltaEventArgs e)
+    //    {
+    //        if (sender is CustomThumbForInternal thumb)
+    //        {
+    //            thumb.MyData.InternalX += e.HorizontalChange;
+    //            thumb.MyData.InternalY += e.VerticalChange;
+    //            e.Handled = true;
+    //        }
+    //    }
+
+    //    private static void Thumb_DragCompleted(object sender, DragCompletedEventArgs e)
+    //    {
+    //        if (sender is CustomThumbForInternal thumb)
+    //        {
+    //            // 移動完了時、DataのWidthとheightを更新する
+    //            // この値はParentのThumbのサイズとバインドしている
+    //            var data = thumb.MyData;
+    //            data.Width = data.BoundsWidth + data.InternalX;
+    //            data.Height = data.BoundsHeight + data.InternalY;
+
+    //            //if (data.X > 0) { data.Width -= data.X; }
+    //            //if (data.Y > 0) { data.Height -= data.Y; }
+
+
+    //            // 移動後座標がマイナスになったときは、0にしたいので、
+    //            // その分ParentThumbを逆に移動させる
+    //            if (data.InternalX < 0)
+    //            {
+    //                data.Width = data.BoundsWidth; // ParentThumbのサイズは図形と同じになるはず
+    //                data.X += data.InternalX; // ParentThumbを逆側に移動させてから
+    //                data.InternalX = 0; // 自身の座標
+    //                                    //data.X = 0; // ParentThumbがマイナス座標になったときの処理はRootで行うはず
+    //            }
+    //            if (data.InternalY < 0)
+    //            {
+    //                data.Height = data.BoundsHeight;
+    //                data.Y += data.InternalY;
+    //                data.InternalY = 0;
+    //            }
+    //        }
+    //    }
+    //    #endregion ドラッグ移動
+
+
+
+    //}
 
 
 

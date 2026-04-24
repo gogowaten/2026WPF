@@ -85,23 +85,17 @@ namespace _20260311
             DataList.Add(textBlockData);
             DataList.Add(new PolylineData() { Name = "ボリライン", X = 0, Y = 0, StrokeThickness = 50, Stroke = Brushes.MediumPurple });
             DataList.Add(new GeoShapeData() { Name = "ベジェ曲線", X = 100, Y = 100, Stroke = Brushes.MediumAquamarine, StrokeThickness = 20.0, Points = [new Point(50, 70), new Point(250, 150), new Point(50, 250), new Point(50, 200), new Point(50, 150), new Point(150, 100), new Point(250, 250),], StrokeEndLineCap = PenLineCap.Round, Background = Brushes.Gray });
-            DataList.Add(new GeoLineData2()
+            DataList.Add(new GeoLineData()
             {
-                Background = Brushes.Lavender,
-                //Fill = Brushes.DeepSkyBlue;
-                Stroke = Brushes.Orchid,
+                MyPoints = [new Point(80, 0), new Point(80, 100), new Point(2, 2)],
+                //MyPoints = [new Point(80, 0), new Point(80, 100)],
+                Stroke = Brushes.Plum,
                 StrokeThickness = 20,
-                Points = [(new Point(50, 0)),
-                        (new Point(50, 100)),],
-                //Points = [(new Point(50, 70)),
-                //        (new Point(100, 150)),
-                //        (new Point(50, 250)),
-                //        (new Point(50, 200)),],
-                MiterLimit = 10,
-                IsCanDragMove = false,
-                IsOffset = true
+                Background = Brushes.CadetBlue,
+                Fill = Brushes.Silver,
+                //IsOffset = true,
+                IsCanDragMove = true,
             });
-
 
 
             // 直下のItemのIsSelectableをtrueにする
@@ -185,20 +179,21 @@ namespace _20260311
 
         #endregion On～プロパティの変更時
 
-        /// <summary>
-        /// オフセットの切り替え、GeoShapeData専用
-        /// 図形の位置が左上(0,0)になるのと、通常の位置の切り替えになる
-        /// 図形の位置が変わるののでThumbのいちも相対的に変更するため、DataのX,Yを変更している
-        /// </summary>
-        //[RelayCommand(CanExecute = nameof(CanChageGeoShapeData))]
-        [RelayCommand]
-        private void ChangeGeoShapeOffset()
-        {
-            if (CurrentItem is GeoShapeData data)
-            {
-                data.IsOffset = !data.IsOffset;
-            }
-        }
+        ///// <summary>
+        ///// オフセットの切り替え、GeoShapeData専用
+        ///// 図形の位置が左上(0,0)になるのと、通常の位置の切り替えになる
+        ///// 図形の位置が変わるののでThumbのいちも相対的に変更するため、DataのX,Yを変更している
+        ///// </summary>
+        ////[RelayCommand(CanExecute = nameof(CanChageGeoShapeData))]
+        //[RelayCommand]
+        //private void ChangeGeoShapeOffset()
+        //{
+        //    if (CurrentItem is GeoShapeData data)
+        //    {
+        //        data.IsOffset = !data.IsOffset;
+        //    }
+        //}
+
         public bool CanChageGeoShapeData()
         {
             return CurrentItem is GeoShapeData;
@@ -832,85 +827,111 @@ namespace _20260311
 
     #region 図形
 
-    public partial class GeoLineData2 : GeoShapeData2
+    //public partial class GeoLineData2 : GeoShapeData2
+    //{
+
+    //    [ObservableProperty] private PenLineCap _endLineCap;
+    //    [ObservableProperty] private PenLineCap _startLineCap;
+    //    [ObservableProperty] private double _miterLimit = 1.0;
+    //    [ObservableProperty] private PenLineJoin _lineJoin;
+    //    //[ObservableProperty] private bool _isOffset;
+    //    [ObservableProperty] private bool _isCanDragMove;
+
+    //    [ObservableProperty] private Pen? _testPen;
+    //    [ObservableProperty] private double _strokeThickness;
+
+
+
+    //    public GeoLineData2()
+    //    {
+    //        Name = "FromGeoLineData2";
+
+    //    }
+    //    partial void OnEndLineCapChanged(PenLineCap value)
+    //    {
+    //        UpdatePen();
+    //    }
+    //    partial void OnStartLineCapChanged(PenLineCap value)
+    //    {
+    //        UpdatePen();
+    //    }
+    //    partial void OnMiterLimitChanged(double value)
+    //    {
+    //        UpdatePen();
+    //    }
+    //    partial void OnLineJoinChanged(PenLineJoin value)
+    //    {
+    //        UpdatePen();
+    //    }
+    //    partial void OnStrokeThicknessChanged(double value)
+    //    {
+    //        UpdatePen();
+    //    }
+
+    //    private void UpdatePen()
+    //    {
+    //        TestPen = new Pen(Stroke, StrokeThickness)
+    //        {
+    //            EndLineCap = EndLineCap,
+    //            StartLineCap = StartLineCap,
+    //            MiterLimit = MiterLimit,
+    //            LineJoin = LineJoin,
+
+    //        };
+    //    }
+
+    //}
+
+    //public abstract partial class GeoShapeData2 : ShapeData
+    //{
+    //    [ObservableProperty] private PointCollection _points = [];
+    //    [ObservableProperty] private double _internalX;
+    //    [ObservableProperty] private double _internalY;
+
+    //    // Geometry.GetRenderBoundsより
+    //    [ObservableProperty] private double _boundsLeft;
+    //    [ObservableProperty] private double _boundsTop;
+    //    [ObservableProperty] private double _boundsWidth;
+    //    [ObservableProperty] private double _boundsHeight;
+
+    //    // 見た目上＋Actualの最大値
+    //    [ObservableProperty] private double _myActualWidth;
+    //    [ObservableProperty] private double _myActualHeight;
+
+    //    // 確認用
+    //    [ObservableProperty] private double _actualWidth;
+    //    [ObservableProperty] private double _actualHeight;
+    //    [ObservableProperty] private double _geoLeft;
+    //    [ObservableProperty] private double _geoTop;
+    //    [ObservableProperty] private double _geoWidth;
+    //    [ObservableProperty] private double _geoHeight;
+    //    // 確認用
+
+    //}
+
+    public partial class GeoLineData : GeoShapeData
     {
 
+        public GeoLineData()
+        {
+            Name = "FromGeoLineData";
+            //#if DEBUG
+            //            Debug.WriteLine($"{MethodBase.GetCurrentMethod()?.ReflectedType?.Name}__{MethodBase.GetCurrentMethod()?.Name}");
+            //#endif
+        }
+
+        [ObservableProperty] private PointCollection? _myPoints;
         [ObservableProperty] private PenLineCap _endLineCap;
         [ObservableProperty] private PenLineCap _startLineCap;
-        [ObservableProperty] private double _miterLimit = 1.0;
+        [ObservableProperty] private double _miterLimit = 10.0;
         [ObservableProperty] private PenLineJoin _lineJoin;
-        [ObservableProperty] private bool _isOffset;
         [ObservableProperty] private bool _isCanDragMove;
+        [ObservableProperty] private double _strokeThickness = 1.0;
+        [ObservableProperty] private bool _isVisibleVertexHandles;
 
-        [ObservableProperty] private Pen? _testPen;
-        [ObservableProperty] private double _strokeThickness;
-        
+        [ObservableProperty] private double _vertexHandleSize = 50.0; // これはアプリ全体の設定に移動させたほうが良い？
+        //[ObservableProperty] private Brush _vertexHandleFillBrush; // これはアプリ全体の設定に移動させたほうが良い？
 
-
-        public GeoLineData2()
-        {
-            Name = "FromGeoLineData2";
-            
-        }
-        partial void OnEndLineCapChanged(PenLineCap value)
-        {
-            UpdatePen();
-        }
-        partial void OnStartLineCapChanged(PenLineCap value)
-        {
-            UpdatePen();
-        }
-        partial void OnMiterLimitChanged(double value)
-        {
-            UpdatePen();
-        }
-        partial void OnLineJoinChanged(PenLineJoin value)
-        {
-            UpdatePen();
-        }
-        partial void OnStrokeThicknessChanged(double value)
-        {
-            UpdatePen();
-        }
-        
-        private void UpdatePen()
-        {
-            TestPen = new Pen(Stroke, StrokeThickness)
-            {
-                EndLineCap = EndLineCap,
-                StartLineCap = StartLineCap,
-                MiterLimit = MiterLimit,
-                LineJoin = LineJoin,
-                
-            };
-        }
-        
-    }
-
-    public abstract partial class GeoShapeData2 : ShapeData
-    {
-        [ObservableProperty] private PointCollection _points = [];
-        [ObservableProperty] private double _internalX;
-        [ObservableProperty] private double _internalY;
-
-        // Geometry.GetRenderBoundsより
-        [ObservableProperty] private double _boundsLeft;
-        [ObservableProperty] private double _boundsTop;
-        [ObservableProperty] private double _boundsWidth;
-        [ObservableProperty] private double _boundsHeight;
-
-        // 見た目上＋Actualの最大値
-        [ObservableProperty] private double _myActualWidth;
-        [ObservableProperty] private double _myActualHeight;
-
-        // 確認用
-        [ObservableProperty] private double _actualWidth;
-        [ObservableProperty] private double _actualHeight;
-        [ObservableProperty] private double _geoLeft;
-        [ObservableProperty] private double _geoTop;
-        [ObservableProperty] private double _geoWidth;
-        [ObservableProperty] private double _geoHeight;
-        // 確認用
 
     }
 
@@ -922,35 +943,24 @@ namespace _20260311
         [ObservableProperty] private PenLineCap _strokeStartLineCap = PenLineCap.Flat;
         [ObservableProperty] private PenLineJoin _strokeLineJoin = PenLineJoin.Miter;
         [ObservableProperty] private double _strokeMiterLimit = 1.0;
-        [ObservableProperty] private bool _isOffset;
-
-
-        partial void OnIsOffsetChanged(bool value)
-        {
-            if (value)
-            {
-                X += OriginBounds.X;
-                Y += OriginBounds.Y;
-            }
-            else
-            {
-                X -= OriginBounds.X;
-                Y -= OriginBounds.Y;
-            }
-        }
-    }
-
-    public partial class GeoLineData : ShapeData
-    {
-        [ObservableProperty] private PointCollection _points = [];
-        [ObservableProperty] private PenLineCap _strokeEndLineCap = PenLineCap.Flat;
-        [ObservableProperty] private PenLineCap _strokeStartLineCap = PenLineCap.Flat;
-        [ObservableProperty] private PenLineJoin _strokeLineJoin = PenLineJoin.Miter;
-        [ObservableProperty] private double _strokeMiterLimit = 1.0;
-
-        
+        [ObservableProperty] private double _internalX;
+        [ObservableProperty] private double _internalY;
+        [ObservableProperty] private Brush? _fill;
+        [ObservableProperty] private Brush? _stroke;
 
     }
+
+    //public partial class GeoLineData : ShapeData
+    //{
+    //    [ObservableProperty] private PointCollection _points = [];
+    //    [ObservableProperty] private PenLineCap _strokeEndLineCap = PenLineCap.Flat;
+    //    [ObservableProperty] private PenLineCap _strokeStartLineCap = PenLineCap.Flat;
+    //    [ObservableProperty] private PenLineJoin _strokeLineJoin = PenLineJoin.Miter;
+    //    [ObservableProperty] private double _strokeMiterLimit = 1.0;
+
+
+
+    //}
 
     public partial class PolylineData : ShapeData
     {
@@ -959,7 +969,7 @@ namespace _20260311
             StrokeThickness = 20;
             Stroke = Brushes.Red;
             Points = new PointCollection([new Point(), new Point(100, 0)]);
-            
+
         }
         [ObservableProperty] private PointCollection _points = [];
     }
@@ -974,7 +984,7 @@ namespace _20260311
         [ObservableProperty] private Brush? _fill;
         [ObservableProperty] private Brush _stroke = new SolidColorBrush(Color.FromArgb(200, 0, 250, 200));
         [ObservableProperty] private double _strokeThickness = 1.0;
-         
+
     }
     #endregion 図形
 
