@@ -14,7 +14,7 @@ namespace _20260420
     {
 
         private readonly VisualCollection _visualChildren;
-        private readonly Dictionary<ResizeDirection, Thumb> HT = []; // リサイズハンドル群
+        private readonly Dictionary<ResizeDirection, FlatHandle> HT = []; // リサイズハンドル群
         private double ResizeHandleHalfSize { get; set; } // 計算用：ハンドルサイズの半分
         private Size InternalResizeHandleSize { get; set; } // 計算用：ハンドルサイズ
 
@@ -22,6 +22,7 @@ namespace _20260420
 
         public ResizeAdorner(UIElement adornedElement) : base(adornedElement)
         {
+            this.UseLayoutRounding = true; // ドットに合わせてくっきり表示
             _visualChildren = new VisualCollection(this);
             ResizeHandleHalfSize = ResizeHandleSize / 2.0;
             InternalResizeHandleSize = new Size(ResizeHandleSize, ResizeHandleSize);
@@ -40,20 +41,32 @@ namespace _20260420
             }
         }
 
-        private Thumb CreateResizeHandleThumb(ResizeDirection direction, Cursor cursor)
+        private FlatHandle CreateResizeHandleThumb(ResizeDirection direction, Cursor cursor)
         {
-            var thumb = new Thumb()
+            var thumb = new FlatHandle()
             {
-                Background = Brushes.White,
-                BorderBrush = Brushes.DodgerBlue,
-                BorderThickness = new Thickness(1),
                 Tag = direction,
-                Cursor = cursor
+                Cursor = cursor,
+                MyFillBrush = new SolidColorBrush(Color.FromArgb(40, 100, 200, 0))
             };
             thumb.DragDelta += OnResize;
             _visualChildren.Add(thumb);
             return thumb;
         }
+        //private Thumb CreateResizeHandleThumb(ResizeDirection direction, Cursor cursor)
+        //{
+        //    var thumb = new Thumb()
+        //    {
+        //        Background = Brushes.White,
+        //        BorderBrush = Brushes.DodgerBlue,
+        //        BorderThickness = new Thickness(1),
+        //        Tag = direction,
+        //        Cursor = cursor
+        //    };
+        //    thumb.DragDelta += OnResize;
+        //    _visualChildren.Add(thumb);
+        //    return thumb;
+        //}
 
         private static readonly Dictionary<ResizeDirection, ResizeMatrix> ResizePolicies = new()
         {   
@@ -119,7 +132,7 @@ namespace _20260420
         // Thumbの移動、対象要素のサイズ変更
         private void OnResize(object sender, DragDeltaEventArgs e)
         {
-            if (sender is not Thumb thumb || AdornedElement is not FrameworkElement element) { return; }
+            if (sender is not FlatHandle thumb || AdornedElement is not FrameworkElement element) { return; }
 
             var dir = (ResizeDirection)thumb.Tag;
             if (!ResizePolicies.TryGetValue(dir, out var policy)) { return; }

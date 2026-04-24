@@ -31,6 +31,14 @@ namespace _20260420
         }
 
 
+        public Brush MyFillBrush
+        {
+            get { return (Brush)GetValue(MyFillBrushProperty); }
+            set { SetValue(MyFillBrushProperty, value); }
+        }
+        public static readonly DependencyProperty MyFillBrushProperty =
+            DependencyProperty.Register(nameof(MyFillBrush), typeof(Brush), typeof(FlatHandle), new PropertyMetadata(Brushes.Transparent));
+
         public double MyLeft
         {
             get { return (double)GetValue(MyLeftProperty); }
@@ -70,9 +78,9 @@ namespace _20260420
             MyResizeAdorner = new(this);
             Loaded += (s, e) => { InitResizeAdorner(); };
             DragDelta += CanvasThumb_DragDelta;
-
         }
 
+     
 
         private void InitResizeAdorner()
         {
@@ -127,6 +135,19 @@ namespace _20260420
 
         #region パブリックメソッド
 
+        // ぴったりサイズ
+        public void PerfectlyFit()
+        {
+            if (MyInternalUIElement is GeoThumb gt)
+            {
+                var bounds = gt.MyGeoLine.GetRenderBounds();
+                Width = bounds.Width;
+                Height = bounds.Height;
+                // 位置合わせは保留
+            }
+        }
+
+        // 図形の頂点ハンドルを更新
         public void UpdateVertexHandle()
         {
             if (MyInternalUIElement is GeoThumb gt)

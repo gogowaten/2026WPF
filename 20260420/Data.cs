@@ -32,7 +32,8 @@ namespace _20260420
         [ObservableProperty] private double _strokeThickness = 1.0;
         [ObservableProperty] private bool _isVisibleVertexHandles;
 
-        [ObservableProperty] private double _vertexHandleSize = 50.0; // これはアプリ全体の設定に移動させたほうが良い
+        [ObservableProperty] private double _vertexHandleSize = 50.0; // これはアプリ全体の設定に移動させたほうが良い？
+        //[ObservableProperty] private Brush _vertexHandleFillBrush; // これはアプリ全体の設定に移動させたほうが良い？
 
         //partial void OnMyPointsChanged(PointCollection? oldValue, PointCollection? newValue)
         //{

@@ -29,6 +29,7 @@ namespace _20260420
 
         public VertexAdorner(UIElement adornedElement) : base(adornedElement)
         {
+            this.UseLayoutRounding = true; // ドットに合わせてくっきり表示
             _adornedElement = (GeoLine)adornedElement;
             _visuals = new(this);
             MyCanvas = new Canvas();
@@ -79,18 +80,15 @@ namespace _20260420
         {
             MyCanvas.Children.Clear();
 
-            //var points = _adornedElement.MyPoints;
             if (MyGeoPoints == null) { return; }
 
             for (int i = 0; i < MyGeoPoints.Count; i++)
             {
                 var thumb = new FlatHandle()
                 {
-                    Background = Brushes.Red,
-                    BorderBrush = Brushes.White,
-                    BorderThickness = new Thickness(1),
                     Cursor = Cursors.Hand,
-                    Tag = i // インデックスを保持
+                    Tag = i, // インデックスを保持
+                    MyFillBrush = new SolidColorBrush(Color.FromArgb(40, 255, 0, 0))
                 };
 
                 thumb.SetBinding(WidthProperty, new Binding() { Source = this, Path = new PropertyPath(MyHandleSizeProperty) });

@@ -93,5 +93,10 @@ namespace _20260420
             //MyElement.UpdateVertexHandles();
             
         }
+
+        private void Button_Click_PerfectlyFit(object sender, RoutedEventArgs e)
+        {
+            MyElement.PerfectlyFit();
+        }
     }
 }

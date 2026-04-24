@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Accessibility;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
@@ -162,6 +163,17 @@ namespace _20260420
         #endregion オーバーライド
 
         #region publicメソッド
+        public Rect GetRenderBounds()
+        {
+            if (_cachedGeometry is null || _cachedGeometry == Geometry.Empty)
+            {
+                return Rect.Empty;
+            }
+            else
+            {
+                return _cachedGeometry.GetRenderBounds(MyStrokePen);
+            }
+        }
         //public void UpdateVertexHandles()
         //{
         //    _vertexAdorner?.UpdateHandles();
