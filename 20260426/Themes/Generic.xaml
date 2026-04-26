@@ -10,7 +10,7 @@
 
   >
 
-  <!-- #region これは一番上に書く必要がある -->  
+  <!-- #region これは一番上に書く必要がある -->
 
   <Style x:Key="CanvasItemContaier">
     <Setter Property="Canvas.Left" Value="{Binding X}"/>
@@ -21,19 +21,19 @@
   <!-- #endregion これは一番上に書く必要がある -->
 
 
+
   <DataTemplate DataType="{x:Type local:GeoLineData}">
     <local:CustomThumb>
-      <local:GeoThumb/>
+      <local:ResizeCanvas>
+        <local:GeoThumb/>
+      </local:ResizeCanvas>
     </local:CustomThumb>
   </DataTemplate>
 
-  <!--<DataTemplate DataType="{x:Type local:GeoLineData}">
-    <local:CanvasThumb/>
-  </DataTemplate>-->
 
-  
-  
-  <Style TargetType="{x:Type local:CanvasThumb}">
+
+
+  <!--<Style TargetType="{x:Type local:CanvasThumb}">
     <Setter Property="Template">
       <Setter.Value>
         <ControlTemplate TargetType="{x:Type local:CanvasThumb}">
@@ -43,11 +43,11 @@
         </ControlTemplate>
       </Setter.Value>
     </Setter>
-  </Style>
+  </Style>-->
 
   <Style TargetType="{x:Type local:GeoThumb}">
-    <Setter Property="Canvas.Left" Value="{Binding RelativeSource={RelativeSource Mode=Self}, Path=MyData.InternalX}"/>
-    <Setter Property="Canvas.Top" Value="{Binding RelativeSource={RelativeSource Mode=Self}, Path=MyData.InternalY}"/>
+    <Setter Property="Canvas.Left" Value="{Binding RelativeSource={RelativeSource Mode=Self}, Path=MyData.InternalX, Mode=TwoWay}"/>
+    <Setter Property="Canvas.Top" Value="{Binding RelativeSource={RelativeSource Mode=Self}, Path=MyData.InternalY, Mode=TwoWay}"/>
     <Setter Property="Template">
       <Setter.Value>
         <ControlTemplate TargetType="{x:Type local:GeoThumb}">
@@ -65,14 +65,16 @@
       </Setter.Value>
     </Setter>
   </Style>
-  
-  
+
+
   <DataTemplate DataType="{x:Type local:EllipseData}">
-    <Ellipse Width="{Binding Width}"
+    <local:CustomThumb>
+      <Ellipse Width="{Binding Width}"
              Height="{Binding Height}"
              Fill="{Binding Fill}"/>
+    </local:CustomThumb>
   </DataTemplate>
-  
+
   <DataTemplate DataType="{x:Type local:GroupData}">
     <local:CustomThumb>
       <Grid d:DataContext="{d:DesignInstance Type=local:GroupData}">

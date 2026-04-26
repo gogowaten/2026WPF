@@ -17,7 +17,123 @@ using System.Windows.Shapes;
 namespace _20260426
 {
 
- 
+
+    public class ResizeCanvas : Canvas
+    {
+        //public ResizeAdorner MyResizeAdorner { get; set; }
+        private UIElement MyInternalUIElement = null!;
+
+        public ResizeCanvas()
+        {
+            //MyResizeAdorner = new(this);
+            //Loaded += (s, e) => { InitResizeAdorner(); };
+            
+
+        }
+
+
+        //private void InitResizeAdorner()
+        //{
+        //    if (AdornerLayer.GetAdornerLayer(this) is AdornerLayer layer)
+        //    {
+        //        layer.Add(MyResizeAdorner);
+        //        MyResizeAdorner.Visibility = Visibility.Collapsed;
+
+        //        MyResizeAdorner.LeftLocateChanged += ResizeHandle_LeftLocateChanged;
+        //        MyResizeAdorner.TopLocateChanged += ResizeHandle_TopLocateChanged;
+
+        //        MyResizeAdorner.SetBinding(ResizeAdorner.ResizeHandleSizeProperty,
+        //            new Binding() { Source = this, Path = new PropertyPath(ResizeHandleSizeProperty) });
+        //    }
+        //}
+
+
+
+        public double ResizeHandleSize
+        {
+            get { return (double)GetValue(ResizeHandleSizeProperty); }
+            set { SetValue(ResizeHandleSizeProperty, value); }
+        }
+        public static readonly DependencyProperty ResizeHandleSizeProperty =
+            DependencyProperty.Register(nameof(ResizeHandleSize), typeof(double),
+                typeof(ResizeCanvas), new PropertyMetadata(12.0));
+
+
+
+        #region パブリックメソッド
+
+        // ぴったりサイズ
+        public void PerfectlyFit()
+        {
+            if (MyInternalUIElement is GeoThumb gt)
+            {
+                var bounds = gt.MyGeoLine.GetRenderBounds();
+                Width = bounds.Width;
+                Height = bounds.Height;
+                // 位置合わせは保留
+            }
+        }
+
+        // 図形の頂点ハンドルを更新
+        //public void UpdateVertexHandle()
+        //{
+        //    if (MyInternalUIElement is GeoThumb gt)
+        //    {
+        //        gt.UpdateVertexHandles();
+        //    }
+        //}
+
+        //public void ChangeResizeHandleVisible()
+        //{
+        //    if (MyResizeAdorner.Visibility == Visibility.Visible)
+        //    {
+        //        MyResizeAdorner.Visibility = Visibility.Collapsed;
+        //    }
+        //    else
+        //    {
+        //        MyResizeAdorner.Visibility = Visibility.Visible;
+        //    }
+        //}
+
+        //public void HiddenResizeHndle()
+        //{
+        //    MyResizeAdorner.Visibility = Visibility.Collapsed;
+        //}
+
+        //public void VisibleResizeHandle()
+        //{
+        //    MyResizeAdorner.Visibility = Visibility.Visible;
+        //}
+
+        #endregion パブリックメソッド
+
+        #region プライベートメソッド
+
+        // リサイズハンドルの移動でCanvasの座標が変更される時には、
+        // 中の要素をその場に留めるために反対方向に移動させる
+        private void ResizeHandle_TopLocateChanged(object? sender, double e)
+        {
+            Canvas.SetTop(MyInternalUIElement, Canvas.GetTop(MyInternalUIElement) - e);
+        }
+
+        private void ResizeHandle_LeftLocateChanged(object? sender, double e)
+        {
+
+            Canvas.SetLeft(MyInternalUIElement, Canvas.GetLeft(MyInternalUIElement) - e);
+        }
+
+
+
+        //private void CanvasThumb_DragDelta(object sender, DragDeltaEventArgs e)
+        //{
+        //    //Canvas.SetLeft(this, Canvas.GetLeft(this) + e.HorizontalChange);
+        //    //Canvas.SetTop(this, Canvas.GetTop(this) + e.VerticalChange);
+        //}
+        #endregion プライベートメソッド
+    }
+
+
+
 
     public class CanvasThumb : Thumb
     {
@@ -337,7 +453,7 @@ namespace _20260426
 
     [ContentProperty(nameof(MyContent))]
     public class CustomThumb : Thumb
-    {  
+    {
         //// Ctrl+クリック移動後の削除判定用
         //// 移動開始時に自身は選択状態だった場合にtrue
         //private bool isSelectedAtDragStart;
@@ -403,5 +519,5 @@ namespace _20260426
 
 
 
- 
+
 }

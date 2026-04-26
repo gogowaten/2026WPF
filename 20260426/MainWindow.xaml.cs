@@ -48,6 +48,9 @@ namespace _20260426
                 Points = [new Point(), new Point(100, 100)],
                 Stroke = Brushes.Black,
                 StrokeThickness = 10,
+                InternalX = 100,
+                InternalY = 100,
+                IsCanDragMove = true,
 
             };
             return data;
