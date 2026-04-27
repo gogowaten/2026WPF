@@ -16,37 +16,84 @@ using System.Windows.Shapes;
 
 namespace _20260426
 {
-
-
-    public class ResizeCanvas : Canvas
+    public class CustomCanvasThumb : CustomThumb
     {
-        //public ResizeAdorner MyResizeAdorner { get; set; }
-        private UIElement MyInternalUIElement = null!;
+        private Canvas MyTemplateCanvas = null!;
+        public ResizeAdorner MyResizeAdorner { get; set; } = null!;
+        private UIElement MyInternalElement = null!;
 
-        public ResizeCanvas()
+        static CustomCanvasThumb()
         {
-            //MyResizeAdorner = new(this);
-            //Loaded += (s, e) => { InitResizeAdorner(); };
-            
+            DefaultStyleKeyProperty.OverrideMetadata(typeof(CustomCanvasThumb), new FrameworkPropertyMetadata(typeof(CustomCanvasThumb)));
+        }
+        public CustomCanvasThumb()
+        {
+            MyResizeAdorner = new ResizeAdorner(this);
+            PreviewMouseLeftButtonDown += CustomCanvasThumb_PreviewMouseLeftButtonDown;
+            Loaded += CustomCanvasThumb_Loaded;
 
         }
 
+        private void CustomCanvasThumb_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            MyData?.RootData?.CurrentItemData = MyData;
+        }
 
-        //private void InitResizeAdorner()
-        //{
-        //    if (AdornerLayer.GetAdornerLayer(this) is AdornerLayer layer)
-        //    {
-        //        layer.Add(MyResizeAdorner);
-        //        MyResizeAdorner.Visibility = Visibility.Collapsed;
+        private void CustomCanvasThumb_Loaded(object sender, RoutedEventArgs e)
+        {
+            InitResizeAdorner();
+            InitContextMenu();
+        }
 
-        //        MyResizeAdorner.LeftLocateChanged += ResizeHandle_LeftLocateChanged;
-        //        MyResizeAdorner.TopLocateChanged += ResizeHandle_TopLocateChanged;
 
-        //        MyResizeAdorner.SetBinding(ResizeAdorner.ResizeHandleSizeProperty,
-        //            new Binding() { Source = this, Path = new PropertyPath(ResizeHandleSizeProperty) });
-        //    }
-        //}
+        public override void OnApplyTemplate()
+        {
+            base.OnApplyTemplate();
+            if (GetTemplateChild("PART_Canvas") is Canvas canvas)
+            {
+                MyTemplateCanvas = canvas;
+                if (MyTemplateCanvas.Children[0] is UIElement element)
+                {
+                    MyInternalElement = element;
 
+                }
+                else
+                {
+                    throw new InvalidOperationException("中の要素が見つからない");
+                }
+            }
+            else
+            {
+                throw new InvalidOperationException("TemplateのCanvasが見つからない");
+            }
+        }
+
+        private void InitContextMenu()
+        {
+            ContextMenu context = new();
+            MenuItem item = new() { Header = "perfectly" };
+            item.Click += (o, e) => { PerfectlyFit(); };
+            context.Items.Add(item);
+            this.ContextMenu = context;
+        }
+
+        private void InitResizeAdorner()
+        {
+            if (AdornerLayer.GetAdornerLayer(this) is AdornerLayer layer)
+            {
+                layer.Add(MyResizeAdorner);
+                //MyResizeAdorner.Visibility = Visibility.Collapsed;
+
+                MyResizeAdorner.LeftLocateChanged += ResizeHandle_LeftLocateChanged;
+                MyResizeAdorner.TopLocateChanged += ResizeHandle_TopLocateChanged;
+
+                MyResizeAdorner.SetBinding(ResizeAdorner.ResizeHandleSizeProperty,
+                    new Binding() { Source = this, Path = new PropertyPath(ResizeHandleSizeProperty) });
+            }
+        }
+
+
+        #region プロパティ
 
 
         public double ResizeHandleSize
@@ -56,8 +103,8 @@ namespace _20260426
         }
         public static readonly DependencyProperty ResizeHandleSizeProperty =
             DependencyProperty.Register(nameof(ResizeHandleSize), typeof(double),
-                typeof(ResizeCanvas), new PropertyMetadata(12.0));
-
+                typeof(CustomCanvasThumb), new PropertyMetadata(12.0));
+        #endregion プロパティ
 
 
         #region パブリックメソッド
@@ -65,11 +112,11 @@ namespace _20260426
         // ぴったりサイズ
         public void PerfectlyFit()
         {
-            if (MyInternalUIElement is GeoThumb gt)
+            if (MyInternalElement is GeoThumb gt)
             {
                 var bounds = gt.MyGeoLine.GetRenderBounds();
-                Width = bounds.Width;
-                Height = bounds.Height;
+                MyData.Width = bounds.Width;
+                MyData.Height = bounds.Height;
                 // 位置合わせは保留
             }
         }
@@ -109,6 +156,291 @@ namespace _20260426
 
         #region プライベートメソッド
 
+        // リサイズハンドルの移動でCanvasの座標が変更される時には、
+        // 中の要素をその場に留めるために反対方向に移動させる
+        private void ResizeHandle_LeftLocateChanged(object? sender, double e)
+        {
+            //MyData.X += e;
+            Canvas.SetLeft(MyInternalElement, Canvas.GetLeft(MyInternalElement) - e);
+        }
+
+        private void ResizeHandle_TopLocateChanged(object? sender, double e)
+        {
+            Canvas.SetTop(MyInternalElement, Canvas.GetTop(MyInternalElement) - e);
+        }
+
+        #endregion プライベートメソッド
+    }
+
+
+
+
+    [ContentProperty(nameof(MyContentElement))]
+    public class CustomThumbEx : Thumb
+    {
+        public ResizeAdorner MyResizeAdorner { get; set; }
+
+        static CustomThumbEx()
+        {
+            DefaultStyleKeyProperty.OverrideMetadata(typeof(CustomThumbEx), new FrameworkPropertyMetadata(typeof(CustomThumbEx)));
+        }
+        public CustomThumbEx()
+        {
+            MyResizeAdorner = new(this);
+            Loaded += CustomThumbEx_Loaded;
+            DragDelta += CustomThumbEx_DragDelta;
+            PreviewMouseLeftButtonDown += CustomThumbEx_PreviewMouseLeftButtonDown;
+        }
+
+        private void CustomThumbEx_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            MyData?.RootData?.CurrentItemData = MyData;
+        }
+
+        private void CustomThumbEx_DragDelta(object sender, DragDeltaEventArgs e)
+        {
+            MyData.X += e.HorizontalChange;
+            MyData.Y += e.VerticalChange;
+            e.Handled = true;
+        }
+
+        private void CustomThumbEx_Loaded(object sender, RoutedEventArgs e)
+        {
+            InitResizeAdorner();
+            InitContextMenu();
+            PerfectlyFit();
+        }
+
+        private void InitContextMenu()
+        {
+            ContextMenu menu = new();
+            MenuItem item = new() { Header = "menu", Name = "nenu" };
+            item.Click += (s, e) => { PerfectlyFit(); };
+            menu.Items.Add(item);
+            this.ContextMenu = menu;
+        }
+
+        // リサイズハンドルの初期化
+        private void InitResizeAdorner()
+        {
+            if (AdornerLayer.GetAdornerLayer(this) is AdornerLayer layer)
+            {
+                layer.Add(MyResizeAdorner);
+                //MyResizeAdorner.Visibility = Visibility.Collapsed;
+
+                // リサイズ時、子要素の逆移動
+                MyResizeAdorner.LeftLocateChanged += ResizeHandle_LeftLocateChanged;
+                MyResizeAdorner.TopLocateChanged += ResizeHandle_TopLocateChanged;
+
+                MyResizeAdorner.SetBinding(ResizeAdorner.ResizeHandleSizeProperty,
+                    new Binding() { Source = this, Path = new PropertyPath(ResizeHandleSizeProperty) });
+            }
+        }
+
+        #region 依存関係プロパティ
+
+        public Data MyData
+        {
+            get { return (Data)GetValue(MyDataProperty); }
+            set { SetValue(MyDataProperty, value); }
+        }
+        public static readonly DependencyProperty MyDataProperty =
+            DependencyProperty.Register(nameof(MyData), typeof(Data), typeof(CustomThumbEx), new PropertyMetadata(null));
+
+        public FrameworkElement MyContentElement
+        {
+            get { return (FrameworkElement)GetValue(MyContentElementProperty); }
+            set { SetValue(MyContentElementProperty, value); }
+        }
+        public static readonly DependencyProperty MyContentElementProperty =
+            DependencyProperty.Register(nameof(MyContentElement), typeof(FrameworkElement), typeof(FrameworkElement), new PropertyMetadata(null));
+
+        public double ResizeHandleSize
+        {
+            get { return (double)GetValue(ResizeHandleSizeProperty); }
+            set { SetValue(ResizeHandleSizeProperty, value); }
+        }
+        public static readonly DependencyProperty ResizeHandleSizeProperty =
+            DependencyProperty.Register(nameof(ResizeHandleSize), typeof(double),
+                typeof(ResizeCanvas), new PropertyMetadata(20.0));
+        #endregion 依存関係プロパティ
+
+
+        #region パブリックメソッド
+
+
+        // ぴったりサイズ
+        public void PerfectlyFit()
+        {
+            if (MyContentElement is GeoThumb gt)
+            {
+                var bounds = gt.MyGeoLine.GetRenderBounds();
+                MyData.Width = bounds.Width;
+                MyData.Height = bounds.Height;
+                // 位置合わせは保留
+            }
+            else
+            {
+
+            }
+        }
+
+        // 図形の頂点ハンドルを更新
+        //public void UpdateVertexHandle()
+        //{
+        //    if (MyInternalUIElement is GeoThumb gt)
+        //    {
+        //        gt.UpdateVertexHandles();
+        //    }
+        //}
+
+        //public void ChangeResizeHandleVisible()
+        //{
+        //    if (MyResizeAdorner.Visibility == Visibility.Visible)
+        //    {
+        //        MyResizeAdorner.Visibility = Visibility.Collapsed;
+        //    }
+        //    else
+        //    {
+        //        MyResizeAdorner.Visibility = Visibility.Visible;
+        //    }
+        //}
+        #endregion パブリックメソッド
+
+        #region プライベートメソッド
+        // リサイズハンドルの移動でCanvasの座標が変更される時には、
+        // 中の要素をその場に留めるために反対方向に移動させる
+        private void ResizeHandle_TopLocateChanged(object? sender, double e)
+        {
+            Canvas.SetTop(MyContentElement, Canvas.GetTop(MyContentElement) - e);
+        }
+
+        private void ResizeHandle_LeftLocateChanged(object? sender, double e)
+        {
+
+            Canvas.SetLeft(MyContentElement, Canvas.GetLeft(MyContentElement) - e);
+        }
+
+
+
+        //private void CanvasThumb_DragDelta(object sender, DragDeltaEventArgs e)
+        //{
+        //    //Canvas.SetLeft(this, Canvas.GetLeft(this) + e.HorizontalChange);
+        //    //Canvas.SetTop(this, Canvas.GetTop(this) + e.VerticalChange);
+        //}
+        #endregion プライベートメソッド
+
+
+
+
+    }
+
+    // 中止
+    // リサイズハンドルを持つCanvas
+    // ハンドルの表示切り替えはnewじゃなくて、VisibilityのVisibleとCollapsedで切り替える
+    // 子要素は1個に限定
+    // LeftとTop要素のリサイズ時は子要素を移動させる
+    public class ResizeCanvas : Canvas
+    {
+        public ResizeAdorner MyResizeAdorner { get; set; }
+        private UIElement MyInternalUIElement = null!;
+
+        public ResizeCanvas()
+        {
+            MyResizeAdorner = new(this);
+            Loaded += ResizeCanvas_Loaded;
+
+
+        }
+
+        private void ResizeCanvas_Loaded(object sender, RoutedEventArgs e)
+        {
+            InitResizeAdorner();
+            if (Children[0] is UIElement element)
+            {
+                MyInternalUIElement = element;
+            }
+        }
+
+        // リサイズハンドルの初期化
+        private void InitResizeAdorner()
+        {
+            if (AdornerLayer.GetAdornerLayer(this) is AdornerLayer layer)
+            {
+                layer.Add(MyResizeAdorner);
+                //MyResizeAdorner.Visibility = Visibility.Collapsed;
+
+                // リサイズ時、子要素の逆移動
+                MyResizeAdorner.LeftLocateChanged += ResizeHandle_LeftLocateChanged;
+                MyResizeAdorner.TopLocateChanged += ResizeHandle_TopLocateChanged;
+
+                MyResizeAdorner.SetBinding(ResizeAdorner.ResizeHandleSizeProperty,
+                    new Binding() { Source = this, Path = new PropertyPath(ResizeHandleSizeProperty) });
+            }
+        }
+
+
+
+        public double ResizeHandleSize
+        {
+            get { return (double)GetValue(ResizeHandleSizeProperty); }
+            set { SetValue(ResizeHandleSizeProperty, value); }
+        }
+        public static readonly DependencyProperty ResizeHandleSizeProperty =
+            DependencyProperty.Register(nameof(ResizeHandleSize), typeof(double),
+                typeof(ResizeCanvas), new PropertyMetadata(20.0));
+
+
+
+        #region パブリックメソッド
+
+        // ぴったりサイズ
+        public void PerfectlyFit()
+        {
+            if (MyInternalUIElement is GeoThumb gt)
+            {
+                var bounds = gt.MyGeoLine.GetRenderBounds();
+                Width = bounds.Width;
+                Height = bounds.Height;
+                // 位置合わせは保留
+            }
+        }
+
+        // 図形の頂点ハンドルを更新
+        //public void UpdateVertexHandle()
+        //{
+        //    if (MyInternalUIElement is GeoThumb gt)
+        //    {
+        //        gt.UpdateVertexHandles();
+        //    }
+        //}
+
+        //public void ChangeResizeHandleVisible()
+        //{
+        //    if (MyResizeAdorner.Visibility == Visibility.Visible)
+        //    {
+        //        MyResizeAdorner.Visibility = Visibility.Collapsed;
+        //    }
+        //    else
+        //    {
+        //        MyResizeAdorner.Visibility = Visibility.Visible;
+        //    }
+        //}
+
+        public void HiddenResizeHndle()
+        {
+            MyResizeAdorner.Visibility = Visibility.Collapsed;
+        }
+
+        public void VisibleResizeHandle()
+        {
+            MyResizeAdorner.Visibility = Visibility.Visible;
+        }
+        #endregion パブリックメソッド
+
+
+
+        #region プライベートメソッド
         // リサイズハンドルの移動でCanvasの座標が変更される時には、
         // 中の要素をその場に留めるために反対方向に移動させる
         private void ResizeHandle_TopLocateChanged(object? sender, double e)
@@ -391,12 +723,12 @@ namespace _20260426
 
         private void GeoThumb_DragDelta(object sender, DragDeltaEventArgs e)
         {
-            //if (MyData is not null)
-            //{
-            //    MyData.InternalX += e.HorizontalChange;
-            //    MyData.InternalY += e.VerticalChange;
-            //    e.Handled = true;
-            //}
+            if (MyData is not null)
+            {
+                MyData.InternalX += e.HorizontalChange;
+                MyData.InternalY += e.VerticalChange;
+                e.Handled = true;
+            }
         }
 
         private void GeoThumb_Loaded(object sender, RoutedEventArgs e)
@@ -468,6 +800,15 @@ namespace _20260426
         public CustomThumb()
         {
 
+
+            DragDelta += CustomThumb_DragDelta;
+        }
+
+        private void CustomThumb_DragDelta(object sender, DragDeltaEventArgs e)
+        {
+            MyData.X += e.HorizontalChange;
+            MyData.Y += e.VerticalChange;
+            e.Handled = true;
         }
 
         #region 依存関係プロパティ
@@ -491,7 +832,18 @@ namespace _20260426
             DependencyProperty.Register(nameof(MyContent), typeof(FrameworkElement), typeof(CustomThumb), new PropertyMetadata(null));
         #endregion 依存関係プロパティ
 
+        #region パブリックメソッド
+        //// たぶん右クリックメニューから実行
+        //// 図形Thumb専用、図形にピッタリサイズにする
+        //public void PerfectlyFit()
+        //{
+        //    if (MyContent is ResizeCanvas geot)
+        //    {
+        //        geot.PerfectlyFit();
+        //    }
+        //}
 
+        #endregion パブリックメソッド
     }
 
 

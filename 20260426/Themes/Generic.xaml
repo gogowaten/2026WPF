@@ -22,13 +22,83 @@
 
 
 
+
+  <Style TargetType="{x:Type local:FlatHandle}">
+    <Setter Property="Canvas.Left" Value="{Binding RelativeSource={RelativeSource Mode=Self}, Path=MyLeft, Mode=TwoWay}"/>
+    <Setter Property="Canvas.Top" Value="{Binding RelativeSource={RelativeSource Mode=Self}, Path=MyTop, Mode=TwoWay}"/>
+    <Setter Property="Template">
+      <Setter.Value>
+        <ControlTemplate TargetType="{x:Type local:FlatHandle}">
+          <Grid Background="{TemplateBinding MyFillBrush}">
+            <Rectangle Stroke="Black" StrokeThickness="1"/>
+            <Rectangle Stroke="White" StrokeThickness="1" StrokeDashArray="2,2"/>
+          </Grid>
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+  </Style>
+
   <DataTemplate DataType="{x:Type local:GeoLineData}">
-    <local:CustomThumb>
-      <local:ResizeCanvas>
-        <local:GeoThumb/>
-      </local:ResizeCanvas>
-    </local:CustomThumb>
+    <local:CustomCanvasThumb>
+      <local:GeoThumb/>
+    </local:CustomCanvasThumb>
   </DataTemplate>
+  
+  <Style TargetType="{x:Type local:CustomCanvasThumb}">
+    <Setter Property="MyData" Value="{Binding}"/>
+    <Setter Property="Canvas.Left" Value="{Binding RelativeSource={RelativeSource Mode=Self}, Path=MyData.X, Mode=TwoWay}"/>
+    <Setter Property="Canvas.Top" Value="{Binding RelativeSource={RelativeSource Mode=Self}, Path=MyData.Y, Mode=TwoWay}"/>
+    <Setter Property="Width" Value="{Binding RelativeSource={RelativeSource Mode=Self}, Path=MyData.Width, Mode=TwoWay}"/>
+    <Setter Property="Height" Value="{Binding RelativeSource={RelativeSource Mode=Self}, Path=MyData.Height, Mode=TwoWay}"/>
+   
+    <Setter Property="Template">
+      <Setter.Value>
+        <ControlTemplate TargetType="{x:Type local:CustomCanvasThumb}">
+            <Canvas x:Name="PART_Canvas" Background="PowderBlue"
+                    HorizontalAlignment="Left" VerticalAlignment="Top"
+                    Width="{Binding Width, Mode=TwoWay}" Height="{Binding Height, Mode=TwoWay}"
+                    >
+              <local:GeoThumb/>
+            </Canvas>
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+  </Style>
+  
+
+  <Style TargetType="{x:Type local:CustomThumbEx}">
+    <Setter Property="MyData" Value="{Binding}"/>
+    <Setter Property="Canvas.Left" Value="{Binding RelativeSource={RelativeSource Mode=Self}, Path=MyData.X, Mode=TwoWay}"/>
+    <Setter Property="Canvas.Top" Value="{Binding RelativeSource={RelativeSource Mode=Self}, Path=MyData.Y, Mode=TwoWay}"/>
+    <Setter Property="Template">
+      <Setter.Value>
+        <ControlTemplate TargetType="{x:Type local:CustomThumbEx}">
+          <Grid>
+            <ContentPresenter Content="{TemplateBinding MyContentElement}"/>
+            <Border x:Name="SelectedBorder" Visibility="Visible"
+                    BorderBrush="Orange" BorderThickness="1"
+                    Margin="-10"/>
+          </Grid>
+          <ControlTemplate.Triggers>
+            <DataTrigger Binding="{Binding IsSelected}" Value="True">
+              <Setter Property="Visibility" Value="Visible" TargetName="SelectedBorder"/>
+            </DataTrigger>
+          </ControlTemplate.Triggers>
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+  </Style>
+
+  <!--<DataTemplate DataType="{x:Type local:GeoLineData}">
+    <local:CustomThumbEx Background="Gold"
+                         Width="{Binding Width, Mode=TwoWay}"
+                         Height="{Binding Height, Mode=TwoWay}"
+                         >
+      <Canvas>
+        <local:GeoThumb/>
+      </Canvas>
+    </local:CustomThumbEx>
+  </DataTemplate>-->
 
 
 

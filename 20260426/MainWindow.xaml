@@ -23,7 +23,14 @@
     </Canvas>-->
 
     <StackPanel Grid.Column="1">
-
+      <GroupBox Header="MyData.CurrentItemData" DataContext="{Binding MyData.CurrentItemData}">
+        <StackPanel>
+          <TextBlock Text="{Binding Width, StringFormat='Width = {0: 0; -0; 0}'}"/>
+          <TextBlock Text="{Binding X, StringFormat='X = {0: 0; -0; 0}'}"/>
+          <TextBlock Text="{Binding InternalX, StringFormat='InternalX = {0: 0; -0; 0}'}"/>
+          <TextBlock Text="{Binding StringFormat=' {0: 0; -0; 0}'}"/>
+        </StackPanel>
+      </GroupBox>
     </StackPanel>
   </Grid>
 </Window>

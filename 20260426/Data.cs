@@ -20,15 +20,15 @@ namespace _20260426
         //[ObservableProperty] private string _addText = "ここに文字列";
 
 
-        [ObservableProperty] private Data? _currentItem; // 筆頭
-        [ObservableProperty] private Data? _clickedItem; // 大抵は最後にクリックしたItem
+        [ObservableProperty] private Data? _currentItemData; // 筆頭
+        [ObservableProperty] private Data? _clickedItemData; // 大抵は最後にクリックしたItem
 
         //[NotifyCanExecuteChangedFor(nameof(ZAgeCommand))]
-        [ObservableProperty] private ObservableCollection<Data> _selectedItems = [];
+        [ObservableProperty] private ObservableCollection<Data> _selectedItemsData = [];
 
         //[NotifyCanExecuteChangedFor(nameof(ZUpCommand))]
         //[NotifyCanExecuteChangedFor(nameof(ZtoTopCommand))]
-        [ObservableProperty] private GroupData? _editingGroup;
+        [ObservableProperty] private GroupData? _editingGroupData;
 
 
 
@@ -38,7 +38,7 @@ namespace _20260426
         public RootData()
         {
             Name = "RootDataです";
-            EditingGroup = this;
+            EditingGroupData = this;
             //MyInit();
             //SelectedItems.CollectionChanged += SelectedItems_CollectionChanged;
         }
@@ -189,24 +189,24 @@ namespace _20260426
 
         public bool CanChageGeoShapeData()
         {
-            return CurrentItem is GeoShapeData;
+            return CurrentItemData is GeoShapeData;
         }
 
         // 全選択解除
         [RelayCommand]
         public void ClearSelectedItems()
         {
-            foreach (var item in SelectedItems)
+            foreach (var item in SelectedItemsData)
             {
                 item.IsSelected = false;
                 item.IsCurrent = false;
             }
 
             //SelectedItems.Clear(); // Clearメソッドは使わない
-            var tempList = new List<Data>(SelectedItems);
-            foreach (Data item in tempList) { _ = SelectedItems.Remove(item); }
+            var tempList = new List<Data>(SelectedItemsData);
+            foreach (Data item in tempList) { _ = SelectedItemsData.Remove(item); }
 
-            CurrentItem = null;
+            CurrentItemData = null;
         }
 
         // 選択状態のData変更時
