@@ -869,6 +869,9 @@ namespace _20260426
         [ObservableProperty] private Brush? _fill;
         [ObservableProperty] private Brush? _stroke;
         [ObservableProperty] private double _strokeThickness = 1.0;
+        [ObservableProperty] private bool _isVertexHandle;
+
+        
     }
 
 

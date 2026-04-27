@@ -21,7 +21,18 @@
   <!-- #endregion これは一番上に書く必要がある -->
 
 
+  <DataTemplate DataType="{x:Type local:GeoLineData}">
+    <local:CustomThumb>
+      <local:GeoLineBG MyPoints="{Binding Points}"
+                     Stroke="{Binding Stroke}"
+                     StrokeThickness="{Binding StrokeThickness}"
+                     IsVertexHandle="{Binding IsVertexHandle}"/>
+    </local:CustomThumb>
+  </DataTemplate>
 
+  
+  
+  
 
   <Style TargetType="{x:Type local:FlatHandle}">
     <Setter Property="Canvas.Left" Value="{Binding RelativeSource={RelativeSource Mode=Self}, Path=MyLeft, Mode=TwoWay}"/>
@@ -38,11 +49,13 @@
     </Setter>
   </Style>
 
-  <DataTemplate DataType="{x:Type local:GeoLineData}">
+  <!--<DataTemplate DataType="{x:Type local:GeoLineData}">
     <local:CustomCanvasThumb>
       <local:GeoThumb/>
     </local:CustomCanvasThumb>
-  </DataTemplate>
+  </DataTemplate>-->
+  
+  
   
   <Style TargetType="{x:Type local:CustomCanvasThumb}">
     <Setter Property="MyData" Value="{Binding}"/>

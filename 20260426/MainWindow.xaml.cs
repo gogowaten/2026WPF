@@ -46,12 +46,13 @@ namespace _20260426
             {
                 X = 100,
                 Y = 10,
-                Points = [new Point(), new Point(100, 100)],
-                Stroke = Brushes.Black,
-                StrokeThickness = 10,
+                Points = [new Point(), new Point(100, 100), new Point(-20, 50)],
+                Stroke = Brushes.Crimson,
+                StrokeThickness = 30,
                 InternalX = 0,
                 InternalY = 0,
                 IsCanDragMove = true,
+                IsVertexHandle = true,
 
             };
             return data;
