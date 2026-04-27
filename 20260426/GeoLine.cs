@@ -133,6 +133,8 @@ namespace _20260426
         }
     }
 
+
+
     // 独立している
 
     public class GeoLine : Shape
@@ -263,23 +265,6 @@ namespace _20260426
 
         #endregion コンストラクタ
 
-        #region オーバーライド
-
-        //protected override void OnRender(DrawingContext drawingContext)
-        //{
-        //    // オフセット表示の場合はTranslateTransformで変形したものを描画
-        //    if (MyIsOffset)
-        //    {
-        //        //drawingContext.PushTransform(new TranslateTransform(-MyData.Bounds.Left, -MyData.Bounds.Top));
-        //        drawingContext.PushTransform(new TranslateTransform(-MyGeometryBounds.Left, -MyGeometryBounds.Top));
-        //    }
-        //    //if (MyData is GeoLineData data && data.Background is not null)
-        //    //{
-        //    //    drawingContext.DrawRectangle(data.Background, null, new Rect(MyData.BoundsLeft, MyData.BoundsTop, MyData.BoundsWidth, MyData.BoundsHeight));
-        //    //}
-        //    base.OnRender(drawingContext);
-        //}
-        #endregion オーバーライド
 
         #region publicメソッド
         public Rect GetRenderBounds()
