@@ -21,7 +21,7 @@
 
   <DataTemplate DataType="{x:Type local:GeoLineData}">
     <local:CustomThumb>
-      <local:GeoLineEX MyPoints="{Binding Points}"
+      <local:GeoLineEXforData MyPoints="{Binding Points}"
                        Stroke="{Binding Stroke}"
                        StrokeThickness="{Binding StrokeThickness}"
                        Background="{Binding Background}"
@@ -30,9 +30,9 @@
                        VertexHandleSize="50"
                        MySurfaceWidth="{Binding Width, Mode=OneWayToSource}"
                        MySurfaceHeight="{Binding Height, Mode=OneWayToSource}"
-                       MyOffsetLeft="{Binding OffsetX}"
-                       MyOffsetTop="{Binding OffsetY}"
                      />
+                       <!--MyOffsetLeft="{Binding OffsetX}"
+                       MyOffsetTop="{Binding OffsetY}"-->
     </local:CustomThumb>
   </DataTemplate>
 

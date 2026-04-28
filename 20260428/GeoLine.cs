@@ -14,6 +14,68 @@ using System.Windows.Shapes;
 namespace _20260428
 {
 
+    public class GeoLineEXforData : GeoLineEX
+    {
+        public GeoLineEXforData()
+        {
+            Loaded += GeoLineEXforData_Loaded;
+            MyUpdateSurfaceBounds += GeoLineEXforData_MyUpdateSurfaceBounds;
+        }
+
+        private void GeoLineEXforData_MyUpdateSurfaceBounds(object? sender, Rect e)
+        {
+            if (MyData is null) { return; }
+            MyData.Width = MySurfaceWidth;
+            MyData.Height = MySurfaceHeight;
+            MyData.OffsetX = MySurfaceLeft;
+            MyData.OffsetY = MySurfaceTop;
+            //MyData.RootData?.UpdateParentSize();
+            MyData.ParentData?.UpdateSize();
+        }
+
+        private void GeoLineEXforData_Loaded(object sender, RoutedEventArgs e)
+        {
+            if (DataContext is GeoLineData data)
+            {
+                MyData = data;
+            }
+        }
+
+        public GeoLineData MyData
+        {
+            get { return (GeoLineData)GetValue(MyDataProperty); }
+            set { SetValue(MyDataProperty, value); }
+        }
+        public static readonly DependencyProperty MyDataProperty =
+            DependencyProperty.Register(nameof(MyData), typeof(GeoLineData), typeof(GeoLineEXforData), new PropertyMetadata(null));
+
+
+        //// 頂点ハンドル表示
+        //public new void ShowVertexAdorner()
+        //{
+        //    // 頂点ハンドルを一旦削除して作り直す
+        //    HideVertexAdorner();
+        //    MyVertexAdorner = new VertexAdorner(this);
+        //    MyVertexAdorner.MyDragCompleted += VertexAdorner_MyDragCompleted;
+        //    MyAdornerLayer.Add(MyVertexAdorner);
+        //}
+
+
+        //// 頂点ハンドル移動後に自身の見た目上の位置とサイズ更新と通知
+        //private void VertexAdorner_MyDragCompleted(object? sender, EventArgs e)
+        //{
+        //    UpdateSurfaceBounds();
+        //    MyData.Width = MySurfaceWidth;
+        //    MyData.Height = MySurfaceHeight;
+        //    MyData.OffsetX = MySurfaceLeft;
+        //    MyData.OffsetY = MySurfaceTop;
+        //    MyData.RootData?.UpdateParentSize();
+        //}
+
+
+
+    }
+
     /// <summary>
     /// 頂点ハンドルを備えた拡張線形状を提供します。
     /// </summary>
@@ -24,8 +86,8 @@ namespace _20260428
     /// ロード時にInvalidOperationExceptionがスローされます。</remarks>
     public class GeoLineEX : GeoLineBG
     {
-        private VertexAdorner? _vertexAdorner; // 頂点移動用ハンドル
-        private AdornerLayer MyAdornerLayer = null!;
+        internal VertexAdorner? MyVertexAdorner; // 頂点移動用ハンドル
+        internal AdornerLayer MyAdornerLayer = null!;
 
         public GeoLineEX()
         {
@@ -97,7 +159,7 @@ namespace _20260428
         // 頂点の追加や削除時に使う
         public void UpdateVertexHandles()
         {
-            _vertexAdorner?.UpdateHandles();
+            MyVertexAdorner?.UpdateHandles();
         }
 
         // 頂点ハンドル表示
@@ -105,17 +167,26 @@ namespace _20260428
         {
             // 頂点ハンドルを一旦削除して作り直す
             HideVertexAdorner();
-            _vertexAdorner = new VertexAdorner(this);
-            MyAdornerLayer.Add(_vertexAdorner);
+            MyVertexAdorner = new VertexAdorner(this);
+            MyVertexAdorner.MyDragCompleted += VertexAdorner_MyDragCompleted;
+            MyAdornerLayer.Add(MyVertexAdorner);
+        }
+
+
+        // 頂点ハンドル移動後に自身の見た目上の位置とサイズ更新と通知
+        private void VertexAdorner_MyDragCompleted(object? sender, EventArgs e)
+        {
+            UpdateSurfaceBounds();
+
         }
 
         // 頂点ハンドル非表示(削除)
         public void HideVertexAdorner()
         {
-            if (_vertexAdorner is not null)
+            if (MyVertexAdorner is not null)
             {
-                MyAdornerLayer.Remove(_vertexAdorner);
-                _vertexAdorner = null;
+                MyAdornerLayer.Remove(MyVertexAdorner);
+                MyVertexAdorner = null;
             }
         }
         #endregion パブリックメソッド
@@ -219,21 +290,21 @@ namespace _20260428
         }
         #region テスト依存関係プロパティ
 
-        public double MyOffsetLeft
-        {
-            get { return (double)GetValue(MyOffsetLeftProperty); }
-            set { SetValue(MyOffsetLeftProperty, value); }
-        }
-        public static readonly DependencyProperty MyOffsetLeftProperty =
-            DependencyProperty.Register(nameof(MyOffsetLeft), typeof(double), typeof(GeoLine), new PropertyMetadata(0.0));
+        //public double MyOffsetLeft
+        //{
+        //    get { return (double)GetValue(MyOffsetLeftProperty); }
+        //    set { SetValue(MyOffsetLeftProperty, value); }
+        //}
+        //public static readonly DependencyProperty MyOffsetLeftProperty =
+        //    DependencyProperty.Register(nameof(MyOffsetLeft), typeof(double), typeof(GeoLine), new PropertyMetadata(0.0));
 
-        public double MyOffsetTop
-        {
-            get { return (double)GetValue(MyOffsetTopProperty); }
-            set { SetValue(MyOffsetTopProperty, value); }
-        }
-        public static readonly DependencyProperty MyOffsetTopProperty =
-            DependencyProperty.Register(nameof(MyOffsetTop), typeof(double), typeof(GeoLine), new PropertyMetadata(0.0));
+        //public double MyOffsetTop
+        //{
+        //    get { return (double)GetValue(MyOffsetTopProperty); }
+        //    set { SetValue(MyOffsetTopProperty, value); }
+        //}
+        //public static readonly DependencyProperty MyOffsetTopProperty =
+        //    DependencyProperty.Register(nameof(MyOffsetTop), typeof(double), typeof(GeoLine), new PropertyMetadata(0.0));
 
         public double MySurfaceWidth
         {
@@ -342,7 +413,7 @@ namespace _20260428
 
         private void GeoLine_Loaded(object sender, RoutedEventArgs e)
         {
-            UpdateSurfaceBoundsAndOffset();
+            UpdateSurfaceBounds();
         }
 
         private void SetMyBind()
@@ -359,16 +430,18 @@ namespace _20260428
         #endregion コンストラクタ
 
         #region publicメソッド
+        public event EventHandler<Rect>? MyUpdateSurfaceBounds;
         // Surface(見た目上の位置とサイズ)の更新
-        public void UpdateSurfaceBoundsAndOffset()
+        public void UpdateSurfaceBounds()
         {
             var bounds = GetSurfaceBounds();
             MySurfaceHeight = bounds.Height;
             MySurfaceLeft = bounds.Left;
             MySurfaceTop = bounds.Top;
             MySurfaceWidth = bounds.Width;
-            MyOffsetLeft = bounds.Left;
-            MyOffsetTop = bounds.Top;
+            //MyOffsetLeft = bounds.Left;
+            //MyOffsetTop = bounds.Top;
+            MyUpdateSurfaceBounds?.Invoke(this, bounds);
         }
 
         // 図形がピッタリ収まるRectを返す
@@ -377,7 +450,9 @@ namespace _20260428
         {
             var bounds = GetRenderBounds();
             var left = Canvas.GetLeft(this);
+            if (double.IsNaN(left)) { left = 0; }
             var top = Canvas.GetTop(this);
+            if (double.IsNaN(top)) { top = 0; }
             Rect surface = new(left + bounds.Left, top + bounds.Top, bounds.Width, bounds.Height);
             return surface;
         }
@@ -546,8 +621,17 @@ namespace _20260428
                 thumb.MyTop = MyGeoPoints[i].Y - MyHandleOffset;
 
                 thumb.DragDelta += Thumb_DragDelta;
+                thumb.DragCompleted += Thumb_DragCompleted;
                 _ = MyCanvas.Children.Add(thumb);
             }
+        }
+
+        public event EventHandler? MyDragCompleted;
+
+        // 移動終了時、通知を出す
+        private void Thumb_DragCompleted(object sender, DragCompletedEventArgs e)
+        {
+            MyDragCompleted?.Invoke(this, e);
         }
 
         private void Thumb_DragDelta(object sender, DragDeltaEventArgs e)

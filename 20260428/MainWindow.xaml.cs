@@ -41,12 +41,13 @@ namespace _20260428
             return root;
         }
 
-        private GeoLineData CreateGeoLineData()
+        private GroupData CreateGeoLineData()
         {
-            GeoLineData data = new()
+
+            GeoLineData geo = new()
             {
-                X = 100,
-                Y = 10,
+                X = 0,
+                Y = 0,
                 Points = [new Point(), new Point(100, 100), new Point(-20, 50)],
                 Stroke = Brushes.Crimson,
                 StrokeThickness = 20,
@@ -54,10 +55,26 @@ namespace _20260428
                 InternalX = 0,
                 InternalY = 0,
                 IsCanDragMove = true,
-                IsVertexHandle = true,
-                
+                IsVertexHandle = true,                
             };
-            return data;
+            GroupData group = new() { X = 100, Y = 100 };
+            group.AddData(geo);
+
+            geo = new()
+            {
+                X = 100,
+                Y = 50,
+                Points = [new Point(), new Point(100, 100)],
+                Stroke = Brushes.Green,
+                StrokeThickness = 20,
+                Background = Brushes.YellowGreen,
+                InternalX = 0,
+                InternalY = 0,
+                IsCanDragMove = true,
+                IsVertexHandle = true,                
+            };
+            group.AddData(geo);
+            return group;
         }
 
 
