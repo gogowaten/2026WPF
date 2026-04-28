@@ -26,5 +26,11 @@ namespace _20260428_GeoLineEx
             MyEx.MyPoints.Add(new Point(200, 200));
             MyEx.IsVertexHandle = !MyEx.IsVertexHandle;
         }
+
+        private void Button_Click_1(object sender, RoutedEventArgs e)
+        {
+            var rect = MyEx.GetSurfaceBounds();
+            MessageBox.Show($"{rect}");
+        }
     }
 }

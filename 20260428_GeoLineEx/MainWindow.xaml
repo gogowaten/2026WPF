@@ -20,10 +20,13 @@
                        Stroke="Pink" StrokeThickness="30"
                        Background="Beige" IsBackgroundDraw="True"
                        IsVertexHandle="True" VertexHandleSize="30" VertexHandleFillBrush="#200f"/>
+      <Rectangle Fill="Gray" Width="240" Height="1"/>
+      <Rectangle Fill="Magenta" Width="193" Height="1"/>
     </Canvas>
 
     <StackPanel Grid.Column="1">
       <Button Content="ex" Click="Button_Click"/>
+      <Button Content="size" Click="Button_Click_1"/>
     </StackPanel>
   </Grid>
 </Window>

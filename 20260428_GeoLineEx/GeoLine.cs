@@ -137,6 +137,15 @@ namespace _20260428_GeoLineEx
     {
         #region 依存関係プロパティ
 
+        //// 表示位置の調整、trueでCanvasLeftやTopに合わせる。falseは調整なし
+        //public bool IsReverseOffsetDraw
+        //{
+        //    get { return (bool)GetValue(IsReverseOffsetDrawProperty); }
+        //    set { SetValue(IsReverseOffsetDrawProperty, value); }
+        //}
+        //public static readonly DependencyProperty IsReverseOffsetDrawProperty =
+        //    DependencyProperty.Register(nameof(IsReverseOffsetDraw), typeof(bool), typeof(GeoLineBG), new PropertyMetadata(false));
+
         // 背景色
         public Brush Background
         {
@@ -293,10 +302,20 @@ namespace _20260428_GeoLineEx
 
         #endregion コンストラクタ
 
-
         #region publicメソッド
+        // 図形がピッタリ収まるRectを返す
+        // 図形の見た目上の位置とサイズのRectを返す
+        public Rect GetSurfaceBounds()
+        {
+            var bounds = GetRenderBounds();
+            var left = Canvas.GetLeft(this);
+            var top = Canvas.GetTop(this);
+            Rect surface = new(left + bounds.Left, top + bounds.Top, bounds.Width, bounds.Height);
+            return surface;
+        }
 
         // 図形がピッタリ収まるRectを返す
+        // 内部的な計算なので見た目とは位置が異なる
         public Rect GetRenderBounds()
         {
             if (_cachedGeometry is null || _cachedGeometry == Geometry.Empty)
