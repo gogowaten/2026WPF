@@ -23,6 +23,7 @@ namespace _20260428_GeoLineEx
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
+            MyEx.MyPoints.Add(new Point(200, 200));
             MyEx.IsVertexHandle = !MyEx.IsVertexHandle;
         }
     }

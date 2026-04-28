@@ -45,6 +45,9 @@ namespace _20260428_GeoLineEx
                 throw new InvalidOperationException("AdornerLayerが見つからなかった");
             }
         }
+
+        #region 依存関係プロパティ
+
         // 頂点ハンドル色
 
         public Brush VertexHandleFillBrush
@@ -87,7 +90,12 @@ namespace _20260428_GeoLineEx
                 }
             }
         }
+        #endregion 依存関係プロパティ
 
+        #region パブリックメソッド
+
+        // 頂点ハンドルの更新
+        // 頂点の追加や削除時に使う
         public void UpdateVertexHandles()
         {
             _vertexAdorner?.UpdateHandles();
@@ -111,6 +119,8 @@ namespace _20260428_GeoLineEx
                 _vertexAdorner = null;
             }
         }
+        #endregion パブリックメソッド
+
     }
 
 
@@ -125,6 +135,8 @@ namespace _20260428_GeoLineEx
     /// IsBackgroundDraw が <see langword="true"/> に設定されている場合にのみレンダリングされます。このクラスは通常、幾何学的線​​の背後に強調表示または着色された背景が必要なカスタム描画シナリオで使用されます。</remarks>
     public class GeoLineBG : GeoLine
     {
+        #region 依存関係プロパティ
+
         // 背景色
         public Brush Background
         {
@@ -142,6 +154,7 @@ namespace _20260428_GeoLineEx
         }
         public static readonly DependencyProperty IsBackgroundDrawProperty =
             DependencyProperty.Register(nameof(IsBackgroundDraw), typeof(bool), typeof(GeoLineBG), new FrameworkPropertyMetadata(true, FrameworkPropertyMetadataOptions.AffectsRender));
+        #endregion 依存関係プロパティ
 
         // 使わない？OnRender実行になる
         public void RedBG()
@@ -149,7 +162,7 @@ namespace _20260428_GeoLineEx
             this.InvalidateVisual();
         }
 
-        // 描画
+        // 描画、背景色
         protected override void OnRender(DrawingContext drawingContext)
         {
             if (IsBackgroundDraw)
@@ -198,26 +211,15 @@ namespace _20260428_GeoLineEx
         }
 
         #region 依存関係プロパティ
-
-
-
+        // penだけど、指定はしない読み取り専用
         public Pen MyStrokePen
         {
             get { return (Pen)GetValue(MyStrokePenProperty); }
             set { SetValue(MyStrokePenProperty, value); }
         }
         public static readonly DependencyProperty MyStrokePenProperty =
-            DependencyProperty.Register(nameof(MyStrokePen), typeof(Pen), typeof(GeoLine), new PropertyMetadata(null, OnMyStrokePenChanged));
+            DependencyProperty.Register(nameof(MyStrokePen), typeof(Pen), typeof(GeoLine), new PropertyMetadata(null));
 
-        private static void OnMyStrokePenChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            // pen変更時の処理
-            if (d is GeoLine geo)
-            {
-                //geo.UpdateMySize(); // 必須、描画更新も兼ねている
-                //geo.MyGeometryBounds = geo.MyData.OnUpdateBounds(geo._cachedGeometry);
-            }
-        }
 
 
         /// <summary>
@@ -289,13 +291,12 @@ namespace _20260428_GeoLineEx
             SetBinding(MyStrokePenProperty, mb);
         }
 
-
-
-
         #endregion コンストラクタ
 
 
         #region publicメソッド
+
+        // 図形がピッタリ収まるRectを返す
         public Rect GetRenderBounds()
         {
             if (_cachedGeometry is null || _cachedGeometry == Geometry.Empty)
@@ -308,12 +309,12 @@ namespace _20260428_GeoLineEx
             }
         }
 
-
         #endregion publicメソッド
 
 
         #region privateメソッド
 
+        // 図形のGeometryをPointsから作成
         private static PathGeometry MakeLineGeometry(IEnumerable<Point> pc)
         {
             if (!pc.Any()) { return new PathGeometry(); }
@@ -331,7 +332,7 @@ namespace _20260428_GeoLineEx
 
 
 
-
+    // 各種プロパティからpenを作成
     public class ConvStrokePen : IMultiValueConverter
     {
         public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
@@ -359,7 +360,7 @@ namespace _20260428_GeoLineEx
 
 
 
-
+    // 頂点ハンドルのアドーナー、GeoLineEX専用
     public class VertexAdorner : Adorner
     {
         protected override int VisualChildrenCount => _visuals.Count;
@@ -369,7 +370,7 @@ namespace _20260428_GeoLineEx
         private readonly GeoLineEX _adornedElement;
         private readonly Canvas MyCanvas;
         private double MyHandleOffset;
-        private PointCollection MyGeoPoints;
+        private readonly PointCollection MyGeoPoints;
 
         public VertexAdorner(UIElement adornedElement) : base(adornedElement)
         {
@@ -382,9 +383,8 @@ namespace _20260428_GeoLineEx
             if (_adornedElement is GeoLineEX geo)
             {
                 MyGeoPoints = geo.MyPoints;
-                SetBinding(MyHandleSizeProperty, new Binding() { Source = _adornedElement, Path = new PropertyPath(GeoLineEX.VertexHandleSizeProperty)});
-                SetBinding(MyHandleFillBrushProperty, new Binding() { Source = _adornedElement, Path = new PropertyPath(GeoLineEX.VertexHandleFillBrushProperty)});
-
+                SetBinding(MyHandleSizeProperty, new Binding() { Source = _adornedElement, Path = new PropertyPath(GeoLineEX.VertexHandleSizeProperty) });
+                SetBinding(MyHandleFillBrushProperty, new Binding() { Source = _adornedElement, Path = new PropertyPath(GeoLineEX.VertexHandleFillBrushProperty) });
             }
             else
             {
@@ -398,6 +398,7 @@ namespace _20260428_GeoLineEx
 
 
         #region プロパティ
+
         // 頂点ハンドル色
         public Brush MyHandleFillBrush
         {
@@ -423,6 +424,7 @@ namespace _20260428_GeoLineEx
             {
                 // ハンドルサイズ変更に伴う変更、オフセット、全ハンドルの座標
                 ador.MyHandleOffset = (double)e.NewValue / 2.0;
+
                 var points = ador.MyGeoPoints;
                 for (int i = 0; i < points.Count; i++)
                 {
@@ -496,8 +498,6 @@ namespace _20260428_GeoLineEx
 
         }
     }
-
-
 
 }
 
