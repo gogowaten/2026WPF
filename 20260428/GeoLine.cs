@@ -18,28 +18,23 @@ namespace _20260428
     {
         public GeoLineEXforData()
         {
-            Loaded += GeoLineEXforData_Loaded;
             MyUpdateSurfaceBounds += GeoLineEXforData_MyUpdateSurfaceBounds;
         }
 
+        // 見た目上のBoundsの更新後の処理
+        // データの更新と親要素のサイズ更新
         private void GeoLineEXforData_MyUpdateSurfaceBounds(object? sender, Rect e)
         {
             if (MyData is null) { return; }
-            MyData.Width = MySurfaceWidth;
-            MyData.Height = MySurfaceHeight;
+            //MyData.Width = MySurfaceWidth;
+            //MyData.Height = MySurfaceHeight;
             MyData.OffsetX = MySurfaceLeft;
             MyData.OffsetY = MySurfaceTop;
-            //MyData.RootData?.UpdateParentSize();
-            MyData.ParentData?.UpdateSize();
+            //MyData.ParentData?.UpdateSize();
+            MyData.ParentData?.UpdateBoundsToRoot();
         }
 
-        private void GeoLineEXforData_Loaded(object sender, RoutedEventArgs e)
-        {
-            if (DataContext is GeoLineData data)
-            {
-                MyData = data;
-            }
-        }
+
 
         public GeoLineData MyData
         {
@@ -50,31 +45,37 @@ namespace _20260428
             DependencyProperty.Register(nameof(MyData), typeof(GeoLineData), typeof(GeoLineEXforData), new PropertyMetadata(null));
 
 
-        //// 頂点ハンドル表示
-        //public new void ShowVertexAdorner()
-        //{
-        //    // 頂点ハンドルを一旦削除して作り直す
-        //    HideVertexAdorner();
-        //    MyVertexAdorner = new VertexAdorner(this);
-        //    MyVertexAdorner.MyDragCompleted += VertexAdorner_MyDragCompleted;
-        //    MyAdornerLayer.Add(MyVertexAdorner);
-        //}
+        // Points全体を左上(0,0)に寄せる + 図形のOffset
+        public void PointsTopLeftZeroFixWithOffset()
+        {
+            var bounds = GetRenderBounds(); // Offset用に元のBounds取得しておく
+            if (Math.Abs(bounds.X) < 0.01 && Math.Abs(bounds.Y) < 0.01) { return; }
 
+            // 全座標変換
+            PointsOffset(-bounds.X, -bounds.Y);
 
-        //// 頂点ハンドル移動後に自身の見た目上の位置とサイズ更新と通知
-        //private void VertexAdorner_MyDragCompleted(object? sender, EventArgs e)
-        //{
-        //    UpdateSurfaceBounds();
-        //    MyData.Width = MySurfaceWidth;
-        //    MyData.Height = MySurfaceHeight;
-        //    MyData.OffsetX = MySurfaceLeft;
-        //    MyData.OffsetY = MySurfaceTop;
-        //    MyData.RootData?.UpdateParentSize();
-        //}
+            MyData.X += bounds.X; // 図形座標のOffset
+            MyData.Y += bounds.Y;
 
+            // 頂点ハンドルのOffset
+            UpdateVertexHandles();
+        }
+
+        public void PointsOffset(double offsetX, double offsetY)
+        {
+            // 全座標変換
+            for (int i = 0; i < MyPoints.Count; i++)
+            {
+                var poi = MyPoints[i];
+                MyPoints[i] = new Point(poi.X + offsetX, poi.Y + offsetY);
+            }
+        }
 
 
     }
+
+
+
 
     /// <summary>
     /// 頂点ハンドルを備えた拡張線形状を提供します。
@@ -159,7 +160,10 @@ namespace _20260428
         // 頂点の追加や削除時に使う
         public void UpdateVertexHandles()
         {
-            MyVertexAdorner?.UpdateHandles();
+            if (IsVertexHandle)
+            {
+                MyVertexAdorner?.UpdateHandles();
+            }
         }
 
         // 頂点ハンドル表示
@@ -173,9 +177,10 @@ namespace _20260428
         }
 
 
-        // 頂点ハンドル移動後に自身の見た目上の位置とサイズ更新と通知
+        // 頂点ハンドル移動後
         private void VertexAdorner_MyDragCompleted(object? sender, EventArgs e)
         {
+            // 自身の見た目上の位置とサイズ更新と通知
             UpdateSurfaceBounds();
 
         }
@@ -288,6 +293,7 @@ namespace _20260428
                 return geo;
             }
         }
+
         #region テスト依存関係プロパティ
 
         //public double MyOffsetLeft
@@ -413,7 +419,7 @@ namespace _20260428
 
         private void GeoLine_Loaded(object sender, RoutedEventArgs e)
         {
-            UpdateSurfaceBounds();
+            UpdateSurfaceBounds(); // Surface(見た目上の位置とサイズ)の更新
         }
 
         private void SetMyBind()
@@ -430,18 +436,21 @@ namespace _20260428
         #endregion コンストラクタ
 
         #region publicメソッド
+
         public event EventHandler<Rect>? MyUpdateSurfaceBounds;
         // Surface(見た目上の位置とサイズ)の更新
         public void UpdateSurfaceBounds()
-        {
+        {            
             var bounds = GetSurfaceBounds();
+            if(bounds == Rect.Empty) { return; }
+
             MySurfaceHeight = bounds.Height;
             MySurfaceLeft = bounds.Left;
             MySurfaceTop = bounds.Top;
             MySurfaceWidth = bounds.Width;
             //MyOffsetLeft = bounds.Left;
             //MyOffsetTop = bounds.Top;
-            MyUpdateSurfaceBounds?.Invoke(this, bounds);
+            MyUpdateSurfaceBounds?.Invoke(this, bounds);// 通知
         }
 
         // 図形がピッタリ収まるRectを返す
@@ -449,6 +458,7 @@ namespace _20260428
         public Rect GetSurfaceBounds()
         {
             var bounds = GetRenderBounds();
+            if(bounds == Rect.Empty) { return bounds; }
             var left = Canvas.GetLeft(this);
             if (double.IsNaN(left)) { left = 0; }
             var top = Canvas.GetTop(this);

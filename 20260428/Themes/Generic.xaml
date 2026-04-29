@@ -21,18 +21,19 @@
 
   <DataTemplate DataType="{x:Type local:GeoLineData}">
     <local:CustomThumb>
-      <local:GeoLineEXforData MyPoints="{Binding Points}"
-                       Stroke="{Binding Stroke}"
-                       StrokeThickness="{Binding StrokeThickness}"
-                       Background="{Binding Background}"
-                       IsVertexHandle="{Binding IsVertexHandle}"
-                       VertexHandleFillBrush="#100f"
-                       VertexHandleSize="50"
-                       MySurfaceWidth="{Binding Width, Mode=OneWayToSource}"
-                       MySurfaceHeight="{Binding Height, Mode=OneWayToSource}"
-                     />
-                       <!--MyOffsetLeft="{Binding OffsetX}"
-                       MyOffsetTop="{Binding OffsetY}"-->
+      <local:GeoLineEXforData MyData="{Binding}"
+                              MyPoints="{Binding Points}"
+                               Stroke="{Binding Stroke}"
+                               StrokeThickness="{Binding StrokeThickness}"
+                               Background="{Binding Background}"
+                               IsVertexHandle="{Binding IsVertexHandle}"
+                               VertexHandleFillBrush="#100f"
+                               VertexHandleSize="50"
+                               MySurfaceWidth="{Binding Width, Mode=OneWayToSource}"
+                               MySurfaceHeight="{Binding Height, Mode=OneWayToSource}"
+                             />
+      <!--MyOffsetLeft="{Binding OffsetX}"
+                               MyOffsetTop="{Binding OffsetY}"-->
     </local:CustomThumb>
   </DataTemplate>
 
@@ -76,7 +77,7 @@
         <ControlTemplate TargetType="{x:Type local:CustomThumb}">
           <Grid>
             <ContentPresenter Content="{TemplateBinding MyContent}"/>
-            <Border x:Name="SelectedBorder" Visibility="Collapsed"
+            <Border x:Name="SelectedBorder" Visibility="Visible"
                     BorderBrush="Orange" BorderThickness="1"
                     Margin="-10"/>
           </Grid>
@@ -126,8 +127,8 @@
 
 
 
-  
-  
+
+
   <Style TargetType="{x:Type local:FlatHandle}">
     <Setter Property="Canvas.Left" Value="{Binding RelativeSource={RelativeSource Mode=Self}, Path=MyLeft, Mode=TwoWay}"/>
     <Setter Property="Canvas.Top" Value="{Binding RelativeSource={RelativeSource Mode=Self}, Path=MyTop, Mode=TwoWay}"/>

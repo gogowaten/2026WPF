@@ -1,4 +1,5 @@
 ﻿
+using Microsoft.VisualBasic;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -36,9 +37,35 @@ namespace _20260428
         }
         public CustomThumb()
         {
-
-
             DragDelta += CustomThumb_DragDelta;
+            PreviewMouseLeftButtonDown += CustomThumb_PreviewMouseLeftButtonDown;
+            Loaded += CustomThumb_Loaded;
+
+            // テスト用右クリックメニュー、図形のOffsetテスト
+            ContextMenu menu = new();
+            MenuItem item = new() { Header = "test" };
+            item.Click += (s, e) =>
+            {
+                if (MyContent is GeoLineEXforData ex)
+                {
+                    ex.PointsTopLeftZeroFixWithOffset();
+                }
+            };
+            menu.Items.Add(item);
+            this.ContextMenu = menu;
+        }
+
+        private void CustomThumb_Loaded(object sender, RoutedEventArgs e)
+        {
+            if(MyContent is GeoLineEXforData ex)
+            {
+                ex.PointsTopLeftZeroFixWithOffset();
+            }
+        }
+
+        private void CustomThumb_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            MyData.RootData?.ClickedItemData = MyData;
         }
 
         private void CustomThumb_DragDelta(object sender, DragDeltaEventArgs e)
@@ -100,7 +127,7 @@ namespace _20260428
         private void RootItemsControl_Loaded(object sender, RoutedEventArgs e)
         {
             //MyData.UpdateBounds();
-            MyData.UpdateSize();
+            //MyData.UpdateSize();
         }
 
         public RootData MyData
@@ -111,6 +138,7 @@ namespace _20260428
         public static readonly DependencyProperty MyDataProperty =
             DependencyProperty.Register(nameof(MyData), typeof(RootData), typeof(RootItemsControl), new PropertyMetadata(null));
 
+        
     }
 
 
@@ -159,11 +187,5 @@ namespace _20260428
 
 
 
-public class CustomControl1 : Control
-    {
-        static CustomControl1()
-        {
-            DefaultStyleKeyProperty.OverrideMetadata(typeof(CustomControl1), new FrameworkPropertyMetadata(typeof(CustomControl1)));
-        }
-    }
+ 
 }

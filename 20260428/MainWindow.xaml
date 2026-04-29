@@ -16,20 +16,27 @@
                   VerticalScrollBarVisibility="Auto"
                   HorizontalAlignment="Left"
                   VerticalAlignment="Top">
-      <local:RootItemsControl x:Name="MyRootItems" MyData="{Binding MyData}"/>
+      <local:RootItemsControl x:Name="MyRootItems"
+                              UseLayoutRounding="True"
+                              MyData="{Binding MyData}"/>
       
     </ScrollViewer>
     <!--<Canvas x:Name="MyCanvas">
 
     </Canvas>-->
+    <!--<Polyline x:Name="MyLine" Points="100,30 250,130" Stroke="Red" StrokeThickness="60"/>-->
+    <!--<local:GeoLine x:Name="MyLine" MyPoints="100,30 250,130" Stroke="Red" StrokeThickness="60"/>-->
 
     <StackPanel Grid.Column="1">
-      <GroupBox Header="MyData.CurrentItemData" DataContext="{Binding MyData.CurrentItemData}">
+      <GroupBox Header="MyData.ClickedItemData" DataContext="{Binding MyData.ClickedItemData}">
         <StackPanel>
           <TextBlock Text="{Binding Width, StringFormat='Width = {0: 0; -0; 0}'}"/>
           <TextBlock Text="{Binding X, StringFormat='X = {0: 0; -0; 0}'}"/>
-          <TextBlock Text="{Binding InternalX, StringFormat='InternalX = {0: 0; -0; 0}'}"/>
-          <TextBlock Text="{Binding StringFormat=' {0: 0; -0; 0}'}"/>
+          <!--<TextBlock Text="{Binding InternalX, StringFormat='InternalX = {0: 0; -0; 0}'}"/>-->
+          <TextBlock Text="{Binding OffsetX, StringFormat='OffsetX = {0: 0; -0; 0}'}"/>
+          <TextBlock Text="{Binding OffsetY, StringFormat='OffsetY = {0: 0; -0; 0}'}"/>
+
+          <Button Content="test" Click="Button_Click"/>
         </StackPanel>
       </GroupBox>
     </StackPanel>

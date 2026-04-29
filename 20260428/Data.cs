@@ -703,7 +703,7 @@ namespace _20260428
                     //newData.Z = DataList.Count - 1;
                     newData.Z = e.NewStartingIndex;
                     newData.ParentData = this;
-                    newData.UpdateParentSize();
+                    newData.ParentData.UpdateSize();
                 }
             }
             else if (e.Action == NotifyCollectionChangedAction.Remove)
@@ -720,7 +720,7 @@ namespace _20260428
                         }
                     }
 
-                    oldData.UpdateParentSize();
+                    oldData.ParentData?.UpdateSize();
                     oldData.ParentData = null; // Parentをリサイズしてからnullにする
                 }
             }
@@ -768,7 +768,10 @@ namespace _20260428
             }
         }
 
-        // グループ自身のサイズ更新
+
+        /// <summary>
+        /// グループ自身のサイズ更新
+        /// </summary>
         [RelayCommand]
         public void UpdateSize()
         {
@@ -783,8 +786,9 @@ namespace _20260428
             Height = bottom;
         }
 
+        
         //Bounds更新
-        public void UpdateBounds(GroupData group)
+        public void UpdateBoundsToRoot(GroupData group)
         {
             double right = 0;
             double bottom = 0;
@@ -805,7 +809,11 @@ namespace _20260428
             foreach (var item in group.DataList) { item.X -= mx; item.Y -= my; }
 
             // 親要素のBounds更新
-            group.ParentData?.UpdateBounds(group.ParentData);
+            group.ParentData?.UpdateBoundsToRoot(group.ParentData);
+        }
+        public void UpdateBoundsToRoot()
+        {
+            UpdateBoundsToRoot(this);
         }
 
         #region パブリックメソッド
@@ -841,13 +849,8 @@ namespace _20260428
             //#endif
         }
 
-        //[ObservableProperty] private PointCollection? _myPoints;
-        //[ObservableProperty] private PenLineCap _endLineCap;
-        //[ObservableProperty] private PenLineCap _startLineCap;
-        //[ObservableProperty] private double _miterLimit = 10.0;
-        //[ObservableProperty] private PenLineJoin _lineJoin;
         [ObservableProperty] private bool _isCanDragMove;
-        //[ObservableProperty] private double _strokeThickness = 1.0;
+
         [ObservableProperty] private bool _isVisibleVertexHandles;
 
         //[ObservableProperty] private double _vertexHandleSize = 50.0; // これはアプリ全体の設定に移動させたほうが良い？
@@ -864,14 +867,11 @@ namespace _20260428
         [ObservableProperty] private PenLineCap _strokeStartLineCap = PenLineCap.Flat;
         [ObservableProperty] private PenLineJoin _strokeLineJoin = PenLineJoin.Miter;
         [ObservableProperty] private double _strokeMiterLimit = 10.0;
-        [ObservableProperty] private double _internalX;
-        [ObservableProperty] private double _internalY;
-        //[ObservableProperty] private Brush? _fill;
+        //[ObservableProperty] private double _internalX;
+        //[ObservableProperty] private double _internalY;
         [ObservableProperty] private Brush? _stroke;
         [ObservableProperty] private double _strokeThickness = 1.0;
         [ObservableProperty] private bool _isVertexHandle;
-        [ObservableProperty] private double _offsetX;
-        [ObservableProperty] private double _offsetY;
 
     }
 
@@ -908,28 +908,22 @@ namespace _20260428
         [ObservableProperty] bool _isSelectable = false; // 選択状態
         [ObservableProperty] bool _isCurrent = false; // 筆頭
         [ObservableProperty] bool _isClicked = false; // クリックされた要素
+        [ObservableProperty] private double _offsetX;
+        [ObservableProperty] private double _offsetY;
 
-        public void UpdateParentSize()
-        {
-            if (ParentData is null) { return; }
+        //public void UpdateParentSize()
+        //{
+        //    if (ParentData is null) { return; }
 
-            double right = 0;
-            double bottom = 0;
-            foreach (var item in ParentData.DataList)
-            {
-                if (item is GeoShapeData geo)
-                {
-                    right = Math.Max(right, geo.X + geo.OffsetX + geo.Width);
-                    bottom = Math.Max(bottom, geo.Y + geo.OffsetY + geo.Height);
-                }
-                else
-                {
-                    right = Math.Max(right, item.X + item.Width);
-                    bottom = Math.Max(bottom, item.Y + item.Height);
-                }
-            }
-            ParentData.Width = right; ParentData.Height = bottom;
-        }
+        //    double right = 0;
+        //    double bottom = 0;
+        //    foreach (var item in ParentData.DataList)
+        //    {
+        //        right = Math.Max(right, X + OffsetX + Width);
+        //        bottom = Math.Max(bottom, Y + OffsetY + Height);
+        //    }
+        //    ParentData.Width = right; ParentData.Height = bottom;
+        //}
 
 
 
