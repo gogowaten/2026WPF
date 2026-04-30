@@ -495,6 +495,7 @@ namespace _20260311_05_FixSelected_ZUpDownMove
             }
         }
 
+        // 基本的に使用していない
         [RelayCommand]
         public void UpdateSize()
         {

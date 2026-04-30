@@ -39,6 +39,12 @@
           <Button Content="test" Click="Button_Click"/>
         </StackPanel>
       </GroupBox>
+      <GroupBox Header="RootThumb" DataContext="{Binding ElementName=MyRootItems}">
+        <StackPanel>
+          <TextBlock Text="{Binding ActualWidth, StringFormat='ActualWidth = {0}'}"/>
+          <TextBlock Text="{Binding (Canvas.Left), StringFormat='Canvas.Left = {0}'}"/>
+        </StackPanel>
+      </GroupBox>
     </StackPanel>
   </Grid>
 </Window>

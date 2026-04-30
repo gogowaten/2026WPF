@@ -28,7 +28,6 @@
                                Background="{Binding Background}"
                                IsVertexHandle="{Binding IsVertexHandle}"
                                VertexHandleFillBrush="#100f"
-                               VertexHandleSize="50"
                                MySurfaceWidth="{Binding Width, Mode=OneWayToSource}"
                                MySurfaceHeight="{Binding Height, Mode=OneWayToSource}"
                              />
@@ -98,9 +97,12 @@
 
 
   <Style TargetType="{x:Type local:RootItemsControl}">
+    <!--<Setter Property="MyData" Value="{Binding}"/>-->
     <Setter Property="ItemContainerStyle" Value="{StaticResource CanvasItemContaier}"/>
     <Setter Property="ItemsSource" Value="{Binding RelativeSource={RelativeSource Mode=Self}, Path=MyData.DataList}"/>
-
+    <Setter Property="Width" Value="{Binding RelativeSource={RelativeSource Mode=Self}, Path=MyData.Width}"/>
+    <Setter Property="Height" Value="{Binding RelativeSource={RelativeSource Mode=Self}, Path=MyData.Height}"/>
+    
     <Setter Property="ItemsPanel">
       <Setter.Value>
         <ItemsPanelTemplate>

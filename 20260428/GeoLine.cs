@@ -127,7 +127,7 @@ namespace _20260428
             set { SetValue(VertexHandleSizeProperty, value); }
         }
         public static readonly DependencyProperty VertexHandleSizeProperty =
-            DependencyProperty.Register(nameof(VertexHandleSize), typeof(double), typeof(GeoLineEX), new FrameworkPropertyMetadata(10.0));
+            DependencyProperty.Register(nameof(VertexHandleSize), typeof(double), typeof(GeoLineEX), new FrameworkPropertyMetadata(20.0));
 
 
         // 頂点ハンドルの表示非表示の切り替え用
@@ -632,11 +632,14 @@ namespace _20260428
 
                 thumb.DragDelta += Thumb_DragDelta;
                 thumb.DragCompleted += Thumb_DragCompleted;
+
                 _ = MyCanvas.Children.Add(thumb);
             }
         }
 
+        #region イベント        
         public event EventHandler? MyDragCompleted;
+        #endregion   イベント
 
         // 移動終了時、通知を出す
         private void Thumb_DragCompleted(object sender, DragCompletedEventArgs e)

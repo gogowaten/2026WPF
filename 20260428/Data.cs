@@ -43,71 +43,6 @@ namespace _20260428
 
         #region テスト用初期化
 
-        //private void MyInit()
-        //{
-        //    this.RootData = this; // 自身をRootにしておく
-        //    this.CurrentItem = this; // 自身を筆頭にしておく
-        //    this.IsEditing = true; // 起動時は自身が編集状態グループ
-
-        //    //RectangleData rRed = new() { Name = "赤四角", X = 0, Y = 0, Width = 60, Height = 60, Fill = new SolidColorBrush(Color.FromArgb(250, 255, 0, 0)) };
-        //    //RectangleData rBlue = new() { Name = "青四角", X = 20, Y = 20, Width = 60, Height = 60, Fill = new SolidColorBrush(Color.FromArgb(250, 0, 0, 255)) };
-        //    //EllipseData maruRed = new() { Name = "黄玉", X = 0, Y = 0, Width = 50, Height = 50, Fill = new SolidColorBrush(Color.FromArgb(250, 255, 200, 0)) };
-        //    //EllipseData maruBlue = new() { Name = "水玉", X = 120, Y = 20, Width = 50, Height = 50, Fill = new SolidColorBrush(Color.FromArgb(250, 0, 200, 255)) };
-        //    //EllipseData maruGreen = new() { Name = "翠玉", X = 40, Y = 140, Width = 50, Height = 50, Fill = new SolidColorBrush(Color.FromArgb(250, 100, 200, 150)) };
-
-        //    //GroupData groupRect = new() { RootData = this, Name = "GropuA", X = 0, Y = 0 };
-        //    //groupRect.DataList.Add(rRed);
-        //    //groupRect.DataList.Add(rBlue);
-
-        //    //GroupData groupEllipse = new() { RootData = this, Name = "GropuB", X = 100, Y = 0 };
-        //    //groupEllipse.DataList.Add(maruRed);
-        //    //groupEllipse.DataList.Add(maruBlue);
-
-        //    //GroupData groupB_1 = new() { RootData = this, Name = "GroupB_1", X = 0, Y = 100 };
-        //    //groupB_1.DataList.Add(new EllipseData() { Name = "青丸", X = 0, Y = 0, Width = 50, Height = 50, Fill = new SolidColorBrush(Color.FromArgb(250, 0, 0, 255)) });
-        //    //groupB_1.DataList.Add(new EllipseData() { Name = "赤丸", X = 100, Y = 100, Width = 50, Height = 50, Fill = new SolidColorBrush(Color.FromArgb(250, 255, 0, 0)) });
-        //    //groupEllipse.DataList.Add(groupB_1);
-
-        //    //DataList.Add(groupRect);
-        //    //DataList.Add(groupEllipse);
-        //    //DataList.Add(maruGreen);
-        //    //TextBlockData textBlockData = new() { Name = "Text1", X = 0, Y = 0, Text = "Text1", FontSize = 30 };
-        //    //DataList.Add(textBlockData);
-        //    //DataList.Add(new PolylineData() { Name = "ボリライン", X = 0, Y = 0, StrokeThickness = 50, Stroke = Brushes.MediumPurple });
-        //    //DataList.Add(new GeoShapeData() { Name = "ベジェ曲線", X = 100, Y = 100, Stroke = Brushes.MediumAquamarine, StrokeThickness = 20.0, Points = [new Point(50, 70), new Point(250, 150), new Point(50, 250), new Point(50, 200), new Point(50, 150), new Point(150, 100), new Point(250, 250),], StrokeEndLineCap = PenLineCap.Round, Background = Brushes.Gray });
-        //    DataList.Add(new GeoLineData()
-        //    {
-        //        MyPoints = [new Point(80, 0), new Point(80, 100), new Point(2, 2)],
-        //        //MyPoints = [new Point(80, 0), new Point(80, 100)],
-        //        Stroke = Brushes.Plum,
-        //        StrokeThickness = 20,
-        //        Background = Brushes.CadetBlue,
-        //        Fill = Brushes.Silver,
-        //        IsCanDragMove = true,
-        //        Width = 200,
-        //        Height = 200,
-        //    });
-
-
-        //    // 直下のItemのIsSelectableをtrueにする
-        //    foreach (var item in DataList)
-        //    {
-        //        item.IsSelectable = true;
-        //    }
-
-        //    DataSyokika(this);
-        //}
-
-        //// 起動時のDataの辻褄合わせ
-        //// すべてのItemのRootDataを自身にする
-        //private void DataSyokika(GroupData data)
-        //{
-        //    foreach (var item in data.DataList)
-        //    {
-        //        item.RootData = this;
-        //        if (item is GroupData group) { DataSyokika(group); }
-        //    }
-        //}
         #endregion テスト用初期化
 
 
@@ -786,8 +721,11 @@ namespace _20260428
             Height = bottom;
         }
 
-        
-        //Bounds更新
+
+        /// <summary>
+        /// 指定GroupのBounds更新して、Rootまで行くBounds更新
+        /// </summary>
+        /// <param name="group"></param>
         public void UpdateBoundsToRoot(GroupData group)
         {
             double right = 0;
@@ -911,21 +849,27 @@ namespace _20260428
         [ObservableProperty] private double _offsetX;
         [ObservableProperty] private double _offsetY;
 
-        //public void UpdateParentSize()
+
+        // 自身の座標変更時は親要素を変更しないほうが良さそう、負荷が高いのも在る
+        // 移動後に変更する
+
+
+        // 自身のサイズ変更されたときに親要素のサイズも変更すると、その変更が伝播してRootまで行く
+        partial void OnWidthChanged(double oldValue, double newValue) => UpdateParentSize();
+        partial void OnHeightChanged(double oldValue, double newValue) => UpdateParentSize();
+        //partial void OnXChanged(double oldValue, double newValue)
         //{
-        //    if (ParentData is null) { return; }
-
-        //    double right = 0;
-        //    double bottom = 0;
-        //    foreach (var item in ParentData.DataList)
-        //    {
-        //        right = Math.Max(right, X + OffsetX + Width);
-        //        bottom = Math.Max(bottom, Y + OffsetY + Height);
-        //    }
-        //    ParentData.Width = right; ParentData.Height = bottom;
+        //    UpdateParentSize();
         //}
-
-
-
+        //partial void OnYChanged(double oldValue, double newValue)
+        //{
+        //    UpdateParentSize();
+        //}
+        private void UpdateParentSize()
+        {
+            // 親要素のサイズ更新
+            ParentData?.UpdateSize();
+            // だけど、自身のサイズ更新が親要素のサイズにかかわらないときは実行しないようにしたほうが良い
+        }
     }
 }

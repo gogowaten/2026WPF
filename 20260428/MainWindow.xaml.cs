@@ -36,10 +36,10 @@ namespace _20260428
             root.AddData(ellipse);
 
             EllipseData ellipseBlue = new() { Fill = Brushes.Blue, Width = 30, Height = 30 };
-            GroupData group = new();
-            group.AddData(ellipseBlue);
-            group.AddData(new EllipseData() { X = 10, Y = 50, Fill = Brushes.Orange, Width = 30, Height = 30 });
-            root.AddData(group);
+            //GroupData group = new();
+            //group.AddData(ellipseBlue);
+            //group.AddData(new EllipseData() { X = 10, Y = 50, Fill = Brushes.Orange, Width = 30, Height = 30 });
+            //root.AddData(group);
             root.AddData(CreateGeoLineGroupData());
             return root;
         }

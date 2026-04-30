@@ -39,7 +39,7 @@ namespace _20260428
         {
             DragDelta += CustomThumb_DragDelta;
             PreviewMouseLeftButtonDown += CustomThumb_PreviewMouseLeftButtonDown;
-            Loaded += CustomThumb_Loaded;
+            //Loaded += CustomThumb_Loaded;
 
             // テスト用右クリックメニュー、図形のOffsetテスト
             ContextMenu menu = new();
@@ -55,13 +55,13 @@ namespace _20260428
             this.ContextMenu = menu;
         }
 
-        private void CustomThumb_Loaded(object sender, RoutedEventArgs e)
-        {
-            if(MyContent is GeoLineEXforData ex)
-            {
-                ex.PointsTopLeftZeroFixWithOffset();
-            }
-        }
+        //private void CustomThumb_Loaded(object sender, RoutedEventArgs e)
+        //{
+        //    if(MyContent is GeoLineEXforData ex)
+        //    {
+        //        ex.PointsTopLeftZeroFixWithOffset();
+        //    }
+        //}
 
         private void CustomThumb_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
