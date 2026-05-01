@@ -41,6 +41,7 @@
           <!--<TextBlock Text="{Binding InternalX, StringFormat='InternalX = {0: 0; -0; 0}'}"/>-->
           <TextBlock Text="{Binding OffsetX, StringFormat='OffsetX = {0: 0; -0; 0}'}"/>
           <TextBlock Text="{Binding OffsetY, StringFormat='OffsetY = {0: 0; -0; 0}'}"/>
+          <TextBlock Text="{Binding IsVertexHandle, StringFormat='IsVertexHandle = {0: 0; -0; 0}'}"/>
 
           <Button Content="test" Click="Button_Click"/>
         </StackPanel>
