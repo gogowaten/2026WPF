@@ -40,7 +40,8 @@ namespace _20260428
             //group.AddData(ellipseBlue);
             //group.AddData(new EllipseData() { X = 10, Y = 50, Fill = Brushes.Orange, Width = 30, Height = 30 });
             //root.AddData(group);
-            root.AddData(CreateGeoLineGroupData());
+            //root.AddData(CreateGeoLineGroupData());
+            root.AddData(CreateGeoLineData());
             return root;
         }
 
@@ -50,7 +51,9 @@ namespace _20260428
             {
                 X = 100,
                 Y = 100,
-                Points = [new Point(), new Point(100, 100)],
+                //Points = [new Point(50,0), new Point(100, 00)],
+                Points = [new Point(-50,0), new Point(100, 00)],
+                //Points = [new Point(), new Point(100, 00)],
                 Stroke = Brushes.Crimson,
                 StrokeThickness = 50,
                 Background = Brushes.Pink,
@@ -93,7 +96,8 @@ namespace _20260428
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-
+            //var bounds = MyTest.GetRenderBoundsWithPen();
+            
             //MyLine.VertexTopLeftZeroFix();
 
             //Pen pp = new Pen()

@@ -21,9 +21,14 @@
                               MyData="{Binding MyData}"/>
       
     </ScrollViewer>
-    <!--<Canvas x:Name="MyCanvas">
-
-    </Canvas>-->
+    <Canvas x:Name="MyCanvas">
+      <Rectangle Width="100" Height="1" Stroke="Black"/>
+      <Rectangle Canvas.Left="100" Canvas.Top="0" Width="1" Height="100" Stroke="Black"/>
+      <Rectangle Canvas.Left="100" Canvas.Top="100" Width="100" Height="1" Stroke="Black"/>
+      <!--<local:GeoLineEX x:Name="MyTest" Stroke="Red" StrokeThickness="40" MyPoints="30,40 130,100"
+                       Background="Gold" IsVertexHandle="True"/>-->
+    </Canvas>
+    
     <!--<Polyline x:Name="MyLine" Points="100,30 250,130" Stroke="Red" StrokeThickness="60"/>-->
     <!--<local:GeoLine x:Name="MyLine" MyPoints="100,30 250,130" Stroke="Red" StrokeThickness="60"/>-->
 
@@ -31,6 +36,7 @@
       <GroupBox Header="MyData.ClickedItemData" DataContext="{Binding MyData.ClickedItemData}">
         <StackPanel>
           <TextBlock Text="{Binding Width, StringFormat='Width = {0: 0; -0; 0}'}"/>
+          <TextBlock Text="{Binding Points, StringFormat='Width = {0: 0; -0; 0}'}"/>
           <TextBlock Text="{Binding X, StringFormat='X = {0: 0; -0; 0}'}"/>
           <!--<TextBlock Text="{Binding InternalX, StringFormat='InternalX = {0: 0; -0; 0}'}"/>-->
           <TextBlock Text="{Binding OffsetX, StringFormat='OffsetX = {0: 0; -0; 0}'}"/>

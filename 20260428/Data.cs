@@ -855,8 +855,9 @@ namespace _20260428
 
 
         // 自身のサイズ変更されたときに親要素のサイズも変更すると、その変更が伝播してRootまで行く
-        partial void OnWidthChanged(double oldValue, double newValue) => UpdateParentSize();
-        partial void OnHeightChanged(double oldValue, double newValue) => UpdateParentSize();
+        //partial void OnWidthChanged(double oldValue, double newValue) => UpdateParentSize();
+        //partial void OnHeightChanged(double oldValue, double newValue) => UpdateParentSize();
+
         //partial void OnXChanged(double oldValue, double newValue)
         //{
         //    UpdateParentSize();

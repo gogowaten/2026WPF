@@ -43,16 +43,25 @@ namespace _20260428
 
             // テスト用右クリックメニュー、図形のOffsetテスト
             ContextMenu menu = new();
-            MenuItem item = new() { Header = "test" };
+            MenuItem item = new() { Header = "PointsTopLeftZeroFixWithOffset" };
             item.Click += (s, e) =>
             {
                 if (MyContent is GeoLineEXforData ex)
                 {
-                    ex.PointsTopLeftZeroFixWithOffset();
+                    //ex.PointsTopLeftZeroFixWithOffset();
                 }
             };
             menu.Items.Add(item);
             this.ContextMenu = menu;
+            item = new() { Header = "test" };
+            item.Click += (s, e) =>
+            {
+                if (MyContent is GeoLineEXforData ex)
+                {
+                    ex.TestRenderBounds();
+                }
+            };
+            menu.Items.Add(item);
         }
 
         //private void CustomThumb_Loaded(object sender, RoutedEventArgs e)
@@ -138,7 +147,7 @@ namespace _20260428
         public static readonly DependencyProperty MyDataProperty =
             DependencyProperty.Register(nameof(MyData), typeof(RootData), typeof(RootItemsControl), new PropertyMetadata(null));
 
-        
+
     }
 
 
@@ -187,5 +196,5 @@ namespace _20260428
 
 
 
- 
+
 }

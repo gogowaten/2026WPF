@@ -18,23 +18,45 @@ namespace _20260428
     {
         public GeoLineEXforData()
         {
-            MyUpdateSurfaceBounds += GeoLineEXforData_MyUpdateSurfaceBounds;
+            //MyUpdateSurfaceBounds += GeoLineEXforData_MyUpdateSurfaceBounds;
         }
 
-        // 見た目上のBoundsの更新後の処理
-        // データの更新と親要素のサイズ更新
-        private void GeoLineEXforData_MyUpdateSurfaceBounds(object? sender, Rect e)
+        //// 見た目上のBoundsの更新後の処理
+        //// データの更新と親要素のサイズ更新
+        //private void GeoLineEXforData_MyUpdateSurfaceBounds(object? sender, Rect e)
+        //{
+        //    if (MyData is null) { return; }
+        //    //MyData.Width = MySurfaceWidth;
+        //    //MyData.Height = MySurfaceHeight;
+        //    MyData.OffsetX = MySurfaceLeft;
+        //    MyData.OffsetY = MySurfaceTop;
+        //    //MyData.ParentData?.UpdateSize();
+        //    MyData.ParentData?.UpdateBoundsToRoot();
+        //}
+
+
+        // 頂点ハンドルの表示非表示の切り替え用
+        public bool IsVertexHandle
         {
-            if (MyData is null) { return; }
-            //MyData.Width = MySurfaceWidth;
-            //MyData.Height = MySurfaceHeight;
-            MyData.OffsetX = MySurfaceLeft;
-            MyData.OffsetY = MySurfaceTop;
-            //MyData.ParentData?.UpdateSize();
-            MyData.ParentData?.UpdateBoundsToRoot();
+            get { return (bool)GetValue(IsVertexHandleProperty); }
+            set { SetValue(IsVertexHandleProperty, value); }
         }
-
-
+        public static readonly DependencyProperty IsVertexHandleProperty =
+            DependencyProperty.Register(nameof(IsVertexHandle), typeof(bool), typeof(GeoLineEX), new PropertyMetadata(false, OnIsVertexHandleChanged));
+        private static void OnIsVertexHandleChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            if (d is GeoLineEX geo && geo.MyAdornerLayer is not null)
+            {
+                if ((bool)e.NewValue)
+                {
+                    geo.ShowVertexAdorner();
+                }
+                else
+                {
+                    geo.HideVertexAdorner();
+                }
+            }
+        }
 
         public GeoLineData MyData
         {
@@ -45,21 +67,21 @@ namespace _20260428
             DependencyProperty.Register(nameof(MyData), typeof(GeoLineData), typeof(GeoLineEXforData), new PropertyMetadata(null));
 
 
-        // Points全体を左上(0,0)に寄せる + 図形のOffset
-        public void PointsTopLeftZeroFixWithOffset()
-        {
-            var bounds = GetRenderBounds(); // Offset用に元のBounds取得しておく
-            if (Math.Abs(bounds.X) < 0.01 && Math.Abs(bounds.Y) < 0.01) { return; }
+        //// Points全体を左上(0,0)に寄せる + 図形のOffset
+        //public void PointsTopLeftZeroFixWithOffset()
+        //{
+        //    var bounds = GetRenderBounds(); // Offset用に元のBounds取得しておく
+        //    if (Math.Abs(bounds.X) < 0.01 && Math.Abs(bounds.Y) < 0.01) { return; }
 
-            // 全座標変換
-            PointsOffset(-bounds.X, -bounds.Y);
+        //    // 全座標変換
+        //    PointsOffset(-bounds.X, -bounds.Y);
 
-            MyData.X += bounds.X; // 図形座標のOffset
-            MyData.Y += bounds.Y;
+        //    MyData.X += bounds.X; // 図形座標のOffset
+        //    MyData.Y += bounds.Y;
 
-            // 頂点ハンドルのOffset
-            UpdateVertexHandles();
-        }
+        //    // 頂点ハンドルのOffset
+        //    UpdateVertexHandles();
+        //}
 
         public void PointsOffset(double offsetX, double offsetY)
         {
@@ -71,6 +93,36 @@ namespace _20260428
             }
         }
 
+        public void TestRenderBounds()
+        {
+            var bounds = GetRenderBoundsWithPen();
+            //MySurfaceWidth = bounds.Width;
+            //MySurfaceHeight = bounds.Height;
+            Width = bounds.Width;
+            Height = bounds.Height;
+            PointsOffset(-bounds.Left, -bounds.Top);
+            MyData.X += bounds.Left;
+            MyData.Y += bounds.Top;
+            var neko = MyPoints;
+        }
+
+        // 頂点ハンドル表示
+        public new void ShowVertexAdorner()
+        {
+            // 頂点ハンドルを一旦削除して作り直す
+            HideVertexAdorner();
+            MyVertexAdorner = new VertexAdorner(this);
+            MyVertexAdorner.MyDragCompleted += VertexAdorner_MyDragCompleted;
+            MyAdornerLayer.Add(MyVertexAdorner);
+        }
+
+        // 頂点ハンドル移動後
+        private void VertexAdorner_MyDragCompleted(object? sender, EventArgs e)
+        {
+            // 自身の見た目上の位置とサイズ更新と通知
+            //UpdateSurfaceBounds();
+            TestRenderBounds();
+        }
 
     }
 
@@ -166,24 +218,28 @@ namespace _20260428
             }
         }
 
+        //// 頂点ハンドル移動後
+        //private void VertexAdorner_MyDragCompleted(object? sender, EventArgs e)
+        //{
+        //    if(sender is GeoLineEXforData data)
+        //    {
+        //        var neko = 1;
+        //    }
+        //    // 自身の見た目上の位置とサイズ更新と通知
+        //    //UpdateSurfaceBounds();
+
+        //}
+
         // 頂点ハンドル表示
         public void ShowVertexAdorner()
         {
             // 頂点ハンドルを一旦削除して作り直す
             HideVertexAdorner();
             MyVertexAdorner = new VertexAdorner(this);
-            MyVertexAdorner.MyDragCompleted += VertexAdorner_MyDragCompleted;
+            //MyVertexAdorner.MyDragCompleted += VertexAdorner_MyDragCompleted;
             MyAdornerLayer.Add(MyVertexAdorner);
         }
 
-
-        // 頂点ハンドル移動後
-        private void VertexAdorner_MyDragCompleted(object? sender, EventArgs e)
-        {
-            // 自身の見た目上の位置とサイズ更新と通知
-            UpdateSurfaceBounds();
-
-        }
 
         // 頂点ハンドル非表示(削除)
         public void HideVertexAdorner()
@@ -210,6 +266,23 @@ namespace _20260428
     /// IsBackgroundDraw が <see langword="true"/> に設定されている場合にのみレンダリングされます。このクラスは通常、幾何学的線​​の背後に強調表示または着色された背景が必要なカスタム描画シナリオで使用されます。</remarks>
     public class GeoLineBG : GeoLine
     {
+        public GeoLineBG()
+        {
+            SetMyBind();
+        }
+
+        private void SetMyBind()
+        {
+            MultiBinding mb = new() { Converter = new ConvStrokePen() };
+            mb.Bindings.Add(new Binding() { Source = this, Path = new PropertyPath(StrokeThicknessProperty) });
+            mb.Bindings.Add(new Binding() { Source = this, Path = new PropertyPath(StrokeMiterLimitProperty) });
+            mb.Bindings.Add(new Binding() { Source = this, Path = new PropertyPath(StrokeEndLineCapProperty) });
+            mb.Bindings.Add(new Binding() { Source = this, Path = new PropertyPath(StrokeStartLineCapProperty) });
+            mb.Bindings.Add(new Binding() { Source = this, Path = new PropertyPath(StrokeLineJoinProperty) });
+            SetBinding(MyStrokePenProperty, mb);
+        }
+
+
         #region 依存関係プロパティ
 
         //// 表示位置の調整、trueでCanvasLeftやTopに合わせる。falseは調整なし
@@ -238,7 +311,30 @@ namespace _20260428
         }
         public static readonly DependencyProperty IsBackgroundDrawProperty =
             DependencyProperty.Register(nameof(IsBackgroundDraw), typeof(bool), typeof(GeoLineBG), new FrameworkPropertyMetadata(true, FrameworkPropertyMetadataOptions.AffectsRender));
+        // penだけど、指定はしない読み取り専用
+        public Pen MyStrokePen
+        {
+            get { return (Pen)GetValue(MyStrokePenProperty); }
+            set { SetValue(MyStrokePenProperty, value); }
+        }
+        public static readonly DependencyProperty MyStrokePenProperty =
+            DependencyProperty.Register(nameof(MyStrokePen), typeof(Pen), typeof(GeoLineBG), new PropertyMetadata(null));
+
         #endregion 依存関係プロパティ
+
+        // 図形がピッタリ収まるRectを返す
+        // 内部的な計算なので見た目とは位置が異なる
+        public Rect GetRenderBoundsWithPen()
+        {
+            if (DefiningGeometry is null || DefiningGeometry == Geometry.Empty)
+            {
+                return Rect.Empty;
+            }
+            else
+            {
+                return DefiningGeometry.GetRenderBounds(MyStrokePen);
+            }
+        }
 
         // 使わない？OnRender実行になる
         public void RedBG()
@@ -251,7 +347,7 @@ namespace _20260428
         {
             if (IsBackgroundDraw)
             {
-                var bounds = GetRenderBounds();
+                var bounds = GetRenderBoundsWithPen();
                 drawingContext.DrawRectangle(Background, null, bounds);
             }
             base.OnRender(drawingContext);
@@ -312,49 +408,49 @@ namespace _20260428
         //public static readonly DependencyProperty MyOffsetTopProperty =
         //    DependencyProperty.Register(nameof(MyOffsetTop), typeof(double), typeof(GeoLine), new PropertyMetadata(0.0));
 
-        public double MySurfaceWidth
-        {
-            get { return (double)GetValue(MySurfaceWidthProperty); }
-            set { SetValue(MySurfaceWidthProperty, value); }
-        }
-        public static readonly DependencyProperty MySurfaceWidthProperty =
-            DependencyProperty.Register(nameof(MySurfaceWidth), typeof(double), typeof(GeoLine), new PropertyMetadata(0.0));
+        //public double MySurfaceWidth
+        //{
+        //    get { return (double)GetValue(MySurfaceWidthProperty); }
+        //    set { SetValue(MySurfaceWidthProperty, value); }
+        //}
+        //public static readonly DependencyProperty MySurfaceWidthProperty =
+        //    DependencyProperty.Register(nameof(MySurfaceWidth), typeof(double), typeof(GeoLine), new PropertyMetadata(0.0));
 
-        public double MySurfaceHeight
-        {
-            get { return (double)GetValue(MySurfaceHeightProperty); }
-            set { SetValue(MySurfaceHeightProperty, value); }
-        }
-        public static readonly DependencyProperty MySurfaceHeightProperty =
-            DependencyProperty.Register(nameof(MySurfaceHeight), typeof(double), typeof(GeoLine), new PropertyMetadata(0.0));
+        //public double MySurfaceHeight
+        //{
+        //    get { return (double)GetValue(MySurfaceHeightProperty); }
+        //    set { SetValue(MySurfaceHeightProperty, value); }
+        //}
+        //public static readonly DependencyProperty MySurfaceHeightProperty =
+        //    DependencyProperty.Register(nameof(MySurfaceHeight), typeof(double), typeof(GeoLine), new PropertyMetadata(0.0));
 
-        public double MySurfaceLeft
-        {
-            get { return (double)GetValue(MySurfaceLeftProperty); }
-            set { SetValue(MySurfaceLeftProperty, value); }
-        }
-        public static readonly DependencyProperty MySurfaceLeftProperty =
-            DependencyProperty.Register(nameof(MySurfaceLeft), typeof(double), typeof(GeoLine), new PropertyMetadata(0.0));
+        //public double MySurfaceLeft
+        //{
+        //    get { return (double)GetValue(MySurfaceLeftProperty); }
+        //    set { SetValue(MySurfaceLeftProperty, value); }
+        //}
+        //public static readonly DependencyProperty MySurfaceLeftProperty =
+        //    DependencyProperty.Register(nameof(MySurfaceLeft), typeof(double), typeof(GeoLine), new PropertyMetadata(0.0));
 
-        public double MySurfaceTop
-        {
-            get { return (double)GetValue(MySurfaceTopProperty); }
-            set { SetValue(MySurfaceTopProperty, value); }
-        }
-        public static readonly DependencyProperty MySurfaceTopProperty =
-            DependencyProperty.Register(nameof(MySurfaceTop), typeof(double), typeof(GeoLine), new PropertyMetadata(0.0));
+        //public double MySurfaceTop
+        //{
+        //    get { return (double)GetValue(MySurfaceTopProperty); }
+        //    set { SetValue(MySurfaceTopProperty, value); }
+        //}
+        //public static readonly DependencyProperty MySurfaceTopProperty =
+        //    DependencyProperty.Register(nameof(MySurfaceTop), typeof(double), typeof(GeoLine), new PropertyMetadata(0.0));
 
         #endregion テスト依存関係プロパティ
 
         #region 依存関係プロパティ
-        // penだけど、指定はしない読み取り専用
-        public Pen MyStrokePen
-        {
-            get { return (Pen)GetValue(MyStrokePenProperty); }
-            set { SetValue(MyStrokePenProperty, value); }
-        }
-        public static readonly DependencyProperty MyStrokePenProperty =
-            DependencyProperty.Register(nameof(MyStrokePen), typeof(Pen), typeof(GeoLine), new PropertyMetadata(null));
+        //// penだけど、指定はしない読み取り専用
+        //public Pen MyStrokePen
+        //{
+        //    get { return (Pen)GetValue(MyStrokePenProperty); }
+        //    set { SetValue(MyStrokePenProperty, value); }
+        //}
+        //public static readonly DependencyProperty MyStrokePenProperty =
+        //    DependencyProperty.Register(nameof(MyStrokePen), typeof(Pen), typeof(GeoLine), new PropertyMetadata(null));
 
 
 
@@ -413,73 +509,73 @@ namespace _20260428
         #region コンストラクタ
         public GeoLine()
         {
-            SetMyBind();
+            //SetMyBind();
             Loaded += GeoLine_Loaded;
         }
 
         private void GeoLine_Loaded(object sender, RoutedEventArgs e)
         {
-            UpdateSurfaceBounds(); // Surface(見た目上の位置とサイズ)の更新
+            //UpdateSurfaceBounds(); // Surface(見た目上の位置とサイズ)の更新
         }
 
-        private void SetMyBind()
-        {
-            MultiBinding mb = new() { Converter = new ConvStrokePen() };
-            mb.Bindings.Add(new Binding() { Source = this, Path = new PropertyPath(StrokeThicknessProperty) });
-            mb.Bindings.Add(new Binding() { Source = this, Path = new PropertyPath(StrokeMiterLimitProperty) });
-            mb.Bindings.Add(new Binding() { Source = this, Path = new PropertyPath(StrokeEndLineCapProperty) });
-            mb.Bindings.Add(new Binding() { Source = this, Path = new PropertyPath(StrokeStartLineCapProperty) });
-            mb.Bindings.Add(new Binding() { Source = this, Path = new PropertyPath(StrokeLineJoinProperty) });
-            SetBinding(MyStrokePenProperty, mb);
-        }
+        //private void SetMyBind()
+        //{
+        //    MultiBinding mb = new() { Converter = new ConvStrokePen() };
+        //    mb.Bindings.Add(new Binding() { Source = this, Path = new PropertyPath(StrokeThicknessProperty) });
+        //    mb.Bindings.Add(new Binding() { Source = this, Path = new PropertyPath(StrokeMiterLimitProperty) });
+        //    mb.Bindings.Add(new Binding() { Source = this, Path = new PropertyPath(StrokeEndLineCapProperty) });
+        //    mb.Bindings.Add(new Binding() { Source = this, Path = new PropertyPath(StrokeStartLineCapProperty) });
+        //    mb.Bindings.Add(new Binding() { Source = this, Path = new PropertyPath(StrokeLineJoinProperty) });
+        //    SetBinding(MyStrokePenProperty, mb);
+        //}
 
         #endregion コンストラクタ
 
         #region publicメソッド
 
-        public event EventHandler<Rect>? MyUpdateSurfaceBounds;
-        // Surface(見た目上の位置とサイズ)の更新
-        public void UpdateSurfaceBounds()
-        {            
-            var bounds = GetSurfaceBounds();
-            if(bounds == Rect.Empty) { return; }
+        //public event EventHandler<Rect>? MyUpdateSurfaceBounds;
+        //// Surface(見た目上の位置とサイズ)の更新
+        //public void UpdateSurfaceBounds()
+        //{            
+        //    var bounds = GetRenderBounds();
+        //    if(bounds == Rect.Empty) { return; }
 
-            MySurfaceHeight = bounds.Height;
-            MySurfaceLeft = bounds.Left;
-            MySurfaceTop = bounds.Top;
-            MySurfaceWidth = bounds.Width;
-            //MyOffsetLeft = bounds.Left;
-            //MyOffsetTop = bounds.Top;
-            MyUpdateSurfaceBounds?.Invoke(this, bounds);// 通知
-        }
+        //    MySurfaceHeight = bounds.Height;
+        //    MySurfaceLeft = bounds.Left;
+        //    MySurfaceTop = bounds.Top;
+        //    MySurfaceWidth = bounds.Width;
+        //    //MyOffsetLeft = bounds.Left;
+        //    //MyOffsetTop = bounds.Top;
+        //    MyUpdateSurfaceBounds?.Invoke(this, bounds);// 通知
+        //}
 
-        // 図形がピッタリ収まるRectを返す
-        // 図形の見た目上の位置とサイズのRectを返す
-        public Rect GetSurfaceBounds()
-        {
-            var bounds = GetRenderBounds();
-            if(bounds == Rect.Empty) { return bounds; }
-            var left = Canvas.GetLeft(this);
-            if (double.IsNaN(left)) { left = 0; }
-            var top = Canvas.GetTop(this);
-            if (double.IsNaN(top)) { top = 0; }
-            Rect surface = new(left + bounds.Left, top + bounds.Top, bounds.Width, bounds.Height);
-            return surface;
-        }
+        //// 図形がピッタリ収まるRectを返す
+        //// 図形の見た目上の位置とサイズのRectを返す
+        //public Rect GetSurfaceBounds()
+        //{
+        //    var bounds = GetRenderBounds();
+        //    if(bounds == Rect.Empty) { return bounds; }
+        //    var left = Canvas.GetLeft(this);
+        //    if (double.IsNaN(left)) { left = 0; }
+        //    var top = Canvas.GetTop(this);
+        //    if (double.IsNaN(top)) { top = 0; }
+        //    Rect surface = new(left + bounds.Left, top + bounds.Top, bounds.Width, bounds.Height);
+        //    return surface;
+        //}
 
-        // 図形がピッタリ収まるRectを返す
-        // 内部的な計算なので見た目とは位置が異なる
-        public Rect GetRenderBounds()
-        {
-            if (_cachedGeometry is null || _cachedGeometry == Geometry.Empty)
-            {
-                return Rect.Empty;
-            }
-            else
-            {
-                return _cachedGeometry.GetRenderBounds(MyStrokePen);
-            }
-        }
+        //// 図形がピッタリ収まるRectを返す
+        //// 内部的な計算なので見た目とは位置が異なる
+        //public Rect GetRenderBounds()
+        //{
+        //    if (_cachedGeometry is null || _cachedGeometry == Geometry.Empty)
+        //    {
+        //        return Rect.Empty;
+        //    }
+        //    else
+        //    {
+        //        return _cachedGeometry.GetRenderBounds(MyStrokePen);
+        //    }
+        //}
 
         #endregion publicメソッド
 

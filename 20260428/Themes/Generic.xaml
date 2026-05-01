@@ -28,9 +28,11 @@
                                Background="{Binding Background}"
                                IsVertexHandle="{Binding IsVertexHandle}"
                                VertexHandleFillBrush="#100f"
-                               MySurfaceWidth="{Binding Width, Mode=OneWayToSource}"
-                               MySurfaceHeight="{Binding Height, Mode=OneWayToSource}"
+                              Width="{Binding Width}"
+                              Height="{Binding Height}"
                              />
+                               <!--MySurfaceWidth="{Binding Width, Mode=OneWayToSource}"
+                               MySurfaceHeight="{Binding Height, Mode=OneWayToSource}"-->
       <!--MyOffsetLeft="{Binding OffsetX}"
                                MyOffsetTop="{Binding OffsetY}"-->
     </local:CustomThumb>
@@ -100,8 +102,10 @@
     <!--<Setter Property="MyData" Value="{Binding}"/>-->
     <Setter Property="ItemContainerStyle" Value="{StaticResource CanvasItemContaier}"/>
     <Setter Property="ItemsSource" Value="{Binding RelativeSource={RelativeSource Mode=Self}, Path=MyData.DataList}"/>
-    <Setter Property="Width" Value="{Binding RelativeSource={RelativeSource Mode=Self}, Path=MyData.Width}"/>
-    <Setter Property="Height" Value="{Binding RelativeSource={RelativeSource Mode=Self}, Path=MyData.Height}"/>
+    <!--<Setter Property="Width" Value="{Binding RelativeSource={RelativeSource Mode=Self}, Path=MyData.Width}"/>
+    <Setter Property="Height" Value="{Binding RelativeSource={RelativeSource Mode=Self}, Path=MyData.Height}"/>-->
+    <Setter Property="Width" Value="300"/>
+    <Setter Property="Height" Value="300"/>
     
     <Setter Property="ItemsPanel">
       <Setter.Value>
