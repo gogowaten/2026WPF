@@ -36,13 +36,15 @@
       <GroupBox Header="MyData.ClickedItemData" DataContext="{Binding MyData.ClickedItemData}">
         <StackPanel>
           <TextBlock Text="{Binding Width, StringFormat='Width = {0: 0; -0; 0}'}"/>
-          <TextBlock Text="{Binding Points, StringFormat='Width = {0: 0; -0; 0}'}"/>
+          <TextBlock Text="{Binding Height, StringFormat='Height = {0: 0; -0; 0}'}"/>
+          <TextBlock Text="{Binding Points, StringFormat='Points = {0: 0; -0; 0}'}"/>
           <TextBlock Text="{Binding X, StringFormat='X = {0: 0; -0; 0}'}"/>
+          <TextBlock Text="{Binding Y, StringFormat='y = {0: 0; -0; 0}'}"/>
           <!--<TextBlock Text="{Binding InternalX, StringFormat='InternalX = {0: 0; -0; 0}'}"/>-->
           <TextBlock Text="{Binding OffsetX, StringFormat='OffsetX = {0: 0; -0; 0}'}"/>
           <TextBlock Text="{Binding OffsetY, StringFormat='OffsetY = {0: 0; -0; 0}'}"/>
           <TextBlock Text="{Binding IsVertexHandle, StringFormat='IsVertexHandle = {0: 0; -0; 0}'}"/>
-
+          <Slider Minimum="1" Maximum="50" Value="{Binding StrokeThickness}"/>
           <Button Content="test" Click="Button_Click"/>
         </StackPanel>
       </GroupBox>

@@ -100,6 +100,7 @@ namespace _20260428
             {
                 //data.IsVertexHandle = !data.IsVertexHandle;
                 data.Points.Add(new Point(150, 50));
+                //data.StrokeStartLineCap = PenLineCap.Round;
             }
             //var bounds = MyTest.GetRenderBoundsWithPen();
             //MyTest.IsVertexHandle = !MyTest.IsVertexHandle;

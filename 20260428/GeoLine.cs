@@ -27,25 +27,46 @@ namespace _20260428
 
         private void GeoLineEXforData_Loaded(object sender, RoutedEventArgs e)
         {
-            // 左上寄せと、
+            // 図形のBoundsの調整
+            // 元の座標を取得しておく
+            var x = MyData.X;
+            var y = MyData.Y;
+            // Pointsの左上寄せと、Offset
             PointsTopLeftZeroFixWithOffset();
+
+            // Offsetで変更されたのを元の位置に戻す
+            MyData.X = x;
+            MyData.Y = y;
 
             // 頂点ハンドル表示
             if (IsVertexHandle) { ShowVertexAdorner(); }
+
+            // 基底クラスのMyStrokePenプロパティ変更時に実行するコールバックへの設定
+            MyStrokePenProperty.OverrideMetadata(typeof(GeoLineEXforData), new PropertyMetadata(null, OnMyStrokePenChanged));
+
+            //MyPointsProperty.OverrideMetadata(typeof(GeoLineEXforData), new PropertyMetadata(null, OnMyPointsPropertyChanged));
         }
 
-        //// 見た目上のBoundsの更新後の処理
-        //// データの更新と親要素のサイズ更新
-        //private void GeoLineEXforData_MyUpdateSurfaceBounds(object? sender, Rect e)
+        //private static void OnMyPointsPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         //{
-        //    if (MyData is null) { return; }
-        //    //MyData.Width = MySurfaceWidth;
-        //    //MyData.Height = MySurfaceHeight;
-        //    MyData.OffsetX = MySurfaceLeft;
-        //    MyData.OffsetY = MySurfaceTop;
-        //    //MyData.ParentData?.UpdateSize();
-        //    MyData.ParentData?.UpdateBoundsToRoot();
+        //    if (d is GeoLineEXforData geo)
+        //    {
+        //        var n = e.NewValue;
+        //        var o = e.OldValue;
+        //        geo.PointsTopLeftZeroFixWithOffset();
+        //    }
         //}
+
+
+        #region プロパティ
+        // 基底クラスのMyStrokePenプロパティ変更時に実行するコールバック
+        private static void OnMyStrokePenChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            if (d is GeoLineEXforData geo)
+            {
+                geo.PointsTopLeftZeroFixWithOffset();
+            }
+        }
 
 
         // 頂点ハンドルの表示非表示の切り替え用
@@ -78,20 +99,36 @@ namespace _20260428
         }
         public static readonly DependencyProperty MyDataProperty =
             DependencyProperty.Register(nameof(MyData), typeof(GeoLineData), typeof(GeoLineEXforData), new PropertyMetadata(null));
+        #endregion プロパティ
 
-        // ハンドル移動後の処理
-        // Points全体を左上(0,0)に寄せる + 図形のOffset + 図形のサイズ更新 + ハンドルの位置調整
+        public override void PointCollection_Changed(object? sender, EventArgs e)
+        {
+            base.PointCollection_Changed(sender, e);
+            PointsTopLeftZeroFixWithOffset();
+        }
+
+        /// <summary>
+        /// Points全体を左上(0,0)に寄せる + 図形のOffset + 図形のサイズ更新 + ハンドルの位置調整
+        /// </summary>
+        /// <remarks>
+        /// 使用先：ハンドル移動後の処理、pen更新時
+        /// </remarks>
         public void PointsTopLeftZeroFixWithOffset()
         {
             // 左上寄せする前に、今のBounds取得しておく
             var bounds = GetRenderBoundsWithPen();
 
             // Bounds座標が(0,0)に近いときは何もしないで終了
-            if (Math.Abs(bounds.X) < 0.01 && Math.Abs(bounds.Y) < 0.01) { return; }
+            if (Math.Abs(bounds.Left) + Math.Abs(bounds.Top) < 0.01)
+            {
+                if (Math.Abs(Width - bounds.Width) + Math.Abs(Height - bounds.Height) < 0.01)
+                {
+                    return;
+                }
+            }
 
             // 全Pointを左上寄せ(全座標変換)
             PointsOffset(MyPoints, -bounds.X, -bounds.Y);
-
 
             MyData.Width = bounds.Width;
             MyData.Height = bounds.Height;
@@ -100,12 +137,11 @@ namespace _20260428
 
             // 頂点ハンドルのOffset
             MyVertexAdorner?.SyncAllThumbPoition();
-            //UpdateVertexHandles();
         }
 
 
-
-        public void PointsOffset(PointCollection points, double offsetX, double offsetY)
+        // Points全座標のオフセット
+        public static void PointsOffset(PointCollection points, double offsetX, double offsetY)
         {
             // 全座標変換
             for (int i = 0; i < points.Count; i++)
@@ -116,33 +152,25 @@ namespace _20260428
         }
 
 
-        // 頂点ハンドル移動後
-        private void VertexAdorner_MyDragCompleted(object? sender, EventArgs e)
-        {
-            // 自身の見た目上の位置とサイズ更新と通知
-            PointsTopLeftZeroFixWithOffset();
-        }
 
         #region パブリックメソッド
         // 頂点ハンドルの更新
         // 頂点の追加や削除時に使う
-        public new void UpdateVertexHandles()
-        {
-            //base.UpdateVertexHandles();
-            if (IsVertexHandle) { MyVertexAdorner?.UpdateHandles(); }
-        }
+        //public new void UpdateVertexHandles()
+        //{
+        //    //base.UpdateVertexHandles();
+        //    if (IsVertexHandle) { MyVertexAdorner?.UpdateHandles(); }
+        //}
 
         // 頂点ハンドル表示(再作成)
         public override void ShowVertexAdorner()
         {
             base.ShowVertexAdorner();
-            MyVertexAdorner?.MyDragCompleted += MyVertexAdorner_MyDragCompleted;
+
+            // ハンドル移動後イベントを購読と、ハンドル移動後の処理
+            MyVertexAdorner?.MyDragCompleted += (s, e) => { PointsTopLeftZeroFixWithOffset(); };
         }
 
-        private void MyVertexAdorner_MyDragCompleted(object? sender, EventArgs e)
-        {
-            PointsTopLeftZeroFixWithOffset();
-        }
 
         //// 頂点ハンドル非表示(削除)
         public override void HideVertexAdorner()
@@ -458,16 +486,6 @@ namespace _20260428
         #endregion テスト依存関係プロパティ
 
         #region 依存関係プロパティ
-        //// penだけど、指定はしない読み取り専用
-        //public Pen MyStrokePen
-        //{
-        //    get { return (Pen)GetValue(MyStrokePenProperty); }
-        //    set { SetValue(MyStrokePenProperty, value); }
-        //}
-        //public static readonly DependencyProperty MyStrokePenProperty =
-        //    DependencyProperty.Register(nameof(MyStrokePen), typeof(Pen), typeof(GeoLine), new PropertyMetadata(null));
-
-
 
         /// <summary>
         /// Pointsの型はPointCollectionでもObservableCollectionのどちらでも同じ結果で
@@ -504,7 +522,7 @@ namespace _20260428
             }
         }
 
-        private void PointCollection_Changed(object? sender, EventArgs e)
+        public virtual void PointCollection_Changed(object? sender, EventArgs e)
         {
             // キャッシュクリアしてから再描画
             _cachedGeometry = null;
