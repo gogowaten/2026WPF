@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.VisualBasic;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
@@ -16,6 +17,8 @@ namespace _20260428
 
     public class GeoLineEXforData : GeoLineEX
     {
+        //private new VertexAdornerForData? MyVertexAdorner;
+
         public GeoLineEXforData()
         {
             //MyUpdateSurfaceBounds += GeoLineEXforData_MyUpdateSurfaceBounds;
@@ -76,16 +79,17 @@ namespace _20260428
         public static readonly DependencyProperty MyDataProperty =
             DependencyProperty.Register(nameof(MyData), typeof(GeoLineData), typeof(GeoLineEXforData), new PropertyMetadata(null));
 
-
-        // Points全体を左上(0,0)に寄せる + 図形のOffset
+        // ハンドル移動後の処理
+        // Points全体を左上(0,0)に寄せる + 図形のOffset + 図形のサイズ更新 + ハンドルの位置調整
         public void PointsTopLeftZeroFixWithOffset()
         {
-            var bounds = GetRenderBoundsWithPen(); // Offset用に元のBounds取得しておく
+            // 左上寄せする前に、今のBounds取得しておく
+            var bounds = GetRenderBoundsWithPen();
+
             // Bounds座標が(0,0)に近いときは何もしないで終了
             if (Math.Abs(bounds.X) < 0.01 && Math.Abs(bounds.Y) < 0.01) { return; }
 
-            // 全座標変換
-            //PointsOffset(-bounds.X, -bounds.Y);
+            // 全Pointを左上寄せ(全座標変換)
             PointsOffset(MyPoints, -bounds.X, -bounds.Y);
 
 
@@ -95,7 +99,8 @@ namespace _20260428
             MyData.Y += bounds.Y;
 
             // 頂点ハンドルのOffset
-            UpdateVertexHandles();
+            MyVertexAdorner?.SyncAllThumbPoition();
+            //UpdateVertexHandles();
         }
 
 
@@ -110,60 +115,42 @@ namespace _20260428
             }
         }
 
-        //public PointCollection MakePointsOffset(PointCollection points, double offsetX, double offsetY)
-        //{
-        //    PointCollection poi = [];
-        //    // 全座標変換
-        //    for (int i = 0; i < points.Count; i++)
-        //    {
-        //        var p = points[i];
-        //        poi.Add(new Point(p.X + offsetX, p.Y + offsetY));
-        //    }
-        //    return poi;
-        //}
-
-        //public void PointsOffset(double offsetX, double offsetY)
-        //{
-        //    // 全座標変換
-        //    for (int i = 0; i < MyPoints.Count; i++)
-        //    {
-        //        var poi = MyPoints[i];
-        //        MyPoints[i] = new Point(poi.X + offsetX, poi.Y + offsetY);
-        //    }
-        //}
-
-        public void TestRenderBounds()
-        {
-            var bounds = GetRenderBoundsWithPen();
-            //MySurfaceWidth = bounds.Width;
-            //MySurfaceHeight = bounds.Height;
-            Width = bounds.Width;
-            Height = bounds.Height;
-            PointsOffset(MyPoints, -bounds.Left, -bounds.Top);
-            MyData.X += bounds.Left;
-            MyData.Y += bounds.Top;
-            var neko = MyPoints;
-        }
 
         // 頂点ハンドル移動後
         private void VertexAdorner_MyDragCompleted(object? sender, EventArgs e)
         {
             // 自身の見た目上の位置とサイズ更新と通知
-            //UpdateSurfaceBounds();
-            //TestRenderBounds();
             PointsTopLeftZeroFixWithOffset();
         }
 
-        // 頂点ハンドル表示(再作成)
-        public new void ShowVertexAdorner()
+        #region パブリックメソッド
+        // 頂点ハンドルの更新
+        // 頂点の追加や削除時に使う
+        public new void UpdateVertexHandles()
         {
-            // 頂点ハンドルを一旦削除して作り直す
-            HideVertexAdorner();
-            MyVertexAdorner = new VertexAdorner(this);
-            MyVertexAdorner.MyDragCompleted += VertexAdorner_MyDragCompleted;
-            MyAdornerLayer.Add(MyVertexAdorner);
+            //base.UpdateVertexHandles();
+            if (IsVertexHandle) { MyVertexAdorner?.UpdateHandles(); }
         }
 
+        // 頂点ハンドル表示(再作成)
+        public override void ShowVertexAdorner()
+        {
+            base.ShowVertexAdorner();
+            MyVertexAdorner?.MyDragCompleted += MyVertexAdorner_MyDragCompleted;
+        }
+
+        private void MyVertexAdorner_MyDragCompleted(object? sender, EventArgs e)
+        {
+            PointsTopLeftZeroFixWithOffset();
+        }
+
+        //// 頂点ハンドル非表示(削除)
+        public override void HideVertexAdorner()
+        {
+            base.HideVertexAdorner();
+        }
+
+        #endregion パブリックメソッド
     }
 
 
@@ -250,7 +237,7 @@ namespace _20260428
 
         // 頂点ハンドルの更新
         // 頂点の追加や削除時に使う
-        public void UpdateVertexHandles()
+        public virtual void UpdateVertexHandles()
         {
             if (IsVertexHandle)
             {
@@ -258,31 +245,19 @@ namespace _20260428
             }
         }
 
-        //// 頂点ハンドル移動後
-        //private void VertexAdorner_MyDragCompleted(object? sender, EventArgs e)
-        //{
-        //    if(sender is GeoLineEXforData data)
-        //    {
-        //        var neko = 1;
-        //    }
-        //    // 自身の見た目上の位置とサイズ更新と通知
-        //    //UpdateSurfaceBounds();
-
-        //}
 
         // 頂点ハンドル表示
-        public void ShowVertexAdorner()
+        public virtual void ShowVertexAdorner()
         {
             // 頂点ハンドルを一旦削除して作り直す
             HideVertexAdorner();
             MyVertexAdorner = new VertexAdorner(this);
-            //MyVertexAdorner.MyDragCompleted += VertexAdorner_MyDragCompleted; // これはData用
             MyAdornerLayer.Add(MyVertexAdorner);
         }
 
 
         // 頂点ハンドル非表示(削除)
-        public void HideVertexAdorner()
+        public virtual void HideVertexAdorner()
         {
             if (MyVertexAdorner is not null)
             {
@@ -670,6 +645,123 @@ namespace _20260428
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+    //public class VertexAdornerForData : VertexAdorner
+    //{
+    //    private readonly GeoLineEXforData MyTargetElement;
+    //    private readonly GeoLineData MyTargetData;
+
+    //    public VertexAdornerForData(GeoLineEXforData adornedElement) : base(adornedElement)
+    //    {
+    //        MyTargetElement = adornedElement;
+    //        MyTargetData = MyTargetElement.MyData;
+    //        Loaded += VertexAdornerForData_Loaded;
+    //    }
+
+    //    private void VertexAdornerForData_Loaded(object sender, RoutedEventArgs e)
+    //    {
+    //        //AddCompletedEventForHandleThumb();
+    //    }
+
+    //    //#region イベント        
+    //    //public event EventHandler? MyDragCompleted;
+    //    //#endregion   イベント
+
+    //    // 移動終了時、通知を出す
+    //    private void HandleThumb_DragCompleted(object sender, DragCompletedEventArgs e)
+    //    {
+    //        PointsTopLeftZeroFixWithOffset();
+    //    }
+
+    //    //private void AddCompletedEventForHandleThumb()
+    //    //{
+    //    //    foreach (var item in this.MyCanvas.Children.OfType<Thumb>())
+    //    //    {
+    //    //        item.DragCompleted += HandleThumb_DragCompleted;
+    //    //    }
+    //    //}
+
+
+    //    // Points全体を左上(0,0)に寄せる + 図形のOffset
+    //    public void PointsTopLeftZeroFixWithOffset()
+    //    {
+    //        var bounds = MyTargetElement.GetRenderBoundsWithPen(); // Offset用に元のBounds取得しておく
+    //        // Bounds座標が(0,0)に近いときは何もしないで終了
+    //        if (Math.Abs(bounds.X) < 0.01 && Math.Abs(bounds.Y) < 0.01) { return; }
+
+    //        // 全座標変換
+    //        //PointsOffset(-bounds.X, -bounds.Y);
+    //        PointsOffset(MyTargetData.Points, -bounds.X, -bounds.Y);
+
+
+    //        MyTargetData.Width = bounds.Width;
+    //        MyTargetData.Height = bounds.Height;
+    //        MyTargetData.X += bounds.X; // 図形座標のOffset
+    //        MyTargetData.Y += bounds.Y;
+
+    //        // 頂点ハンドルのOffset
+    //        //UpdateVertexHandles();
+    //        SyncAllThumbPoition();
+    //    }
+
+    //    public static void PointsOffset(PointCollection points, double offsetX, double offsetY)
+    //    {
+    //        // 全座標変換
+    //        for (int i = 0; i < points.Count; i++)
+    //        {
+    //            var p = points[i];
+    //            points[i] = new Point(p.X + offsetX, p.Y + offsetY);
+    //        }
+    //    }
+
+    //    public override void UpdateHandles()
+    //    {
+    //        base.UpdateHandles();
+    //        foreach (var item in MyCanvas.Children.OfType<Thumb>())
+    //        {
+    //            item.DragCompleted += HandleThumb_DragCompleted;
+    //        }
+    //    }
+
+    //    //// Points全体を左上(0,0)に寄せる + 図形のOffset
+    //    //public void PointsTopLeftZeroFixWithOffset(GeoLineEXforData exData)
+    //    //{
+    //    //    var bounds = exData.GetRenderBoundsWithPen(); // Offset用に元のBounds取得しておく
+    //    //    // Bounds座標が(0,0)に近いときは何もしないで終了
+    //    //    if (Math.Abs(bounds.X) < 0.01 && Math.Abs(bounds.Y) < 0.01) { return; }
+
+    //    //    // 全座標変換
+    //    //    //PointsOffset(-bounds.X, -bounds.Y);
+    //    //    exData.PointsOffset(exData.MyPoints, -bounds.X, -bounds.Y);
+
+
+    //    //    MyData.Width = bounds.Width;
+    //    //    MyData.Height = bounds.Height;
+    //    //    MyData.X += bounds.X; // 図形座標のOffset
+    //    //    MyData.Y += bounds.Y;
+
+    //    //    // 頂点ハンドルのOffset
+    //    //    UpdateVertexHandles();
+    //    //}
+    //}
+
+
+
+
+
+
+
+
     // 頂点ハンドルのアドーナー、GeoLineEX専用
     public class VertexAdorner : Adorner
     {
@@ -678,34 +770,31 @@ namespace _20260428
 
         private readonly VisualCollection _visuals;
         private readonly GeoLineEX _adornedElement;
-        private readonly Canvas MyCanvas;
-        private double MyHandleOffset;
+        internal readonly Canvas MyCanvas;
+        private double MyHandleSizeHalfOffset;
         private readonly PointCollection MyGeoPoints;
 
-        public VertexAdorner(UIElement adornedElement) : base(adornedElement)
+        public VertexAdorner(GeoLineEX adornedElement) : base(adornedElement)
         {
-            this.UseLayoutRounding = true; // ドットに合わせてくっきり表示
-            _adornedElement = (GeoLineEX)adornedElement;
+            _adornedElement = adornedElement;
             _visuals = new(this);
             MyCanvas = new Canvas();
-            _visuals.Add(MyCanvas);
-            MyHandleOffset = MyHandleSize / 2.0;
-            if (_adornedElement is GeoLineEX geo)
-            {
-                MyGeoPoints = geo.MyPoints;
-                SetBinding(MyHandleSizeProperty, new Binding() { Source = _adornedElement, Path = new PropertyPath(GeoLineEX.VertexHandleSizeProperty) });
-                SetBinding(MyHandleFillBrushProperty, new Binding() { Source = _adornedElement, Path = new PropertyPath(GeoLineEX.VertexHandleFillBrushProperty) });
-            }
-            else
-            {
-                throw new InvalidOperationException("図形のPointsが見つからない");
-            }
+            MyGeoPoints = _adornedElement.MyPoints;
+
+            MyInit();
 
             // 頂点の数だけハンドルを作成
             UpdateHandles();
         }
 
-
+        private void MyInit()
+        {
+            this.UseLayoutRounding = true; // ドットに合わせてくっきり表示
+            _visuals.Add(MyCanvas);
+            MyHandleSizeHalfOffset = MyHandleSize / 2.0;
+            SetBinding(MyHandleSizeProperty, new Binding() { Source = _adornedElement, Path = new PropertyPath(GeoLineEX.VertexHandleSizeProperty) });
+            SetBinding(MyHandleFillBrushProperty, new Binding() { Source = _adornedElement, Path = new PropertyPath(GeoLineEX.VertexHandleFillBrushProperty) });
+        }
 
         #region プロパティ
 
@@ -733,7 +822,7 @@ namespace _20260428
             if (d is VertexAdorner ador)
             {
                 // ハンドルサイズ変更に伴う変更、オフセット、全ハンドルの座標
-                ador.MyHandleOffset = (double)e.NewValue / 2.0;
+                ador.MyHandleSizeHalfOffset = (double)e.NewValue / 2.0;
 
                 var points = ador.MyGeoPoints;
                 for (int i = 0; i < points.Count; i++)
@@ -745,7 +834,7 @@ namespace _20260428
 
         #endregion プロパティ
 
-        public void UpdateHandles()
+        public virtual void UpdateHandles()
         {
             MyCanvas.Children.Clear();
 
@@ -756,8 +845,7 @@ namespace _20260428
                 var thumb = new FlatHandle()
                 {
                     Cursor = Cursors.Hand,
-                    Tag = i, // インデックスを保持                    
-                    //MyFillBrush = new SolidColorBrush(Color.FromArgb(40, 255, 0, 0))
+                    Tag = i, // インデックスを保持
                 };
 
                 thumb.SetBinding(WidthProperty, new Binding() { Source = this, Path = new PropertyPath(MyHandleSizeProperty) });
@@ -765,8 +853,8 @@ namespace _20260428
                 thumb.SetBinding(FlatHandle.MyFillBrushProperty, new Binding() { Source = this, Path = new PropertyPath(MyHandleFillBrushProperty) });
 
 
-                thumb.MyLeft = MyGeoPoints[i].X - MyHandleOffset;
-                thumb.MyTop = MyGeoPoints[i].Y - MyHandleOffset;
+                thumb.MyLeft = MyGeoPoints[i].X - MyHandleSizeHalfOffset;
+                thumb.MyTop = MyGeoPoints[i].Y - MyHandleSizeHalfOffset;
 
                 thumb.DragDelta += Thumb_DragDelta;
                 thumb.DragCompleted += Thumb_DragCompleted;
@@ -775,39 +863,15 @@ namespace _20260428
             }
         }
 
-        #region イベント        
+        #region イベント
+        // ハンドル移動終了通知用
         public event EventHandler? MyDragCompleted;
         #endregion   イベント
 
-        // 移動終了時、通知を出す
+        // ハンドル移動終了時に通知を出す
         private void Thumb_DragCompleted(object sender, DragCompletedEventArgs e)
         {
             MyDragCompleted?.Invoke(this, e);
-            if(_adornedElement is GeoLineEXforData data)
-            {
-
-            }
-        }
-
-        // Points全体を左上(0,0)に寄せる + 図形のOffset
-        public void PointsTopLeftZeroFixWithOffset(GeoLineEXforData exData)
-        {
-            var bounds = exData.GetRenderBoundsWithPen(); // Offset用に元のBounds取得しておく
-            // Bounds座標が(0,0)に近いときは何もしないで終了
-            if (Math.Abs(bounds.X) < 0.01 && Math.Abs(bounds.Y) < 0.01) { return; }
-
-            // 全座標変換
-            //PointsOffset(-bounds.X, -bounds.Y);
-            exData.PointsOffset(exData.MyPoints, -bounds.X, -bounds.Y);
-
-
-            MyData.Width = bounds.Width;
-            MyData.Height = bounds.Height;
-            MyData.X += bounds.X; // 図形座標のOffset
-            MyData.Y += bounds.Y;
-
-            // 頂点ハンドルのOffset
-            UpdateVertexHandles();
         }
 
         private void Thumb_DragDelta(object sender, DragDeltaEventArgs e)
@@ -834,16 +898,35 @@ namespace _20260428
         }
 
 
-        private void SyncThumbPosition(int index, Point p)
+        /// <summary>
+        /// 指定したハンドルの座標を頂点に合わせる
+        /// </summary>
+        /// <param name="index"></param>
+        /// <param name="p"></param>
+        public void SyncThumbPosition(int index, Point p)
         {
             if (MyCanvas.Children.Count == 0) { return; }
             if (MyCanvas.Children[index] is FlatHandle thumb)
             {
-                thumb.MyLeft = p.X - MyHandleOffset;
-                thumb.MyTop = p.Y - MyHandleOffset;
+                thumb.MyLeft = p.X - MyHandleSizeHalfOffset;
+                thumb.MyTop = p.Y - MyHandleSizeHalfOffset;
             }
-
         }
+
+        public void SyncAllThumbPoition()
+        {
+            if (MyCanvas.Children.Count == 0) { return; }
+            foreach (FlatHandle item in MyCanvas.Children.OfType<FlatHandle>())
+            {
+                if (item.Tag is int ii)
+                {
+                    item.MyLeft = MyGeoPoints[ii].X - MyHandleSizeHalfOffset;
+                    item.MyTop = MyGeoPoints[ii].Y - MyHandleSizeHalfOffset;
+                }
+            }
+        }
+
+
     }
 
 }

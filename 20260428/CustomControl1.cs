@@ -57,7 +57,7 @@ namespace _20260428
             {
                 if (MyContent is GeoLineEXforData ex)
                 {
-                    ex.TestRenderBounds();
+                    //ex.TestRenderBounds();
                     
                 }
             };

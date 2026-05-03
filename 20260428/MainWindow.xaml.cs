@@ -50,8 +50,9 @@ namespace _20260428
             {
                 X = 100,
                 Y = 100,
-                //Points = [new Point(50,0), new Point(100, 00)],
-                Points = [new Point(-50, 0), new Point(100, 00)],
+                Points = [new Point(50, 0), new Point(100, 00), new Point(50, 100)],
+                //Points = [new Point(50, 0), new Point(100, 00)],
+                //Points = [new Point(-50, 0), new Point(100, 00)],
                 //Points = [new Point(), new Point(100, 00)],
                 Stroke = Brushes.Crimson,
                 StrokeThickness = 50,
@@ -95,7 +96,14 @@ namespace _20260428
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
+            if(MyData.ClickedItemData is GeoLineData data)
+            {
+                //data.IsVertexHandle = !data.IsVertexHandle;
+                data.Points.Add(new Point(150, 50));
+            }
             //var bounds = MyTest.GetRenderBoundsWithPen();
+            //MyTest.IsVertexHandle = !MyTest.IsVertexHandle;
+
 
             //MyLine.VertexTopLeftZeroFix();
 
