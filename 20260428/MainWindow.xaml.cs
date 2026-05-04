@@ -23,8 +23,9 @@ namespace _20260428
             InitializeComponent();
 
             MyData = CreateData();
-
             DataContext = this;
+
+          
         }
 
 
@@ -50,8 +51,8 @@ namespace _20260428
             {
                 X = 100,
                 Y = 100,
-                Points = [new Point(50, 0), new Point(100, 00), new Point(50, 100)],
-                //Points = [new Point(50, 0), new Point(100, 00)],
+                //Points = [new Point(50, 0), new Point(100, 00), new Point(50, 100)],
+                Points = [new Point(50, 0), new Point(100, 00)],
                 //Points = [new Point(-50, 0), new Point(100, 00)],
                 //Points = [new Point(), new Point(100, 00)],
                 Stroke = Brushes.Crimson,
@@ -99,7 +100,7 @@ namespace _20260428
             if(MyData.ClickedItemData is GeoLineData data)
             {
                 //data.IsVertexHandle = !data.IsVertexHandle;
-                data.Points.Add(new Point(150, 50));
+                data.Points.Add(new Point(100, 100));
                 //data.StrokeStartLineCap = PenLineCap.Round;
             }
             //var bounds = MyTest.GetRenderBoundsWithPen();

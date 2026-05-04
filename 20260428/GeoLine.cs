@@ -44,18 +44,19 @@ namespace _20260428
             // 基底クラスのMyStrokePenプロパティ変更時に実行するコールバックへの設定
             MyStrokePenProperty.OverrideMetadata(typeof(GeoLineEXforData), new PropertyMetadata(null, OnMyStrokePenChanged));
 
+            // これだと起動途中に無言で落ちる
             //MyPointsProperty.OverrideMetadata(typeof(GeoLineEXforData), new PropertyMetadata(null, OnMyPointsPropertyChanged));
         }
 
-        //private static void OnMyPointsPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        //{
-        //    if (d is GeoLineEXforData geo)
-        //    {
-        //        var n = e.NewValue;
-        //        var o = e.OldValue;
-        //        geo.PointsTopLeftZeroFixWithOffset();
-        //    }
-        //}
+        private static void OnMyPointsPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            if (d is GeoLineEXforData geo)
+            {
+                var n = e.NewValue;
+                var o = e.OldValue;
+                geo.PointsTopLeftZeroFixWithOffset();
+            }
+        }
 
 
         #region プロパティ
@@ -101,11 +102,19 @@ namespace _20260428
             DependencyProperty.Register(nameof(MyData), typeof(GeoLineData), typeof(GeoLineEXforData), new PropertyMetadata(null));
         #endregion プロパティ
 
-        public override void PointCollection_Changed(object? sender, EventArgs e)
-        {
-            base.PointCollection_Changed(sender, e);
-            PointsTopLeftZeroFixWithOffset();
-        }
+        //public override void PointCollection_Changed(object? sender, EventArgs e)
+        //{
+        //    //base.PointCollection_Changed(sender, e);
+
+        //    //PointsTopLeftZeroFixWithOffset();
+        //}
+
+        //protected override void OnRender(DrawingContext drawingContext)
+        //{
+        //    base.OnRender(drawingContext);
+        //    //if(MyData is null) { return; }
+        //    //UpdateVertexHandles(); // これだとハンドル移動ができなくなる
+        //}
 
         /// <summary>
         /// Points全体を左上(0,0)に寄せる + 図形のOffset + 図形のサイズ更新 + ハンドルの位置調整
@@ -143,6 +152,8 @@ namespace _20260428
         // Points全座標のオフセット
         public static void PointsOffset(PointCollection points, double offsetX, double offsetY)
         {
+            if(points is null) { return; }
+
             // 全座標変換
             for (int i = 0; i < points.Count; i++)
             {
@@ -156,11 +167,12 @@ namespace _20260428
         #region パブリックメソッド
         // 頂点ハンドルの更新
         // 頂点の追加や削除時に使う
-        //public new void UpdateVertexHandles()
-        //{
-        //    //base.UpdateVertexHandles();
-        //    if (IsVertexHandle) { MyVertexAdorner?.UpdateHandles(); }
-        //}
+        public new void UpdateVertexHandles()
+        {
+            if (IsVertexHandle) { MyVertexAdorner?.UpdateHandles(); }
+            PointsTopLeftZeroFixWithOffset();
+
+        }
 
         // 頂点ハンドル表示(再作成)
         public override void ShowVertexAdorner()
@@ -504,7 +516,7 @@ namespace _20260428
             DependencyProperty.Register(nameof(MyPoints), typeof(PointCollection), typeof(GeoLine), new FrameworkPropertyMetadata(null, OnPointCollectionChanged));
 
         private static void OnPointCollectionChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
+        {  
             if (d is GeoLine geo)
             {
                 // 古いCollectionのイベント購読を解除(メモリリーク防止)
@@ -518,7 +530,6 @@ namespace _20260428
                 {
                     newCollection.Changed += geo.PointCollection_Changed;
                 }
-
             }
         }
 
@@ -542,74 +553,18 @@ namespace _20260428
         #region コンストラクタ
         public GeoLine()
         {
-            //SetMyBind();
-            Loaded += GeoLine_Loaded;
+
         }
 
-        private void GeoLine_Loaded(object sender, RoutedEventArgs e)
-        {
-            //UpdateSurfaceBounds(); // Surface(見た目上の位置とサイズ)の更新
-        }
-
-        //private void SetMyBind()
-        //{
-        //    MultiBinding mb = new() { Converter = new ConvStrokePen() };
-        //    mb.Bindings.Add(new Binding() { Source = this, Path = new PropertyPath(StrokeThicknessProperty) });
-        //    mb.Bindings.Add(new Binding() { Source = this, Path = new PropertyPath(StrokeMiterLimitProperty) });
-        //    mb.Bindings.Add(new Binding() { Source = this, Path = new PropertyPath(StrokeEndLineCapProperty) });
-        //    mb.Bindings.Add(new Binding() { Source = this, Path = new PropertyPath(StrokeStartLineCapProperty) });
-        //    mb.Bindings.Add(new Binding() { Source = this, Path = new PropertyPath(StrokeLineJoinProperty) });
-        //    SetBinding(MyStrokePenProperty, mb);
-        //}
 
         #endregion コンストラクタ
 
         #region publicメソッド
-
-        //public event EventHandler<Rect>? MyUpdateSurfaceBounds;
-        //// Surface(見た目上の位置とサイズ)の更新
-        //public void UpdateSurfaceBounds()
-        //{            
-        //    var bounds = GetRenderBounds();
-        //    if(bounds == Rect.Empty) { return; }
-
-        //    MySurfaceHeight = bounds.Height;
-        //    MySurfaceLeft = bounds.Left;
-        //    MySurfaceTop = bounds.Top;
-        //    MySurfaceWidth = bounds.Width;
-        //    //MyOffsetLeft = bounds.Left;
-        //    //MyOffsetTop = bounds.Top;
-        //    MyUpdateSurfaceBounds?.Invoke(this, bounds);// 通知
-        //}
-
-        //// 図形がピッタリ収まるRectを返す
-        //// 図形の見た目上の位置とサイズのRectを返す
-        //public Rect GetSurfaceBounds()
-        //{
-        //    var bounds = GetRenderBounds();
-        //    if(bounds == Rect.Empty) { return bounds; }
-        //    var left = Canvas.GetLeft(this);
-        //    if (double.IsNaN(left)) { left = 0; }
-        //    var top = Canvas.GetTop(this);
-        //    if (double.IsNaN(top)) { top = 0; }
-        //    Rect surface = new(left + bounds.Left, top + bounds.Top, bounds.Width, bounds.Height);
-        //    return surface;
-        //}
-
-        //// 図形がピッタリ収まるRectを返す
-        //// 内部的な計算なので見た目とは位置が異なる
-        //public Rect GetRenderBounds()
-        //{
-        //    if (_cachedGeometry is null || _cachedGeometry == Geometry.Empty)
-        //    {
-        //        return Rect.Empty;
-        //    }
-        //    else
-        //    {
-        //        return _cachedGeometry.GetRenderBounds(MyStrokePen);
-        //    }
-        //}
-
+        public void Test()
+        {
+            TranslateTransform tt = new(100, 100);
+            DefiningGeometry.Transform = tt;
+        }
         #endregion publicメソッド
 
 

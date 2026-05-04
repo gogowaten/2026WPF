@@ -47,7 +47,7 @@ namespace _20260428
             {
                 if (MyContent is GeoLineEXforData ex)
                 {
-                    //ex.PointsTopLeftZeroFixWithOffset();
+                    ex.PointsTopLeftZeroFixWithOffset();
                 }
             };
             menu.Items.Add(item);
@@ -57,14 +57,16 @@ namespace _20260428
             {
                 if (MyContent is GeoLineEXforData ex)
                 {
-                    //ex.TestRenderBounds();
-                    
+                    ex.UpdateVertexHandles();
                 }
             };
             menu.Items.Add(item);
+
+
+            
         }
 
-      
+    
 
         private void CustomThumb_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
