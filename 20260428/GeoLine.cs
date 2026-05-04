@@ -1,7 +1,9 @@
 ﻿using Microsoft.VisualBasic;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
+using System.Reflection;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
@@ -18,6 +20,7 @@ namespace _20260428
     public class GeoLineEXforData : GeoLineEX
     {
         //private new VertexAdornerForData? MyVertexAdorner;
+        private Rect MyGeometryRenderBoundsWithPen;
 
         public GeoLineEXforData()
         {
@@ -102,11 +105,12 @@ namespace _20260428
             DependencyProperty.Register(nameof(MyData), typeof(GeoLineData), typeof(GeoLineEXforData), new PropertyMetadata(null));
         #endregion プロパティ
 
+        // これも無限ループになる
         //public override void PointCollection_Changed(object? sender, EventArgs e)
         //{
-        //    //base.PointCollection_Changed(sender, e);
+        //    base.PointCollection_Changed(sender, e);
 
-        //    //PointsTopLeftZeroFixWithOffset();
+        //    PointsTopLeftZeroFixWithOffset();
         //}
 
         //protected override void OnRender(DrawingContext drawingContext)
@@ -117,7 +121,7 @@ namespace _20260428
         //}
 
         /// <summary>
-        /// Points全体を左上(0,0)に寄せる + 図形のOffset + 図形のサイズ更新 + ハンドルの位置調整
+        /// Points全体を左上(0,0)に寄せる + 図形DataのBoundsの更新 + ハンドルの位置調整
         /// </summary>
         /// <remarks>
         /// 使用先：ハンドル移動後の処理、pen更新時
@@ -150,7 +154,7 @@ namespace _20260428
 
 
         // Points全座標のオフセット
-        public static void PointsOffset(PointCollection points, double offsetX, double offsetY)
+        public void PointsOffset(PointCollection points, double offsetX, double offsetY)
         {
             if(points is null) { return; }
 
@@ -160,6 +164,14 @@ namespace _20260428
                 var p = points[i];
                 points[i] = new Point(p.X + offsetX, p.Y + offsetY);
             }
+
+            //var poi = new PointCollection();
+            //for (int i = 0; i < points.Count; i++)
+            //{
+            //    var p = points[i];
+            //    poi.Add(new Point(p.X + offsetX, p.Y + offsetY));
+            //}
+            //MyPoints = poi;
         }
 
 
@@ -340,15 +352,6 @@ namespace _20260428
 
         #region 依存関係プロパティ
 
-        //// 表示位置の調整、trueでCanvasLeftやTopに合わせる。falseは調整なし
-        //public bool IsReverseOffsetDraw
-        //{
-        //    get { return (bool)GetValue(IsReverseOffsetDrawProperty); }
-        //    set { SetValue(IsReverseOffsetDrawProperty, value); }
-        //}
-        //public static readonly DependencyProperty IsReverseOffsetDrawProperty =
-        //    DependencyProperty.Register(nameof(IsReverseOffsetDraw), typeof(bool), typeof(GeoLineBG), new PropertyMetadata(false));
-
         // 背景色
         public Brush Background
         {
@@ -366,6 +369,7 @@ namespace _20260428
         }
         public static readonly DependencyProperty IsBackgroundDrawProperty =
             DependencyProperty.Register(nameof(IsBackgroundDraw), typeof(bool), typeof(GeoLineBG), new FrameworkPropertyMetadata(true, FrameworkPropertyMetadataOptions.AffectsRender));
+
         // penだけど、指定はしない読み取り専用
         public Pen MyStrokePen
         {
@@ -407,6 +411,7 @@ namespace _20260428
             }
             base.OnRender(drawingContext);
         }
+
     }
 
 
@@ -423,9 +428,6 @@ namespace _20260428
         {
             get
             {
-                //#if DEBUG
-                //                Debug.WriteLine($"{MethodBase.GetCurrentMethod()?.ReflectedType?.Name}__{MethodBase.GetCurrentMethod()?.Name}");
-                //#endif
 
                 // キャッシュが在ればそれを返して終わる
                 if (_cachedGeometry is not null)
@@ -438,6 +440,11 @@ namespace _20260428
                     _cachedGeometry = null;
                     return Geometry.Empty;
                 }
+//#if DEBUG
+                
+//                Debug.WriteLine($"{MethodBase.GetCurrentMethod()?.ReflectedType?.Name}__{MethodBase.GetCurrentMethod()?.Name}");
+                
+//#endif
 
                 PathGeometry geo = MakeLineGeometry(MyPoints);
                 _cachedGeometry = geo;
@@ -535,6 +542,12 @@ namespace _20260428
 
         public virtual void PointCollection_Changed(object? sender, EventArgs e)
         {
+#if DEBUG
+
+            Debug.WriteLine($"{MethodBase.GetCurrentMethod()?.ReflectedType?.Name}__{MethodBase.GetCurrentMethod()?.Name}");
+
+#endif
+
             // キャッシュクリアしてから再描画
             _cachedGeometry = null;
             InvalidateVisual(); // 再描画？これだけでは不足、サイズが更新されない、図形によっては再描画にならない

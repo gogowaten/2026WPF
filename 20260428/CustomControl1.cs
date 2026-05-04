@@ -31,6 +31,8 @@ namespace _20260428
         //// 移動開始時にCtrlキーが押されていたフラグ
         //private bool isDragStartWithPressedCtrl;
 
+        public Point migikurikkuiti;
+
         static CustomThumb()
         {
             DefaultStyleKeyProperty.OverrideMetadata(typeof(CustomThumb), new FrameworkPropertyMetadata(typeof(CustomThumb)));
@@ -39,6 +41,7 @@ namespace _20260428
         {
             DragDelta += CustomThumb_DragDelta;
             PreviewMouseLeftButtonDown += CustomThumb_PreviewMouseLeftButtonDown;
+            MouseRightButtonDown += (s, e) => { migikurikkuiti = e.GetPosition(this); };
 
             // テスト用右クリックメニュー、図形のOffsetテスト
             ContextMenu menu = new();
@@ -52,12 +55,27 @@ namespace _20260428
             };
             menu.Items.Add(item);
             this.ContextMenu = menu;
+
             item = new() { Header = "test" };
             item.Click += (s, e) =>
             {
                 if (MyContent is GeoLineEXforData ex)
                 {
                     ex.UpdateVertexHandles();
+                }
+            };
+            menu.Items.Add(item);
+
+
+            item = new() { Header = "testAdd" };
+            item.Click += (s, e) =>
+            {
+                if (MyContent is GeoLineEXforData ex)
+                {
+                    var pfs = menu.PointFromScreen(new Point());
+                    var pts = menu.PointToScreen(new Point());
+                    MessageBox.Show($"{migikurikkuiti}");
+                    ex.MyPoints.Add(migikurikkuiti);
                 }
             };
             menu.Items.Add(item);
