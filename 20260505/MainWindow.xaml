@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:_20260505"
+        xmlns:local="clr-namespace:_20260505" d:DataContext="{d:DesignInstance Type=local:MainWindow}"
         mc:Ignorable="d"
         Title="MainWindow" Height="367" Width="654">
   <Grid>
@@ -12,12 +12,33 @@
       <ColumnDefinition Width="200"/>
     </Grid.ColumnDefinitions>
 
+    <ScrollViewer HorizontalScrollBarVisibility="Auto"
+                  VerticalScrollBarVisibility="Auto"
+                  HorizontalAlignment="Left"
+                  VerticalAlignment="Top">
+      <local:RootItemsControl x:Name="MyRootItems"
+                              UseLayoutRounding="True"
+                              MyData="{Binding MyData}"/>
+
+    </ScrollViewer>
+    
     <Canvas x:Name="MyCanvas">
       
     </Canvas>
 
     <StackPanel Grid.Column="1">
       <Button Content="addpoint" Click="Button_Click"/>
+      <Button x:Name="background" Content="background" Click="background_Click"/>
+      <GroupBox Header="currentItemData" DataContext="{Binding MyData.ClickedItemData}">
+        <StackPanel>
+          <TextBlock Text="{Binding StringFormat=' {0: 0; -0; 0}'}"/>
+          <TextBlock Text="{Binding Width, StringFormat='Width = {0: 0; -0; 0}'}"/>
+          <TextBlock Text="{Binding Points, StringFormat='Points = {0: 0; -0; 0}'}"/>
+          
+          <TextBlock Text="{Binding StrokeThickness, StringFormat='StrokeThickness = {0: 0; -0; 0}'}"/>
+          <Slider Value="{Binding StrokeThickness}" Minimum="1" Maximum="50"/>
+        </StackPanel>
+      </GroupBox>
     </StackPanel>
   </Grid>
 </Window>
