@@ -19,6 +19,7 @@ namespace _20260505
         public GeoLineEX()
         {
             SetMyBind();
+            Loaded += GeoLineEX_Loaded;
         }
 
         #region 初期化
@@ -32,10 +33,16 @@ namespace _20260505
             mb.Bindings.Add(new Binding() { Source = this, Path = new PropertyPath(StrokeLineJoinProperty) });
             SetBinding(MyStrokePenProperty, mb);
         }
+
+
+        private void GeoLineEX_Loaded(object sender, RoutedEventArgs e)
+        {
+            ReplaceAllPointsToBoundsZero();
+        }
         #endregion 初期化
 
         #region 依存関係プロパティ
-        
+
 
         public GeoLineData MyData
         {
@@ -108,19 +115,6 @@ namespace _20260505
         }
         public static readonly DependencyProperty MyBackgroundProperty =
             DependencyProperty.Register(nameof(MyBackground), typeof(Brush), typeof(GeoLineEX), new PropertyMetadata(Brushes.Gray));
-
-        public Pen MyStrokePen
-        {
-            get { return (Pen)GetValue(MyStrokePenProperty); }
-            set { SetValue(MyStrokePenProperty, value); }
-        }
-        public static readonly DependencyProperty MyStrokePenProperty =
-            DependencyProperty.Register(nameof(MyStrokePen), typeof(Pen), typeof(GeoLineEX), new PropertyMetadata(null));
-
-
-        #endregion 依存関係プロパティ
-
-
         public Rect MyRenderBounds
         {
             get { return (Rect)GetValue(MyRenderBoundsProperty); }
@@ -129,8 +123,51 @@ namespace _20260505
         public static readonly DependencyProperty MyRenderBoundsProperty =
             DependencyProperty.Register(nameof(MyRenderBounds), typeof(Rect), typeof(GeoLineEX), new PropertyMetadata(Rect.Empty));
 
+
+        #endregion 依存関係プロパティ
+
+        public Pen MyStrokePen
+        {
+            get { return (Pen)GetValue(MyStrokePenProperty); }
+            set { SetValue(MyStrokePenProperty, value); }
+        }
+        public static readonly DependencyProperty MyStrokePenProperty =
+            DependencyProperty.Register(nameof(MyStrokePen), typeof(Pen), typeof(GeoLineEX), new PropertyMetadata(null, OnMyStrokePenChanged));
+
+        private static void OnMyStrokePenChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            if (d is GeoLineEX geo)
+            {
+                geo.ReplaceAllPointsToBoundsZero();
+            }
+        }
+
+        /// <summary>
+        /// すべてのポイントをゼロ基点に置き換える
+        /// </summary>
+        /// <remarks>
+        /// 使用先：今のところStrokePenの更新時だけ
+        /// 描画BoundsのXYが0になるように、Pointsを置き換える
+        /// 再描画を1回で済ませるためにPointsを新たに作成して、それと入れ替える
+        /// </remarks>
+        public void ReplaceAllPointsToBoundsZero()
+        {
+            if (MyPoints is null) { return; }
+            
+            var bounds = GetRenderBoundsWithPen();
+            if (Math.Abs(bounds.X + bounds.Y) < 0.01) { return; }
+
+            var ps = new ObservableCollection<Point>();
+            foreach (Point item in MyPoints)
+            {
+                ps.Add(new Point(item.X - bounds.X, item.Y - bounds.Y));
+            }
+            MyPoints = ps;
+        }
+
+
         #region パブリックメソッド
-        
+
         // 図形がピッタリ収まるRectを返す
         // 内部的な計算なので見た目とは位置が異なる
         public Rect GetRenderBoundsWithPen()
@@ -164,6 +201,9 @@ namespace _20260505
             }
             base.OnRender(drawingContext);
         }
+
+
+
     }
 
 
@@ -201,6 +241,8 @@ namespace _20260505
             }
         }
 
+        #region 初期化
+
         public GeoLine()
         {
 
@@ -211,6 +253,7 @@ namespace _20260505
         {
             MyPoints.CollectionChanged += MyPoints_CollectionChanged;
         }
+        #endregion 初期化
 
         private void MyPoints_CollectionChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
@@ -220,7 +263,16 @@ namespace _20260505
                 InvalidateVisual(); // 必要、描画更新
                 InvalidateMeasure(); // サイズ更新が不必要なら要らない、ActualWidth、ActualHeight
             }
+
+            if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Replace)
+            {
+                _cachedGeometry = null; // Invalidateとの順番はどちらでも良いみたい？
+                InvalidateVisual(); // 必要、描画更新
+                InvalidateMeasure(); // サイズ更新が不必要なら要らない、ActualWidth、ActualHeight
+            }
+
         }
+
 
         #region 依存関係プロパティ
 
@@ -231,10 +283,25 @@ namespace _20260505
             set { SetValue(MyPointsProperty, value); }
         }
         public static readonly DependencyProperty MyPointsProperty =
-            DependencyProperty.Register(nameof(MyPoints), typeof(ObservableCollection<Point>), typeof(GeoLine), new PropertyMetadata(null));
+            DependencyProperty.Register(nameof(MyPoints), typeof(ObservableCollection<Point>), typeof(GeoLine), new PropertyMetadata(null, OnMyPointsChanged));
+
+        private static void OnMyPointsChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            if (d is GeoLineEX geo)
+            {
+                geo.MyUpdateVisual();
+            }
+        }
 
         #endregion 依存関係プロパティ
 
+
+        public void MyUpdateVisual()
+        {
+            _cachedGeometry = null; // Invalidateとの順番はどちらでも良いみたい？
+            InvalidateVisual(); // 必要、描画更新
+            InvalidateMeasure(); // サイズ更新が不必要なら要らない、ActualWidth、ActualHeight
+        }
 
 
         /// <summary>

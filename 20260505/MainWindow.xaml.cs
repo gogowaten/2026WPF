@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Collections.ObjectModel;
+using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -122,7 +123,33 @@ namespace _20260505
 
         private void background_Click(object sender, RoutedEventArgs e)
         {
-            
+
+        }
+
+        private void check_Click(object sender, RoutedEventArgs e)
+        {
+            if (MyData.ClickedItemData is GeoLineData data)
+            {
+                var ps = data.Points;
+                var bo = data.Bounds;
+                if (Math.Abs(bo.X + bo.Y) < 0.01) { return; }
+
+                var op = new ObservableCollection<Point>();
+                foreach (Point item in ps)
+                {
+                    op.Add(new Point(item.X - bo.X, item.Y - bo.Y));
+                }
+                data.Points = op;
+              
+            }
+        }
+
+        private void vertexhandle_Click(object sender, RoutedEventArgs e)
+        {
+            if (MyData.ClickedItemData is GeoLineData data)
+            {
+                data.IsVertexHandle = !data.IsVertexHandle;
+            }
         }
     }
 }

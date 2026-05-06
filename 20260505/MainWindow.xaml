@@ -29,14 +29,21 @@
     <StackPanel Grid.Column="1">
       <Button Content="addpoint" Click="Button_Click"/>
       <Button x:Name="background" Content="background" Click="background_Click"/>
-      <GroupBox Header="currentItemData" DataContext="{Binding MyData.ClickedItemData}">
+      <Button x:Name="check" Content="check" Click="check_Click"/>
+      <Button x:Name="vertexhandle" Content="vertexHandle" Click="vertexhandle_Click"/>
+      
+      <GroupBox Header="ClickedItemData" DataContext="{Binding MyData.ClickedItemData}">
         <StackPanel>
           <TextBlock Text="{Binding StringFormat=' {0: 0; -0; 0}'}"/>
           <TextBlock Text="{Binding Width, StringFormat='Width = {0: 0; -0; 0}'}"/>
           <TextBlock Text="{Binding Points, StringFormat='Points = {0: 0; -0; 0}'}"/>
+          <TextBlock Text="{Binding X, StringFormat='X = {0: 0; -0; 0}'}"/>
+          <TextBlock Text="{Binding Y, StringFormat='Y = {0: 0; -0; 0}'}"/>
+          <TextBlock Text="{Binding Z, StringFormat='Z = {0: 0; -0; 0}'}"/>
           
           <TextBlock Text="{Binding StrokeThickness, StringFormat='StrokeThickness = {0: 0; -0; 0}'}"/>
-          <Slider Value="{Binding StrokeThickness}" Minimum="1" Maximum="50"/>
+          <Slider Value="{Binding StrokeThickness}" Minimum="1" Maximum="50"
+                  SmallChange="10" LargeChange="10"/>
         </StackPanel>
       </GroupBox>
     </StackPanel>

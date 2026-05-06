@@ -86,6 +86,7 @@ namespace _20260505
         private void CustomThumb_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             MyData.RootData?.ClickedItemData = MyData;
+            MyData.RootData?.MyClickedItem = this;
         }
 
         private void CustomThumb_DragDelta(object sender, DragDeltaEventArgs e)

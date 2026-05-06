@@ -27,6 +27,7 @@ namespace _20260505
         //[NotifyCanExecuteChangedFor(nameof(ZUpCommand))]
         //[NotifyCanExecuteChangedFor(nameof(ZtoTopCommand))]
         [ObservableProperty] private GroupData? _editingGroupData;
+        public CustomThumb MyClickedItem { get; set; }
 
 
 
@@ -49,7 +50,7 @@ namespace _20260505
         #region On～プロパティの変更時
 
         //// クリックItem
-        //partial void OnClickedItemChanged(Data? oldValue, Data? newValue)
+        //partial void OnClickedItemDataChanged(Data? oldValue, Data? newValue)
         //{
         //    if (oldValue is not null)
         //    {
@@ -799,7 +800,7 @@ namespace _20260505
 
         //[ObservableProperty] private bool _isCanDragMove;
 
-        [ObservableProperty] private bool _isVisibleVertexHandles;
+        //[ObservableProperty] private bool _isVisibleVertexHandles;
 
         //[ObservableProperty] private double _vertexHandleSize = 50.0; // これはアプリ全体の設定に移動させたほうが良い？
         //[ObservableProperty] private Brush _vertexHandleFillBrush; // これはアプリ全体の設定に移動させたほうが良い？
