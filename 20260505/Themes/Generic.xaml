@@ -36,13 +36,7 @@
                        Width="{Binding Bounds.Width}"
                        Height="{Binding Bounds.Height}"
                         />
-                       <!--MyIsBackgroundDraw="True"-->
-                       <!--Width="{Binding Width}"
-                       Height="{Binding Height}"-->
-      <!--MySurfaceWidth="{Binding Width, Mode=OneWayToSource}"
-                               MySurfaceHeight="{Binding Height, Mode=OneWayToSource}"-->
-      <!--MyOffsetLeft="{Binding OffsetX}"
-                               MyOffsetTop="{Binding OffsetY}"-->
+                       
     </local:CustomThumb>
   </DataTemplate>
 

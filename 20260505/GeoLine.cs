@@ -7,15 +7,23 @@ using System.Globalization;
 using System.Reflection;
 using System.Text;
 using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Data;
+using System.Windows.Documents;
+using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Shapes;
 
 namespace _20260505
 {
-
+    /// <summary>
+    /// 頂点ハンドル付き
+    /// </summary>
     public class GeoLineEX : GeoLine
     {
+        private VertexAdorner? MyVertexAdorner; // 頂点ハンドル用のAdorner
+        private AdornerLayer MyAdornerLayer = null!; // AdornerLayer保持
         public GeoLineEX()
         {
             SetMyBind();
@@ -38,7 +46,20 @@ namespace _20260505
         private void GeoLineEX_Loaded(object sender, RoutedEventArgs e)
         {
             ReplaceAllPointsToBoundsZero();
+            if(AdornerLayer.GetAdornerLayer(this) is AdornerLayer layer)
+            {
+                MyAdornerLayer = layer;
+                if (IsVertexHandle)
+                {
+                    ShowVertexAdorner();
+                }
+            }
+            else
+            {
+                throw new InvalidOperationException("AdornerLayerが見つからなかった");
+            }
         }
+
         #endregion 初期化
 
         #region 依存関係プロパティ
@@ -124,8 +145,6 @@ namespace _20260505
             DependencyProperty.Register(nameof(MyRenderBounds), typeof(Rect), typeof(GeoLineEX), new PropertyMetadata(Rect.Empty));
 
 
-        #endregion 依存関係プロパティ
-
         public Pen MyStrokePen
         {
             get { return (Pen)GetValue(MyStrokePenProperty); }
@@ -141,6 +160,48 @@ namespace _20260505
                 geo.ReplaceAllPointsToBoundsZero();
             }
         }
+
+        #endregion 依存関係プロパティ
+
+
+
+        #region 頂点ハンドル
+
+        // 頂点ハンドルの更新
+        // 頂点の追加や削除時に使う
+        public virtual void UpdateVertexHandles()
+        {
+            if (IsVertexHandle)
+            {
+                MyVertexAdorner?.UpdateHandles();
+            }
+        }
+
+
+        // 頂点ハンドル表示
+        public virtual void ShowVertexAdorner()
+        {
+            // 頂点ハンドルを一旦削除
+            HideVertexAdorner();
+
+            // 新規作成追加
+            MyVertexAdorner = new VertexAdorner(this);
+            MyAdornerLayer.Add(MyVertexAdorner);
+        }
+
+
+        // 頂点ハンドル非表示(削除)
+        public virtual void HideVertexAdorner()
+        {
+            if (MyVertexAdorner is not null)
+            {
+                MyAdornerLayer.Remove(MyVertexAdorner);
+                MyVertexAdorner = null;
+            }
+        }
+        #endregion 頂点ハンドル
+
+        #region パブリックメソッド
 
         /// <summary>
         /// すべてのポイントをゼロ基点に置き換える
@@ -166,7 +227,6 @@ namespace _20260505
         }
 
 
-        #region パブリックメソッド
 
         // 図形がピッタリ収まるRectを返す
         // 内部的な計算なので見た目とは位置が異なる
@@ -355,6 +415,173 @@ namespace _20260505
 
 
 
+
+    // 頂点ハンドルのアドーナー、GeoLineEX専用
+    public class VertexAdorner : Adorner
+    {
+        protected override int VisualChildrenCount => _visuals.Count;
+        protected override Visual GetVisualChild(int index) => _visuals[index];
+
+        private readonly VisualCollection _visuals;
+        private readonly GeoLineEX _adornedElement;
+        internal readonly Canvas MyCanvas;
+        private double MyHandleSizeHalfOffset;
+        private readonly ObservableCollection<Point> MyGeoPoints;
+
+        public VertexAdorner(GeoLineEX adornedElement) : base(adornedElement)
+        {
+            _adornedElement = adornedElement;
+            _visuals = new(this);
+            MyCanvas = new Canvas();
+            MyGeoPoints = _adornedElement.MyPoints;
+
+            MyInit();
+
+            // 頂点の数だけハンドルを作成
+            UpdateHandles();
+        }
+
+        private void MyInit()
+        {
+            this.UseLayoutRounding = true; // ドットに合わせてくっきり表示
+            _visuals.Add(MyCanvas);
+            MyHandleSizeHalfOffset = MyHandleSize / 2.0;
+            SetBinding(MyHandleSizeProperty, new Binding() { Source = _adornedElement, Path = new PropertyPath(GeoLineEX.VertexHandleSizeProperty) });
+            SetBinding(MyHandleFillBrushProperty, new Binding() { Source = _adornedElement, Path = new PropertyPath(GeoLineEX.VertexHandleFillBrushProperty) });
+        }
+
+        #region プロパティ
+
+        // 頂点ハンドル色
+        public Brush MyHandleFillBrush
+        {
+            get { return (Brush)GetValue(MyHandleFillBrushProperty); }
+            set { SetValue(MyHandleFillBrushProperty, value); }
+        }
+        public static readonly DependencyProperty MyHandleFillBrushProperty =
+            DependencyProperty.Register(nameof(MyHandleFillBrush), typeof(Brush), typeof(VertexAdorner), new PropertyMetadata(Brushes.Transparent));
+
+
+        // 頂点ハンドルサイズ
+        public double MyHandleSize
+        {
+            get { return (double)GetValue(MyHandleSizeProperty); }
+            set { SetValue(MyHandleSizeProperty, value); }
+        }
+        public static readonly DependencyProperty MyHandleSizeProperty =
+            DependencyProperty.Register(nameof(MyHandleSize), typeof(double), typeof(VertexAdorner), new PropertyMetadata(20.0, OnMyHandleSizeChanged));
+
+        private static void OnMyHandleSizeChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            if (d is VertexAdorner ador)
+            {
+                // ハンドルサイズ変更に伴う変更、オフセット、全ハンドルの座標
+                ador.MyHandleSizeHalfOffset = (double)e.NewValue / 2.0;
+
+                var points = ador.MyGeoPoints;
+                for (int i = 0; i < points.Count; i++)
+                {
+                    ador.SyncThumbPosition(i, points[i]);
+                }
+            }
+        }
+
+        #endregion プロパティ
+
+        public virtual void UpdateHandles()
+        {
+            MyCanvas.Children.Clear();
+
+            if (MyGeoPoints == null) { return; }
+
+            for (int i = 0; i < MyGeoPoints.Count; i++)
+            {
+                var thumb = new FlatHandle()
+                {
+                    Cursor = Cursors.Hand,
+                    Tag = i, // インデックスを保持
+                };
+
+                thumb.SetBinding(WidthProperty, new Binding() { Source = this, Path = new PropertyPath(MyHandleSizeProperty) });
+                thumb.SetBinding(HeightProperty, new Binding() { Source = this, Path = new PropertyPath(MyHandleSizeProperty) });
+                thumb.SetBinding(FlatHandle.MyFillBrushProperty, new Binding() { Source = this, Path = new PropertyPath(MyHandleFillBrushProperty) });
+
+
+                thumb.MyLeft = MyGeoPoints[i].X - MyHandleSizeHalfOffset;
+                thumb.MyTop = MyGeoPoints[i].Y - MyHandleSizeHalfOffset;
+
+                thumb.DragDelta += Thumb_DragDelta;
+                thumb.DragCompleted += Thumb_DragCompleted;
+
+                _ = MyCanvas.Children.Add(thumb);
+            }
+        }
+
+        #region イベント
+        // ハンドル移動終了通知用
+        public event EventHandler? MyDragCompleted;
+        #endregion   イベント
+
+        // ハンドル移動終了時に通知を出す
+        private void Thumb_DragCompleted(object sender, DragCompletedEventArgs e)
+        {
+            MyDragCompleted?.Invoke(this, e);
+        }
+
+        private void Thumb_DragDelta(object sender, DragDeltaEventArgs e)
+        {
+            if (sender is Thumb thumb && thumb.Tag is int index)
+            {
+                //var points = _adornedElement.MyPoints;
+                if (MyGeoPoints != null && index < MyGeoPoints.Count)
+                {
+                    Point p = MyGeoPoints[index];
+                    // 頂点座標を更新
+                    MyGeoPoints[index] = new Point(p.X + e.HorizontalChange, p.Y + e.VerticalChange);
+                    // ハンドル位置更新
+                    SyncThumbPosition(index, MyGeoPoints[index]);
+                }
+                e.Handled = true;
+            }
+        }
+
+        protected override Size ArrangeOverride(Size finalSize)
+        {
+            MyCanvas.Arrange(new Rect(finalSize));
+            return base.ArrangeOverride(finalSize);
+        }
+
+
+        /// <summary>
+        /// 指定したハンドルの座標を頂点に合わせる
+        /// </summary>
+        /// <param name="index"></param>
+        /// <param name="p"></param>
+        public void SyncThumbPosition(int index, Point p)
+        {
+            if (MyCanvas.Children.Count == 0) { return; }
+            if (MyCanvas.Children[index] is FlatHandle thumb)
+            {
+                thumb.MyLeft = p.X - MyHandleSizeHalfOffset;
+                thumb.MyTop = p.Y - MyHandleSizeHalfOffset;
+            }
+        }
+
+        public void SyncAllThumbPoition()
+        {
+            if (MyCanvas.Children.Count == 0) { return; }
+            foreach (FlatHandle item in MyCanvas.Children.OfType<FlatHandle>())
+            {
+                if (item.Tag is int ii)
+                {
+                    item.MyLeft = MyGeoPoints[ii].X - MyHandleSizeHalfOffset;
+                    item.MyTop = MyGeoPoints[ii].Y - MyHandleSizeHalfOffset;
+                }
+            }
+        }
+
+
+    }
 
 
 }
