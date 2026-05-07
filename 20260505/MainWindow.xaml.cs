@@ -116,7 +116,15 @@ namespace _20260505
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            MyElement.MyPoints.Add(new Point(50, 200));
+            //if(MyData.DataList[1] is GeoLineData data)
+            //{
+            //    data.Points.Add(new Point(200, 50));
+            //}
+            if(MyRootItems.MyData.MyClickedItem.MyContent is GeoLineEX geo)
+            {
+                geo.MyPoints.Add(new Point(200, 50));
+            }
+            //MyElement.MyPoints.Add(new Point(50, 200));
             //MyElement.InvalidateMeasure();
             //MyElement.InvalidateVisual();
         }
@@ -128,6 +136,9 @@ namespace _20260505
 
         private void check_Click(object sender, RoutedEventArgs e)
         {
+            var clicked = MyData.ClickedItemData;
+            var rootcliked = MyRootItems.MyData.MyClickedItem.MyData;
+            var clickeditem = MyRootItems.MyData.MyClickedItem;
             if (MyData.ClickedItemData is GeoLineData data)
             {
                 var ps = data.Points;
@@ -140,7 +151,7 @@ namespace _20260505
                     op.Add(new Point(item.X - bo.X, item.Y - bo.Y));
                 }
                 data.Points = op;
-              
+
             }
         }
 
@@ -149,6 +160,14 @@ namespace _20260505
             if (MyData.ClickedItemData is GeoLineData data)
             {
                 data.IsVertexHandle = !data.IsVertexHandle;
+            }
+        }
+
+        private void vertexHandleFix_Click(object sender, RoutedEventArgs e)
+        {
+            if(MyRootItems.MyData.MyClickedItem.MyContent is GeoLineEX ex)
+            {
+                ex.UpdateVertexHandles();
             }
         }
     }

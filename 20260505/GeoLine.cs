@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Globalization;
 using System.Reflection;
@@ -46,7 +47,7 @@ namespace _20260505
         private void GeoLineEX_Loaded(object sender, RoutedEventArgs e)
         {
             ReplaceAllPointsToBoundsZero();
-            if(AdornerLayer.GetAdornerLayer(this) is AdornerLayer layer)
+            if (AdornerLayer.GetAdornerLayer(this) is AdornerLayer layer)
             {
                 MyAdornerLayer = layer;
                 if (IsVertexHandle)
@@ -63,15 +64,6 @@ namespace _20260505
         #endregion 初期化
 
         #region 依存関係プロパティ
-
-
-        public GeoLineData MyData
-        {
-            get { return (GeoLineData)GetValue(MyDataProperty); }
-            set { SetValue(MyDataProperty, value); }
-        }
-        public static readonly DependencyProperty MyDataProperty =
-            DependencyProperty.Register(nameof(MyData), typeof(GeoLineData), typeof(GeoLineEX), new PropertyMetadata(null));
 
         // 頂点ハンドル色
 
@@ -103,18 +95,19 @@ namespace _20260505
             DependencyProperty.Register(nameof(IsVertexHandle), typeof(bool), typeof(GeoLineEX), new PropertyMetadata(false, OnIsVertexHandleChanged));
         private static void OnIsVertexHandleChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            //if (d is GeoLineEX geo && geo.MyAdornerLayer is not null)
-            //{
-            //    if ((bool)e.NewValue)
-            //    {
-            //        geo.ShowVertexAdorner();
-            //    }
-            //    else
-            //    {
-            //        geo.HideVertexAdorner();
-            //    }
-            //}
+            if (d is GeoLineEX geo && geo.MyAdornerLayer is not null)
+            {
+                if ((bool)e.NewValue)
+                {
+                    geo.ShowVertexAdorner();
+                }
+                else
+                {
+                    geo.HideVertexAdorner();
+                }
+            }
         }
+
         /// <summary>
         /// 背景色の有無
         /// </summary>
@@ -136,13 +129,14 @@ namespace _20260505
         }
         public static readonly DependencyProperty MyBackgroundProperty =
             DependencyProperty.Register(nameof(MyBackground), typeof(Brush), typeof(GeoLineEX), new PropertyMetadata(Brushes.Gray));
-        public Rect MyRenderBounds
-        {
-            get { return (Rect)GetValue(MyRenderBoundsProperty); }
-            set { SetValue(MyRenderBoundsProperty, value); }
-        }
-        public static readonly DependencyProperty MyRenderBoundsProperty =
-            DependencyProperty.Register(nameof(MyRenderBounds), typeof(Rect), typeof(GeoLineEX), new PropertyMetadata(Rect.Empty));
+
+        //public Rect MyRenderBounds
+        //{
+        //    get { return (Rect)GetValue(MyRenderBoundsProperty); }
+        //    set { SetValue(MyRenderBoundsProperty, value); }
+        //}
+        //public static readonly DependencyProperty MyRenderBoundsProperty =
+        //    DependencyProperty.Register(nameof(MyRenderBounds), typeof(Rect), typeof(GeoLineEX), new PropertyMetadata(Rect.Empty));
 
 
         public Pen MyStrokePen
@@ -161,19 +155,35 @@ namespace _20260505
             }
         }
 
-        #endregion 依存関係プロパティ
+        public double MyOffsetLeft
+        {
+            get { return (double)GetValue(MyOffsetLeftProperty); }
+            set { SetValue(MyOffsetLeftProperty, value); }
+        }
+        public static readonly DependencyProperty MyOffsetLeftProperty =
+            DependencyProperty.Register(nameof(MyOffsetLeft), typeof(double), typeof(GeoLineEX), new PropertyMetadata(0.0));
 
+        public double MyOffsetTop
+        {
+            get { return (double)GetValue(MyOffsetTopProperty); }
+            set { SetValue(MyOffsetTopProperty, value); }
+        }
+        public static readonly DependencyProperty MyOffsetTopProperty =
+            DependencyProperty.Register(nameof(MyOffsetTop), typeof(double), typeof(GeoLineEX), new PropertyMetadata(0.0));
+
+
+        #endregion 依存関係プロパティ
 
 
         #region 頂点ハンドル
 
         // 頂点ハンドルの更新
         // 頂点の追加や削除時に使う
-        public virtual void UpdateVertexHandles()
+        public void UpdateVertexHandles()
         {
             if (IsVertexHandle)
             {
-                MyVertexAdorner?.UpdateHandles();
+                MyVertexAdorner?.ReMakeAllHandles();
             }
         }
 
@@ -186,6 +196,11 @@ namespace _20260505
 
             // 新規作成追加
             MyVertexAdorner = new VertexAdorner(this);
+            //MyVertexAdorner.MyDragCompleted += (s, e) =>
+            //{
+            //    // ハンドル移動後に図形の調整
+
+            //};
             MyAdornerLayer.Add(MyVertexAdorner);
         }
 
@@ -214,17 +229,33 @@ namespace _20260505
         public void ReplaceAllPointsToBoundsZero()
         {
             if (MyPoints is null) { return; }
-            
-            var bounds = GetRenderBoundsWithPen();
-            if (Math.Abs(bounds.X + bounds.Y) < 0.01) { return; }
 
+            var bounds = GetRenderBoundsWithPen();
+            if (Math.Abs(bounds.X + bounds.Y) < 0.01)
+            {
+                if ((Math.Abs(bounds.Width - Width) +
+               Math.Abs(bounds.Height - Height)) < 0.01)
+                {
+                    return;
+                }
+            }
+
+            Width = bounds.Width;
+            Height = bounds.Height;
+
+            MyOffsetLeft += bounds.X;
+            MyOffsetTop += bounds.Y;
             var ps = new ObservableCollection<Point>();
             foreach (Point item in MyPoints)
             {
                 ps.Add(new Point(item.X - bounds.X, item.Y - bounds.Y));
             }
+
             MyPoints = ps;
+            MyVertexAdorner?.SyncAllThumbPoition();
         }
+
+
 
 
 
@@ -240,6 +271,7 @@ namespace _20260505
             {
                 return DefiningGeometry.GetRenderBounds(MyStrokePen);
             }
+
         }
 
         //// 使わない？OnRender実行になる
@@ -252,18 +284,31 @@ namespace _20260505
         // 描画、背景色
         protected override void OnRender(DrawingContext drawingContext)
         {
-            MyRenderBounds = GetRenderBoundsWithPen();
             if (MyBackground is not null)
             {
-                //var bounds = GetRenderBoundsWithPen();
-                //drawingContext.DrawRectangle(MyBackground, null, bounds);
-                drawingContext.DrawRectangle(MyBackground, null, MyRenderBounds);
+                drawingContext.DrawRectangle(MyBackground, null, GetRenderBoundsWithPen());
             }
             base.OnRender(drawingContext);
         }
 
 
-
+        internal override void MyPoints_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+        {
+            base.MyPoints_CollectionChanged(sender, e);
+            if (e.Action == NotifyCollectionChangedAction.Add)
+            {
+                if (IsVertexHandle)
+                {
+                    if (sender is ObservableCollection<Point> points && e.NewStartingIndex is int ii)
+                    {
+                        ReplaceAllPointsToBoundsZero();
+                        // 頂点ハンドルを追加
+                        MyVertexAdorner?.AddHandle(ii, points[ii]);
+                        //InvalidateVisual(); // 再描画、ここでは必要ないのは基底クラスで行っているから？
+                    }
+                }
+            }
+        }
     }
 
 
@@ -315,16 +360,17 @@ namespace _20260505
         }
         #endregion 初期化
 
-        private void MyPoints_CollectionChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        internal virtual void MyPoints_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
         {
-            if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Add)
+            if (e.Action == NotifyCollectionChangedAction.Add)
             {
                 _cachedGeometry = null; // Invalidateとの順番はどちらでも良いみたい？
                 InvalidateVisual(); // 必要、描画更新
                 InvalidateMeasure(); // サイズ更新が不必要なら要らない、ActualWidth、ActualHeight
+
             }
 
-            if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Replace)
+            if (e.Action == NotifyCollectionChangedAction.Replace)
             {
                 _cachedGeometry = null; // Invalidateとの順番はどちらでも良いみたい？
                 InvalidateVisual(); // 必要、描画更新
@@ -349,6 +395,12 @@ namespace _20260505
         {
             if (d is GeoLineEX geo)
             {
+                if (e.OldValue is ObservableCollection<Point> oldPs)
+                {
+                    oldPs.CollectionChanged -= geo.MyPoints_CollectionChanged;
+                }
+                ((ObservableCollection<Point>)e.NewValue).CollectionChanged += geo.MyPoints_CollectionChanged;
+
                 geo.MyUpdateVisual();
             }
         }
@@ -423,31 +475,50 @@ namespace _20260505
         protected override Visual GetVisualChild(int index) => _visuals[index];
 
         private readonly VisualCollection _visuals;
-        private readonly GeoLineEX _adornedElement;
+        private readonly GeoLineEX MyTargetGeoShape;
         internal readonly Canvas MyCanvas;
         private double MyHandleSizeHalfOffset;
-        private readonly ObservableCollection<Point> MyGeoPoints;
+        //private ObservableCollection<Point> MyGeoPoints;
 
         public VertexAdorner(GeoLineEX adornedElement) : base(adornedElement)
         {
-            _adornedElement = adornedElement;
+            MyTargetGeoShape = adornedElement;
             _visuals = new(this);
             MyCanvas = new Canvas();
-            MyGeoPoints = _adornedElement.MyPoints;
-
+            //MyGeoPoints = _adornedElement.MyPoints;
+            //MyTargetGeoShape.MyPoints.CollectionChanged -= MyPoints_CollectionChanged;
+            //MyTargetGeoShape.MyPoints.CollectionChanged += MyPoints_CollectionChanged;
             MyInit();
 
             // 頂点の数だけハンドルを作成
-            UpdateHandles();
+            ReMakeAllHandles();
         }
+
+        //private void MyPoints_CollectionChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        //{
+        //    if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Add)
+        //    {
+        //        if(sender is ObservableCollection<Point> points && e.NewStartingIndex is int ii)
+        //        {
+        //            MyCanvas.Children.Add(CreateHandle(ii, points[ii]));
+        //            MyTargetGeoShape.ReplaceAllPointsToBoundsZero();
+        //            MyTargetGeoShape.MyUpdateVisual();
+        //        }
+        //        var neko = e.NewItems;
+        //        var inu = e.NewStartingIndex;
+        //        var uma = e.OldItems;
+        //        var tako = e.OldStartingIndex;
+        //        //MyCanvas.Children.Add(CreateHandle())
+        //    }
+        //}
 
         private void MyInit()
         {
             this.UseLayoutRounding = true; // ドットに合わせてくっきり表示
             _visuals.Add(MyCanvas);
             MyHandleSizeHalfOffset = MyHandleSize / 2.0;
-            SetBinding(MyHandleSizeProperty, new Binding() { Source = _adornedElement, Path = new PropertyPath(GeoLineEX.VertexHandleSizeProperty) });
-            SetBinding(MyHandleFillBrushProperty, new Binding() { Source = _adornedElement, Path = new PropertyPath(GeoLineEX.VertexHandleFillBrushProperty) });
+            SetBinding(MyHandleSizeProperty, new Binding() { Source = MyTargetGeoShape, Path = new PropertyPath(GeoLineEX.VertexHandleSizeProperty) });
+            SetBinding(MyHandleFillBrushProperty, new Binding() { Source = MyTargetGeoShape, Path = new PropertyPath(GeoLineEX.VertexHandleFillBrushProperty) });
         }
 
         #region プロパティ
@@ -478,7 +549,7 @@ namespace _20260505
                 // ハンドルサイズ変更に伴う変更、オフセット、全ハンドルの座標
                 ador.MyHandleSizeHalfOffset = (double)e.NewValue / 2.0;
 
-                var points = ador.MyGeoPoints;
+                var points = ador.MyTargetGeoShape.MyPoints;
                 for (int i = 0; i < points.Count; i++)
                 {
                     ador.SyncThumbPosition(i, points[i]);
@@ -488,58 +559,77 @@ namespace _20260505
 
         #endregion プロパティ
 
-        public virtual void UpdateHandles()
+        /// <summary>
+        /// すべてのハンドルを再作成、再配置
+        /// </summary>
+        public virtual void ReMakeAllHandles()
         {
+            var points = MyTargetGeoShape.MyPoints;
+            if (points == null) { return; }
+
             MyCanvas.Children.Clear();
 
-            if (MyGeoPoints == null) { return; }
-
-            for (int i = 0; i < MyGeoPoints.Count; i++)
+            for (int i = 0; i < points.Count; i++)
             {
-                var thumb = new FlatHandle()
-                {
-                    Cursor = Cursors.Hand,
-                    Tag = i, // インデックスを保持
-                };
-
-                thumb.SetBinding(WidthProperty, new Binding() { Source = this, Path = new PropertyPath(MyHandleSizeProperty) });
-                thumb.SetBinding(HeightProperty, new Binding() { Source = this, Path = new PropertyPath(MyHandleSizeProperty) });
-                thumb.SetBinding(FlatHandle.MyFillBrushProperty, new Binding() { Source = this, Path = new PropertyPath(MyHandleFillBrushProperty) });
-
-
-                thumb.MyLeft = MyGeoPoints[i].X - MyHandleSizeHalfOffset;
-                thumb.MyTop = MyGeoPoints[i].Y - MyHandleSizeHalfOffset;
-
-                thumb.DragDelta += Thumb_DragDelta;
-                thumb.DragCompleted += Thumb_DragCompleted;
-
-                _ = MyCanvas.Children.Add(thumb);
+                _ = MyCanvas.Children.Add(CreateHandle(i, points[i]));
             }
+        }
+
+        private FlatHandle CreateHandle(int i, Point p)
+        {
+            var thumb = new FlatHandle()
+            {
+                Cursor = Cursors.Hand,
+                Tag = i, // インデックスを保持
+            };
+
+            thumb.SetBinding(WidthProperty, new Binding() { Source = this, Path = new PropertyPath(MyHandleSizeProperty) });
+            thumb.SetBinding(HeightProperty, new Binding() { Source = this, Path = new PropertyPath(MyHandleSizeProperty) });
+            thumb.SetBinding(FlatHandle.MyFillBrushProperty, new Binding() { Source = this, Path = new PropertyPath(MyHandleFillBrushProperty) });
+
+            thumb.MyLeft = p.X - MyHandleSizeHalfOffset;
+            thumb.MyTop = p.Y - MyHandleSizeHalfOffset;
+
+            thumb.DragDelta += Thumb_DragDelta;
+            thumb.DragCompleted += Thumb_DragCompleted;
+
+            return thumb;
+
+        }
+
+        public void AddHandle(int index, Point p)
+        {
+            MyCanvas.Children.Add(CreateHandle(index, p));
         }
 
         #region イベント
         // ハンドル移動終了通知用
-        public event EventHandler? MyDragCompleted;
+        //public event EventHandler? MyDragCompleted;
         #endregion   イベント
 
         // ハンドル移動終了時に通知を出す
         private void Thumb_DragCompleted(object sender, DragCompletedEventArgs e)
         {
-            MyDragCompleted?.Invoke(this, e);
+            //MyDragCompleted?.Invoke(this, e);
+
+            MyTargetGeoShape.ReplaceAllPointsToBoundsZero();
+            MyTargetGeoShape.MyUpdateVisual();
         }
 
         private void Thumb_DragDelta(object sender, DragDeltaEventArgs e)
         {
             if (sender is Thumb thumb && thumb.Tag is int index)
             {
-                //var points = _adornedElement.MyPoints;
-                if (MyGeoPoints != null && index < MyGeoPoints.Count)
+                ObservableCollection<Point> points = MyTargetGeoShape.MyPoints;
+                if (points != null && index < points.Count)
                 {
-                    Point p = MyGeoPoints[index];
+                    Point p = points[index];
+
                     // 頂点座標を更新
-                    MyGeoPoints[index] = new Point(p.X + e.HorizontalChange, p.Y + e.VerticalChange);
+                    points[index] = new Point(p.X + e.HorizontalChange, p.Y + e.VerticalChange);
+
                     // ハンドル位置更新
-                    SyncThumbPosition(index, MyGeoPoints[index]);
+                    SyncThumbPosition(index, points[index]);
                 }
                 e.Handled = true;
             }
@@ -567,6 +657,9 @@ namespace _20260505
             }
         }
 
+        /// <summary>
+        /// ハンドルの位置調整
+        /// </summary>
         public void SyncAllThumbPoition()
         {
             if (MyCanvas.Children.Count == 0) { return; }
@@ -574,14 +667,51 @@ namespace _20260505
             {
                 if (item.Tag is int ii)
                 {
-                    item.MyLeft = MyGeoPoints[ii].X - MyHandleSizeHalfOffset;
-                    item.MyTop = MyGeoPoints[ii].Y - MyHandleSizeHalfOffset;
+                    item.MyLeft = MyTargetGeoShape.MyPoints[ii].X - MyHandleSizeHalfOffset;
+                    item.MyTop = MyTargetGeoShape.MyPoints[ii].Y - MyHandleSizeHalfOffset;
                 }
             }
         }
 
 
     }
+
+
+    public class MyConvTestLeft : IMultiValueConverter
+    {
+        public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
+        {
+            var points = (ObservableCollection<Point>)values[0];
+            var index = (int)values[1];
+            var size = (double)values[2];
+            double left = points[index].X - (size / 2.0);
+            return left;
+        }
+
+        public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+
+    public class MyConvTestTop : IMultiValueConverter
+    {
+        public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
+        {
+            var points = (ObservableCollection<Point>)values[0];
+            var index = (int)values[1];
+            var size = (double)values[2];
+            double top = points[index].Y - (size / 2.0);
+            return top;
+        }
+
+        public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
 
 
 }

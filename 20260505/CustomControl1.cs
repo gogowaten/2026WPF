@@ -81,6 +81,10 @@ namespace _20260505
         private void CustomThumb_Loaded(object sender, RoutedEventArgs e)
         {
             var neko = MyData;
+            //if (MyData is GeoShapeData geo && MyContent is GeoLineEX ex)
+            //{
+            //    ex.MyPoints = geo.Points;
+            //}
         }
 
         private void CustomThumb_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)

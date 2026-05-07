@@ -21,21 +21,26 @@
 
   <DataTemplate DataType="{x:Type local:GeoLineData}">
     <local:CustomThumb>
-      <local:GeoLineEX MyData="{Binding}"
-                       MyPoints="{Binding Points}"
-                       Stroke="{Binding Stroke}"
-                       StrokeThickness="{Binding StrokeThickness}"
-                       StrokeStartLineCap="{Binding StrokeStartLineCap}"
-                       StrokeEndLineCap="{Binding StrokeEndLineCap}"
-                       StrokeLineJoin="{Binding StrokeLineJoin}"
-                       StrokeMiterLimit="{Binding StrokeMiterLimit}"
-                       MyBackground="{Binding Background}"
-                       IsVertexHandle="{Binding IsVertexHandle}"
-                       VertexHandleFillBrush="#100f"
-                       MyRenderBounds="{Binding Bounds, Mode=OneWayToSource}"
-                       Width="{Binding Bounds.Width}"
-                       Height="{Binding Bounds.Height}"
-                        />
+      <!--MyData="{Binding}"-->
+      <local:GeoLineEX 
+        MyPoints="{Binding Points, Mode=TwoWay}"
+        Stroke="{Binding Stroke}"
+        StrokeThickness="{Binding StrokeThickness}"
+        StrokeStartLineCap="{Binding StrokeStartLineCap}"
+        StrokeEndLineCap="{Binding StrokeEndLineCap}"
+        StrokeLineJoin="{Binding StrokeLineJoin}"
+        StrokeMiterLimit="{Binding StrokeMiterLimit}"
+        MyBackground="{Binding Background}"
+        IsVertexHandle="{Binding IsVertexHandle}"
+        VertexHandleFillBrush="#100f"
+        Width="{Binding Width, Mode=OneWayToSource}"
+        Height="{Binding Height, Mode=OneWayToSource}"
+        MyOffsetLeft="{Binding X, Mode=TwoWay}"
+        MyOffsetTop="{Binding Y, Mode=TwoWay}"
+        />
+        <!--MyRenderBounds="{Binding Bounds, Mode=OneWayToSource}"-->
+                       <!--Width="{Binding Bounds.Width}"
+                       Height="{Binding Bounds.Height}"-->
                        
     </local:CustomThumb>
   </DataTemplate>
