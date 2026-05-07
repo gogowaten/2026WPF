@@ -191,16 +191,11 @@ namespace _20260505
         // 頂点ハンドル表示
         public virtual void ShowVertexAdorner()
         {
-            // 頂点ハンドルを一旦削除
+            // 一旦全ハンドル削除
             HideVertexAdorner();
 
             // 新規作成追加
             MyVertexAdorner = new VertexAdorner(this);
-            //MyVertexAdorner.MyDragCompleted += (s, e) =>
-            //{
-            //    // ハンドル移動後に図形の調整
-
-            //};
             MyAdornerLayer.Add(MyVertexAdorner);
         }
 
@@ -485,32 +480,12 @@ namespace _20260505
             MyTargetGeoShape = adornedElement;
             _visuals = new(this);
             MyCanvas = new Canvas();
-            //MyGeoPoints = _adornedElement.MyPoints;
-            //MyTargetGeoShape.MyPoints.CollectionChanged -= MyPoints_CollectionChanged;
-            //MyTargetGeoShape.MyPoints.CollectionChanged += MyPoints_CollectionChanged;
             MyInit();
 
             // 頂点の数だけハンドルを作成
             ReMakeAllHandles();
         }
 
-        //private void MyPoints_CollectionChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
-        //{
-        //    if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Add)
-        //    {
-        //        if(sender is ObservableCollection<Point> points && e.NewStartingIndex is int ii)
-        //        {
-        //            MyCanvas.Children.Add(CreateHandle(ii, points[ii]));
-        //            MyTargetGeoShape.ReplaceAllPointsToBoundsZero();
-        //            MyTargetGeoShape.MyUpdateVisual();
-        //        }
-        //        var neko = e.NewItems;
-        //        var inu = e.NewStartingIndex;
-        //        var uma = e.OldItems;
-        //        var tako = e.OldStartingIndex;
-        //        //MyCanvas.Children.Add(CreateHandle())
-        //    }
-        //}
 
         private void MyInit()
         {
@@ -571,7 +546,7 @@ namespace _20260505
 
             for (int i = 0; i < points.Count; i++)
             {
-                _ = MyCanvas.Children.Add(CreateHandle(i, points[i]));
+                AddHandle(i, points[i]);
             }
         }
 

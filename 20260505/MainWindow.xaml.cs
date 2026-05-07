@@ -163,11 +163,11 @@ namespace _20260505
             }
         }
 
-        private void vertexHandleFix_Click(object sender, RoutedEventArgs e)
+        private void RemoveEndPoint_Click(object sender, RoutedEventArgs e)
         {
-            if(MyRootItems.MyData.MyClickedItem.MyContent is GeoLineEX ex)
+            if (MyData.ClickedItemData is GeoLineData data)
             {
-                ex.UpdateVertexHandles();
+                data.Points.RemoveAt(data.Points.Count - 1);
             }
         }
     }

@@ -31,7 +31,7 @@
       <Button x:Name="background" Content="background" Click="background_Click"/>
       <Button x:Name="check" Content="check" Click="check_Click"/>
       <Button x:Name="vertexhandle" Content="vertexHandle" Click="vertexhandle_Click"/>
-      <Button x:Name="vertexHandleFix" Content="VertexHandleFix" Click="vertexHandleFix_Click"/>
+      <Button x:Name="RemoveEndPoint" Content="RemoveEndPoint" Click="RemoveEndPoint_Click"/>
 
       <GroupBox Header="ClickedItemData" DataContext="{Binding MyData.ClickedItemData}">
         <StackPanel>
