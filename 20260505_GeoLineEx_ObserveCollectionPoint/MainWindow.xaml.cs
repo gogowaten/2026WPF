@@ -16,24 +16,9 @@ namespace _20260505_GeoLineEx_ObserveCollectionPoint
     /// </summary>
     public partial class MainWindow : Window
     {
-        public GeoLineEX MyShape { get; set; }
         public MainWindow()
         {
             InitializeComponent();
-            MyShape = new GeoLineEX()
-            {
-                MyPoints = [new Point(), new Point(100, 100)],
-                Stroke = Brushes.Red,
-                StrokeThickness = 20,
-                MyBackground = Brushes.Pink,
-                StrokeEndLineCap = PenLineCap.Round,
-                StrokeLineJoin = PenLineJoin.Round,
-
-            };
-            MyCanvas.Children.Add(MyShape);
-
         }
-
-       
     }
 }

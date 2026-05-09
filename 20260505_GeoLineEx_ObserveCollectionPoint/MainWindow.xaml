@@ -13,7 +13,12 @@
     </Grid.ColumnDefinitions>
 
     <Canvas x:Name="MyCanvas">
-      <local:GeoLineEX MyPoints="0,0 100,100" Stroke="Red"/>
+      <local:GeoLineEX Canvas.Left="20" Canvas.Top="20"
+                       MyPoints="0,0 100,100"
+                       Stroke="Red"
+                       StrokeThickness="20"
+                       MyBackground="Pink"
+                       StrokeEndLineCap="Round"/>
     </Canvas>
 
     <StackPanel Grid.Column="1">
