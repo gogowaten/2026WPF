@@ -41,12 +41,13 @@ namespace _20260505
             root.AddData(ellipse);
 
             EllipseData ellipseBlue = new() { Fill = Brushes.Blue, Width = 30, Height = 30 };
-            //GroupData group = new();
-            //group.AddData(ellipseBlue);
-            //group.AddData(new EllipseData() { X = 10, Y = 50, Fill = Brushes.Orange, Width = 30, Height = 30 });
-            //root.AddData(group);
+            GroupData group = new();
+            group.AddData(ellipseBlue);
+            group.AddData(new EllipseData() { X = 10, Y = 50, Fill = Brushes.Orange, Width = 30, Height = 30 });
+            root.AddData(group);
+
             //root.AddData(CreateGeoLineGroupData());
-            root.AddData(CreateGeoLineData());
+            //root.AddData(CreateGeoLineData());
             return root;
         }
 
@@ -63,7 +64,7 @@ namespace _20260505
                 //Points = [new Point(), new Point(100, 100)],
                 Stroke = Brushes.Crimson,
                 StrokeThickness = 30,
-                Background = Brushes.Pink,
+                //Background = Brushes.Pink,
                 //IsCanDragMove = true,
                 //IsVertexHandle = true,
             };
@@ -81,7 +82,7 @@ namespace _20260505
                 StrokeThickness = 20,
                 Background = Brushes.Pink,
                 //IsCanDragMove = true,
-                IsVertexHandle = true,
+                //IsVertexHandle = true,
             };
             GroupData group = new() { X = 100, Y = 100 };
             group.AddData(geo);
@@ -95,7 +96,7 @@ namespace _20260505
                 StrokeThickness = 20,
                 Background = Brushes.YellowGreen,
                 //IsCanDragMove = true,
-                IsVertexHandle = true,
+                //IsVertexHandle = true,
             };
             group.AddData(geo);
             return group;
@@ -120,7 +121,7 @@ namespace _20260505
             //{
             //    data.Points.Add(new Point(200, 50));
             //}
-            if (MyRootItems.MyData.MyClickedItem.MyContent is GeoLineEX geo)
+            if (MyRootItems.MyData.MyClickedItem?.MyContent is GeoLineEX geo)
             {
                 geo.MyPoints.Add(new Point(200, 50));
             }

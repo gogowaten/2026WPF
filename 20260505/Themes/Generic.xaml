@@ -19,6 +19,9 @@
   <!-- #endregion これは一番上に書く必要がある -->
 
 
+  
+  
+  
   <DataTemplate DataType="{x:Type local:GeoLineData}">
     <local:CustomThumb>
       <!--MyData="{Binding}"-->

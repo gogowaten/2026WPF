@@ -26,13 +26,17 @@ namespace _20260505
     {
         private VertexAdorner? MyVertexAdorner; // 頂点ハンドル用のAdorner
         private AdornerLayer MyAdornerLayer = null!; // AdornerLayer保持
-        private Point MyPointOfRightClicked;
+        private Point MyPointOfRightClicked; // 右クリックの位置記録用、頂点追加に使用
+        
 
         public GeoLineEX()
         {
             SetMyBind();
             Loaded += GeoLineEX_Loaded;
+
+            // 右クリックメニュー作成
             ContextMenu = CreateContextMenu();
+
             PreviewMouseRightButtonDown += (s, e) =>
             {
                 MyPointOfRightClicked = e.GetPosition(this);
@@ -71,13 +75,15 @@ namespace _20260505
         private void GeoLineEX_Loaded(object sender, RoutedEventArgs e)
         {
             ReplaceAllPointsToBoundsZero();
+
+            // AdornerLayer確保
             if (AdornerLayer.GetAdornerLayer(this) is AdornerLayer layer)
             {
                 MyAdornerLayer = layer;
-                if (IsVertexHandle)
-                {
-                    ShowVertexAdorner();
-                }
+                //if (IsVertexHandle)
+                //{
+                //    ShowVertexAdorner();
+                //}
             }
             else
             {
@@ -85,6 +91,7 @@ namespace _20260505
             }
         }
 
+        // 右クリックメニュー作成
         private ContextMenu CreateContextMenu()
         {
             var cm = new ContextMenu();
@@ -97,10 +104,34 @@ namespace _20260505
             item.SetBinding(IsEnabledProperty, new Binding() { Source = this, Path = new PropertyPath(IsVertexHandleProperty) });
             item.Click += (s, e) =>
             {
-
                 MyPoints.Add(MyPointOfRightClicked);
             };
             cm.Items.Add(item);
+
+            item = new MenuItem() { Header = "ここに頂点を1番目に挿入" };
+            item.SetBinding(IsEnabledProperty, new Binding() { Source = this, Path = new PropertyPath(IsVertexHandleProperty) });
+            item.Click += (s, e) =>
+            {
+                MyPoints.Insert(1, MyPointOfRightClicked);
+            };
+            cm.Items.Add(item);
+
+            item = new MenuItem() { Header = "ここに頂点を追加(先頭)" };
+            item.SetBinding(IsEnabledProperty, new Binding() { Source = this, Path = new PropertyPath(IsVertexHandleProperty) });
+            item.Click += (s, e) =>
+            {
+                MyPoints.Insert(0, MyPointOfRightClicked);
+            };
+            cm.Items.Add(item);
+
+            item = new MenuItem() { Header = "ここに頂点を追加(末尾)" };
+            item.SetBinding(IsEnabledProperty, new Binding() { Source = this, Path = new PropertyPath(IsVertexHandleProperty) });
+            item.Click += (s, e) =>
+            {
+                MyPoints.Insert(MyPoints.Count, MyPointOfRightClicked);
+            };
+            cm.Items.Add(item);
+
 
             item = new MenuItem() { Header = "編集終了" };
             item.SetBinding(IsEnabledProperty, new Binding() { Source = this, Path = new PropertyPath(IsVertexHandleProperty) }); cm.Items.Add(item);
@@ -147,26 +178,18 @@ namespace _20260505
                 if ((bool)e.NewValue)
                 {
                     geo.ShowVertexAdorner();
-                    //geo.ContextMenu = geo.CreateContextMenu();
+
+                    // 再描画、背景色nullの場合に一時的にTransparentで塗るため
+                    geo.InvalidateVisual();
                 }
                 else
                 {
                     geo.HideVertexAdorner();
-                    //geo.ContextMenu = null;
+                    geo.InvalidateVisual();
                 }
             }
         }
 
-        /// <summary>
-        /// 背景色の有無
-        /// </summary>
-        public bool MyIsBackgroundDraw
-        {
-            get { return (bool)GetValue(MyIsBackgroundDrawProperty); }
-            set { SetValue(MyIsBackgroundDrawProperty, value); }
-        }
-        public static readonly DependencyProperty MyIsBackgroundDrawProperty =
-            DependencyProperty.Register(nameof(MyIsBackgroundDraw), typeof(bool), typeof(GeoLineEX), new PropertyMetadata(false));
 
         /// <summary>
         /// 背景色
@@ -178,14 +201,6 @@ namespace _20260505
         }
         public static readonly DependencyProperty MyBackgroundProperty =
             DependencyProperty.Register(nameof(MyBackground), typeof(Brush), typeof(GeoLineEX), new PropertyMetadata(Brushes.Gray));
-
-        //public Rect MyRenderBounds
-        //{
-        //    get { return (Rect)GetValue(MyRenderBoundsProperty); }
-        //    set { SetValue(MyRenderBoundsProperty, value); }
-        //}
-        //public static readonly DependencyProperty MyRenderBoundsProperty =
-        //    DependencyProperty.Register(nameof(MyRenderBounds), typeof(Rect), typeof(GeoLineEX), new PropertyMetadata(Rect.Empty));
 
 
         public Pen MyStrokePen
@@ -364,10 +379,19 @@ namespace _20260505
         // 描画、背景色
         protected override void OnRender(DrawingContext drawingContext)
         {
+            // null & 編集中 = transparent
+            // not null & 編集中 = ブラシ
+            // not null & 通常 ブラシ
+            // null & 通常 = null
             if (MyBackground is not null)
             {
                 drawingContext.DrawRectangle(MyBackground, null, GetRenderBoundsWithPen());
             }
+            else if (IsVertexHandle && MyBackground is null)
+            {
+                drawingContext.DrawRectangle(Brushes.Transparent, null, GetRenderBoundsWithPen());
+            }
+
             base.OnRender(drawingContext);
         }
 

@@ -27,7 +27,7 @@ namespace _20260505
         //[NotifyCanExecuteChangedFor(nameof(ZUpCommand))]
         //[NotifyCanExecuteChangedFor(nameof(ZtoTopCommand))]
         [ObservableProperty] private GroupData? _editingGroupData;
-        public CustomThumb MyClickedItem { get; set; }
+        public CustomThumb? MyClickedItem { get; set; }
 
 
 
