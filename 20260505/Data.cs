@@ -741,25 +741,30 @@ namespace _20260505
         {
             double right = 0;
             double bottom = 0;
-            double mx = double.MaxValue;
-            double my = double.MaxValue;
+            double minX = double.MaxValue;
+            double minY = double.MaxValue;
             foreach (var item in group.DataList)
             {
-                mx = Math.Min(mx, item.X);
-                my = Math.Min(my, item.Y);
+                minX = Math.Min(minX, item.X);
+                minY = Math.Min(minY, item.Y);
                 right = Math.Max(right, item.X + item.Width);
                 bottom = Math.Max(bottom, item.Y + item.Height);
             }
 
             // サイズ更新
-            group.Width = right - mx; group.Height = bottom - my;
+            group.Width = right - minX; group.Height = bottom - minY;
 
             // 子要素の座標更新
-            foreach (var item in group.DataList) { item.X -= mx; item.Y -= my; }
+            foreach (var item in group.DataList) { item.X -= minX; item.Y -= minY; }
 
-            // 親要素のBounds更新
+            // 自身の座標更新
+            X += minX;
+            Y += minY;
+
+            // 親要素へ伝播
             group.ParentData?.UpdateBoundsToRoot(group.ParentData);
         }
+
         public void UpdateBoundsToRoot()
         {
             UpdateBoundsToRoot(this);

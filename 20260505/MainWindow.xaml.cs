@@ -40,13 +40,13 @@ namespace _20260505
             EllipseData ellipse = new() { X = 20, Y = 30, Fill = Brushes.Olive, Width = 30, Height = 30 };
             root.AddData(ellipse);
 
-            EllipseData ellipseBlue = new() { Fill = Brushes.Blue, Width = 30, Height = 30 };
-            GroupData group = new();
-            group.AddData(ellipseBlue);
-            group.AddData(new EllipseData() { X = 10, Y = 50, Fill = Brushes.Orange, Width = 30, Height = 30 });
-            root.AddData(group);
+            //EllipseData ellipseBlue = new() { Fill = Brushes.Blue, Width = 30, Height = 30 };
+            //GroupData group = new();
+            //group.AddData(ellipseBlue);
+            //group.AddData(new EllipseData() { X = 10, Y = 50, Fill = Brushes.Orange, Width = 30, Height = 30 });
+            //root.AddData(group);
 
-            //root.AddData(CreateGeoLineGroupData());
+            root.AddData(CreateGeoLineGroupData());
             //root.AddData(CreateGeoLineData());
             return root;
         }

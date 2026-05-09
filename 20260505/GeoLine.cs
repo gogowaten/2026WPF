@@ -41,23 +41,23 @@ namespace _20260505
             {
                 MyPointOfRightClicked = e.GetPosition(this);
             };
-            this.ContextMenuOpening += GeoLineEX_ContextMenuOpening;
+            //this.ContextMenuOpening += GeoLineEX_ContextMenuOpening;
         }
 
-        private void GeoLineEX_ContextMenuOpening(object sender, ContextMenuEventArgs e)
-        {
-            var left = e.CursorLeft;
-            var top = e.CursorTop;
-            if (sender is GeoLineEX geo)
-            {
-                var menu = geo.ContextMenu;
-                foreach (var item in menu.Items.OfType<MenuItem>())
-                {
+        //private void GeoLineEX_ContextMenuOpening(object sender, ContextMenuEventArgs e)
+        //{
+        //    var left = e.CursorLeft;
+        //    var top = e.CursorTop;
+        //    if (sender is GeoLineEX geo)
+        //    {
+        //        var menu = geo.ContextMenu;
+        //        foreach (var item in menu.Items.OfType<MenuItem>())
+        //        {
 
-                }
-            }
-            var neko = 0;
-        }
+        //        }
+        //    }
+        //    var neko = 0;
+        //}
 
         #region 初期化
         private void SetMyBind()
@@ -326,6 +326,8 @@ namespace _20260505
             if (MyPoints is null) { return; }
 
             var bounds = GetRenderBoundsWithPen();
+
+            // 誤差程度なら更新しない
             if (Math.Abs(bounds.X + bounds.Y) < 0.01)
             {
                 if ((Math.Abs(bounds.Width - Width) +
@@ -337,16 +339,19 @@ namespace _20260505
 
             Width = bounds.Width;
             Height = bounds.Height;
-
             MyOffsetLeft += bounds.X;
             MyOffsetTop += bounds.Y;
+
+            // Points更新はCollection自体を入れ替えすることで
+            // Point1つごとの更新処理を省く
             var ps = new ObservableCollection<Point>();
             foreach (Point item in MyPoints)
             {
                 ps.Add(new Point(item.X - bounds.X, item.Y - bounds.Y));
             }
+            MyPoints = ps; // Collection入れ替え
 
-            MyPoints = ps;
+            // 頂点編集時ならハンドルの位置調整
             MyVertexAdorner?.SyncAllThumbPoition();
         }
 

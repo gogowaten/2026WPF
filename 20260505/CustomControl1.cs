@@ -37,55 +37,31 @@ namespace _20260505
             PreviewMouseLeftButtonDown += CustomThumb_PreviewMouseLeftButtonDown;
             MouseRightButtonDown += (s, e) => { migikurikkuiti = e.GetPosition(this); };
             Loaded += CustomThumb_Loaded;
-            //// テスト用右クリックメニュー、図形のOffsetテスト
-            //ContextMenu menu = new();
-            //MenuItem item = new() { Header = "PointsTopLeftZeroFixWithOffset" };
-            //item.Click += (s, e) =>
-            //{
-            //    if (MyContent is GeoLineEXforData ex)
-            //    {
-            //        ex.PointsTopLeftZeroFixWithOffset();
-            //    }
-            //};
-            //menu.Items.Add(item);
-            //this.ContextMenu = menu;
+            DragCompleted += CustomThumb_DragCompleted;
+            
 
-            //item = new() { Header = "test" };
-            //item.Click += (s, e) =>
-            //{
-            //    if (MyContent is GeoLineEXforData ex)
-            //    {
-            //        ex.UpdateVertexHandles();
-            //    }
-            //};
-            //menu.Items.Add(item);
+        }
 
-
-            //item = new() { Header = "testAdd" };
-            //item.Click += (s, e) =>
-            //{
-            //    if (MyContent is GeoLineEXforData ex)
-            //    {
-            //        var pfs = menu.PointFromScreen(new Point());
-            //        var pts = menu.PointToScreen(new Point());
-            //        MessageBox.Show($"{migikurikkuiti}");
-            //        ex.MyPoints.Add(migikurikkuiti);
-            //    }
-            //};
-            //menu.Items.Add(item);
-
-
-
+        private void CustomThumb_DragCompleted(object sender, DragCompletedEventArgs e)
+        {
+            MyData?.ParentData?.UpdateBoundsToRoot();
         }
 
         private void CustomThumb_Loaded(object sender, RoutedEventArgs e)
         {
             var neko = MyData;
-            //if (MyData is GeoShapeData geo && MyContent is GeoLineEX ex)
-            //{
-            //    ex.MyPoints = geo.Points;
-            //}
+            if(MyContent is  FrameworkElement element)
+            {
+                element.SizeChanged += Element_SizeChanged;
+            }
+
         }
+
+        private void Element_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            MyData?.ParentData?.UpdateBoundsToRoot();
+        }
+
 
         private void CustomThumb_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
