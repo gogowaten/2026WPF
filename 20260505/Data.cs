@@ -752,10 +752,11 @@ namespace _20260505
             }
 
             // サイズ更新
-            group.Width = right - minX; group.Height = bottom - minY;
+            group.Width = right - minX;
+            group.Height = bottom - minY;
 
             // 子要素の座標更新
-            foreach (var item in group.DataList) { item.X -= minX; item.Y -= minY; }
+            foreach (Data item in group.DataList) { item.X -= minX; item.Y -= minY; }
 
             // 自身の座標更新
             X += minX;
