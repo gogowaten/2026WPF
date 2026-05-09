@@ -172,6 +172,8 @@ namespace _20260505
 
     public class FlatHandle : Thumb
     {
+        public int MyIndex { get; set; } // 識別用インデックス
+
         static FlatHandle()
         {
             DefaultStyleKeyProperty.OverrideMetadata(typeof(FlatHandle), new FrameworkPropertyMetadata(typeof(FlatHandle)));
@@ -180,7 +182,6 @@ namespace _20260505
         {
 
         }
-
 
         public Brush MyFillBrush
         {

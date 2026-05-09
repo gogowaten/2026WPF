@@ -5,6 +5,7 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Globalization;
+using System.Net.ServerSentEvents;
 using System.Reflection;
 using System.Text;
 using System.Windows;
@@ -25,10 +26,33 @@ namespace _20260505
     {
         private VertexAdorner? MyVertexAdorner; // 頂点ハンドル用のAdorner
         private AdornerLayer MyAdornerLayer = null!; // AdornerLayer保持
+        private Point MyPointOfRightClicked;
+
         public GeoLineEX()
         {
             SetMyBind();
             Loaded += GeoLineEX_Loaded;
+            ContextMenu = CreateContextMenu();
+            PreviewMouseRightButtonDown += (s, e) =>
+            {
+                MyPointOfRightClicked = e.GetPosition(this);
+            };
+            this.ContextMenuOpening += GeoLineEX_ContextMenuOpening;
+        }
+
+        private void GeoLineEX_ContextMenuOpening(object sender, ContextMenuEventArgs e)
+        {
+            var left = e.CursorLeft;
+            var top = e.CursorTop;
+            if (sender is GeoLineEX geo)
+            {
+                var menu = geo.ContextMenu;
+                foreach (var item in menu.Items.OfType<MenuItem>())
+                {
+
+                }
+            }
+            var neko = 0;
         }
 
         #region 初期化
@@ -59,6 +83,29 @@ namespace _20260505
             {
                 throw new InvalidOperationException("AdornerLayerが見つからなかった");
             }
+        }
+
+        private ContextMenu CreateContextMenu()
+        {
+            var cm = new ContextMenu();
+            var item = new MenuItem() { Header = "編集開始" };
+            item.SetBinding(IsEnabledProperty, new Binding() { Source = this, Path = new PropertyPath(IsVertexHandleProperty), Converter = new MyConvReverseBool() });
+            item.Click += (s, e) => { IsVertexHandle = true; };
+            cm.Items.Add(item);
+
+            item = new MenuItem() { Header = "ここに頂点を追加" };
+            item.SetBinding(IsEnabledProperty, new Binding() { Source = this, Path = new PropertyPath(IsVertexHandleProperty) });
+            item.Click += (s, e) =>
+            {
+
+                MyPoints.Add(MyPointOfRightClicked);
+            };
+            cm.Items.Add(item);
+
+            item = new MenuItem() { Header = "編集終了" };
+            item.SetBinding(IsEnabledProperty, new Binding() { Source = this, Path = new PropertyPath(IsVertexHandleProperty) }); cm.Items.Add(item);
+            item.Click += (s, e) => { IsVertexHandle = false; };
+            return cm;
         }
 
         #endregion 初期化
@@ -100,10 +147,12 @@ namespace _20260505
                 if ((bool)e.NewValue)
                 {
                     geo.ShowVertexAdorner();
+                    //geo.ContextMenu = geo.CreateContextMenu();
                 }
                 else
                 {
                     geo.HideVertexAdorner();
+                    //geo.ContextMenu = null;
                 }
             }
         }
@@ -172,6 +221,42 @@ namespace _20260505
             DependencyProperty.Register(nameof(MyOffsetTop), typeof(double), typeof(GeoLineEX), new PropertyMetadata(0.0));
 
 
+        /// <summary>
+        /// 頂点追加、削除時
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        internal override void MyPoints_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+        {
+            base.MyPoints_CollectionChanged(sender, e);
+
+            if (e.Action == NotifyCollectionChangedAction.Add)
+            {
+                if (IsVertexHandle)
+                {
+                    if (sender is ObservableCollection<Point> points && e.NewStartingIndex is int ii)
+                    {
+                        // 頂点ハンドルを追加後に図形の更新
+                        MyVertexAdorner?.AddOrInsertHandle(ii, points[ii]);
+                        ReplaceAllPointsToBoundsZero();
+
+                        //InvalidateVisual(); // 再描画、ここでは必要ないのは基底クラスで行っているから？
+                    }
+                }
+            }
+            else if (e.Action == NotifyCollectionChangedAction.Remove)
+            {
+                if (IsVertexHandle)
+                {
+                    if (e.OldStartingIndex is int ii)
+                    {
+                        // 該当ハンドルを削除後に図形の更新
+                        MyVertexAdorner?.RemoveHandle(ii);
+                        ReplaceAllPointsToBoundsZero();
+                    }
+                }
+            }
+        }
         #endregion 依存関係プロパティ
 
 
@@ -287,23 +372,10 @@ namespace _20260505
         }
 
 
-        internal override void MyPoints_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
-        {
-            base.MyPoints_CollectionChanged(sender, e);
-            if (e.Action == NotifyCollectionChangedAction.Add)
-            {
-                if (IsVertexHandle)
-                {
-                    if (sender is ObservableCollection<Point> points && e.NewStartingIndex is int ii)
-                    {
-                        ReplaceAllPointsToBoundsZero();
-                        // 頂点ハンドルを追加
-                        MyVertexAdorner?.AddHandle(ii, points[ii]);
-                        //InvalidateVisual(); // 再描画、ここでは必要ないのは基底クラスで行っているから？
-                    }
-                }
-            }
-        }
+
+
+
+
     }
 
 
@@ -365,7 +437,14 @@ namespace _20260505
 
             }
 
-            if (e.Action == NotifyCollectionChangedAction.Replace)
+            else if (e.Action == NotifyCollectionChangedAction.Replace)
+            {
+                _cachedGeometry = null; // Invalidateとの順番はどちらでも良いみたい？
+                InvalidateVisual(); // 必要、描画更新
+                InvalidateMeasure(); // サイズ更新が不必要なら要らない、ActualWidth、ActualHeight
+            }
+
+            else if (e.Action == NotifyCollectionChangedAction.Remove)
             {
                 _cachedGeometry = null; // Invalidateとの順番はどちらでも良いみたい？
                 InvalidateVisual(); // 必要、描画更新
@@ -473,7 +552,8 @@ namespace _20260505
         private readonly GeoLineEX MyTargetGeoShape;
         internal readonly Canvas MyCanvas;
         private double MyHandleSizeHalfOffset;
-        //private ObservableCollection<Point> MyGeoPoints;
+
+        #region 初期化
 
         public VertexAdorner(GeoLineEX adornedElement) : base(adornedElement)
         {
@@ -484,6 +564,8 @@ namespace _20260505
 
             // 頂点の数だけハンドルを作成
             ReMakeAllHandles();
+
+
         }
 
 
@@ -495,6 +577,10 @@ namespace _20260505
             SetBinding(MyHandleSizeProperty, new Binding() { Source = MyTargetGeoShape, Path = new PropertyPath(GeoLineEX.VertexHandleSizeProperty) });
             SetBinding(MyHandleFillBrushProperty, new Binding() { Source = MyTargetGeoShape, Path = new PropertyPath(GeoLineEX.VertexHandleFillBrushProperty) });
         }
+
+
+
+        #endregion 初期化
 
         #region プロパティ
 
@@ -546,7 +632,7 @@ namespace _20260505
 
             for (int i = 0; i < points.Count; i++)
             {
-                AddHandle(i, points[i]);
+                AddOrInsertHandle(i, points[i]);
             }
         }
 
@@ -555,7 +641,7 @@ namespace _20260505
             var thumb = new FlatHandle()
             {
                 Cursor = Cursors.Hand,
-                Tag = i, // インデックスを保持
+                MyIndex = i, // インデックスを保持
             };
 
             thumb.SetBinding(WidthProperty, new Binding() { Source = this, Path = new PropertyPath(MyHandleSizeProperty) });
@@ -568,13 +654,81 @@ namespace _20260505
             thumb.DragDelta += Thumb_DragDelta;
             thumb.DragCompleted += Thumb_DragCompleted;
 
+            thumb.ContextMenu = CreateContextMenuForHandle();
+
             return thumb;
 
         }
 
-        public void AddHandle(int index, Point p)
+        /// <summary>
+        /// ハンドルの右クリックメニュー作成
+        /// </summary>
+        /// <returns></returns>
+        private ContextMenu CreateContextMenuForHandle()
         {
-            MyCanvas.Children.Add(CreateHandle(index, p));
+            var menu = new ContextMenu();
+            var item = new MenuItem()
+            {
+                Header = "頂点削除",
+            };
+            item.Click += (s, e) =>
+            {
+                // 右クリックされたハンドルを取得
+                if (s is MenuItem item
+                && item.Parent is ContextMenu cm
+                && cm.Parent is Popup pop
+                && pop.PlacementTarget is FlatHandle handle)
+                {
+                    // 指定インデックスの頂点削除、これは図形側から行う
+                    MyTargetGeoShape.MyPoints.RemoveAt(handle.MyIndex);
+                }
+            };
+
+            menu.Items.Add(item);
+
+            return menu;
+        }
+
+
+
+        /// <summary>
+        /// 指定インデックスを持つハンドルを削除
+        /// </summary>
+        /// <param name="index"></param>
+        public void RemoveHandle(int index)
+        {
+            // 削除
+            MyCanvas.Children.RemoveAt(index);
+
+            // 削除箇所以降のIndexを1詰める
+            for (int i = index; i < MyCanvas.Children.Count; i++)
+            {
+                if (MyCanvas.Children[i] is FlatHandle handle)
+                {
+                    handle.MyIndex--;
+                }
+            }
+
+        }
+
+        /// <summary>
+        /// 指定Point用のハンドルを追加(挿入)
+        /// </summary>
+        /// <param name="index"></param>
+        /// <param name="p"></param>
+        public void AddOrInsertHandle(int index, Point p)
+        {
+            // 指定インデックスが総数より小さい場合は挿入なので、
+            // 挿入箇所以降のハンドルのIndexを底上げする
+            for (int i = index; i < MyCanvas.Children.Count; i++)
+            {
+                if (MyCanvas.Children[i] is FlatHandle handle)
+                {
+                    handle.MyIndex++;
+                }
+            }
+
+            MyCanvas.Children.Insert(index, CreateHandle(index, p));
         }
 
         #region イベント
@@ -582,7 +736,7 @@ namespace _20260505
         //public event EventHandler? MyDragCompleted;
         #endregion   イベント
 
-        // ハンドル移動終了時に通知を出す
+        // ハンドル移動終了時、ターゲット図形のBoundsと描画更新
         private void Thumb_DragCompleted(object sender, DragCompletedEventArgs e)
         {
             //MyDragCompleted?.Invoke(this, e);
@@ -591,9 +745,10 @@ namespace _20260505
             MyTargetGeoShape.MyUpdateVisual();
         }
 
+        // ハンドル移動時
         private void Thumb_DragDelta(object sender, DragDeltaEventArgs e)
         {
-            if (sender is Thumb thumb && thumb.Tag is int index)
+            if (sender is FlatHandle hanlde && hanlde.MyIndex is int index)
             {
                 ObservableCollection<Point> points = MyTargetGeoShape.MyPoints;
                 if (points != null && index < points.Count)
@@ -640,7 +795,7 @@ namespace _20260505
             if (MyCanvas.Children.Count == 0) { return; }
             foreach (FlatHandle item in MyCanvas.Children.OfType<FlatHandle>())
             {
-                if (item.Tag is int ii)
+                if (item.MyIndex is int ii)
                 {
                     item.MyLeft = MyTargetGeoShape.MyPoints[ii].X - MyHandleSizeHalfOffset;
                     item.MyTop = MyTargetGeoShape.MyPoints[ii].Y - MyHandleSizeHalfOffset;
@@ -688,5 +843,16 @@ namespace _20260505
     }
 
 
+    public class MyConvReverseBool : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            return !(bool)value;
+        }
 
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
 }
