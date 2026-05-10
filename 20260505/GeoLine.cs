@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Globalization;
 using System.Net.ServerSentEvents;
@@ -27,7 +28,7 @@ namespace _20260505
         private VertexAdorner? MyVertexAdorner; // 頂点ハンドル用のAdorner
         private AdornerLayer MyAdornerLayer = null!; // AdornerLayer保持
         private Point MyPointOfRightClicked; // 右クリックの位置記録用、頂点追加に使用
-        
+
 
         public GeoLineEX()
         {
@@ -397,6 +398,7 @@ namespace _20260505
                 drawingContext.DrawRectangle(Brushes.Transparent, null, GetRenderBoundsWithPen());
             }
 
+
             base.OnRender(drawingContext);
         }
 
@@ -485,7 +487,7 @@ namespace _20260505
 
         #region 依存関係プロパティ
 
-
+        [TypeConverter(typeof(MyTypeConverterStringObserveablePoints))]
         public ObservableCollection<Point> MyPoints
         {
             get { return (ObservableCollection<Point>)GetValue(MyPointsProperty); }
@@ -884,4 +886,50 @@ namespace _20260505
             throw new NotImplementedException();
         }
     }
+
+
+
+
+
+
+    /// <summary>
+    /// 文字列をObservableCollection Point に変換
+    /// 例：XAMLでの入力が"0,10 20,100"なら、
+    /// ObserableCollectionPoint[Point(0,10), Point(20,100)]に変換する
+    /// </summary>
+    public class MyTypeConverterStringObserveablePoints : TypeConverter
+    {
+        public override bool CanConvertFrom(ITypeDescriptorContext? context, Type sourceType)
+        {
+            return sourceType == typeof(string) || base.CanConvertFrom(context, sourceType);
+        }
+
+        public override object? ConvertFrom(ITypeDescriptorContext? context, CultureInfo? culture, object value)
+        {
+            if (value is null) { return null; }
+
+            if (value is string str)
+            {
+                ObservableCollection<Point> points = [];
+
+                string[] ss = str.Split(" ");// スペースで分割
+                foreach (var item in ss)
+                {
+                    string[] xy = item.Split(","); // カンマで分割
+                    if (double.TryParse(xy[0], out double x) &&
+                        double.TryParse(xy[1], out double y))
+                    {
+                        points.Add(new Point(x, y));
+                    }
+                }
+                return points;
+            }
+
+            return base.ConvertFrom(context, culture, value);
+        }
+    }
+
+
+
+
 }

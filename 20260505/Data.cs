@@ -185,9 +185,9 @@ namespace _20260505
         #region パブリックメソッド
         public void TestBackground()
         {
-            if(CurrentItemData is GeoLineData data)
+            if (CurrentItemData is GeoLineData data)
             {
-                
+
             }
         }
         #endregion パブリックメソッド
@@ -771,6 +771,43 @@ namespace _20260505
             UpdateBoundsToRoot(this);
         }
 
+        public void UpdateBoundsToRoot2(GroupData group)
+        {
+            double right = 0;
+            double bottom = 0;
+            double minX = double.MaxValue;
+            double minY = double.MaxValue;
+            RotateTransform rotate = new();
+            // 子要素が収まるBounds、それがGroupのBoundsになる
+            foreach (Data item in group.DataList)
+            {
+                Rect r = new(item.X, item.Y, item.Width, item.Height);
+                rotate.Angle = item.Angle;
+                var re = rotate.TransformBounds(r);
+                item.LayoutTransformedRect = rotate.TransformBounds(r);
+
+                minX = Math.Min(minX, re.X);
+                minY = Math.Min(minY, re.Y);
+                right = Math.Max(right, re.X + re.Width);
+                bottom = Math.Max(bottom, re.Y + re.Height);
+            }
+
+            // サイズ更新
+            group.Width = right - minX;
+            group.Height = bottom - minY;
+
+
+            // 子要素の座標更新
+            foreach (Data item in group.DataList) { item.X -= minX; item.Y -= minY; }
+
+            // 自身の座標更新
+            X += minX;
+            Y += minY;
+
+            // 親要素へ伝播
+            group.ParentData?.UpdateBoundsToRoot(group.ParentData);
+        }
+
         #region パブリックメソッド
 
         public void AddData(Data data)
@@ -840,7 +877,7 @@ namespace _20260505
         [ObservableProperty] private double _strokeMiterLimit = 10.0;
         //[ObservableProperty] private Pen? _strokePen; // 保存対象外にする
 
-      
+
     }
     #endregion 図形
 
@@ -863,29 +900,14 @@ namespace _20260505
         [ObservableProperty] bool _isClicked = false; // クリックされた要素
         [ObservableProperty] private double _offsetX;
         [ObservableProperty] private double _offsetY;
+        [ObservableProperty] private double _angle; // 回転角度
+        public Rect LayoutTransformedRect { get; internal set; }
+
 
 
         // 自身の座標変更時は親要素を変更しないほうが良さそう、負荷が高いのも在る
         // 移動後に変更する
 
 
-        // 自身のサイズ変更されたときに親要素のサイズも変更すると、その変更が伝播してRootまで行く
-        //partial void OnWidthChanged(double oldValue, double newValue) => UpdateParentSize();
-        //partial void OnHeightChanged(double oldValue, double newValue) => UpdateParentSize();
-
-        //partial void OnXChanged(double oldValue, double newValue)
-        //{
-        //    UpdateParentSize();
-        //}
-        //partial void OnYChanged(double oldValue, double newValue)
-        //{
-        //    UpdateParentSize();
-        //}
-        private void UpdateParentSize()
-        {
-            // 親要素のサイズ更新
-            ParentData?.UpdateSize();
-            // だけど、自身のサイズ更新が親要素のサイズにかかわらないときは実行しないようにしたほうが良い
-        }
     }
 }

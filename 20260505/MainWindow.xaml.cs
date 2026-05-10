@@ -37,7 +37,7 @@ namespace _20260505
         private RootData CreateRootData()
         {
             RootData root = new();
-            EllipseData ellipse = new() { X = 20, Y = 30, Fill = Brushes.Olive, Width = 30, Height = 30 };
+            EllipseData ellipse = new() { X = 20, Y = 30, Fill = Brushes.Olive, Width = 130, Height = 30 , Angle = 20};
             root.AddData(ellipse);
 
             //EllipseData ellipseBlue = new() { Fill = Brushes.Blue, Width = 30, Height = 30 };
@@ -46,8 +46,8 @@ namespace _20260505
             //group.AddData(new EllipseData() { X = 10, Y = 50, Fill = Brushes.Orange, Width = 30, Height = 30 });
             //root.AddData(group);
 
-            root.AddData(CreateGeoLineGroupData());
-            //root.AddData(CreateGeoLineData());
+            //root.AddData(CreateGeoLineGroupData());
+            root.AddData(CreateGeoLineData());
             return root;
         }
 
@@ -64,6 +64,7 @@ namespace _20260505
                 //Points = [new Point(), new Point(100, 100)],
                 Stroke = Brushes.Crimson,
                 StrokeThickness = 30,
+                Angle = 20,
                 //Background = Brushes.Pink,
                 //IsCanDragMove = true,
                 //IsVertexHandle = true,
@@ -81,6 +82,7 @@ namespace _20260505
                 Stroke = Brushes.Crimson,
                 StrokeThickness = 20,
                 Background = Brushes.Pink,
+                Angle = 20,
                 //IsCanDragMove = true,
                 //IsVertexHandle = true,
             };
@@ -137,9 +139,20 @@ namespace _20260505
 
         private void check_Click(object sender, RoutedEventArgs e)
         {
+           
+
             var clicked = MyData.ClickedItemData;
-            var rootcliked = MyRootItems.MyData.MyClickedItem.MyData;
-            var clickeditem = MyRootItems.MyData.MyClickedItem;
+            var rootcliked = MyRootItems.MyData.MyClickedItem?.MyData;
+            CustomThumb? clickeditem = MyRootItems.MyData.MyClickedItem;
+            if(clickeditem is not null)
+            {
+                var content = clickeditem.MyContent;
+                var rSize = content.RenderSize;
+                var layTra = content.LayoutTransform;
+                var dd = clickeditem.MyData;
+                var rec = new Rect(dd.X, dd.Y, dd.Width, dd.Height);
+                var layRect = layTra.TransformBounds(rec);
+            }
             if (MyData.ClickedItemData is GeoLineData data)
             {
                 var ps = data.Points;

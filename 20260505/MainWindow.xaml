@@ -23,13 +23,13 @@
     </ScrollViewer>
     
     <Canvas x:Name="MyCanvas">
-      
+
     </Canvas>
 
     <StackPanel Grid.Column="1">
+      <Button x:Name="check" Content="check" Click="check_Click"/>
       <Button Content="addpoint" Click="Button_Click"/>
       <Button x:Name="background" Content="background" Click="background_Click"/>
-      <Button x:Name="check" Content="check" Click="check_Click"/>
       <Button x:Name="vertexhandle" Content="vertexHandle" Click="vertexhandle_Click"/>
       <Button x:Name="RemoveEndPoint" Content="RemoveEndPoint" Click="RemoveEndPoint_Click"/>
       <Button x:Name="InsertStartPoint" Content="InsertStartPoint" Click="InsertStartPoint_Click"/>
@@ -46,6 +46,10 @@
           <TextBlock Text="{Binding StrokeThickness, StringFormat='StrokeThickness = {0: 0; -0; 0}'}"/>
           <Slider Value="{Binding StrokeThickness}" Minimum="1" Maximum="50"
                   SmallChange="10" LargeChange="10"/>
+          
+          <Slider Value="{Binding Angle}" Minimum="0" Maximum="360"
+                  SmallChange="10" LargeChange="10"/>
+          
         </StackPanel>
       </GroupBox>
     </StackPanel>

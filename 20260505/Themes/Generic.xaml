@@ -40,7 +40,11 @@
         Height="{Binding Height, Mode=OneWayToSource}"
         MyOffsetLeft="{Binding X, Mode=TwoWay}"
         MyOffsetTop="{Binding Y, Mode=TwoWay}"
-        />
+        >
+        <!--<local:GeoLineEX.LayoutTransform>
+          <RotateTransform Angle="{Binding Angle}"/>
+        </local:GeoLineEX.LayoutTransform>-->
+      </local:GeoLineEX>
         <!--MyRenderBounds="{Binding Bounds, Mode=OneWayToSource}"-->
                        <!--Width="{Binding Bounds.Width}"
                        Height="{Binding Bounds.Height}"-->
@@ -87,7 +91,11 @@
       <Setter.Value>
         <ControlTemplate TargetType="{x:Type local:CustomThumb}">
           <Grid>
-            <ContentPresenter Content="{TemplateBinding MyContent}"/>
+            <ContentPresenter Content="{TemplateBinding MyContent}">
+              <!--<ContentPresenter.LayoutTransform>
+                <RotateTransform Angle="{Binding Angle}"/>
+              </ContentPresenter.LayoutTransform>-->
+            </ContentPresenter>
             <Border x:Name="SelectedBorder" Visibility="Visible"
                     BorderBrush="Orange" BorderThickness="1"
                     Margin="-10"/>
@@ -112,10 +120,10 @@
     <!--<Setter Property="MyData" Value="{Binding}"/>-->
     <Setter Property="ItemContainerStyle" Value="{StaticResource CanvasItemContaier}"/>
     <Setter Property="ItemsSource" Value="{Binding RelativeSource={RelativeSource Mode=Self}, Path=MyData.DataList}"/>
-    <!--<Setter Property="Width" Value="{Binding RelativeSource={RelativeSource Mode=Self}, Path=MyData.Width}"/>
-    <Setter Property="Height" Value="{Binding RelativeSource={RelativeSource Mode=Self}, Path=MyData.Height}"/>-->
-    <Setter Property="Width" Value="300"/>
-    <Setter Property="Height" Value="300"/>
+    <Setter Property="Width" Value="{Binding RelativeSource={RelativeSource Mode=Self}, Path=MyData.Width}"/>
+    <Setter Property="Height" Value="{Binding RelativeSource={RelativeSource Mode=Self}, Path=MyData.Height}"/>
+    <!--<Setter Property="Width" Value="300"/>
+    <Setter Property="Height" Value="300"/>-->
 
     <Setter Property="ItemsPanel">
       <Setter.Value>
