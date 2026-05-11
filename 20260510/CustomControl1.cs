@@ -39,14 +39,27 @@ namespace _20260510
             PreviewMouseLeftButtonDown += CustomThumb_PreviewMouseLeftButtonDown;
             MouseRightButtonDown += (s, e) => { migikurikkuiti = e.GetPosition(this); };
             Loaded += CustomThumb_Loaded;
+            PreviewMouseDown += CustomThumb_PreviewMouseDown;
+            MouseUp += CustomThumb_MouseUp;
+        }
 
+        #region クリックイベント時
+
+
+        private void CustomThumb_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            MyData.RootData?.ClickedItemData = MyData;
+            MyData.RootData?.MyClickedItem = this;
+        }
+
+
+        private void CustomThumb_MouseUp(object sender, MouseButtonEventArgs e)
+        {
 
         }
 
-        private void CustomThumb_DragStarted(object sender, DragStartedEventArgs e)
+        private void CustomThumb_PreviewMouseDown(object sender, MouseButtonEventArgs e)
         {
-            if (MyData.IsSelectable == false) { return; }
-
             if (MyData.RootData is RootData root)
             {
                 // 自身の選択状態を記録
@@ -54,70 +67,99 @@ namespace _20260510
 
                 // Ctrlキーの状態を記録
                 IsDragStartWithPressedCtrl = Keyboard.Modifiers.HasFlag(ModifierKeys.Control);
+            }
+        }
 
-                // 選択状態を更新
+        private void CustomThumb_DragDelta(object sender, DragDeltaEventArgs e)
+        {
+            if (MyData.RootData is null) { return; }
+
+            var selectedItems = MyData.RootData.SelectedItemsData;
+            if (selectedItems.Contains(MyData))
+            {
+                foreach (var item in selectedItems)
+                {
+                    item.X += e.HorizontalChange;
+                    item.Y += e.VerticalChange;
+                }
+                e.Handled = true;
+            }
+
+        }
+
+        // ドラッグ移動開始時
+        private void CustomThumb_DragStarted(object sender, DragStartedEventArgs e)
+        {
+            if (MyData.IsSelectable == false) { return; }
+
+            if (MyData.RootData is RootData root)
+            {
+                // 選択状態リストを更新
+                // 未選択状態の時だけ処理
                 if (MyData.IsSelected == false)
                 {
-                    // 未選択をCtrlクリックした場合は、選択リストに追加して選択状態にする
+                    // Ctrlクリックした場合は、選択リストに追加
                     if (IsDragStartWithPressedCtrl)
                     {
                         root.AddDataToSelectedItems(MyData);
                     }
-                    // 未選択を通常クリックした場合は、自身だけを選択状態にしたいので
-                    // 選択リストをクリアした後、自身をリストに追加
+                    // 通常クリックした場合は、自身だけを選択状態にしたいので
+                    // 自身を追加後に、自身以外をリストから削除
                     else
                     {
-                        root.ClearSelectedItems();
-                        root.AddDataToSelectedItems(MyData);
+                        if (root.AddDataToSelectedItems(MyData))
+                        {
+                            root.RemoveAllOtherFromSelected(MyData);
+                        }
                     }
                 }
             }
         }
 
+        // ドラッグ移動完了時
         private void CustomThumb_DragCompleted(object sender, DragCompletedEventArgs e)
         {
-            /* 移動なしの場合
-             *      通常クリックの場合
-             *          クリック前から選択状態だった
-             *              単独選択だった：そのまま何もしない
-             *              複数選択だった：自分以外をリストから削除
-             *          クリック前は未選択だった：リストをクリアしてから、自身を追加
-             *      Ctrlクリックの場合
-             *          クリック前から選択状態だった
-             *              単独選択だった：そのまま何もしない
-             *              複数選択だった：自分をリストから削除
-             * 移動があった場合
-             *      通常クリックの場合
-             *          クリック前から選択状態だった
-             *              単独選択だった：そのまま何もしない
-             *              複数選択だった：そのまま何もしない
-             *          クリック前は未選択だった：リストをクリアしてから、自身を追加
-             *      Ctrlクリックの場合
-             *          クリック前から選択状態だった
-             *              単独選択だった：そのまま何もしない
-             *              複数選択だった：自分をリストから削除
+            /*  移動した：何もしない
+             *      
+             *  移動していない
+             *      クリック前未選択：何もしない
+             *      
+             *      クリック前既選択
+             *          今の選択リストのItem個数が1個：何もしない
+             *          
+             *          今の選択リストのItem個数が2個以上
+             *              通常クリックだった：選択リストから自身以外を削除
+             *              Ctrlクリックだった：選択リストから自身を削除
+             *              
+             *  まとめると、処理が必要なのは
+             *      移動なし＆クリック前既選択＆選択Item個数が2個以上の場合だけになる
              */
 
+            if (e.HorizontalChange == 0 &&
+                e.VerticalChange == 0 &&
+                IsSelectedAtDragStart &&
+                MyData.RootData is RootData root &&
+                root.SelectedItemsData.Count >= 2)
+            {
+                if (IsDragStartWithPressedCtrl)
+                {
+                    // Ctrlクリックだった：選択リストから自身を削除
+                    root.RemoveDataFromSelect(MyData);
+                }
+                else
+                {
+                    // 通常クリックだった：選択リストから自身以外を削除
+                    root.RemoveAllOtherFromSelected(MyData);
+                }
 
-            // 選択リストから削除して、未選択状態にする処理
-            // 削除対象になる条件はAとBの2種類
-
-            // AB共通条件
-            // * 移動していない
-            // * クリック前から既選択だった
-
-            // パターンA
-            // * クリック時にCtrlキーが押されていた
-            // * 選択リストの要素数が2個以上(選択要素を0個にしたくないだけなので、これは変えても良いかも)
-
-            // パターンB
-            // * 通常クリックだった(Ctrlキーが押されていない)
-            // * 選択リストに自身が在る
-
+                e.Handled = true;
+            }
 
 
             MyData?.ParentData?.UpdateBoundsToRoot();
         }
+        #endregion クリックイベント時
+
 
         private void CustomThumb_Loaded(object sender, RoutedEventArgs e)
         {
@@ -134,19 +176,6 @@ namespace _20260510
             MyData?.ParentData?.UpdateBoundsToRoot();
         }
 
-
-        private void CustomThumb_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
-        {
-            MyData.RootData?.ClickedItemData = MyData;
-            MyData.RootData?.MyClickedItem = this;
-        }
-
-        private void CustomThumb_DragDelta(object sender, DragDeltaEventArgs e)
-        {
-            MyData.X += e.HorizontalChange;
-            MyData.Y += e.VerticalChange;
-            e.Handled = true;
-        }
 
         #region 依存関係プロパティ
 
@@ -199,6 +228,8 @@ namespace _20260510
 
         private void RootItemsControl_Loaded(object sender, RoutedEventArgs e)
         {
+            MyData.EditingGroupData = this.MyData;
+
             //MyData.UpdateBounds();
             //MyData.UpdateSize();
         }

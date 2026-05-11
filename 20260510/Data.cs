@@ -40,9 +40,9 @@ namespace _20260510
         public RootData()
         {
             Name = "RootDataです";
-            EditingGroupData = this;
+            //EditingGroupData = this;
             //MyInit();
-            //SelectedItems.CollectionChanged += SelectedItems_CollectionChanged;
+            SelectedItemsData.CollectionChanged += SelectedItems_CollectionChanged;
         }
 
         #region テスト用初期化
@@ -73,11 +73,11 @@ namespace _20260510
             if (newValue is not null)
             {
                 newValue.IsCurrent = true;
-                UnGroupCommand.NotifyCanExecuteChanged();
-                if (newValue is GeoShapeData geo)
-                {
-                    CanChageGeoShapeData();
-                }
+                //UnGroupCommand.NotifyCanExecuteChanged();
+                //if (newValue is GeoShapeData geo)
+                //{
+                //    CanChageGeoShapeData();
+                //}
             }
         }
 
@@ -129,23 +129,6 @@ namespace _20260510
             return CurrentItemData is GeoShapeData;
         }
 
-        // 全選択解除
-        [RelayCommand]
-        public void ClearSelectedItems()
-        {
-            foreach (var item in SelectedItemsData)
-            {
-                item.IsSelected = false;
-                item.IsCurrent = false;
-            }
-
-            //SelectedItems.Clear(); // Clearメソッドは使わない
-            var tempList = new List<Data>(SelectedItemsData);
-            foreach (Data item in tempList) { _ = SelectedItemsData.Remove(item); }
-
-            CurrentItemData = null;
-        }
-
         //選択状態のData変更時
         private void SelectedItems_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
         {
@@ -168,9 +151,7 @@ namespace _20260510
                 if (e.OldItems?[0] is Data oldData)
                 {
                     oldData.IsSelected = false;
-                    //oldData.IsCurrent = false;
                     if (CurrentItemData == oldData) { CurrentItemData = null; }
-                    //if (ClickedItem == oldData) { ClickedItem = null; }
                     RemoveSelectedItemsCommand.NotifyCanExecuteChanged(); // 削除Command実行判定
                     ZUpCommand.NotifyCanExecuteChanged();
                     ZtoTopCommand.NotifyCanExecuteChanged();
@@ -196,7 +177,7 @@ namespace _20260510
         #endregion パブリックメソッド
 
         #region グループ化
-        
+
 
         private bool CanUnGroup()
         {
@@ -513,30 +494,135 @@ namespace _20260510
 
         #endregion 編集モード
 
+        #region SelectedItems
+
         /// <summary>
         /// SelectedItemsに指定したDataを追加する
+        /// 追加後にCurrentItemDataに指定する
         /// </summary>
         /// <param name="data"></param>
-        public void AddDataToSelectedItems(Data data)
+        public bool AddDataToSelectedItems(Data data)
         {
-            // 二重登録禁止
-            if (SelectedItemsData.Contains(data)) return;
-            if (data.IsSelectable == false) { return; }
+            // 二重登録禁止チェック
+            if (SelectedItemsData.Contains(data)) { return false; }
 
-            SelectedItemsData.Add(data);
-            CurrentItemData = data;
+            // 選択可能な場合のみ追加して、筆頭に指定する
+            if (data.IsSelectable)
+            {
+                SelectedItemsData.Add(data);
+                CurrentItemData = data;
+                return true;
+            }
+            return false;
         }
 
+        /// <summary>
+        /// 指定Dataを選択リストから削除後、IsCurrentをFalseにする
+        /// </summary>
+        /// <param name="data"></param>
+        /// <returns></returns>
+        private bool RemoveDataFromSelectedWithUpdataIs(Data data)
+        {
+            if (SelectedItemsData.Remove(data))
+            {
+                // 削除完了後にIs系を更新
+                data.IsCurrent = false;
+                return true;
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// 選択リストを空にする
+        /// 削除したDataのIsCurrentをFalseにする
+        /// CurrentItemDataをnullにする
+        /// </summary>
+        [RelayCommand]
+        public void ClearSelectedItems()
+        {
+            // 今の選択リストから一時的なリストを作成
+            var tempList = new List<Data>(SelectedItemsData);
+
+            // 選択リストからDataを削除＆Is系を更新
+            foreach (Data item in tempList)
+            {
+                _ = RemoveDataFromSelectedWithUpdataIs(item);
+            }
+
+            CurrentItemData = null;
+        }
+
+        // 
+        // 
+
+        /// <summary>
+        /// 指定Data以外を選択リストから削除する
+        /// </summary>
+        /// <remarks>未選択Itemを通常クリック時と
+        /// 移動なし＋通常クリックだったときに使用</remarks>
+        /// <param name="data"></param>
+        public void RemoveAllOtherFromSelected(Data data)
+        {
+            // 今の選択リストから、指定Dataを除いたリストを作成
+            var tempList = new List<Data>(SelectedItemsData);
+            _ = tempList.Remove(data);
+
+            // 選択リストからDataを削除＆Is系を更新
+            foreach (Data item in tempList)
+            {
+                _ = RemoveDataFromSelectedWithUpdataIs(item);
+            }
+        }
+
+
+
+        /// <summary>
+        /// 指定Dataを選択リストから削除する
+        /// 削除後に筆頭を更新する、一個前のDataを筆頭にする、それがなければ一個後ろのData
+        /// </summary>
+        /// <param name="data"></param>
         public void RemoveDataFromSelect(Data data)
         {
             var dataIndex = SelectedItemsData.IndexOf(data) - 1;
-            SelectedItemsData.Remove(data);
-            // 筆頭Itemを更新
-            // 一個前を筆頭にする、一個前がなければ一個後を筆頭にする
-            if (dataIndex < 0) { dataIndex++; }
-            CurrentItemData = SelectedItemsData[dataIndex];
+
+
+            if (SelectedItemsData.Remove(data))
+            {
+                // 筆頭Itemを更新
+                // 一個前を筆頭にする、一個前がなければ一個後を筆頭にする
+                if (dataIndex < 0) { dataIndex++; }
+                CurrentItemData = SelectedItemsData[dataIndex];
+            }
         }
 
+
+        #endregion SelectedItems
+
+
+
+        // 選択状態のItemすべてを削除
+        [RelayCommand(CanExecute = nameof(CanSelectedItemsRemove))]
+        public void RemoveSelectedItems()
+        {
+            if (EditingGroupData is null) { return; }
+
+            // リストから削除
+            foreach (var item in SelectedItemsData)
+            {
+                EditingGroupData.DataList.Remove(item);
+                if (item.IsClicked) { ClickedItemData = null; }
+            }
+
+            // 選択状態解除
+            ClearSelectedItems();
+        }
+
+
+        // 選択状態のItemすべてを削除できるかの判定
+        private bool CanSelectedItemsRemove()
+        {
+            return SelectedItemsData.Count > 0;
+        }
 
 
         // TextBlockを追加するテスト
@@ -564,31 +650,6 @@ namespace _20260510
         {
             // 文字が入力されている ＆ 編集モードのグループがある
             return !string.IsNullOrEmpty(AddText) && (EditingGroupData is not null);
-        }
-
-
-        // 選択状態のItemすべてを削除
-        [RelayCommand(CanExecute = nameof(CanSelectedItemsRemove))]
-        public void RemoveSelectedItems()
-        {
-            if (EditingGroupData is null) { return; }
-
-            // リストから削除
-            foreach (var item in SelectedItemsData)
-            {
-                EditingGroupData.DataList.Remove(item);
-                if (item.IsClicked) { ClickedItemData = null; }
-            }
-
-            // 選択状態解除
-            ClearSelectedItems();
-        }
-
-
-        // 選択状態のItemすべてを削除できるかの判定
-        private bool CanSelectedItemsRemove()
-        {
-            return SelectedItemsData.Count > 0;
         }
 
 
@@ -638,7 +699,6 @@ namespace _20260510
         public GroupData()
         {
             Name = "GroupData";
-            //DataList.CollectionChanged += DataList_CollectionChanged;
             DataList.CollectionChanged += DataList_CollectionChanged;
         }
 
@@ -650,7 +710,6 @@ namespace _20260510
             {
                 if (e.NewItems?[0] is Data newData)
                 {
-                    //newData.Z = DataList.Count - 1;
                     newData.Z = e.NewStartingIndex;
                     newData.ParentData = this;
                     newData.ParentData.UpdateSize();

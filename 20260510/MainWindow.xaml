@@ -52,6 +52,11 @@
 
     </StackPanel>
     <StackPanel Grid.Column="2">
+      <GroupBox Header="root" DataContext="{Binding MyData}">
+        <StackPanel>
+          <TextBlock Text="{Binding SelectedItemsData.Count, StringFormat='選択Item個数 = {0:0}'}"/>
+        </StackPanel>
+      </GroupBox>
       <GroupBox Header="MyClickedItem" DataContext="{Binding MyData.MyClickedItem}">
         <StackPanel>
           <!--<ContentPresenter Content="{Binding ElementName=MyRootItems}"/>-->
@@ -62,6 +67,17 @@
               <VisualBrush Visual="{Binding}" Stretch="Uniform"/>
             </Rectangle.Fill>
           </Rectangle>
+        </StackPanel>
+      </GroupBox>
+
+      <GroupBox>
+        <StackPanel>
+          <TextBlock Text="{Binding MyData.DataList[0].IsSelected, StringFormat='isSelected0 = {0}'}"/>
+          <TextBlock Text="{Binding MyData.DataList[0].IsSelectable, StringFormat='IsSelectable0 = {0}'}"/>
+          <TextBlock Text="{Binding MyData.DataList[0], StringFormat='data = {0}'}"/>
+          <TextBlock Text="{Binding MyData.DataList[1].IsSelected, StringFormat='isSelected1 = {0}'}"/>
+          <TextBlock Text="{Binding MyData.DataList[1].IsSelectable, StringFormat='IsSelectable1 = {0}'}"/>
+          <TextBlock Text="{Binding MyData.DataList[1], StringFormat='data = {0}'}"/>
         </StackPanel>
       </GroupBox>
     </StackPanel>
