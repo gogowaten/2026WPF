@@ -57,9 +57,9 @@
           <TextBlock Text="{Binding SelectedItemsData.Count, StringFormat='選択Item個数 = {0:0}'}"/>
         </StackPanel>
       </GroupBox>
-      <GroupBox Header="MyClickedItem" DataContext="{Binding MyData.MyClickedItem}">
+      <!--<GroupBox Header="MyClickedItem" DataContext="{Binding MyData.MyClickedItem}">
         <StackPanel>
-          <!--<ContentPresenter Content="{Binding ElementName=MyRootItems}"/>-->
+          --><!--<ContentPresenter Content="{Binding ElementName=MyRootItems}"/>--><!--
           <TextBlock Text="{Binding ActualHeight}"/>
           <TextBlock Text="{Binding Height}"/>
           <Rectangle Width="50" Height="50">
@@ -68,7 +68,7 @@
             </Rectangle.Fill>
           </Rectangle>
         </StackPanel>
-      </GroupBox>
+      </GroupBox>-->
 
       <GroupBox>
         <StackPanel>
@@ -80,6 +80,20 @@
           <TextBlock Text="{Binding MyData.DataList[1], StringFormat='data = {0}'}"/>
         </StackPanel>
       </GroupBox>
+      <ListBox ItemsSource="{Binding MyData.SelectedItemsData}" IsHitTestVisible="False">
+        <ListBox.ItemsPanel>
+          <ItemsPanelTemplate>
+            <StackPanel Orientation="Horizontal"/>
+          </ItemsPanelTemplate>
+        </ListBox.ItemsPanel>
+        <ListBox.ItemTemplate>
+          <DataTemplate>
+            <Viewbox Height="50" Width="50">
+              <ContentPresenter Content="{Binding}"/>
+            </Viewbox>
+          </DataTemplate>
+        </ListBox.ItemTemplate>
+      </ListBox>
     </StackPanel>
   </Grid>
 </Window>

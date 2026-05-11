@@ -33,30 +33,30 @@ namespace _20260510
         }
         public CustomThumb()
         {
+            PreviewMouseDown += CustomThumb_PreviewMouseDown;
+            MouseRightButtonDown += (s, e) => { migikurikkuiti = e.GetPosition(this); };
+            DragStarted += CustomThumb_DragStarted;
             DragDelta += CustomThumb_DragDelta;
             DragCompleted += CustomThumb_DragCompleted;
-            DragStarted += CustomThumb_DragStarted;
-            PreviewMouseLeftButtonDown += CustomThumb_PreviewMouseLeftButtonDown;
-            MouseRightButtonDown += (s, e) => { migikurikkuiti = e.GetPosition(this); };
+            //PreviewMouseLeftButtonDown += CustomThumb_PreviewMouseLeftButtonDown;
+            //MouseUp += CustomThumb_MouseUp;
             Loaded += CustomThumb_Loaded;
-            PreviewMouseDown += CustomThumb_PreviewMouseDown;
-            MouseUp += CustomThumb_MouseUp;
         }
 
         #region クリックイベント時
 
 
-        private void CustomThumb_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
-        {
-            MyData.RootData?.ClickedItemData = MyData;
-            MyData.RootData?.MyClickedItem = this;
-        }
+        //private void CustomThumb_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        //{
+        //    MyData.RootData?.ClickedItemData = MyData;
+        //    MyData.RootData?.MyClickedItem = this;
+        //}
 
 
-        private void CustomThumb_MouseUp(object sender, MouseButtonEventArgs e)
-        {
+        //private void CustomThumb_MouseUp(object sender, MouseButtonEventArgs e)
+        //{
 
-        }
+        //}
 
         private void CustomThumb_PreviewMouseDown(object sender, MouseButtonEventArgs e)
         {
@@ -67,6 +67,9 @@ namespace _20260510
 
                 // Ctrlキーの状態を記録
                 IsDragStartWithPressedCtrl = Keyboard.Modifiers.HasFlag(ModifierKeys.Control);
+
+                root.ClickedItemData = MyData;
+                root.MyClickedItem = this;
             }
         }
 
@@ -228,7 +231,7 @@ namespace _20260510
 
         private void RootItemsControl_Loaded(object sender, RoutedEventArgs e)
         {
-            MyData.EditingGroupData = this.MyData;
+            //MyData.EditingGroupData = this.MyData;
 
             //MyData.UpdateBounds();
             //MyData.UpdateSize();

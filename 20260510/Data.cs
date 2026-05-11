@@ -18,7 +18,8 @@ namespace _20260510
         [NotifyCanExecuteChangedFor(nameof(AddTextBlockDataCommand))]
         [ObservableProperty] private string _addText = "ここに文字列";
 
-
+        [ObservableProperty] private GroupData _editingGroupData;
+        //[ObservableProperty] private GroupData _editingGroupData; // 編集中のGroupData
 
 
         [ObservableProperty] private Data? _currentItemData; // 筆頭Data
@@ -28,9 +29,9 @@ namespace _20260510
         //[NotifyCanExecuteChangedFor(nameof(ZAgeCommand))]
         [ObservableProperty] private ObservableCollection<Data> _selectedItemsData = []; // 選択ItemData
 
-        [NotifyCanExecuteChangedFor(nameof(ZUpCommand))]
-        [NotifyCanExecuteChangedFor(nameof(ZtoTopCommand))]
-        [ObservableProperty] private GroupData? _editingGroupData; // 編集中のGroupData
+        //[NotifyCanExecuteChangedFor(nameof(ZUpCommand))]
+        //[NotifyCanExecuteChangedFor(nameof(ZtoTopCommand))]
+
 
 
 
@@ -40,7 +41,7 @@ namespace _20260510
         public RootData()
         {
             Name = "RootDataです";
-            //EditingGroupData = this;
+            EditingGroupData = this;
             //MyInit();
             SelectedItemsData.CollectionChanged += SelectedItems_CollectionChanged;
         }
@@ -81,12 +82,12 @@ namespace _20260510
             }
         }
 
-        // 編集Group変更時
-        partial void OnEditingGroupDataChanged(GroupData? oldValue, GroupData? newValue)
+
+        // 編集中グループの変更時
+        partial void OnEditingGroupDataChanged(GroupData? oldValue, GroupData newValue)
         {
+            // 選択リストを空にする
             ClearSelectedItems();
-            CurrentItemData = null;
-            ClickedItemData = null;
 
             if (oldValue is not null)
             {
@@ -94,9 +95,11 @@ namespace _20260510
                 foreach (var item in oldValue.DataList)
                 {
                     item.IsSelectable = false;
+                    item.IsSelected = false;
+                    item.IsCurrent = false;
                 }
-
             }
+
             if (newValue is not null)
             {
                 newValue.IsEditing = true;
@@ -104,10 +107,22 @@ namespace _20260510
                 {
                     item.IsSelectable = true;
                 }
+
+                // クリックItemが子要素に在れば、それを選択状態にして筆頭に指定する
+                if (ClickedItemData is not null && newValue.DataList.Contains(ClickedItemData))
+                {
+                    AddDataToSelectedItems(ClickedItemData);
+                }
             }
+
+
         }
 
+
         #endregion On～プロパティの変更時
+
+
+
 
         ///// <summary>
         ///// オフセットの切り替え、GeoShapeData専用
@@ -713,6 +728,12 @@ namespace _20260510
                     newData.Z = e.NewStartingIndex;
                     newData.ParentData = this;
                     newData.ParentData.UpdateSize();
+
+                    // 自身が編集中なら、子要素を選択可能にする
+                    if (this.IsEditing)
+                    {
+                        newData.IsSelectable = true;
+                    }
                 }
             }
             else if (e.Action == NotifyCollectionChangedAction.Remove)
