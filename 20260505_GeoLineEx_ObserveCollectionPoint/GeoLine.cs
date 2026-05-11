@@ -70,24 +70,16 @@ namespace _20260505_GeoLineEx_ObserveCollectionPoint
         }
 
         // 右クリックメニュー作成
-        private ContextMenu CreateContextMenu()
+                private ContextMenu CreateContextMenu()
         {
             var cm = new ContextMenu();
             var item = new MenuItem() { Header = "編集開始" };
-            item.SetBinding(IsEnabledProperty, new Binding() { Source = this, Path = new PropertyPath(IsVertexHandleProperty), Converter = new MyConvReverseBool() });
+            item.SetBinding(VisibilityProperty, new Binding() { Source = this, Path = new PropertyPath(IsVertexHandleProperty), Converter = new MyConvReverseBootToVisible() });
             item.Click += (s, e) => { IsVertexHandle = true; };
             cm.Items.Add(item);
 
-            //item = new MenuItem() { Header = "ここに頂点を追加" };
-            //item.SetBinding(IsEnabledProperty, new Binding() { Source = this, Path = new PropertyPath(IsVertexHandleProperty) });
-            //item.Click += (s, e) =>
-            //{
-            //    MyPoints.Add(MyPointOfRightClicked);
-            //};
-            //cm.Items.Add(item);
-
             item = new MenuItem() { Header = "ここに頂点を1番目に挿入" };
-            item.SetBinding(IsEnabledProperty, new Binding() { Source = this, Path = new PropertyPath(IsVertexHandleProperty) });
+            item.SetBinding(VisibilityProperty, new Binding() { Source = this, Path = new PropertyPath(IsVertexHandleProperty), Converter = new MyConvBootToVisible() });
             item.Click += (s, e) =>
             {
                 MyPoints.Insert(1, MyPointOfRightClicked);
@@ -95,7 +87,7 @@ namespace _20260505_GeoLineEx_ObserveCollectionPoint
             cm.Items.Add(item);
 
             item = new MenuItem() { Header = "ここに頂点を追加(先頭)" };
-            item.SetBinding(IsEnabledProperty, new Binding() { Source = this, Path = new PropertyPath(IsVertexHandleProperty) });
+            item.SetBinding(VisibilityProperty, new Binding() { Source = this, Path = new PropertyPath(IsVertexHandleProperty), Converter = new MyConvBootToVisible() });
             item.Click += (s, e) =>
             {
                 MyPoints.Insert(0, MyPointOfRightClicked);
@@ -103,7 +95,7 @@ namespace _20260505_GeoLineEx_ObserveCollectionPoint
             cm.Items.Add(item);
 
             item = new MenuItem() { Header = "ここに頂点を追加(末尾)" };
-            item.SetBinding(IsEnabledProperty, new Binding() { Source = this, Path = new PropertyPath(IsVertexHandleProperty) });
+            item.SetBinding(VisibilityProperty, new Binding() { Source = this, Path = new PropertyPath(IsVertexHandleProperty), Converter = new MyConvBootToVisible() });
             item.Click += (s, e) =>
             {
                 MyPoints.Insert(MyPoints.Count, MyPointOfRightClicked);
@@ -112,10 +104,11 @@ namespace _20260505_GeoLineEx_ObserveCollectionPoint
 
 
             item = new MenuItem() { Header = "編集終了" };
-            item.SetBinding(IsEnabledProperty, new Binding() { Source = this, Path = new PropertyPath(IsVertexHandleProperty) }); cm.Items.Add(item);
+            item.SetBinding(VisibilityProperty, new Binding() { Source = this, Path = new PropertyPath(IsVertexHandleProperty), Converter = new MyConvBootToVisible() }); cm.Items.Add(item);
             item.Click += (s, e) => { IsVertexHandle = false; };
             return cm;
         }
+
 
         #endregion 初期化
 
@@ -808,6 +801,32 @@ namespace _20260505_GeoLineEx_ObserveCollectionPoint
     }
 
 
+
+    public class MyConvReverseBootToVisible : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            return (bool)value ? Visibility.Collapsed : Visibility.Visible;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    public class MyConvBootToVisible : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            return (bool)value ? Visibility.Visible : Visibility.Collapsed;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
 
 
 
