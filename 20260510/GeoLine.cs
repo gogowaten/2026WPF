@@ -96,20 +96,12 @@ namespace _20260510
         {
             var cm = new ContextMenu();
             var item = new MenuItem() { Header = "編集開始" };
-            item.SetBinding(IsEnabledProperty, new Binding() { Source = this, Path = new PropertyPath(IsVertexHandleProperty), Converter = new MyConvReverseBool() });
+            item.SetBinding(VisibilityProperty, new Binding() { Source = this, Path = new PropertyPath(IsVertexHandleProperty), Converter = new MyConvReverseBootToVisible() });
             item.Click += (s, e) => { IsVertexHandle = true; };
             cm.Items.Add(item);
 
-            item = new MenuItem() { Header = "ここに頂点を追加" };
-            item.SetBinding(IsEnabledProperty, new Binding() { Source = this, Path = new PropertyPath(IsVertexHandleProperty) });
-            item.Click += (s, e) =>
-            {
-                MyPoints.Add(MyPointOfRightClicked);
-            };
-            cm.Items.Add(item);
-
             item = new MenuItem() { Header = "ここに頂点を1番目に挿入" };
-            item.SetBinding(IsEnabledProperty, new Binding() { Source = this, Path = new PropertyPath(IsVertexHandleProperty) });
+            item.SetBinding(VisibilityProperty, new Binding() { Source = this, Path = new PropertyPath(IsVertexHandleProperty), Converter = new MyConvBootToVisible() });
             item.Click += (s, e) =>
             {
                 MyPoints.Insert(1, MyPointOfRightClicked);
@@ -117,7 +109,7 @@ namespace _20260510
             cm.Items.Add(item);
 
             item = new MenuItem() { Header = "ここに頂点を追加(先頭)" };
-            item.SetBinding(IsEnabledProperty, new Binding() { Source = this, Path = new PropertyPath(IsVertexHandleProperty) });
+            item.SetBinding(VisibilityProperty, new Binding() { Source = this, Path = new PropertyPath(IsVertexHandleProperty), Converter = new MyConvBootToVisible() });
             item.Click += (s, e) =>
             {
                 MyPoints.Insert(0, MyPointOfRightClicked);
@@ -125,7 +117,7 @@ namespace _20260510
             cm.Items.Add(item);
 
             item = new MenuItem() { Header = "ここに頂点を追加(末尾)" };
-            item.SetBinding(IsEnabledProperty, new Binding() { Source = this, Path = new PropertyPath(IsVertexHandleProperty) });
+            item.SetBinding(VisibilityProperty, new Binding() { Source = this, Path = new PropertyPath(IsVertexHandleProperty), Converter = new MyConvBootToVisible() });
             item.Click += (s, e) =>
             {
                 MyPoints.Insert(MyPoints.Count, MyPointOfRightClicked);
@@ -134,7 +126,7 @@ namespace _20260510
 
 
             item = new MenuItem() { Header = "編集終了" };
-            item.SetBinding(IsEnabledProperty, new Binding() { Source = this, Path = new PropertyPath(IsVertexHandleProperty) }); cm.Items.Add(item);
+            item.SetBinding(VisibilityProperty, new Binding() { Source = this, Path = new PropertyPath(IsVertexHandleProperty), Converter = new MyConvBootToVisible() }); cm.Items.Add(item);
             item.Click += (s, e) => { IsVertexHandle = false; };
             return cm;
         }
@@ -837,41 +829,34 @@ namespace _20260510
     }
 
 
-    public class MyConvTestLeft : IMultiValueConverter
+
+
+
+    public class MyConvReverseBootToVisible : IValueConverter
     {
-        public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            var points = (ObservableCollection<Point>)values[0];
-            var index = (int)values[1];
-            var size = (double)values[2];
-            double left = points[index].X - (size / 2.0);
-            return left;
+            return (bool)value ? Visibility.Collapsed : Visibility.Visible;
         }
 
-        public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
             throw new NotImplementedException();
         }
     }
 
-
-    public class MyConvTestTop : IMultiValueConverter
+    public class MyConvBootToVisible : IValueConverter
     {
-        public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            var points = (ObservableCollection<Point>)values[0];
-            var index = (int)values[1];
-            var size = (double)values[2];
-            double top = points[index].Y - (size / 2.0);
-            return top;
+            return (bool)value ? Visibility.Visible : Visibility.Collapsed;
         }
 
-        public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
             throw new NotImplementedException();
         }
     }
-
 
     public class MyConvReverseBool : IValueConverter
     {
