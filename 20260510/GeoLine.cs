@@ -41,23 +41,8 @@ namespace _20260510
             {
                 MyPointOfRightClicked = e.GetPosition(this);
             };
-            //this.ContextMenuOpening += GeoLineEX_ContextMenuOpening;
         }
 
-        //private void GeoLineEX_ContextMenuOpening(object sender, ContextMenuEventArgs e)
-        //{
-        //    var left = e.CursorLeft;
-        //    var top = e.CursorTop;
-        //    if (sender is GeoLineEX geo)
-        //    {
-        //        var menu = geo.ContextMenu;
-        //        foreach (var item in menu.Items.OfType<MenuItem>())
-        //        {
-
-        //        }
-        //    }
-        //    var neko = 0;
-        //}
 
         #region 初期化
         private void SetMyBind()

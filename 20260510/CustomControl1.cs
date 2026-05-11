@@ -18,12 +18,12 @@ namespace _20260510
     [ContentProperty(nameof(MyContent))]
     public class CustomThumb : Thumb
     {
-        //// Ctrl+クリック移動後の削除判定用
-        //// 移動開始時に自身は選択状態だった場合にtrue
-        //private bool isSelectedAtDragStart;
+        // Ctrl+クリック移動後の削除判定用
+        // 移動開始時に自身は選択状態だった場合にtrue
+        private bool IsSelectedAtDragStart;
 
-        //// 移動開始時にCtrlキーが押されていたフラグ
-        //private bool isDragStartWithPressedCtrl;
+        // 移動開始時にCtrlキーが押されていたフラグ
+        private bool IsDragStartWithPressedCtrl;
 
         public Point migikurikkuiti;
 
@@ -34,16 +34,88 @@ namespace _20260510
         public CustomThumb()
         {
             DragDelta += CustomThumb_DragDelta;
+            DragCompleted += CustomThumb_DragCompleted;
+            DragStarted += CustomThumb_DragStarted;
             PreviewMouseLeftButtonDown += CustomThumb_PreviewMouseLeftButtonDown;
             MouseRightButtonDown += (s, e) => { migikurikkuiti = e.GetPosition(this); };
             Loaded += CustomThumb_Loaded;
-            DragCompleted += CustomThumb_DragCompleted;
 
 
         }
 
+        private void CustomThumb_DragStarted(object sender, DragStartedEventArgs e)
+        {
+            if (MyData.IsSelectable == false) { return; }
+
+            if (MyData.RootData is RootData root)
+            {
+                // 自身の選択状態を記録
+                IsSelectedAtDragStart = root.SelectedItemsData.Contains(MyData);
+
+                // Ctrlキーの状態を記録
+                IsDragStartWithPressedCtrl = Keyboard.Modifiers.HasFlag(ModifierKeys.Control);
+
+                // 選択状態を更新
+                if (MyData.IsSelected == false)
+                {
+                    // 未選択をCtrlクリックした場合は、選択リストに追加して選択状態にする
+                    if (IsDragStartWithPressedCtrl)
+                    {
+                        root.AddDataToSelectedItems(MyData);
+                    }
+                    // 未選択を通常クリックした場合は、自身だけを選択状態にしたいので
+                    // 選択リストをクリアした後、自身をリストに追加
+                    else
+                    {
+                        root.ClearSelectedItems();
+                        root.AddDataToSelectedItems(MyData);
+                    }
+                }
+            }
+        }
+
         private void CustomThumb_DragCompleted(object sender, DragCompletedEventArgs e)
         {
+            /* 移動なしの場合
+             *      通常クリックの場合
+             *          クリック前から選択状態だった
+             *              単独選択だった：そのまま何もしない
+             *              複数選択だった：自分以外をリストから削除
+             *          クリック前は未選択だった：リストをクリアしてから、自身を追加
+             *      Ctrlクリックの場合
+             *          クリック前から選択状態だった
+             *              単独選択だった：そのまま何もしない
+             *              複数選択だった：自分をリストから削除
+             * 移動があった場合
+             *      通常クリックの場合
+             *          クリック前から選択状態だった
+             *              単独選択だった：そのまま何もしない
+             *              複数選択だった：そのまま何もしない
+             *          クリック前は未選択だった：リストをクリアしてから、自身を追加
+             *      Ctrlクリックの場合
+             *          クリック前から選択状態だった
+             *              単独選択だった：そのまま何もしない
+             *              複数選択だった：自分をリストから削除
+             */
+
+
+            // 選択リストから削除して、未選択状態にする処理
+            // 削除対象になる条件はAとBの2種類
+
+            // AB共通条件
+            // * 移動していない
+            // * クリック前から既選択だった
+
+            // パターンA
+            // * クリック時にCtrlキーが押されていた
+            // * 選択リストの要素数が2個以上(選択要素を0個にしたくないだけなので、これは変えても良いかも)
+
+            // パターンB
+            // * 通常クリックだった(Ctrlキーが押されていない)
+            // * 選択リストに自身が在る
+
+
+
             MyData?.ParentData?.UpdateBoundsToRoot();
         }
 

@@ -21,16 +21,16 @@ namespace _20260510
 
 
 
-        [ObservableProperty] private Data? _currentItemData; // 筆頭
-        [ObservableProperty] private Data? _clickedItemData; // 大抵は最後にクリックしたItem
+        [ObservableProperty] private Data? _currentItemData; // 筆頭Data
+        [ObservableProperty] private Data? _clickedItemData; // クリックしたData
+        [ObservableProperty] public CustomThumb? _myClickedItem;
 
         //[NotifyCanExecuteChangedFor(nameof(ZAgeCommand))]
-        [ObservableProperty] private ObservableCollection<Data> _selectedItemsData = [];
+        [ObservableProperty] private ObservableCollection<Data> _selectedItemsData = []; // 選択ItemData
 
         [NotifyCanExecuteChangedFor(nameof(ZUpCommand))]
         [NotifyCanExecuteChangedFor(nameof(ZtoTopCommand))]
-        [ObservableProperty] private GroupData? _editingGroupData;
-        [ObservableProperty] public CustomThumb? _myClickedItem;
+        [ObservableProperty] private GroupData? _editingGroupData; // 編集中のGroupData
 
 
 
@@ -195,7 +195,8 @@ namespace _20260510
         }
         #endregion パブリックメソッド
 
-        //#region グループ化
+        #region グループ化
+        
 
         private bool CanUnGroup()
         {
@@ -615,7 +616,7 @@ namespace _20260510
             DataList.Add(data);
         }
 
-        //#endregion メソッド
+        #endregion メソッド
 
 
 
