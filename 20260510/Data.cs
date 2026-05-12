@@ -123,22 +123,6 @@ namespace _20260510
 
 
 
-
-        ///// <summary>
-        ///// オフセットの切り替え、GeoShapeData専用
-        ///// 図形の位置が左上(0,0)になるのと、通常の位置の切り替えになる
-        ///// 図形の位置が変わるののでThumbのいちも相対的に変更するため、DataのX,Yを変更している
-        ///// </summary>
-        ////[RelayCommand(CanExecute = nameof(CanChageGeoShapeData))]
-        //[RelayCommand]
-        //private void ChangeGeoShapeOffset()
-        //{
-        //    if (CurrentItem is GeoShapeData data)
-        //    {
-        //        data.IsOffset = !data.IsOffset;
-        //    }
-        //}
-
         public bool CanChageGeoShapeData()
         {
             return CurrentItemData is GeoShapeData;
@@ -153,9 +137,9 @@ namespace _20260510
                 {
                     newData.IsSelected = true;
                     RemoveSelectedItemsCommand.NotifyCanExecuteChanged(); // 削除Command実行判定
-                    ZUpCommand.NotifyCanExecuteChanged();
+                    ZUpSelectedItemsCommand.NotifyCanExecuteChanged();
                     ZtoTopCommand.NotifyCanExecuteChanged();
-                    ZDownCommand.NotifyCanExecuteChanged();
+                    ZDownSelectedItemsCommand.NotifyCanExecuteChanged();
                     ZtoBottomCommand.NotifyCanExecuteChanged();
                     AddGroupFromSelectedItemsCommand.NotifyCanExecuteChanged();
 
@@ -168,9 +152,9 @@ namespace _20260510
                     oldData.IsSelected = false;
                     if (CurrentItemData == oldData) { CurrentItemData = null; }
                     RemoveSelectedItemsCommand.NotifyCanExecuteChanged(); // 削除Command実行判定
-                    ZUpCommand.NotifyCanExecuteChanged();
+                    ZUpSelectedItemsCommand.NotifyCanExecuteChanged();
                     ZtoTopCommand.NotifyCanExecuteChanged();
-                    ZDownCommand.NotifyCanExecuteChanged();
+                    ZDownSelectedItemsCommand.NotifyCanExecuteChanged();
                     ZtoBottomCommand.NotifyCanExecuteChanged();
                     AddGroupFromSelectedItemsCommand.NotifyCanExecuteChanged();
                     UnGroupCommand.NotifyCanExecuteChanged();
@@ -182,13 +166,8 @@ namespace _20260510
         #region メソッド
 
         #region パブリックメソッド
-        public void TestBackground()
-        {
-            if (CurrentItemData is GeoLineData data)
-            {
 
-            }
-        }
+
         #endregion パブリックメソッド
 
         #region グループ化
@@ -295,14 +274,17 @@ namespace _20260510
 
             // 新グループのZを先に計算しておく
             // 新グループのZ = 選択Itemの最上層Z - (選択個数 - 1)
-            int groupZ = SelectedItemsData.Max(n => n.Z) - (SelectedItemsData.Count - 1);
+            int newGroupZIndex = SelectedItemsData.Max(n => n.Z) - (SelectedItemsData.Count - 1);
 
 
-            // 新リスト作成、非選択Itemを詰め込む
+            // 非選択ItemだけのListを新規作成
             var newDataList = new ObservableCollection<Data>();
             foreach (var item in EditingGroupData.DataList)
             {
-                if (item.IsSelected == false) { newDataList.Add(item); }
+                if (item.IsSelected == false)
+                {
+                    newDataList.Add(item);
+                }
             }
 
 
@@ -320,7 +302,7 @@ namespace _20260510
             }
 
             // 新グループを新リストに挿入            
-            newDataList.Insert(groupZ, newGroup);
+            newDataList.Insert(newGroupZIndex, newGroup);
 
             // 新グループと子要素の座標調整
             double minX = double.MaxValue;
@@ -361,6 +343,9 @@ namespace _20260510
         }
         #endregion グループ化
 
+
+
+
         #region Z
 
         // 選択Itemを最背面へ移動
@@ -376,7 +361,7 @@ namespace _20260510
 
         // 背面へ移動
         [RelayCommand(CanExecute = nameof(CanZDown))]
-        private void ZDown()
+        private void ZDownSelectedItems()
         {
             if (EditingGroupData is null) { return; }
 
@@ -397,7 +382,10 @@ namespace _20260510
             var newList = new ObservableCollection<Data>();
             foreach (var item in EditingGroupData.DataList)
             {
-                if (item.IsSelected == false) { newList.Add(item); }
+                if (item.IsSelected == false)
+                {
+                    newList.Add(item);
+                }
             }
 
             // 新リストに選択Itemを順番に挿入、場所は移動距離(方向)を加味
@@ -413,9 +401,10 @@ namespace _20260510
             // リストの入れ替え
             EditingGroupData.DataList = newList;
 
-            ZDownCommand.NotifyCanExecuteChanged();
+
+            ZDownSelectedItemsCommand.NotifyCanExecuteChanged();
             ZtoBottomCommand.NotifyCanExecuteChanged();
-            ZUpCommand.NotifyCanExecuteChanged();
+            ZUpSelectedItemsCommand.NotifyCanExecuteChanged();
             ZtoTopCommand.NotifyCanExecuteChanged();
         }
 
@@ -457,7 +446,7 @@ namespace _20260510
 
         // Z、選択Itemを上に移動、ZIndexを1増やす
         [RelayCommand(CanExecute = nameof(CanZUp))]
-        private void ZUp()
+        public void ZUpSelectedItems()
         {
             if (EditingGroupData is null) { return; }
             ZMove(1);
@@ -711,6 +700,19 @@ namespace _20260510
         [ObservableProperty] private bool _isEditing; // 編集状態
         [ObservableProperty] private ObservableCollection<Data> _dataList = [];
 
+        partial void OnDataListChanged(ObservableCollection<Data>? oldValue, ObservableCollection<Data> newValue)
+        {
+            if (oldValue is not null)
+            {
+                oldValue.CollectionChanged -= DataList_CollectionChanged;
+            }
+
+            if (newValue is not null)
+            {
+                newValue.CollectionChanged += DataList_CollectionChanged;
+            }
+        }
+
         public GroupData()
         {
             Name = "GroupData";
@@ -719,7 +721,7 @@ namespace _20260510
 
 
 
-        private void DataList_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+        internal void DataList_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
         {
             if (e.Action == NotifyCollectionChangedAction.Add)
             {

@@ -27,6 +27,7 @@ namespace _20260510
         private VertexAdorner? MyVertexAdorner; // 頂点ハンドル用のAdorner
         private AdornerLayer MyAdornerLayer = null!; // AdornerLayer保持
         private Point MyPointOfRightClicked; // 右クリックの位置記録用、頂点追加に使用
+        private ContextMenu MyContextMenu; // 右クリックメニュー
 
 
         public GeoLineEX()
@@ -35,13 +36,16 @@ namespace _20260510
             Loaded += GeoLineEX_Loaded;
 
             // 右クリックメニュー作成
-            ContextMenu = CreateContextMenu();
+            MyContextMenu = CreateContextMenu();
+
+
 
             PreviewMouseRightButtonDown += (s, e) =>
             {
                 MyPointOfRightClicked = e.GetPosition(this);
             };
         }
+
 
 
         #region 初期化
@@ -65,14 +69,16 @@ namespace _20260510
             if (AdornerLayer.GetAdornerLayer(this) is AdornerLayer layer)
             {
                 MyAdornerLayer = layer;
-                //if (IsVertexHandle)
-                //{
-                //    ShowVertexAdorner();
-                //}
             }
             else
             {
                 throw new InvalidOperationException("AdornerLayerが見つからなかった");
+            }
+
+            // 右クリックメニュー表示可否
+            if (IsEnableContextMenu)
+            {
+                this.ContextMenu = MyContextMenu;
             }
         }
 
@@ -119,6 +125,39 @@ namespace _20260510
         #endregion 初期化
 
         #region 依存関係プロパティ
+
+        // 右クリックメニューの有無
+        public bool IsEnableContextMenu
+        {
+            get { return (bool)GetValue(IsEnableContextMenuProperty); }
+            set { SetValue(IsEnableContextMenuProperty, value); }
+        }
+        public static readonly DependencyProperty IsEnableContextMenuProperty =
+            DependencyProperty.Register(nameof(IsEnableContextMenu), typeof(bool), typeof(GeoLineEX), new PropertyMetadata(true, OnIsEnableContextMenuChanged, new CoerceValueCallback(CoerceIsEnableContextMenu)));
+        private static void OnIsEnableContextMenuChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            if (d is GeoLineEX geo)
+            {
+                if ((bool)e.NewValue)
+                {
+                    geo.ContextMenu = geo.MyContextMenu;
+                }
+                else { geo.ContextMenu = null; }
+            }
+        }
+
+        // 頂点編集中は右クリックメニュー有効を維持する、Falseをtrueに強制変換
+        private static object CoerceIsEnableContextMenu(DependencyObject d, object baseValue)
+        {
+            if (((bool)baseValue) == false)
+            {
+                if (d is GeoLineEX geo && geo.IsVertexHandle)
+                {
+                    return true;
+                }
+            }
+            return baseValue;
+        }
 
         // 頂点ハンドル色
 

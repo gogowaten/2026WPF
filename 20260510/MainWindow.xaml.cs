@@ -46,7 +46,7 @@ namespace _20260510
             //group.AddData(new EllipseData() { X = 10, Y = 50, Fill = Brushes.Orange, Width = 30, Height = 30 });
             //root.AddData(group);
 
-            //root.AddData(CreateGeoLineGroupData());
+            root.AddData(CreateGeoLineGroupData());
             root.AddData(CreateGeoLineData());
             return root;
         }
@@ -130,9 +130,12 @@ namespace _20260510
             //MyElement.InvalidateVisual();
         }
 
-        private void background_Click(object sender, RoutedEventArgs e)
+        private void ContextMenu_Click(object sender, RoutedEventArgs e)
         {
-
+            if(MyData is RootData root && root.MyClickedItem?.MyContent is GeoLineEX geo)
+            {
+                geo.IsEnableContextMenu = !geo.IsEnableContextMenu;
+            }
         }
 
         private void check_Click(object sender, RoutedEventArgs e)
@@ -167,20 +170,14 @@ namespace _20260510
             }
         }
 
-        private void vertexhandle_Click(object sender, RoutedEventArgs e)
-        {
-            if (MyData.ClickedItemData is GeoLineData data)
-            {
-                data.IsVertexHandle = !data.IsVertexHandle;
-            }
+        private void Zup(object sender, RoutedEventArgs e)
+        {            
+            MyData.ZUpSelectedItems();
         }
 
         private void RemoveEndPoint_Click(object sender, RoutedEventArgs e)
         {
-            if (MyData.ClickedItemData is GeoLineData data)
-            {
-                data.Points.RemoveAt(data.Points.Count - 1);
-            }
+            
         }
 
         private void InsertStartPoint_Click(object sender, RoutedEventArgs e)

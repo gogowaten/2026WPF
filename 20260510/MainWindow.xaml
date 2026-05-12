@@ -30,8 +30,9 @@
     <StackPanel Grid.Column="1">
       <Button x:Name="check" Content="check" Click="check_Click"/>
       <Button Content="addpoint" Click="Button_Click"/>
-      <Button x:Name="background" Content="background" Click="background_Click"/>
-      <Button x:Name="vertexhandle" Content="vertexHandle" Click="vertexhandle_Click"/>
+      <Button x:Name="background" Content="ContextMenu" Click="ContextMenu_Click"/>
+      <Button x:Name="vertexhandle" Content="ZUP" Click="Zup"/>
+      <Button Content="ZupCommand" Command="{Binding MyData.ZUpSelectedItemsCommand}"/>
       <Button x:Name="RemoveEndPoint" Content="RemoveEndPoint" Click="RemoveEndPoint_Click"/>
       <Button x:Name="InsertStartPoint" Content="InsertStartPoint" Click="InsertStartPoint_Click"/>
 

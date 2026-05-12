@@ -26,6 +26,8 @@ namespace _20260510
         private bool IsDragStartWithPressedCtrl;
 
         public Point migikurikkuiti;
+        public ContextMenu MyContextMenu { get; set; } = null!;
+        
 
         static CustomThumb()
         {
@@ -41,7 +43,34 @@ namespace _20260510
             //PreviewMouseLeftButtonDown += CustomThumb_PreviewMouseLeftButtonDown;
             //MouseUp += CustomThumb_MouseUp;
             Loaded += CustomThumb_Loaded;
+
+            
+            
         }
+
+        private ContextMenu CreateMyContextMenu(Data data)
+        {
+            
+            var menu = new ContextMenu();
+            if (typeof(EllipseData) == data.GetType())
+            {
+                var item = new MenuItem() { Header = "ellipse" };
+                menu.Items.Add(item);
+            }
+            else if (typeof(GeoLineData) == data.GetType())
+            {
+                var item = new MenuItem() { Header = "geoline" };
+                menu.Items.Add(item);
+                if(MyContent is GeoLineEX geo)
+                {
+                    
+                }
+            }
+
+            return menu;
+        }
+
+       
 
         #region クリックイベント時
 
@@ -166,12 +195,12 @@ namespace _20260510
 
         private void CustomThumb_Loaded(object sender, RoutedEventArgs e)
         {
-            var neko = MyData;
             if (MyContent is FrameworkElement element)
             {
                 element.SizeChanged += Element_SizeChanged;
             }
 
+            this.ContextMenu = CreateMyContextMenu(MyData);
         }
 
         private void Element_SizeChanged(object sender, SizeChangedEventArgs e)
