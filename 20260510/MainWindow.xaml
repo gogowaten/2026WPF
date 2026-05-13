@@ -29,7 +29,7 @@
 
     <StackPanel Grid.Column="1">
       <Button x:Name="check" Content="check" Click="check_Click"/>
-      <Button Content="addpoint" Click="Button_Click"/>
+      <Button Content="グループ化" Command="{Binding MyData.AddGroupFromSelectedItemsCommand}"/>
       <Button x:Name="background" Content="ContextMenu" Click="ContextMenu_Click"/>
       <Button x:Name="vertexhandle" Content="ZUP" Click="Zup"/>
       <Button Content="ZupCommand" Command="{Binding MyData.ZUpSelectedItemsCommand}"/>

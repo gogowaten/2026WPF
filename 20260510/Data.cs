@@ -162,6 +162,19 @@ namespace _20260510
             }
         }
 
+        public void AddDataToEditingGroup(Data data, int insert)
+        {
+            data.RootData = this;
+            EditingGroupData.DataList.Insert(insert, data);
+        }
+
+        public void AddDataToEditingGroup(Data data)
+        {
+            data.RootData = this;
+            EditingGroupData.DataList.Add(data);
+        }
+
+
 
         #region メソッド
 
@@ -258,89 +271,145 @@ namespace _20260510
             return true;
         }
 
-        /// <summary>
-        /// 編集グループ内で現在選択されている項目から新しいグループを作成し、データリストを更新します。
-        /// </summary>
-        /// <remarks>このメソッドは、選択された項目を新しいグループにまとめ、位置とZオーダーを再計算し、
-        /// 編集グループのデータリストを更新された構造に置き換えます。その後、新しいグループが選択されます。
-        /// </remarks>
         [RelayCommand(CanExecute = nameof(CanAddGroupFromSelectedItems))]
         private void AddGroupFromSelectedItems()
         {
-            if (EditingGroupData is null) { return; }
-            if (SelectedItemsData.Count <= 1) { return; }
-            if (EditingGroupData.DataList.Count < 1) { return; }
-            if (EditingGroupData.DataList.Count == SelectedItemsData.Count) { return; }
+            if (CanAddGroupFromSelectedItems() == false) { return; }
 
-            // 新グループのZを先に計算しておく
-            // 新グループのZ = 選択Itemの最上層Z - (選択個数 - 1)
+            // 新G：新グループ
+
+            // 新GのZを先に計算しておく
+            // 新GのZ = 選択Itemの最上層Z - (選択個数 - 1)
             int newGroupZIndex = SelectedItemsData.Max(n => n.Z) - (SelectedItemsData.Count - 1);
 
+            // 選択アイテムのBoundsを計算、これが新GのBoundsになるし、その子要素の座標調整にも使う
+            var newBounds = GetBounds(SelectedItemsData);
 
-            // 非選択ItemだけのListを新規作成
-            var newDataList = new ObservableCollection<Data>();
-            foreach (var item in EditingGroupData.DataList)
+            // 新GのDataList
+            // SelectedをZIndex順にソートしたリストを作成
+            var newDataList = new ObservableCollection<Data>(SelectedItemsData.OrderBy(a => a.Z).ToArray());
+            foreach (var item in newDataList)
             {
-                if (item.IsSelected == false)
-                {
-                    newDataList.Add(item);
-                }
-            }
-
-
-            // 新グループ作成、そのDataListに選択Itemを順番に追加
-            GroupData newGroup = new()
-            {
-                RootData = this.RootData,
-                IsSelectable = true,
-                ParentData = EditingGroupData,
-            };
-            var sortedItems = SelectedItemsData.OrderBy(n => n.Z).ToArray();
-            for (int i = 0; i < sortedItems.Length; i++)
-            {
-                newGroup.DataList.Add(sortedItems[i]);
-            }
-
-            // 新グループを新リストに挿入            
-            newDataList.Insert(newGroupZIndex, newGroup);
-
-            // 新グループと子要素の座標調整
-            double minX = double.MaxValue;
-            double minY = double.MaxValue;
-            double right = 0;
-            double bottom = 0;
-            foreach (var item in newGroup.DataList)
-            {
-                if (minX > item.X) { minX = item.X; }
-                if (minY > item.Y) { minY = item.Y; }
-                if (right < item.X + item.Width) { right = item.X + item.Width; }
-                if (bottom < item.Y + item.Height) { bottom = item.Y + item.Height; }
-            }
-            newGroup.X = minX; newGroup.Y = minY;
-            newGroup.Width = right - minX;
-            newGroup.Height = bottom - minY;
-
-            // 子要素の座標調整、ついでにIsSelectableとIsSelectedをfalseに変更
-            foreach (var item in newGroup.DataList)
-            {
-                item.X -= minX;
-                item.Y -= minY;
+                item.X -= newBounds.X;
+                item.Y -= newBounds.Y;
                 item.IsSelectable = false;
                 item.IsSelected = false;
             }
 
-            // 新リストの要素のZを整える
-            for (int i = 0; i < newDataList.Count; i++) { newDataList[i].Z = i; }
+            // 該当DataをSelectedと親要素のDataListから削除
+            for (int i = newDataList.Count - 1; i >= 0; i--)
+            {
+                EditingGroupData.DataList.Remove(newDataList[i]);
+                SelectedItemsData.Remove(newDataList[i]);
+            }
 
-            // 今の全体リストと新リストを入れ替えて完了
-            EditingGroupData.DataList = newDataList;
+            // 新G作成
+            var newGroup = new GroupData()
+            {
+                ParentData = EditingGroupData,
+                RootData = this,
+                DataList = newDataList, // 新DataListを指定する
 
-            // 選択Itemリストを整える
-            ClearSelectedItems();
-            AddDataToSelectedItems(newGroup);// 新グループを選択状態にする
+                X = newBounds.X,
+                Y = newBounds.Y,
+                Width = newBounds.Width,
+                Height = newBounds.Height,
+            };
 
+            // 親要素に新Gを追加（挿入）
+            AddDataToEditingGroup(newGroup, newGroupZIndex);
+
+            // 新GをSelectedにする            
+            AddDataToSelectedItems(newGroup);
+
+            // 通知
             AddGroupFromSelectedItemsCommand.NotifyCanExecuteChanged();
+
         }
+
+
+        ///// <summary>
+        ///// 編集グループ内で現在選択されている項目から新しいグループを作成し、データリストを更新します。
+        ///// </summary>
+        ///// <remarks>このメソッドは、選択された項目を新しいグループにまとめ、位置とZオーダーを再計算し、
+        ///// 編集グループのデータリストを更新された構造に置き換えます。その後、新しいグループが選択されます。
+        ///// </remarks>
+        //[RelayCommand(CanExecute = nameof(CanAddGroupFromSelectedItems))]
+        //private void AddGroupFromSelectedItems()
+        //{
+        //    if (EditingGroupData is null) { return; }
+        //    if (SelectedItemsData.Count <= 1) { return; }
+        //    if (EditingGroupData.DataList.Count < 1) { return; }
+        //    if (EditingGroupData.DataList.Count == SelectedItemsData.Count) { return; }
+
+        //    // 新グループのZを先に計算しておく
+        //    // 新グループのZ = 選択Itemの最上層Z - (選択個数 - 1)
+        //    int newGroupZIndex = SelectedItemsData.Max(n => n.Z) - (SelectedItemsData.Count - 1);
+
+        //    // 非選択ItemだけのListを新規作成
+        //    var newDataList = new ObservableCollection<Data>();
+        //    foreach (var item in EditingGroupData.DataList)
+        //    {
+        //        if (item.IsSelected == false)
+        //        {
+        //            newDataList.Add(item);
+        //        }
+        //    }
+
+        //    // 新グループ作成、そのDataListに選択Itemを順番に追加
+        //    GroupData newGroup = new()
+        //    {
+        //        RootData = this.RootData,
+        //        IsSelectable = true,
+        //        ParentData = EditingGroupData,
+        //    };
+        //    var sortedItems = SelectedItemsData.OrderBy(n => n.Z).ToArray();
+        //    for (int i = 0; i < sortedItems.Length; i++)
+        //    {
+        //        newGroup.DataList.Add(sortedItems[i]);
+        //    }
+
+        //    // 新グループを新リストに挿入
+        //    newDataList.Insert(newGroupZIndex, newGroup);
+
+        //    // 新グループと子要素の座標調整
+        //    double minX = double.MaxValue;
+        //    double minY = double.MaxValue;
+        //    double right = 0;
+        //    double bottom = 0;
+        //    foreach (var item in newGroup.DataList)
+        //    {
+        //        if (minX > item.X) { minX = item.X; }
+        //        if (minY > item.Y) { minY = item.Y; }
+        //        if (right < item.X + item.Width) { right = item.X + item.Width; }
+        //        if (bottom < item.Y + item.Height) { bottom = item.Y + item.Height; }
+        //    }
+        //    newGroup.X = minX; newGroup.Y = minY;
+        //    newGroup.Width = right - minX;
+        //    newGroup.Height = bottom - minY;
+
+        //    // 子要素の座標調整、ついでにIsSelectableとIsSelectedをfalseに変更
+        //    foreach (var item in newGroup.DataList)
+        //    {
+        //        item.X -= minX;
+        //        item.Y -= minY;
+        //        item.IsSelectable = false;
+        //        item.IsSelected = false;
+        //    }
+
+        //    // 新リストの要素のZを整える
+        //    for (int i = 0; i < newDataList.Count; i++) { newDataList[i].Z = i; }
+
+        //    // 今の全体リストと新リストを入れ替えて完了
+        //    EditingGroupData.DataList = newDataList;
+
+        //    // 選択Itemリストを整える
+        //    ClearSelectedItems();
+        //    AddDataToSelectedItems(newGroup);// 新グループを選択状態にする
+
+        //    AddGroupFromSelectedItemsCommand.NotifyCanExecuteChanged();
+        //}
+
         #endregion グループ化
 
 
@@ -604,7 +673,7 @@ namespace _20260510
 
 
 
-        // 選択状態のItemすべてを削除
+        // 選択状態のItemすべてをDataListから削除 ＆ 選択リストもクリア
         [RelayCommand(CanExecute = nameof(CanSelectedItemsRemove))]
         public void RemoveSelectedItems()
         {
@@ -614,7 +683,11 @@ namespace _20260510
             foreach (var item in SelectedItemsData)
             {
                 EditingGroupData.DataList.Remove(item);
-                if (item.IsClicked) { ClickedItemData = null; }
+                if (item.IsClicked)
+                {
+                    ClickedItemData = null;
+                    MyClickedItem = null;
+                }
             }
 
             // 選択状態解除
@@ -752,6 +825,11 @@ namespace _20260510
                         }
                     }
 
+                    // 以下のIs系は念のため
+                    oldData.IsSelectable = false;
+                    oldData.IsSelected = false;
+                    oldData.IsCurrent = false;
+
                     oldData.ParentData?.UpdateSize();
                     oldData.ParentData = null; // Parentをリサイズしてからnullにする
                 }
@@ -827,26 +905,26 @@ namespace _20260510
         {
             double right = 0;
             double bottom = 0;
-            double minX = double.MaxValue;
-            double minY = double.MaxValue;
+            double left = double.MaxValue;
+            double top = double.MaxValue;
             foreach (var item in group.DataList)
             {
-                minX = Math.Min(minX, item.X);
-                minY = Math.Min(minY, item.Y);
+                left = Math.Min(left, item.X);
+                top = Math.Min(top, item.Y);
                 right = Math.Max(right, item.X + item.Width);
                 bottom = Math.Max(bottom, item.Y + item.Height);
             }
 
             // サイズ更新
-            group.Width = right - minX;
-            group.Height = bottom - minY;
+            group.Width = right - left;
+            group.Height = bottom - top;
 
             // 子要素の座標更新
-            foreach (Data item in group.DataList) { item.X -= minX; item.Y -= minY; }
+            foreach (Data item in group.DataList) { item.X -= left; item.Y -= top; }
 
             // 自身の座標更新
-            X += minX;
-            Y += minY;
+            X += left;
+            Y += top;
 
             // 親要素へ伝播
             group.ParentData?.UpdateBoundsToRoot(group.ParentData);
@@ -857,13 +935,35 @@ namespace _20260510
             UpdateBoundsToRoot(this);
         }
 
+        // DataListのBoundsを計算
+        public Rect GetBounds(ObservableCollection<Data> datas)
+        {
+            if (datas.Count == 0) { return new Rect(); }
+            double right = 0;
+            double bottom = 0;
+            double left = double.MaxValue;
+            double top = double.MaxValue;
+            foreach (var item in datas)
+            {
+                left = Math.Min(left, item.X);
+                top = Math.Min(top, item.Y);
+                right = Math.Max(right, item.X + item.Width);
+                bottom = Math.Max(bottom, item.Y + item.Height);
+            }
+            Rect r = new(left, top, right, bottom)
+            {
+                Width = right - left,
+                Height = bottom - top
+            };
+            return r;
+        }
 
         #region パブリックメソッド
 
         public void AddData(Data data)
         {
             data.RootData = this.RootData;
-            //RootのDataListに追加するときはok
+            // RootのDataListに追加するときはok
             // Groupに追加するときは、GroupのDataにRootがあればそれでいいけど
             // ない場合はnullのまま
             // で、Rootに追加するのがGroupだった場合は、GroupのRootDataを指定するのはもちろんで、

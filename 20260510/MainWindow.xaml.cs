@@ -30,6 +30,9 @@ namespace _20260510
             //MyElement = MyTest();
             //MyCanvas.Children.Add(MyElement);
 
+            //Rect rec = new(10, 10, 100, 100) { Width = 90, Height = 90 };
+
+
             MyData = CreateRootData();
             this.DataContext = this;
         }
@@ -115,19 +118,9 @@ namespace _20260510
             return geo;
         }
 
-        private void Button_Click(object sender, RoutedEventArgs e)
+        private void ButtonGroup_Click(object sender, RoutedEventArgs e)
         {
-            //if(MyData.DataList[1] is GeoLineData data)
-            //{
-            //    data.Points.Add(new Point(200, 50));
-            //}
-            if (MyRootItems.MyData.MyClickedItem?.MyContent is GeoLineEX geo)
-            {
-                geo.MyPoints.Add(new Point(200, 50));
-            }
-            //MyElement.MyPoints.Add(new Point(50, 200));
-            //MyElement.InvalidateMeasure();
-            //MyElement.InvalidateVisual();
+            
         }
 
         private void ContextMenu_Click(object sender, RoutedEventArgs e)
