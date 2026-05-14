@@ -23,6 +23,7 @@ namespace _20260510
 
 
         [ObservableProperty] private Data? _currentItemData; // 筆頭Data
+
         [ObservableProperty] private Data? _clickedItemData; // クリックしたData
         [ObservableProperty] public CustomThumb? _myClickedItem;
 
@@ -70,10 +71,15 @@ namespace _20260510
         // 筆頭変更後
         partial void OnCurrentItemDataChanged(Data? oldValue, Data? newValue)
         {
-            if (oldValue is not null) { oldValue.IsCurrent = false; }
+            if (oldValue is not null)
+            {
+                oldValue.IsCurrent = false;
+            }
+
             if (newValue is not null)
             {
                 newValue.IsCurrent = true;
+                UnGroupCurrentCommand.NotifyCanExecuteChanged();
                 //UnGroupCommand.NotifyCanExecuteChanged();
                 //if (newValue is GeoShapeData geo)
                 //{
@@ -142,7 +148,7 @@ namespace _20260510
                     ZDownSelectedItemsCommand.NotifyCanExecuteChanged();
                     ZtoBottomCommand.NotifyCanExecuteChanged();
                     AddGroupFromSelectedItemsCommand.NotifyCanExecuteChanged();
-
+                    UnGroupCurrentCommand.NotifyCanExecuteChanged();
                 }
             }
             else if (e.Action == NotifyCollectionChangedAction.Remove)
@@ -150,6 +156,7 @@ namespace _20260510
                 if (e.OldItems?[0] is Data oldData)
                 {
                     oldData.IsSelected = false;
+                    oldData.IsCurrent = false;
                     if (CurrentItemData == oldData) { CurrentItemData = null; }
                     RemoveSelectedItemsCommand.NotifyCanExecuteChanged(); // 削除Command実行判定
                     ZUpSelectedItemsCommand.NotifyCanExecuteChanged();
@@ -157,17 +164,27 @@ namespace _20260510
                     ZDownSelectedItemsCommand.NotifyCanExecuteChanged();
                     ZtoBottomCommand.NotifyCanExecuteChanged();
                     AddGroupFromSelectedItemsCommand.NotifyCanExecuteChanged();
-                    UnGroupCommand.NotifyCanExecuteChanged();
+                    //UnGroupCommand.NotifyCanExecuteChanged();
+                    UnGroupCurrentCommand.NotifyCanExecuteChanged();
                 }
             }
         }
 
+        /// <summary>
+        /// EditingGroupのDataListにDataを挿入
+        /// </summary>
+        /// <param name="data"></param>
+        /// <param name="insert"></param>
         public void AddDataToEditingGroup(Data data, int insert)
         {
             data.RootData = this;
             EditingGroupData.DataList.Insert(insert, data);
         }
 
+        /// <summary>
+        /// EditingGroupのDataListの末尾にDataを追加
+        /// </summary>
+        /// <param name="data"></param>
         public void AddDataToEditingGroup(Data data)
         {
             data.RootData = this;
@@ -194,81 +211,133 @@ namespace _20260510
             return true;
         }
 
+
         /// <summary>
-        /// 現在選択されているグループ項目をグループ解除し、子要素を親グループに移動させ、選択状態と位置を更新します。
+        /// 今のグループを解除する
         /// </summary>
-        /// <remarks>このメソッドは、現在の項目がグループであり、かつ編集グループが存在する場合にのみ使用できます。
-        /// グループ解除後、グループのすべての子要素が選択され、親グループに対する位置が調整されます。
-        /// グループ自体は親グループから削除されます。この操作により、
-        /// 選択状態が更新され、必要に応じてコマンド状態の変更が通知されます。
-        /// </remarks>
         [RelayCommand(CanExecute = nameof(CanUnGroup))]
-        private void UnGroup()
+        private void UnGroupCurrent()
         {
-            if (CurrentItemData is not GroupData) { return; }
-            if (EditingGroupData is null) { return; }
+            if (CanUnGroup() == false) { return; }
 
             if (CurrentItemData is GroupData targetGroupData)
             {
-                // ClickedItemチェック
-                if (ClickedItemData == targetGroupData) { ClickedItemData = null; }
+                // 対象グループのZIndexを記録、これが分解したData群の追加先基準になる
+                int zIndex = targetGroupData.Z;
 
-                // 親要素のDataListにバラした要素を順番に挿入
-                int z = targetGroupData.Z;
-                for (int i = targetGroupData.DataList.Count - 1; i >= 0; i--)
-                {
-                    var item = targetGroupData.DataList[i];
-                    EditingGroupData.DataList.Insert(z, item);
-                    item.IsSelectable = true;
-                    item.IsSelected = true;
-                }
+                // 対象グループの子要素の一時的なリストを作成、ZIndex順にソートしておく
+                var tempSortedList = targetGroupData.DataList.OrderBy(item => item.Z).ToArray();
 
-                // 子要素の座標調整
-                foreach (var item in targetGroupData.DataList)
-                {
-                    item.X += targetGroupData.X;
-                    item.Y += targetGroupData.Y;
-                }
-
-                // 子要素全体のZを整える
-                for (int i = 0; i < EditingGroupData.DataList.Count; i++)
-                {
-                    EditingGroupData.DataList[i].Z = i;
-                }
-                // 選択Itemを整える、解除したグループの子要素を選択状態にする
-                ClearSelectedItems();
-                foreach (var item in targetGroupData.DataList)
-                {
-                    AddDataToSelectedItems(item);
-                }
-
-                // 解除するDataを外す
+                // 親要素から対象グループのData削除
                 EditingGroupData.DataList.Remove(targetGroupData);
-                //RemoveDataFromSelect(targetGroupData);
-                targetGroupData.IsClicked = false;
-                targetGroupData.IsSelectable = false;
-                targetGroupData.IsSelected = false;
-                targetGroupData.DataList.Clear(); // 要る？
 
-                // 選択ItemにClickedItemが在ればそれをCurrentItemにする
-                if (ClickedItemData is not null && ClickedItemData.IsSelected) { CurrentItemData = ClickedItemData; }
+                // Selectedを空する
+                ClearSelectedItems();
 
+                // CurrentDataにするDataのZIndex
+                int newCurrentDataZIndex = zIndex;
 
-                UnGroupCommand.NotifyCanExecuteChanged();
+                // 親要素にData群を追加、同時に選択状態にする
+                for (int i = 0; i < tempSortedList.Length; i++)
+                {
+                    var data = tempSortedList[i];
+                    if (data.IsClicked) { newCurrentDataZIndex += i; } // Clickedがあれば、それのZIndexを記録
+                    data.IsSelectable = true; // 選択状態可能にしておく
+                    data.X += targetGroupData.X; // Data群のx,y調整
+                    data.Y += targetGroupData.Y;
+                    AddDataToEditingGroup(data, i + zIndex); // zの調整は追加メソッド先で行われる
+                    AddDataToSelectedItems(data); // 選択状態にする
+                }
+
+                CurrentItemData = DataList[newCurrentDataZIndex];
+
+                UnGroupCurrentCommand.NotifyCanExecuteChanged();
             }
-
-
-
-
         }
 
+
+        ///// <summary>
+        ///// 現在選択されているグループ項目をグループ解除し、子要素を親グループに移動させ、選択状態と位置を更新します。
+        ///// </summary>
+        ///// <remarks>このメソッドは、現在の項目がグループであり、かつ編集グループが存在する場合にのみ使用できます。
+        ///// グループ解除後、グループのすべての子要素が選択され、親グループに対する位置が調整されます。
+        ///// グループ自体は親グループから削除されます。この操作により、
+        ///// 選択状態が更新され、必要に応じてコマンド状態の変更が通知されます。
+        ///// </remarks>
+        //[RelayCommand(CanExecute = nameof(CanUnGroup))]
+        //private void UnGroup()
+        //{
+        //    if (CurrentItemData is not GroupData) { return; }
+        //    if (EditingGroupData is null) { return; }
+
+        //    if (CurrentItemData is GroupData targetGroupData)
+        //    {
+        //        // ClickedItemチェック
+        //        if (ClickedItemData == targetGroupData) { ClickedItemData = null; }
+
+        //        // 親要素のDataListにバラした要素を順番に挿入
+        //        int z = targetGroupData.Z;
+        //        for (int i = targetGroupData.DataList.Count - 1; i >= 0; i--)
+        //        {
+        //            var item = targetGroupData.DataList[i];
+        //            EditingGroupData.DataList.Insert(z, item);
+        //            item.IsSelectable = true;
+        //            item.IsSelected = true;
+        //        }
+
+        //        // 子要素の座標調整
+        //        foreach (var item in targetGroupData.DataList)
+        //        {
+        //            item.X += targetGroupData.X;
+        //            item.Y += targetGroupData.Y;
+        //        }
+
+        //        // 子要素全体のZを整える
+        //        for (int i = 0; i < EditingGroupData.DataList.Count; i++)
+        //        {
+        //            EditingGroupData.DataList[i].Z = i;
+        //        }
+        //        // 選択Itemを整える、解除したグループの子要素を選択状態にする
+        //        ClearSelectedItems();
+        //        foreach (var item in targetGroupData.DataList)
+        //        {
+        //            AddDataToSelectedItems(item);
+        //        }
+
+        //        // 解除するDataを外す
+        //        EditingGroupData.DataList.Remove(targetGroupData);
+        //        //RemoveDataFromSelect(targetGroupData);
+        //        targetGroupData.IsClicked = false;
+        //        targetGroupData.IsSelectable = false;
+        //        targetGroupData.IsSelected = false;
+        //        targetGroupData.DataList.Clear(); // 要る？
+
+        //        // 選択ItemにClickedItemが在ればそれをCurrentItemにする
+        //        if (ClickedItemData is not null && ClickedItemData.IsSelected) { CurrentItemData = ClickedItemData; }
+
+
+        //        UnGroupCommand.NotifyCanExecuteChanged();
+        //    }
+
+
+
+
+        //}
+
+        /// <summary>
+        /// グループ化チェック
+        /// </summary>
+        /// <returns></returns>
         private bool CanAddGroupFromSelectedItems()
         {
-            if (EditingGroupData is null) { return false; }
-            if (SelectedItemsData.Count <= 1) { return false; }
-            if (EditingGroupData.DataList.Count < 1) { return false; }
-            if (EditingGroupData.DataList.Count == SelectedItemsData.Count) { return false; }
-            return true;
+            return EditingGroupData is not null && SelectedItemsData.Count > 1 && EditingGroupData.DataList.Count >= 1;
+
+            //if (EditingGroupData is null) { return false; } // 編集中グループがない
+            //if (SelectedItemsData.Count <= 1) { return false; } // 選択Item個数が1個以下
+            //if (EditingGroupData.DataList.Count < 1) { return false; } // 編集中グループのこ要素数が1未満
+
+            //return true;
+
         }
 
         [RelayCommand(CanExecute = nameof(CanAddGroupFromSelectedItems))]
@@ -276,39 +345,18 @@ namespace _20260510
         {
             if (CanAddGroupFromSelectedItems() == false) { return; }
 
-            // 新G：新グループ
-
-            // 新GのZを先に計算しておく
-            // 新GのZ = 選択Itemの最上層Z - (選択個数 - 1)
+            // 新グループのZを先に計算しておく
+            // 新グループのZ = 選択Itemの最上層Z - (選択個数 - 1)
             int newGroupZIndex = SelectedItemsData.Max(n => n.Z) - (SelectedItemsData.Count - 1);
 
             // 選択アイテムのBoundsを計算、これが新GのBoundsになるし、その子要素の座標調整にも使う
             var newBounds = GetBounds(SelectedItemsData);
 
-            // 新GのDataList
-            // SelectedをZIndex順にソートしたリストを作成
-            var newDataList = new ObservableCollection<Data>(SelectedItemsData.OrderBy(a => a.Z).ToArray());
-            foreach (var item in newDataList)
-            {
-                item.X -= newBounds.X;
-                item.Y -= newBounds.Y;
-                item.IsSelectable = false;
-                item.IsSelected = false;
-            }
-
-            // 該当DataをSelectedと親要素のDataListから削除
-            for (int i = newDataList.Count - 1; i >= 0; i--)
-            {
-                EditingGroupData.DataList.Remove(newDataList[i]);
-                SelectedItemsData.Remove(newDataList[i]);
-            }
-
-            // 新G作成
+            // 新グループ作成
             var newGroup = new GroupData()
             {
                 ParentData = EditingGroupData,
                 RootData = this,
-                DataList = newDataList, // 新DataListを指定する
 
                 X = newBounds.X,
                 Y = newBounds.Y,
@@ -316,10 +364,30 @@ namespace _20260510
                 Height = newBounds.Height,
             };
 
-            // 親要素に新Gを追加（挿入）
+            // SelectedをZIndex順にソートした一時的なリストを作成
+            var tempSortedList = SelectedItemsData.OrderBy(item => item.Z).ToArray();
+
+            // 順にx,yを調整してから、新グループに追加
+            foreach (var item in tempSortedList)
+            {
+                item.X -= newBounds.X;
+                item.Y -= newBounds.Y;
+                item.IsSelectable = false;
+                item.IsSelected = false;
+                newGroup.AddData(item);
+            }
+
+            // 該当DataをSelectedと親要素のDataListから削除
+            for (int i = tempSortedList.Length - 1; i >= 0; i--)
+            {
+                EditingGroupData.DataList.Remove(tempSortedList[i]);
+                SelectedItemsData.Remove(tempSortedList[i]);
+            }
+
+            // 親要素に新グループを追加（挿入）
             AddDataToEditingGroup(newGroup, newGroupZIndex);
 
-            // 新GをSelectedにする            
+            // 新グループをSelectedにする            
             AddDataToSelectedItems(newGroup);
 
             // 通知
@@ -328,87 +396,6 @@ namespace _20260510
         }
 
 
-        ///// <summary>
-        ///// 編集グループ内で現在選択されている項目から新しいグループを作成し、データリストを更新します。
-        ///// </summary>
-        ///// <remarks>このメソッドは、選択された項目を新しいグループにまとめ、位置とZオーダーを再計算し、
-        ///// 編集グループのデータリストを更新された構造に置き換えます。その後、新しいグループが選択されます。
-        ///// </remarks>
-        //[RelayCommand(CanExecute = nameof(CanAddGroupFromSelectedItems))]
-        //private void AddGroupFromSelectedItems()
-        //{
-        //    if (EditingGroupData is null) { return; }
-        //    if (SelectedItemsData.Count <= 1) { return; }
-        //    if (EditingGroupData.DataList.Count < 1) { return; }
-        //    if (EditingGroupData.DataList.Count == SelectedItemsData.Count) { return; }
-
-        //    // 新グループのZを先に計算しておく
-        //    // 新グループのZ = 選択Itemの最上層Z - (選択個数 - 1)
-        //    int newGroupZIndex = SelectedItemsData.Max(n => n.Z) - (SelectedItemsData.Count - 1);
-
-        //    // 非選択ItemだけのListを新規作成
-        //    var newDataList = new ObservableCollection<Data>();
-        //    foreach (var item in EditingGroupData.DataList)
-        //    {
-        //        if (item.IsSelected == false)
-        //        {
-        //            newDataList.Add(item);
-        //        }
-        //    }
-
-        //    // 新グループ作成、そのDataListに選択Itemを順番に追加
-        //    GroupData newGroup = new()
-        //    {
-        //        RootData = this.RootData,
-        //        IsSelectable = true,
-        //        ParentData = EditingGroupData,
-        //    };
-        //    var sortedItems = SelectedItemsData.OrderBy(n => n.Z).ToArray();
-        //    for (int i = 0; i < sortedItems.Length; i++)
-        //    {
-        //        newGroup.DataList.Add(sortedItems[i]);
-        //    }
-
-        //    // 新グループを新リストに挿入
-        //    newDataList.Insert(newGroupZIndex, newGroup);
-
-        //    // 新グループと子要素の座標調整
-        //    double minX = double.MaxValue;
-        //    double minY = double.MaxValue;
-        //    double right = 0;
-        //    double bottom = 0;
-        //    foreach (var item in newGroup.DataList)
-        //    {
-        //        if (minX > item.X) { minX = item.X; }
-        //        if (minY > item.Y) { minY = item.Y; }
-        //        if (right < item.X + item.Width) { right = item.X + item.Width; }
-        //        if (bottom < item.Y + item.Height) { bottom = item.Y + item.Height; }
-        //    }
-        //    newGroup.X = minX; newGroup.Y = minY;
-        //    newGroup.Width = right - minX;
-        //    newGroup.Height = bottom - minY;
-
-        //    // 子要素の座標調整、ついでにIsSelectableとIsSelectedをfalseに変更
-        //    foreach (var item in newGroup.DataList)
-        //    {
-        //        item.X -= minX;
-        //        item.Y -= minY;
-        //        item.IsSelectable = false;
-        //        item.IsSelected = false;
-        //    }
-
-        //    // 新リストの要素のZを整える
-        //    for (int i = 0; i < newDataList.Count; i++) { newDataList[i].Z = i; }
-
-        //    // 今の全体リストと新リストを入れ替えて完了
-        //    EditingGroupData.DataList = newDataList;
-
-        //    // 選択Itemリストを整える
-        //    ClearSelectedItems();
-        //    AddDataToSelectedItems(newGroup);// 新グループを選択状態にする
-
-        //    AddGroupFromSelectedItemsCommand.NotifyCanExecuteChanged();
-        //}
 
         #endregion グループ化
 
