@@ -783,13 +783,20 @@ namespace _20260510
 
         internal void DataList_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
         {
+            // Insertの場合もここAddになる
             if (e.Action == NotifyCollectionChangedAction.Add)
             {
                 if (e.NewItems?[0] is Data newData)
                 {
-                    newData.Z = e.NewStartingIndex;
+                    newData.Z = e.NewStartingIndex; // Zを追加先Indexに合わせる
                     newData.ParentData = this;
                     newData.ParentData.UpdateSize();
+
+                    // 追加先Index以降のItemのZをIndexに合わせるために＋１する
+                    for (int i = e.NewStartingIndex + 1; i < DataList.Count; i++)
+                    {
+                        DataList[i].Z++;
+                    }
 
                     // 自身が編集中なら、子要素を選択可能にする
                     if (this.IsEditing)
@@ -802,15 +809,19 @@ namespace _20260510
             {
                 if (e.OldItems?[0] is Data oldData)
                 {
-                    // 削除した要素より上の要素のZを1下げる
-                    int currentZ = oldData.Z;
-                    foreach (var item in this.DataList)
+                    // 削除した要素のIndexから上の要素のZを1下げる
+                    int currentZ = e.OldStartingIndex;
+                    for (int i = currentZ; i < DataList.Count; i++)
                     {
-                        if (item.Z > currentZ)
-                        {
-                            item.Z--;
-                        }
+                        DataList[i].Z--;
                     }
+                    //foreach (var item in this.DataList)
+                    //{
+                    //    if (item.Z > currentZ)
+                    //    {
+                    //        item.Z--;
+                    //    }
+                    //}
 
                     // 以下のIs系は念のため
                     oldData.IsSelectable = false;
@@ -972,7 +983,7 @@ namespace _20260510
 
         public GeoLineData()
         {
-            Name = "FromGeoLineData";
+            Name = "GeoLineData";
             //#if DEBUG
             //            Debug.WriteLine($"{MethodBase.GetCurrentMethod()?.ReflectedType?.Name}__{MethodBase.GetCurrentMethod()?.Name}");
             //#endif
@@ -998,9 +1009,18 @@ namespace _20260510
 
 
 
-    public partial class EllipseData : ShapeData { }
+    public partial class EllipseData : ShapeData
+    {
+        public EllipseData() { Name = "EllipseData"; }
+    }
 
-    public partial class RectangleData : ShapeData { }
+    public partial class RectangleData : ShapeData
+    {
+        public RectangleData()
+        {
+            Name = "RectangleData";
+        }
+    }
 
 
     public abstract partial class ShapeData : Data
@@ -1021,7 +1041,10 @@ namespace _20260510
 
     public partial class TextBlockData : TextData
     {
-
+        public TextBlockData()
+        {
+            Name = "TextBlockData";
+        }
     }
     public abstract partial class TextData : Data
     {

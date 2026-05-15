@@ -86,6 +86,23 @@
           <TextBlock Text="{Binding MyData.DataList[1], StringFormat='data = {0}'}"/>
         </StackPanel>
       </GroupBox>
+
+      <TreeView ItemsSource="{Binding MyData.DataList}">
+        <TreeView.ItemContainerStyle>
+          <Style TargetType="TreeViewItem">
+            <Setter Property="IsExpanded" Value="True"/>
+          </Style>
+        </TreeView.ItemContainerStyle>
+        <TreeView.ItemTemplate>
+          <HierarchicalDataTemplate DataType="{x:Type local:GroupData}" ItemsSource="{Binding DataList}">
+            <StackPanel Orientation="Horizontal">
+              <TextBlock Text="{Binding Z, StringFormat='Z={0:0 }'}"/>
+              <TextBlock Text="{Binding Name}"/>
+            </StackPanel>
+          </HierarchicalDataTemplate>
+        </TreeView.ItemTemplate>
+      </TreeView>
+
       <ListBox ItemsSource="{Binding MyData.SelectedItemsData}" IsHitTestVisible="False">
         <ListBox.ItemsPanel>
           <ItemsPanelTemplate>
@@ -100,6 +117,7 @@
           </DataTemplate>
         </ListBox.ItemTemplate>
       </ListBox>
+      
     </StackPanel>
   </Grid>
 </Window>
