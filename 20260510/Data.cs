@@ -22,7 +22,7 @@ namespace _20260510
         //[ObservableProperty] private GroupData _editingGroupData; // 編集中のGroupData
 
 
-        [ObservableProperty] private Data? _currentItemData; // 筆頭Data
+        [ObservableProperty] private Data? _currentItemData; // CurrentData
 
         [ObservableProperty] private Data? _clickedItemData; // クリックしたData
         [ObservableProperty] public CustomThumb? _myClickedItem;
@@ -47,10 +47,6 @@ namespace _20260510
             SelectedItemsData.CollectionChanged += SelectedItems_CollectionChanged;
         }
 
-        #region テスト用初期化
-
-        #endregion テスト用初期化
-
 
         #region On～プロパティの変更時
 
@@ -68,7 +64,7 @@ namespace _20260510
         }
 
 
-        // 筆頭変更後
+        // Current変更後
         partial void OnCurrentItemDataChanged(Data? oldValue, Data? newValue)
         {
             if (oldValue is not null)
@@ -79,12 +75,12 @@ namespace _20260510
             if (newValue is not null)
             {
                 newValue.IsCurrent = true;
+
+                // グループ解除可否判定通知
                 UnGroupCurrentCommand.NotifyCanExecuteChanged();
-                //UnGroupCommand.NotifyCanExecuteChanged();
-                //if (newValue is GeoShapeData geo)
-                //{
-                //    CanChageGeoShapeData();
-                //}
+
+                // 編集可否判定通知
+                EditingCurrentGroupCommand.NotifyCanExecuteChanged();
             }
         }
 
@@ -93,11 +89,13 @@ namespace _20260510
         partial void OnEditingGroupDataChanged(GroupData? oldValue, GroupData newValue)
         {
             // 選択リストを空にする
-            ClearSelectedItems();
+            ClearSelectedItems(); // Currentはnullになる
 
+            // 旧グループ、
             if (oldValue is not null)
             {
                 oldValue.IsEditing = false;
+                // 子要素のIs系の更新
                 foreach (var item in oldValue.DataList)
                 {
                     item.IsSelectable = false;
@@ -106,21 +104,25 @@ namespace _20260510
                 }
             }
 
+            // 新グループ、
             if (newValue is not null)
             {
                 newValue.IsEditing = true;
+                // 子要素を選択可能にする
                 foreach (var item in newValue.DataList)
                 {
                     item.IsSelectable = true;
                 }
 
-                // クリックItemが子要素に在れば、それを選択状態にして筆頭に指定する
+                // クリックItemが子要素に在れば、それを選択状態にしてCurrentに指定する
                 if (ClickedItemData is not null && newValue.DataList.Contains(ClickedItemData))
                 {
                     AddDataToSelectedItems(ClickedItemData);
                 }
             }
 
+            // 編集可否判定通知
+            EditingUpperGroupCommand.NotifyCanExecuteChanged();
 
         }
 
@@ -225,9 +227,6 @@ namespace _20260510
                 // 対象グループのZIndexを記録、これが分解したData群の追加先基準になる
                 int zIndex = targetGroupData.Z;
 
-                // 対象グループの子要素の一時的なリストを作成、ZIndex順にソートしておく
-                var tempSortedList = targetGroupData.DataList.OrderBy(item => item.Z).ToArray();
-
                 // 親要素から対象グループのData削除
                 EditingGroupData.DataList.Remove(targetGroupData);
 
@@ -238,9 +237,9 @@ namespace _20260510
                 int newCurrentDataZIndex = zIndex;
 
                 // 親要素にData群を追加、同時に選択状態にする
-                for (int i = 0; i < tempSortedList.Length; i++)
+                for (int i = 0; i < targetGroupData.DataList.Count; i++)
                 {
-                    var data = tempSortedList[i];
+                    var data = targetGroupData.DataList[i];
                     if (data.IsClicked) { newCurrentDataZIndex += i; } // Clickedがあれば、それのZIndexを記録
                     data.IsSelectable = true; // 選択状態可能にしておく
                     data.X += targetGroupData.X; // Data群のx,y調整
@@ -330,7 +329,9 @@ namespace _20260510
         /// <returns></returns>
         private bool CanAddGroupFromSelectedItems()
         {
-            return EditingGroupData is not null && SelectedItemsData.Count > 1 && EditingGroupData.DataList.Count >= 1;
+            return EditingGroupData is not null 
+                && SelectedItemsData.Count > 1 
+                && EditingGroupData.DataList.Count >= 1;
 
             //if (EditingGroupData is null) { return false; } // 編集中グループがない
             //if (SelectedItemsData.Count <= 1) { return false; } // 選択Item個数が1個以下
@@ -340,6 +341,9 @@ namespace _20260510
 
         }
 
+        /// <summary>
+        /// グループ化
+        /// </summary>
         [RelayCommand(CanExecute = nameof(CanAddGroupFromSelectedItems))]
         private void AddGroupFromSelectedItems()
         {
@@ -367,6 +371,16 @@ namespace _20260510
             // SelectedをZIndex順にソートした一時的なリストを作成
             var tempSortedList = SelectedItemsData.OrderBy(item => item.Z).ToArray();
 
+            // ItemDataはは元グループから削除してから、新グループに追加する、
+            // この順番が逆だとparentがnullになってしまう
+
+            // 該当DataをSelectedと親要素のDataListから削除
+            for (int i = tempSortedList.Length - 1; i >= 0; i--)
+            {
+                EditingGroupData.DataList.Remove(tempSortedList[i]); // このときparentがnullになる
+                SelectedItemsData.Remove(tempSortedList[i]);
+            }
+
             // 順にx,yを調整してから、新グループに追加
             foreach (var item in tempSortedList)
             {
@@ -375,13 +389,6 @@ namespace _20260510
                 item.IsSelectable = false;
                 item.IsSelected = false;
                 newGroup.AddData(item);
-            }
-
-            // 該当DataをSelectedと親要素のDataListから削除
-            for (int i = tempSortedList.Length - 1; i >= 0; i--)
-            {
-                EditingGroupData.DataList.Remove(tempSortedList[i]);
-                SelectedItemsData.Remove(tempSortedList[i]);
             }
 
             // 親要素に新グループを追加（挿入）
@@ -537,8 +544,12 @@ namespace _20260510
         // 指定グループを編集モードにする
         public void MigrateEditingGroup(GroupData group) { EditingGroupData = group; }
 
-        // 編集モードを今の1個上に移行する
-        public void MigrateEditingGroupUpper()
+
+        public bool CanEditingUpperGroup() => EditingGroupData?.ParentData is not null;
+
+        // 1つ上を編集モードにする
+        [RelayCommand(CanExecute = nameof(CanEditingUpperGroup))]
+        public void EditingUpperGroup()
         {
             if (EditingGroupData?.ParentData is GroupData upper)
             {
@@ -546,8 +557,11 @@ namespace _20260510
             }
         }
 
+        public bool CanEditingCurrentGroup() => CurrentItemData is GroupData;
+
         // Currentを編集モードにする
-        public void MigrateEditingGroupCurrent()
+        [RelayCommand(CanExecute = nameof(CanEditingCurrentGroup))]
+        public void EditingCurrentGroup()
         {
             if (CurrentItemData is GroupData group) { EditingGroupData = group; }
         }
@@ -566,7 +580,7 @@ namespace _20260510
             // 二重登録禁止チェック
             if (SelectedItemsData.Contains(data)) { return false; }
 
-            // 選択可能な場合のみ追加して、筆頭に指定する
+            // 選択可能な場合のみ追加して、Currentに指定する
             if (data.IsSelectable)
             {
                 SelectedItemsData.Add(data);
@@ -638,7 +652,7 @@ namespace _20260510
 
         /// <summary>
         /// 指定Dataを選択リストから削除する
-        /// 削除後に筆頭を更新する、一個前のDataを筆頭にする、それがなければ一個後ろのData
+        /// 削除後にCurrentを更新する、一個前のDataをCurrentにする、それがなければ一個後ろのData
         /// </summary>
         /// <param name="data"></param>
         public void RemoveDataFromSelect(Data data)
@@ -648,8 +662,8 @@ namespace _20260510
 
             if (SelectedItemsData.Remove(data))
             {
-                // 筆頭Itemを更新
-                // 一個前を筆頭にする、一個前がなければ一個後を筆頭にする
+                // CurrentItemを更新
+                // 一個前をCurrentにする、一個前がなければ一個後をCurrentにする
                 if (dataIndex < 0) { dataIndex++; }
                 CurrentItemData = SelectedItemsData[dataIndex];
             }
@@ -815,13 +829,6 @@ namespace _20260510
                     {
                         DataList[i].Z--;
                     }
-                    //foreach (var item in this.DataList)
-                    //{
-                    //    if (item.Z > currentZ)
-                    //    {
-                    //        item.Z--;
-                    //    }
-                    //}
 
                     // 以下のIs系は念のため
                     oldData.IsSelectable = false;
@@ -1074,7 +1081,7 @@ namespace _20260510
         [ObservableProperty] private Rect _originBounds = new();
         [ObservableProperty] bool _isSelected = false; // 選択状態
         [ObservableProperty] bool _isSelectable = false; // 選択状態
-        [ObservableProperty] bool _isCurrent = false; // 筆頭
+        [ObservableProperty] bool _isCurrent = false; // Current
         [ObservableProperty] bool _isClicked = false; // クリックされた要素
         [ObservableProperty] private double _offsetX;
         [ObservableProperty] private double _offsetY;

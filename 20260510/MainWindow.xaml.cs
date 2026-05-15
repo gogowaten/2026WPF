@@ -163,22 +163,7 @@ namespace _20260510
             }
         }
 
-        private void Zup(object sender, RoutedEventArgs e)
-        {            
-            MyData.ZUpSelectedItems();
-        }
+      
 
-        private void RemoveEndPoint_Click(object sender, RoutedEventArgs e)
-        {
-            
-        }
-
-        private void InsertStartPoint_Click(object sender, RoutedEventArgs e)
-        {
-            if (MyData.ClickedItemData is GeoLineData data)
-            {
-                data.Points.Insert(0, new Point(100, 100));
-            }
-        }
     }
 }

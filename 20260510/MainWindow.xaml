@@ -31,28 +31,30 @@
       <Button x:Name="check" Content="check" Click="check_Click"/>
       <Button Content="グループ化" Command="{Binding MyData.AddGroupFromSelectedItemsCommand}"/>
       <Button Content="グループ解除" Command="{Binding MyData.UnGroupCurrentCommand}"/>
-      <Button x:Name="background" Content="ContextMenu" Click="ContextMenu_Click"/>
-      <Button x:Name="vertexhandle" Content="ZUP" Click="Zup"/>
+      <Button Content="ContextMenu" Click="ContextMenu_Click"/>
+      <Button Content="ZDown" Command="{Binding MyData.ZDownSelectedItemsCommand}"/>
       <Button Content="ZupCommand" Command="{Binding MyData.ZUpSelectedItemsCommand}"/>
-      <Button x:Name="RemoveEndPoint" Content="RemoveEndPoint" Click="RemoveEndPoint_Click"/>
-      <Button x:Name="InsertStartPoint" Content="InsertStartPoint" Click="InsertStartPoint_Click"/>
+      <Button Content="Currentを編集する" Command="{Binding MyData.EditingCurrentGroupCommand}"/>
+      <Button Content="1個上を編集する" Command="{Binding MyData.EditingUpperGroupCommand}"/>
 
       <GroupBox Header="CurrentData" DataContext="{Binding MyData.CurrentItemData}">
         <StackPanel>
           <TextBlock Text="{Binding StringFormat=' {0: 0; -0; 0}'}"/>
           <TextBlock Text="{Binding Width, StringFormat='Width = {0: 0; -0; 0}'}"/>
+          <TextBlock Text="{Binding Height, StringFormat='Height = {0: 0; -0; 0}'}"/>
           <TextBlock Text="{Binding Points, StringFormat='Points = {0: 0; -0; 0}'}"/>
           <TextBlock Text="{Binding X, StringFormat='X = {0: 0; -0; 0}'}"/>
           <TextBlock Text="{Binding Y, StringFormat='Y = {0: 0; -0; 0}'}"/>
           <TextBlock Text="{Binding Z, StringFormat='Z = {0: 0; -0; 0}'}"/>
+          <TextBlock Text="{Binding ParentData, StringFormat='ParentData = {0: 0; -0; 0}'}"/>
 
           <TextBlock Text="{Binding StrokeThickness, StringFormat='StrokeThickness = {0: 0; -0; 0}'}"/>
           <Slider Value="{Binding StrokeThickness}" Minimum="1" Maximum="50"
                   SmallChange="10" LargeChange="10"/>
-          <Viewbox Width="50" Height="50">
-            <ContentPresenter Content="{Binding}"/>
-          </Viewbox>
-          
+          <!--<Viewbox Width="50" Height="50" Stretch="Uniform">
+            <ContentControl Content="{Binding}"/>
+          </Viewbox>-->
+
         </StackPanel>
       </GroupBox>
 
@@ -65,7 +67,9 @@
       </GroupBox>
       <!--<GroupBox Header="MyClickedItem" DataContext="{Binding MyData.MyClickedItem}">
         <StackPanel>
-          --><!--<ContentPresenter Content="{Binding ElementName=MyRootItems}"/>--><!--
+          -->
+      <!--<ContentPresenter Content="{Binding ElementName=MyRootItems}"/>-->
+      <!--
           <TextBlock Text="{Binding ActualHeight}"/>
           <TextBlock Text="{Binding Height}"/>
           <Rectangle Width="50" Height="50">
@@ -117,7 +121,7 @@
           </DataTemplate>
         </ListBox.ItemTemplate>
       </ListBox>
-      
+
     </StackPanel>
   </Grid>
 </Window>
