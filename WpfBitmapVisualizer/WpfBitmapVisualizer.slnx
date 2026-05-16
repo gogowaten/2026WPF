@@ -1,4 +1,0 @@
-<Solution>
-  <Project Path="../BitmapSourceVisualizer/BitmapSourceVisualizer.csproj" />
-  <Project Path="WpfBitmapVisualizer.csproj" />
-</Solution>
