@@ -27,11 +27,8 @@ namespace _20260510
             this.Left = 0;
             this.Top = 0;
 #endif
-            //MyElement = MyTest();
-            //MyCanvas.Children.Add(MyElement);
-
-            //Rect rec = new(10, 10, 100, 100) { Width = 90, Height = 90 };
-
+            
+            
 
             MyData = CreateRootData();
             this.DataContext = this;

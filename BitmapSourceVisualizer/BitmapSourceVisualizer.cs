@@ -17,7 +17,7 @@ using System.Windows.Media.Imaging;
     typeof(BitmapSourceVisualizer.BitmapSourceObjectSource),
     TargetTypeName = "System.Windows.Media.Imaging.BitmapSource",
     Target = typeof(BitmapSource),
-    Description = "🐎WPF BitmapSource Visualizer")]
+    Description = "🐎 WPF BitmapSource Visualizer 🐎")]
 
 // この属性指定では虫眼鏡リストに表示されない
 //[assembly: DebuggerVisualizer(

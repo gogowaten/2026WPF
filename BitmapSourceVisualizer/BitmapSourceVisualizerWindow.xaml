@@ -4,14 +4,90 @@
         xmlns:local="clr-namespace:BitmapSourceVisualizer"
         Title="BitmapSource Visualizer"
         Width="800" Height="600"
-        WindowStartupLocation="CenterOwner">
-  <Grid Background="Black">
+        WindowStartupLocation="CenterOwner"
+        ResizeMode="CanResizeWithGrip">
+  <Grid>
+    <Grid.ColumnDefinitions>
+      <ColumnDefinition/>
+      <ColumnDefinition Width="150"/>
+    </Grid.ColumnDefinitions>
     <ScrollViewer HorizontalScrollBarVisibility="Auto"
                   VerticalScrollBarVisibility="Auto">
+      <!--市松模様をXAMLだけで描く方法 | Seizu Development Forge
+https://seizu.dev/2013/06/11/post2437.html-->
+      <ScrollViewer.Background>
+        <DrawingBrush Viewport="0,0,32,32" TileMode="Tile" ViewportUnits="Absolute">
+          <DrawingBrush.Drawing>
+            <DrawingGroup>
+              <GeometryDrawing Brush="#eee">
+                <GeometryDrawing.Geometry>
+                  <RectangleGeometry Rect="0,0,64,64"/>
+                </GeometryDrawing.Geometry>
+              </GeometryDrawing>
+
+              <GeometryDrawing Brush="#fafafa">
+                <GeometryDrawing.Geometry>
+                  <GeometryGroup>
+                    <RectangleGeometry Rect="0,0,32,32"/>
+                    <RectangleGeometry Rect="32,32,32,32"/>
+                  </GeometryGroup>
+                </GeometryDrawing.Geometry>
+              </GeometryDrawing>
+
+            </DrawingGroup>
+          </DrawingBrush.Drawing>
+        </DrawingBrush>
+      </ScrollViewer.Background>
       <Image x:Name="ImageControl"
              Stretch="None"
              SnapsToDevicePixels="True"
-             RenderOptions.BitmapScalingMode="NearestNeighbor" />
+             RenderOptions.BitmapScalingMode="NearestNeighbor"
+             UseLayoutRounding="True"
+             RenderOptions.EdgeMode="Aliased"/>
     </ScrollViewer>
+    <StackPanel Grid.Column="1" DataContext="{Binding ElementName=ImageControl}">
+      <StackPanel.Resources>
+        <Style TargetType="TextBlock">
+          <Setter Property="Margin" Value="5"/>
+        </Style>
+        <Style TargetType="GroupBox">
+          <Setter Property="Margin" Value="4"/>
+        </Style>
+        <Style TargetType="Button">
+          <Setter Property="Margin" Value="15,4"/>
+        </Style>
+      </StackPanel.Resources>
+      <Button Content="コピー" Click="ButtonCopyToClipboard_Click"/>
+      <Button Content="保存" Click="ButtonSave_Click"/>
+
+      <GroupBox Header="StretchMode">
+        <StackPanel>
+          <TextBlock Text="{Binding Stretch}" HorizontalAlignment="Center"/>
+          <Button Content="None" Click="ButtonChangeStretchNone_Click"/>
+          <Button Content="Uniform" Click="ButtonChangeStretchUniform_Click"/>
+          <Button Content="UniformToFill" Click="ButtonChangeStretchUniformToFill_Click"/>
+          <Button Content="Fill" Click="ButtonChangeStretchFill_Click"/>
+        </StackPanel>
+      </GroupBox>
+      <GroupBox Header="RenderOptions">
+        <StackPanel>
+          <GroupBox Header="BitmapScalingMode">
+            <StackPanel>
+              <TextBlock Text="{Binding Path=(RenderOptions.BitmapScalingMode)}" HorizontalAlignment="Center"/>
+              <Button Content="最近傍補間" Click="ButtonScalingModeNearestNeighbor_Click"/>
+              <Button Content="Linear" Click="ButtonScalingModeLinear_Click"/>
+              <Button Content="Fant" Click="ButtonScalingModeFant_Click"/>
+            </StackPanel>
+          </GroupBox>
+          <!--<GroupBox Header="EdgeMode">
+            <StackPanel>
+              <Button Content="切り替え" Click="ButtonEdge_Click"/>
+              <TextBlock Text="{Binding Path=(RenderOptions.EdgeMode)}" HorizontalAlignment="Center"/>
+            </StackPanel>
+          </GroupBox>-->
+
+        </StackPanel>
+      </GroupBox>
+    </StackPanel>
   </Grid>
 </Window>

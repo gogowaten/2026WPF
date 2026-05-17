@@ -353,7 +353,8 @@ windowService.ShowDialog(window);
 # 「Microsoft.VisualStudio.DebuggerVisualizers」はバージョン17.6.1032901がインストール済みになっている
 
 .csproj
-```XAML
+
+```xml
 <Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
@@ -367,7 +368,8 @@ windowService.ShowDialog(window);
 	  <PackageReference Include="Microsoft.VisualStudio.DebuggerVisualizers" Version="17.6.1032901" />
 	</ItemGroup>
 	
-</Project>```
+</Project>
+```
 
 ```cs
 using System;
