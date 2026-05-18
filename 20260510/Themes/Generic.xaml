@@ -90,12 +90,9 @@
       <Setter.Value>
         <ControlTemplate TargetType="{x:Type local:CustomThumb}">
           <Grid>
-            <ContentPresenter Content="{TemplateBinding MyContent}">
-              <!--<ContentPresenter.LayoutTransform>
-                <RotateTransform Angle="{Binding Angle}"/>
-              </ContentPresenter.LayoutTransform>-->
-            </ContentPresenter>
-            <Border x:Name="SelectedBorder" Visibility="Visible"
+            <ContentPresenter Content="{TemplateBinding MyContent}"/>
+
+            <Border x:Name="SelectedBorder" Visibility="Collapsed"
                     BorderBrush="Orange" BorderThickness="1"
                     Margin="-10"/>
           </Grid>

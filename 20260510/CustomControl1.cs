@@ -72,7 +72,7 @@ namespace _20260510
         {
             var menu = new ContextMenu();
             var item = new MenuItem() { Header = "current保存" };
-            item.Click += Item_Click;
+            item.Click += (s, e) => { SaveMyContentToPngImage(); };
             item.SetBinding(IsEnabledProperty, new Binding(nameof(MyData.IsCurrent)) { Source = MyData });
             menu.Items.Add(item);
 
@@ -94,7 +94,7 @@ namespace _20260510
             return menu;
         }
 
-        private void Item_Click(object sender, RoutedEventArgs e)
+        private void SaveMyContentToPngImage()
         {
             SaveFileDialog dialog = new()
             {
@@ -115,8 +115,13 @@ namespace _20260510
                 using FileStream stream = File.OpenWrite(filePath);
                 encoder.Save(stream);
             }
-
         }
+
+        private void Item_Click(object sender, RoutedEventArgs e)
+        {
+            SaveMyContentToPngImage();
+        }
+
 
         public RenderTargetBitmap MakeMyContentRenderBitmap()
         {
@@ -128,16 +133,6 @@ namespace _20260510
             return bmp;
         }
 
-        public void Test(RenderTargetBitmap bmp, string filePath)
-        {
-
-        }
-
-        public void SaveMyContentToImage(string filePath)
-        {
-            RenderTargetBitmap bmp = MakeMyContentRenderBitmap();
-
-        }
 
         #region クリックイベント時
 
