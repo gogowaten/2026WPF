@@ -59,6 +59,7 @@ namespace _20260510
                 element.SizeChanged += Element_SizeChanged;
             }
 
+            // 右クリックメニュー作成
             this.ContextMenu = CreateMyContextMenu(MyData);
         }
 
@@ -67,29 +68,35 @@ namespace _20260510
             MyData?.ParentData?.UpdateBoundsToRoot();
         }
 
-
+        // 右クリックメニュー作成
         private ContextMenu CreateMyContextMenu(Data data)
         {
             var menu = new ContextMenu();
             var item = new MenuItem() { Header = "current保存" };
             item.Click += (s, e) => { SaveMyContentToPngImage(); };
-            item.SetBinding(IsEnabledProperty, new Binding(nameof(MyData.IsCurrent)) { Source = MyData });
+
+            //item.SetBinding(IsEnabledProperty,
+            //    new Binding(nameof(MyData.IsCurrent)) { Source = MyData });
+
+            item.SetBinding(VisibilityProperty,
+                new Binding(nameof(MyData.IsCurrent)) { Source = MyData, Converter = new MyConvBootToVisible() });
+            
             menu.Items.Add(item);
 
-            //if (typeof(EllipseData) == data.GetType())
-            //{
-            //    var item = new MenuItem() { Header = "ellipse" };
-            //    menu.Items.Add(item);
-            //}
-            //else if (typeof(GeoLineData) == data.GetType())
-            //{
-            //    var item = new MenuItem() { Header = "geoline" };
-            //    menu.Items.Add(item);
-            //    if(MyContent is GeoLineEX geo)
-            //    {
+            if (typeof(EllipseData) == data.GetType())
+            {
+                 item = new MenuItem() { Header = "ellipse" };
+                menu.Items.Add(item);
+            }
+            else if (typeof(GeoLineData) == data.GetType())
+            {
+                 item = new MenuItem() { Header = "geoline" };
+                menu.Items.Add(item);
+                if (MyContent is GeoLineEX geo)
+                {
 
-            //    }
-            //}
+                }
+            }
 
             return menu;
         }

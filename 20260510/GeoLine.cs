@@ -133,7 +133,7 @@ namespace _20260510
             set { SetValue(IsEnableContextMenuProperty, value); }
         }
         public static readonly DependencyProperty IsEnableContextMenuProperty =
-            DependencyProperty.Register(nameof(IsEnableContextMenu), typeof(bool), typeof(GeoLineEX), new PropertyMetadata(true, OnIsEnableContextMenuChanged, new CoerceValueCallback(CoerceIsEnableContextMenu)));
+            DependencyProperty.Register(nameof(IsEnableContextMenu), typeof(bool), typeof(GeoLineEX), new PropertyMetadata(false, OnIsEnableContextMenuChanged, new CoerceValueCallback(CoerceIsEnableContextMenu)));
         private static void OnIsEnableContextMenuChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             if (d is GeoLineEX geo)

@@ -62,7 +62,8 @@
   <DataTemplate DataType="{x:Type local:GroupData}">
     <local:CustomThumb>
       <Grid d:DataContext="{d:DesignInstance Type=local:GroupData}">
-        <Rectangle Stroke="Blue" StrokeThickness="1" StrokeDashArray="2,2"/>
+        <Rectangle Stroke="Blue" StrokeThickness="1" StrokeDashArray="2,2"
+                   Visibility="Visible" Margin="-2"/>
         <ItemsControl ItemsSource="{Binding DataList}"
                       Width="{Binding Width}"
                       Height="{Binding Height}"
