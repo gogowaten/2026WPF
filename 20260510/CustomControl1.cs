@@ -1,5 +1,7 @@
-﻿using System;
+﻿using Microsoft.Win32;
+using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
@@ -9,6 +11,7 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Markup;
 using System.Windows.Media;
+using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
@@ -27,7 +30,7 @@ namespace _20260510
 
         public Point migikurikkuiti;
         public ContextMenu MyContextMenu { get; set; } = null!;
-        
+
 
         static CustomThumb()
         {
@@ -44,33 +47,97 @@ namespace _20260510
             //MouseUp += CustomThumb_MouseUp;
             Loaded += CustomThumb_Loaded;
 
-            
-            
+
+
         }
+
+
+        private void CustomThumb_Loaded(object sender, RoutedEventArgs e)
+        {
+            if (MyContent is FrameworkElement element)
+            {
+                element.SizeChanged += Element_SizeChanged;
+            }
+
+            this.ContextMenu = CreateMyContextMenu(MyData);
+        }
+
+        private void Element_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            MyData?.ParentData?.UpdateBoundsToRoot();
+        }
+
 
         private ContextMenu CreateMyContextMenu(Data data)
         {
-            
             var menu = new ContextMenu();
-            if (typeof(EllipseData) == data.GetType())
-            {
-                var item = new MenuItem() { Header = "ellipse" };
-                menu.Items.Add(item);
-            }
-            else if (typeof(GeoLineData) == data.GetType())
-            {
-                var item = new MenuItem() { Header = "geoline" };
-                menu.Items.Add(item);
-                if(MyContent is GeoLineEX geo)
-                {
-                    
-                }
-            }
+            var item = new MenuItem() { Header = "current保存" };
+            item.Click += Item_Click;
+            item.SetBinding(IsEnabledProperty, new Binding(nameof(MyData.IsCurrent)) { Source = MyData });
+            menu.Items.Add(item);
+
+            //if (typeof(EllipseData) == data.GetType())
+            //{
+            //    var item = new MenuItem() { Header = "ellipse" };
+            //    menu.Items.Add(item);
+            //}
+            //else if (typeof(GeoLineData) == data.GetType())
+            //{
+            //    var item = new MenuItem() { Header = "geoline" };
+            //    menu.Items.Add(item);
+            //    if(MyContent is GeoLineEX geo)
+            //    {
+
+            //    }
+            //}
 
             return menu;
         }
 
-       
+        private void Item_Click(object sender, RoutedEventArgs e)
+        {
+            SaveFileDialog dialog = new()
+            {
+                AddExtension = true,
+                DefaultExt = "png",
+                FileName = DateTime.Now.ToString("yyyyMMdd_HHmmss")
+            };
+
+
+            if (dialog.ShowDialog() == true)
+            {
+                string filePath = dialog.FileName;
+                var bmp = MakeMyContentRenderBitmap();
+
+                PngBitmapEncoder encoder = new();
+                encoder.Frames.Add(BitmapFrame.Create(bmp));
+
+                using FileStream stream = File.OpenWrite(filePath);
+                encoder.Save(stream);
+            }
+
+        }
+
+        public RenderTargetBitmap MakeMyContentRenderBitmap()
+        {
+            int width = (int)MyData.Width;
+            int height = (int)MyData.Height;
+            double dpi = MyData.RootData is null ? 96.0 : MyData.RootData.MyDPI;
+            RenderTargetBitmap bmp = new(width, height, dpi, dpi, PixelFormats.Pbgra32);
+            bmp.Render(MyContent);
+            return bmp;
+        }
+
+        public void Test(RenderTargetBitmap bmp, string filePath)
+        {
+
+        }
+
+        public void SaveMyContentToImage(string filePath)
+        {
+            RenderTargetBitmap bmp = MakeMyContentRenderBitmap();
+
+        }
 
         #region クリックイベント時
 
@@ -193,22 +260,6 @@ namespace _20260510
         #endregion クリックイベント時
 
 
-        private void CustomThumb_Loaded(object sender, RoutedEventArgs e)
-        {
-            if (MyContent is FrameworkElement element)
-            {
-                element.SizeChanged += Element_SizeChanged;
-            }
-
-            this.ContextMenu = CreateMyContextMenu(MyData);
-        }
-
-        private void Element_SizeChanged(object sender, SizeChangedEventArgs e)
-        {
-            MyData?.ParentData?.UpdateBoundsToRoot();
-        }
-
-
         #region 依存関係プロパティ
 
 
@@ -260,11 +311,13 @@ namespace _20260510
 
         private void RootItemsControl_Loaded(object sender, RoutedEventArgs e)
         {
-            //MyData.EditingGroupData = this.MyData;
-
-            //MyData.UpdateBounds();
-            //MyData.UpdateSize();
+            // システムのDPIを記録
+            //PresentationSource sou = PresentationSource.FromVisual(this);
+            //double dpi = 96.0 * sou.CompositionTarget.TransformFromDevice.M11;
+            //MyData.MyDPI = dpi;
+            MyData.MyDPI = 96.0 * PresentationSource.FromVisual(this).CompositionTarget.TransformFromDevice.M11;
         }
+
 
         public RootData MyData
         {

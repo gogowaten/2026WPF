@@ -14,6 +14,9 @@ namespace _20260510
 {
     public partial class RootData : GroupData
     {
+        // システムのDPI
+        public double MyDPI { get; set; }
+
         // TextBlock追加時に使う文字列用
         [NotifyCanExecuteChangedFor(nameof(AddTextBlockDataCommand))]
         [ObservableProperty] private string _addText = "ここに文字列";
@@ -45,7 +48,12 @@ namespace _20260510
             EditingGroupData = this;
             //MyInit();
             SelectedItemsData.CollectionChanged += SelectedItems_CollectionChanged;
+            
         }
+
+        #region 起動時
+        
+        #endregion 起動時
 
 
         #region On～プロパティの変更時
@@ -172,6 +180,11 @@ namespace _20260510
             }
         }
 
+
+        #region メソッド
+
+        #region パブリックメソッド
+
         /// <summary>
         /// EditingGroupのDataListにDataを挿入
         /// </summary>
@@ -194,10 +207,6 @@ namespace _20260510
         }
 
 
-
-        #region メソッド
-
-        #region パブリックメソッド
 
 
         #endregion パブリックメソッド
@@ -1066,6 +1075,9 @@ namespace _20260510
     }
 
 
+    /// <summary>
+    /// dataclassbase
+    /// </summary>
     public abstract partial class Data : ObservableObject
     {
         [ObservableProperty] private RootData? _rootData;
