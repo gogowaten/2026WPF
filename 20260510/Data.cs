@@ -15,7 +15,7 @@ namespace _20260510
     public partial class RootData : GroupData
     {
         // システムのDPI
-        public double MyDPI { get; set; }
+        public double MyDPI { get; set; } = 96.0;
 
         // TextBlock追加時に使う文字列用
         [NotifyCanExecuteChangedFor(nameof(AddTextBlockDataCommand))]

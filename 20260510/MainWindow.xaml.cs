@@ -28,8 +28,6 @@ namespace _20260510
             this.Top = 0;
 #endif
             
-            
-
             MyData = CreateRootData();
             this.DataContext = this;
         }
@@ -117,12 +115,12 @@ namespace _20260510
 
         private void ButtonGroup_Click(object sender, RoutedEventArgs e)
         {
-            
+
         }
 
         private void ContextMenu_Click(object sender, RoutedEventArgs e)
         {
-            if(MyData is RootData root && root.MyClickedItem?.MyContent is GeoLineEX geo)
+            if (MyData is RootData root && root.MyClickedItem?.MyContent is GeoLineEX geo)
             {
                 geo.IsEnableContextMenu = !geo.IsEnableContextMenu;
             }
@@ -160,7 +158,7 @@ namespace _20260510
             }
         }
 
-      
+
 
     }
 }

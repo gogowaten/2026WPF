@@ -72,7 +72,7 @@ namespace _20260510
         private ContextMenu CreateMyContextMenu(Data data)
         {
             var menu = new ContextMenu();
-            var item = new MenuItem() { Header = "current保存" };
+            var item = new MenuItem() { Header = "currentをpngで保存" };
             item.Click += (s, e) => { SaveMyContentToPngImage(); };
 
             //item.SetBinding(IsEnabledProperty,
@@ -80,17 +80,17 @@ namespace _20260510
 
             item.SetBinding(VisibilityProperty,
                 new Binding(nameof(MyData.IsCurrent)) { Source = MyData, Converter = new MyConvBootToVisible() });
-            
+
             menu.Items.Add(item);
 
             if (typeof(EllipseData) == data.GetType())
             {
-                 item = new MenuItem() { Header = "ellipse" };
+                item = new MenuItem() { Header = "ellipse" };
                 menu.Items.Add(item);
             }
             else if (typeof(GeoLineData) == data.GetType())
             {
-                 item = new MenuItem() { Header = "geoline" };
+                item = new MenuItem() { Header = "geoline" };
                 menu.Items.Add(item);
                 if (MyContent is GeoLineEX geo)
                 {
@@ -101,8 +101,10 @@ namespace _20260510
             return menu;
         }
 
+        // MyContentをpngで保存する
         private void SaveMyContentToPngImage()
         {
+            // ファイル保存Dialog作成
             SaveFileDialog dialog = new()
             {
                 AddExtension = true,
@@ -110,7 +112,7 @@ namespace _20260510
                 FileName = DateTime.Now.ToString("yyyyMMdd_HHmmss")
             };
 
-
+            // Dialog表示、pngで保存
             if (dialog.ShowDialog() == true)
             {
                 string filePath = dialog.FileName;
@@ -124,12 +126,8 @@ namespace _20260510
             }
         }
 
-        private void Item_Click(object sender, RoutedEventArgs e)
-        {
-            SaveMyContentToPngImage();
-        }
 
-
+        // MyContentからBitmap作成
         public RenderTargetBitmap MakeMyContentRenderBitmap()
         {
             int width = (int)MyData.Width;
@@ -156,6 +154,7 @@ namespace _20260510
 
         //}
 
+        // クリック直前
         private void CustomThumb_PreviewMouseDown(object sender, MouseButtonEventArgs e)
         {
             if (MyData.RootData is RootData root)
@@ -171,6 +170,7 @@ namespace _20260510
             }
         }
 
+        // ドラッグ移動中
         private void CustomThumb_DragDelta(object sender, DragDeltaEventArgs e)
         {
             if (MyData.RootData is null) { return; }
@@ -313,11 +313,10 @@ namespace _20260510
 
         private void RootItemsControl_Loaded(object sender, RoutedEventArgs e)
         {
-            // システムのDPIを記録
-            //PresentationSource sou = PresentationSource.FromVisual(this);
-            //double dpi = 96.0 * sou.CompositionTarget.TransformFromDevice.M11;
-            //MyData.MyDPI = dpi;
-            MyData.MyDPI = 96.0 * PresentationSource.FromVisual(this).CompositionTarget.TransformFromDevice.M11;
+            // システムのDPIを記録したいけど
+            // 、XAML画面でエラーになるけど、動くことは動く
+
+            //MyData.MyDPI = 96.0 * PresentationSource.FromVisual(this).CompositionTarget.TransformFromDevice.M11;
         }
 
 
