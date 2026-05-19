@@ -36,6 +36,7 @@
       <Button Content="ZupCommand" Command="{Binding MyData.ZUpSelectedItemsCommand}"/>
       <Button Content="Currentを編集する" Command="{Binding MyData.EditingCurrentGroupCommand}"/>
       <Button Content="1個上を編集する" Command="{Binding MyData.EditingUpperGroupCommand}"/>
+      <Button Content="全体をpng画像で保存" Click="ButtonSaveRootToPngImage_Click"/>
 
       <GroupBox Header="CurrentData" DataContext="{Binding MyData.CurrentItemData}">
         <StackPanel>

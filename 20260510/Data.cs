@@ -185,6 +185,8 @@ namespace _20260510
 
         #region パブリックメソッド
 
+
+
         /// <summary>
         /// EditingGroupのDataListにDataを挿入
         /// </summary>

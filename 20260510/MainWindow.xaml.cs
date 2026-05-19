@@ -1,4 +1,6 @@
-﻿using System.Collections.ObjectModel;
+﻿using Microsoft.Win32;
+using System.Collections.ObjectModel;
+using System.IO;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
@@ -27,7 +29,7 @@ namespace _20260510
             this.Left = 0;
             this.Top = 0;
 #endif
-            
+
             MyData = CreateRootData();
             this.DataContext = this;
         }
@@ -128,7 +130,10 @@ namespace _20260510
 
         private void check_Click(object sender, RoutedEventArgs e)
         {
-
+            DependencyObject containeer = MyRootItems.ItemContainerGenerator.ContainerFromItem(MyData);
+            ItemContainerGenerator neko = MyRootItems.ItemContainerGenerator;
+            ReadOnlyCollection<object> inu = neko.Items;
+            object uma = inu[0];
 
             var clicked = MyData.ClickedItemData;
             var rootcliked = MyRootItems.MyData.MyClickedItem?.MyData;
@@ -157,6 +162,48 @@ namespace _20260510
 
             }
         }
+
+        private void ButtonSaveRootToPngImage_Click(object sender, RoutedEventArgs e)
+        {
+            // ファイル保存Dialog作成
+            SaveFileDialog dialog = new()
+            {
+                AddExtension = true,
+                DefaultExt = "png",
+                FileName = DateTime.Now.ToString("yyyyMMdd_HHmmss")
+            };
+
+            // Dialog表示、pngで保存
+            if (dialog.ShowDialog() == true)
+            {
+                string filePath = dialog.FileName;
+                var bmp = Manager.MakeBitmapFromElement(MyData.Width, MyData.Height, MyRootItems);
+                //var bmp = MakeMyContentRenderBitmap(MyRootItems);
+
+                PngBitmapEncoder encoder = new();
+                encoder.Frames.Add(BitmapFrame.Create(bmp));
+
+                using FileStream stream = File.OpenWrite(filePath);
+                encoder.Save(stream);
+            }
+
+        }
+
+
+        //// MyContentからBitmap作成
+        //public static RenderTargetBitmap? MakeMyContentRenderBitmap(RootItemsControl item)
+        //{
+        //    if (item?.MyData is Data MyData)
+        //    {
+        //        int width = (int)MyData.Width;
+        //        int height = (int)MyData.Height;
+        //        double dpi = MyData.RootData is null ? 96.0 : MyData.RootData.MyDPI;
+        //        RenderTargetBitmap bmp = new(width, height, dpi, dpi, PixelFormats.Pbgra32);
+        //        bmp.Render(item);
+        //        return bmp;
+        //    }
+        //    return null;
+        //}
 
 
 

@@ -73,7 +73,7 @@ namespace _20260510
         {
             var menu = new ContextMenu();
             var item = new MenuItem() { Header = "currentをpngで保存" };
-            item.Click += (s, e) => { SaveMyContentToPngImage(); };
+            item.Click += (s, e) => { Manager.SaveMyContentToPngImage(this); };
 
             //item.SetBinding(IsEnabledProperty,
             //    new Binding(nameof(MyData.IsCurrent)) { Source = MyData });
@@ -104,6 +104,8 @@ namespace _20260510
         // MyContentをpngで保存する
         private void SaveMyContentToPngImage()
         {
+
+
             // ファイル保存Dialog作成
             SaveFileDialog dialog = new()
             {
