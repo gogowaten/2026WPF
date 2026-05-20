@@ -14,6 +14,12 @@ namespace _20260510
 {
     public partial class RootData : GroupData
     {
+        // 選択状態の要素の枠線表示の有無
+        [ObservableProperty] private bool _isVisbleSelectedBorder = true;
+        // Groupの枠線表示の有無
+        [ObservableProperty] private bool _isVisbleGroupBorder = true;
+
+
         // システムのDPI
         public double MyDPI { get; set; } = 96.0;
 
@@ -48,11 +54,11 @@ namespace _20260510
             EditingGroupData = this;
             //MyInit();
             SelectedItemsData.CollectionChanged += SelectedItems_CollectionChanged;
-            
+
         }
 
         #region 起動時
-        
+
         #endregion 起動時
 
 
@@ -340,8 +346,8 @@ namespace _20260510
         /// <returns></returns>
         private bool CanAddGroupFromSelectedItems()
         {
-            return EditingGroupData is not null 
-                && SelectedItemsData.Count > 1 
+            return EditingGroupData is not null
+                && SelectedItemsData.Count > 1
                 && EditingGroupData.DataList.Count >= 1;
 
             //if (EditingGroupData is null) { return false; } // 編集中グループがない

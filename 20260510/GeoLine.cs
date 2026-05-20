@@ -87,12 +87,12 @@ namespace _20260510
         {
             var cm = new ContextMenu();
             var item = new MenuItem() { Header = "編集開始" };
-            item.SetBinding(VisibilityProperty, new Binding() { Source = this, Path = new PropertyPath(IsVertexHandleProperty), Converter = new MyConvReverseBootToVisible() });
+            item.SetBinding(VisibilityProperty, new Binding() { Source = this, Path = new PropertyPath(IsVertexHandleProperty), Converter = new MyConvReverseBoolToVisible() });
             item.Click += (s, e) => { IsVertexHandle = true; };
             cm.Items.Add(item);
 
             item = new MenuItem() { Header = "ここに頂点を1番目に挿入" };
-            item.SetBinding(VisibilityProperty, new Binding() { Source = this, Path = new PropertyPath(IsVertexHandleProperty), Converter = new MyConvBootToVisible() });
+            item.SetBinding(VisibilityProperty, new Binding() { Source = this, Path = new PropertyPath(IsVertexHandleProperty), Converter = new MyConvBoolToVisible() });
             item.Click += (s, e) =>
             {
                 MyPoints.Insert(1, MyPointOfRightClicked);
@@ -100,7 +100,7 @@ namespace _20260510
             cm.Items.Add(item);
 
             item = new MenuItem() { Header = "ここに頂点を追加(先頭)" };
-            item.SetBinding(VisibilityProperty, new Binding() { Source = this, Path = new PropertyPath(IsVertexHandleProperty), Converter = new MyConvBootToVisible() });
+            item.SetBinding(VisibilityProperty, new Binding() { Source = this, Path = new PropertyPath(IsVertexHandleProperty), Converter = new MyConvBoolToVisible() });
             item.Click += (s, e) =>
             {
                 MyPoints.Insert(0, MyPointOfRightClicked);
@@ -108,7 +108,7 @@ namespace _20260510
             cm.Items.Add(item);
 
             item = new MenuItem() { Header = "ここに頂点を追加(末尾)" };
-            item.SetBinding(VisibilityProperty, new Binding() { Source = this, Path = new PropertyPath(IsVertexHandleProperty), Converter = new MyConvBootToVisible() });
+            item.SetBinding(VisibilityProperty, new Binding() { Source = this, Path = new PropertyPath(IsVertexHandleProperty), Converter = new MyConvBoolToVisible() });
             item.Click += (s, e) =>
             {
                 MyPoints.Insert(MyPoints.Count, MyPointOfRightClicked);
@@ -117,7 +117,7 @@ namespace _20260510
 
 
             item = new MenuItem() { Header = "編集終了" };
-            item.SetBinding(VisibilityProperty, new Binding() { Source = this, Path = new PropertyPath(IsVertexHandleProperty), Converter = new MyConvBootToVisible() }); cm.Items.Add(item);
+            item.SetBinding(VisibilityProperty, new Binding() { Source = this, Path = new PropertyPath(IsVertexHandleProperty), Converter = new MyConvBoolToVisible() }); cm.Items.Add(item);
             item.Click += (s, e) => { IsVertexHandle = false; };
             return cm;
         }
@@ -856,7 +856,7 @@ namespace _20260510
 
 
 
-    public class MyConvReverseBootToVisible : IValueConverter
+    public class MyConvReverseBoolToVisible : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
@@ -869,7 +869,7 @@ namespace _20260510
         }
     }
 
-    public class MyConvBootToVisible : IValueConverter
+    public class MyConvBoolToVisible : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {

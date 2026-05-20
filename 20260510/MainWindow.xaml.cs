@@ -1,4 +1,5 @@
-﻿using Microsoft.Win32;
+﻿using Microsoft.VisualBasic;
+using Microsoft.Win32;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Text;
@@ -165,6 +166,10 @@ namespace _20260510
 
         private void ButtonSaveRootToPngImage_Click(object sender, RoutedEventArgs e)
         {
+            // 枠表示保持
+            bool groupWaku = MyData.IsVisbleSelectedBorder;
+            bool selectWaku = MyData.IsVisbleSelectedBorder;
+
             // ファイル保存Dialog作成
             SaveFileDialog dialog = new()
             {
@@ -176,9 +181,12 @@ namespace _20260510
             // Dialog表示、pngで保存
             if (dialog.ShowDialog() == true)
             {
+                // 枠を非表示
+                MyData.IsVisbleGroupBorder = false;
+                MyData.IsVisbleSelectedBorder = false;
+
                 string filePath = dialog.FileName;
                 var bmp = Manager.MakeBitmapFromElement(MyData.Width, MyData.Height, MyRootItems);
-                //var bmp = MakeMyContentRenderBitmap(MyRootItems);
 
                 PngBitmapEncoder encoder = new();
                 encoder.Frames.Add(BitmapFrame.Create(bmp));
@@ -187,23 +195,13 @@ namespace _20260510
                 encoder.Save(stream);
             }
 
+            // 枠表示を戻す
+            MyData.IsVisbleGroupBorder = groupWaku;
+            MyData.IsVisbleSelectedBorder = selectWaku;
+
         }
 
 
-        //// MyContentからBitmap作成
-        //public static RenderTargetBitmap? MakeMyContentRenderBitmap(RootItemsControl item)
-        //{
-        //    if (item?.MyData is Data MyData)
-        //    {
-        //        int width = (int)MyData.Width;
-        //        int height = (int)MyData.Height;
-        //        double dpi = MyData.RootData is null ? 96.0 : MyData.RootData.MyDPI;
-        //        RenderTargetBitmap bmp = new(width, height, dpi, dpi, PixelFormats.Pbgra32);
-        //        bmp.Render(item);
-        //        return bmp;
-        //    }
-        //    return null;
-        //}
 
 
 

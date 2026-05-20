@@ -79,7 +79,7 @@ namespace _20260510
             //    new Binding(nameof(MyData.IsCurrent)) { Source = MyData });
 
             item.SetBinding(VisibilityProperty,
-                new Binding(nameof(MyData.IsCurrent)) { Source = MyData, Converter = new MyConvBootToVisible() });
+                new Binding(nameof(MyData.IsCurrent)) { Source = MyData, Converter = new MyConvBoolToVisible() });
 
             menu.Items.Add(item);
 

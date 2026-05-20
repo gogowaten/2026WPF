@@ -28,6 +28,8 @@
     </Canvas>
 
     <StackPanel Grid.Column="1">
+      <CheckBox Content="選択状態枠表示" IsChecked="{Binding MyData.IsVisbleSelectedBorder}"/>
+      <CheckBox Content="Group枠表示" IsChecked="{Binding MyData.IsVisbleGroupBorder}"/>
       <Button x:Name="check" Content="check" Click="check_Click"/>
       <Button Content="グループ化" Command="{Binding MyData.AddGroupFromSelectedItemsCommand}"/>
       <Button Content="グループ解除" Command="{Binding MyData.UnGroupCurrentCommand}"/>

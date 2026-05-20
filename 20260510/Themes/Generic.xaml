@@ -60,10 +60,17 @@
   </DataTemplate>
 
   <DataTemplate DataType="{x:Type local:GroupData}">
+    <DataTemplate.Resources>
+      <local:MyConvBoolToVisible x:Key="isVisible"/>
+    </DataTemplate.Resources>
     <local:CustomThumb>
       <Grid d:DataContext="{d:DesignInstance Type=local:GroupData}">
-        <Rectangle Stroke="Blue" StrokeThickness="1" StrokeDashArray="2,2"
-                   Visibility="Visible" Margin="-2"/>
+        <Rectangle x:Name="GroupWaku" Stroke="Blue" StrokeThickness="1" StrokeDashArray="2,2"
+                   Visibility="{Binding Converter={StaticResource isVisible}, RelativeSource={RelativeSource AncestorType=local:CustomThumb}, Path=MyData.RootData.IsVisbleGroupBorder}" Margin="-2"/>
+        <!--<Rectangle x:Name="GroupWaku" Stroke="Blue" StrokeThickness="1" StrokeDashArray="2,2"
+                   Visibility="{Binding Converter={StaticResource isVisible}, RelativeSource={RelativeSource Mode=Self}, Path=RootData.IsVisbleGroupBorder}" Margin="-2"/>-->
+        <!--<Rectangle x:Name="GroupWaku" Stroke="Blue" StrokeThickness="1" StrokeDashArray="2,2"
+                   Visibility="Visible" Margin="-2"/>-->
         <ItemsControl ItemsSource="{Binding DataList}"
                       Width="{Binding Width}"
                       Height="{Binding Height}"
@@ -98,14 +105,24 @@
                     Margin="-10"/>
           </Grid>
           <ControlTemplate.Triggers>
-            <DataTrigger Binding="{Binding IsSelected}" Value="True">
+            <MultiDataTrigger>
+              <MultiDataTrigger.Conditions>
+                <Condition Binding="{Binding Path=IsSelected}" Value="true"/>
+                <Condition Binding="{Binding RelativeSource={RelativeSource Mode=Self}, Path=MyData.RootData.IsVisbleSelectedBorder}" Value="true"/>
+                <!--<Condition Binding="{Binding Path=MyData.RootData.IsVisbleSelectedBorder}" Value="true"/>-->
+                <!--<Condition Binding="{Binding RelativeSource={RelativeSource AncestorType=local:CustomThumb}, Path=MyData.RootData.IsVisbleSelectedBorder}" Value="true"/>-->
+              </MultiDataTrigger.Conditions>
               <Setter TargetName="SelectedBorder" Property="Visibility" Value="Visible"/>
-            </DataTrigger>
+            </MultiDataTrigger>
           </ControlTemplate.Triggers>
         </ControlTemplate>
       </Setter.Value>
     </Setter>
   </Style>
+  
+  <!--MultiDataTriggerの使い方-->
+  <!--[WPF] 複数のトリガー条件を組み合わせた時に AND だけでなく OR で判断する方法 - ぐーたら書房
+https://gootara.org/library/2017/01/wpfao.html-->
 
 
 
