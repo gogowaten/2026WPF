@@ -11,6 +11,9 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 
+// Visual Studio用、BitmapSourceVisualizerに「ファイルに保存」と「コピー」を追加した - 午後わてんのブログ
+// https://gogowaten.hatenablog.com/entry/2026/05/20/233726
+
 namespace BitmapSourceVisualizer
 {
     /// <summary>

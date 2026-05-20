@@ -51,7 +51,7 @@ namespace _20260510
             return result;
         }
 
-        // MyContentからBitmap作成
+        // 要素からBitmap作成
         public static RenderTargetBitmap? MakeBitmapFromElement(double width, double height, FrameworkElement item)
         {
             int w = (int)width;
