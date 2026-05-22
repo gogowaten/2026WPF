@@ -22,11 +22,25 @@ namespace BitmapSourceVisualizer
     public partial class BitmapSourceVisualizerWindow : Window
     {
         public BitmapSource MyBitmapSource;
+        private readonly double ImageScaleMin = 0.01;
+        private readonly double ImageScaleMax = 50.0;
+
         public BitmapSourceVisualizerWindow()
         {
             InitializeComponent();
             ContextMenu = CreateContextMenu();
+            DataContext = this;
         }
+
+
+        public double MyImageScale
+        {
+            get { return (double)GetValue(MyImageScaleProperty); }
+            set { SetValue(MyImageScaleProperty, value); }
+        }
+        public static readonly DependencyProperty MyImageScaleProperty =
+            DependencyProperty.Register(nameof(MyImageScale), typeof(double), typeof(Window), new PropertyMetadata(1.0));
+
 
         public void SetImage(BitmapSource bitmap)
         {
@@ -127,17 +141,6 @@ namespace BitmapSourceVisualizer
             }
         }
 
-        //private void ButtonEdge_Click(object sender, RoutedEventArgs e)
-        //{
-        //    if (RenderOptions.GetEdgeMode(ImageControl) == EdgeMode.Aliased)
-        //    {
-        //        RenderOptions.SetEdgeMode(ImageControl, EdgeMode.Unspecified);
-        //    }
-        //    else
-        //    {
-        //        RenderOptions.SetEdgeMode(ImageControl, EdgeMode.Aliased);
-        //    }
-        //}
 
         private void ButtonScalingModeNearestNeighbor_Click(object sender, RoutedEventArgs e)
         {
@@ -153,5 +156,34 @@ namespace BitmapSourceVisualizer
             RenderOptions.SetBitmapScalingMode(ImageControl, BitmapScalingMode.Fant);
         }
 
+        private void ButtonSetScale_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button button && int.TryParse(button.Tag.ToString(), out int scale))
+            {
+                MyImageScale = scale;
+            }
+        }
+
+        private void ButtonSetMathScale_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button button && double.TryParse(button.Tag.ToString(), out double scale))
+            {
+                MyImageScale = Clamp(MyImageScale * scale, ImageScaleMin, ImageScaleMax);
+            }
+        }
+
+        // クランプ。値を上限下限内に収めて返す
+        private static double Clamp(double value, double min, double max)
+        {
+            if (min > max)
+            {
+                (max, min) = (min, max);
+            }
+
+            double result = value;
+            if (value < min) { result = min; }
+            else if (value > max) { result = max; }
+            return result;
+        }
     }
 }

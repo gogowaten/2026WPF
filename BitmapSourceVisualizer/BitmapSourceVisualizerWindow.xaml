@@ -5,7 +5,8 @@
         Title="BitmapSource Visualizer"
         Width="800" Height="600"
         WindowStartupLocation="CenterOwner"
-        ResizeMode="CanResizeWithGrip">
+        ResizeMode="CanResizeWithGrip"
+        DataContext="{Binding}">
   <Grid>
     <Grid.ColumnDefinitions>
       <ColumnDefinition/>
@@ -13,39 +14,61 @@
     </Grid.ColumnDefinitions>
     <ScrollViewer HorizontalScrollBarVisibility="Auto"
                   VerticalScrollBarVisibility="Auto">
-      <!--市松模様をXAMLだけで描く方法 | Seizu Development Forge
+      <ScrollViewer.Style>
+        <Style TargetType="ScrollViewer">
+          <Setter Property="Background">
+            <Setter.Value>
+
+              <!--市松模様をXAMLだけで描く方法 | Seizu Development Forge
 https://seizu.dev/2013/06/11/post2437.html-->
-      <ScrollViewer.Background>
-        <DrawingBrush Viewport="0,0,32,32" TileMode="Tile" ViewportUnits="Absolute">
-          <DrawingBrush.Drawing>
-            <DrawingGroup>
-              <GeometryDrawing Brush="#eee">
-                <GeometryDrawing.Geometry>
-                  <RectangleGeometry Rect="0,0,64,64"/>
-                </GeometryDrawing.Geometry>
-              </GeometryDrawing>
 
-              <GeometryDrawing Brush="#fafafa">
-                <GeometryDrawing.Geometry>
-                  <GeometryGroup>
-                    <RectangleGeometry Rect="0,0,32,32"/>
-                    <RectangleGeometry Rect="32,32,32,32"/>
-                  </GeometryGroup>
-                </GeometryDrawing.Geometry>
-              </GeometryDrawing>
+              <DrawingBrush Viewport="0,0,32,32" TileMode="Tile" ViewportUnits="Absolute">
+                <DrawingBrush.Drawing>
+                  <DrawingGroup>
 
-            </DrawingGroup>
-          </DrawingBrush.Drawing>
-        </DrawingBrush>
-      </ScrollViewer.Background>
+                    <GeometryDrawing Brush="#eee">
+                      <GeometryDrawing.Geometry>
+                        <RectangleGeometry Rect="0,0,64,64"/>
+                      </GeometryDrawing.Geometry>
+                    </GeometryDrawing>
+
+                    <GeometryDrawing Brush="#fafafa">
+                      <GeometryDrawing.Geometry>
+                        <GeometryGroup>
+                          <RectangleGeometry Rect="0,0,32,32"/>
+                          <RectangleGeometry Rect="32,32,32,32"/>
+                        </GeometryGroup>
+                      </GeometryDrawing.Geometry>
+                    </GeometryDrawing>
+
+                  </DrawingGroup>
+                </DrawingBrush.Drawing>
+              </DrawingBrush>
+
+            </Setter.Value>
+          </Setter>
+          <Style.Triggers>
+            <DataTrigger Binding="{Binding ElementName=IsBackground, Path=IsChecked}" Value="true">
+              <Setter Property="Background" Value="Transparent"/>
+            </DataTrigger>
+          </Style.Triggers>
+        </Style>
+      </ScrollViewer.Style>
+
       <Image x:Name="ImageControl"
              Stretch="None"
              SnapsToDevicePixels="True"
              RenderOptions.BitmapScalingMode="NearestNeighbor"
              UseLayoutRounding="True"
-             RenderOptions.EdgeMode="Aliased"/>
+             RenderOptions.EdgeMode="Aliased"
+             >
+        <Image.LayoutTransform>
+          <ScaleTransform ScaleX="{Binding MyImageScale}"
+                          ScaleY="{Binding MyImageScale}"/>
+        </Image.LayoutTransform>
+      </Image>
     </ScrollViewer>
-    <StackPanel Grid.Column="1" DataContext="{Binding ElementName=ImageControl}">
+    <StackPanel Grid.Column="1">
       <StackPanel.Resources>
         <Style TargetType="TextBlock">
           <Setter Property="Margin" Value="5"/>
@@ -57,8 +80,36 @@ https://seizu.dev/2013/06/11/post2437.html-->
           <Setter Property="Margin" Value="15,4"/>
         </Style>
       </StackPanel.Resources>
+      <CheckBox x:Name="IsBackground" Content="背景無し" IsChecked="False"
+                Margin="10"/>
+
       <Button Content="コピー" Click="ButtonCopyToClipboard_Click"/>
       <Button Content="保存" Click="ButtonSave_Click"/>
+
+      <Separator/>
+
+      <TextBlock Text="{Binding MyImageScale, StringFormat='表示倍率 = {0:0.0}'}"/>
+      <Slider x:Name="ImageScale" Minimum="1" Maximum="30" Value="{Binding MyImageScale}"
+              SmallChange="1" LargeChange="1"
+              Margin="10,5" TickFrequency="1.0"/>
+      <UniformGrid Columns="4" Rows="2">
+        <UniformGrid.Resources>
+          <Style TargetType="Button">
+            <Setter Property="Margin" Value="2"/>
+          </Style>
+        </UniformGrid.Resources>
+        <Button Content="1" Tag="1" Click="ButtonSetScale_Click"/>
+        <Button Content="3" Tag="3" Click="ButtonSetScale_Click"/>
+        <Button Content="10" Tag="10" Click="ButtonSetScale_Click"/>
+        <Button Content="50" Tag="50" Click="ButtonSetScale_Click"/>
+        <Button Content="x 2" Tag="2" Click="ButtonSetMathScale_Click"/>
+        <Button Content="x 10" Tag="10" Click="ButtonSetMathScale_Click"/>
+        <Button Content="x 0.5" Tag="0.5" Click="ButtonSetMathScale_Click"/>
+        <Button Content="x 0.1" Tag="0.1" Click="ButtonSetMathScale_Click"/>
+      </UniformGrid>
+
+      <Separator/>
+
 
       <GroupBox Header="StretchMode">
         <StackPanel>
@@ -79,13 +130,6 @@ https://seizu.dev/2013/06/11/post2437.html-->
               <Button Content="Fant" Click="ButtonScalingModeFant_Click"/>
             </StackPanel>
           </GroupBox>
-          <!--<GroupBox Header="EdgeMode">
-            <StackPanel>
-              <Button Content="切り替え" Click="ButtonEdge_Click"/>
-              <TextBlock Text="{Binding Path=(RenderOptions.EdgeMode)}" HorizontalAlignment="Center"/>
-            </StackPanel>
-          </GroupBox>-->
-
         </StackPanel>
       </GroupBox>
     </StackPanel>
