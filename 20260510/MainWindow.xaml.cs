@@ -201,9 +201,17 @@ namespace _20260510
 
         }
 
+        private void ButtonCurrentToPngImageFile_Click(object sender, RoutedEventArgs e)
+        {
+            if (MyData.CurrentItemData is Data data && data.Content is FrameworkElement)
+            {
+                FrameworkElement? content = data.Content;
+                var bmp = Manager.MakeBitmapFromElement(data.Width, data.Height, data.Content);
 
-
-
-
+                var item0 = VisualTreeHelper.GetChild(MyRootItems, 0);
+                var items = MyRootItems.ItemContainerGenerator.Items;
+                var neko = items[data.Z];
+            }
+        }
     }
 }

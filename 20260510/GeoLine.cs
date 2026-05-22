@@ -469,6 +469,11 @@ namespace _20260510
 
         private void GeoLine_Loaded(object sender, RoutedEventArgs e)
         {
+            // これだと起動しない、直前でエラー無しで落ちる
+            //if (MyPoints is not null)
+            //{
+            //    MyPoints.CollectionChanged += MyPoints_CollectionChanged;
+            //}
             MyPoints.CollectionChanged += MyPoints_CollectionChanged;
         }
         #endregion 初期化
@@ -519,7 +524,12 @@ namespace _20260510
                 {
                     oldPs.CollectionChanged -= geo.MyPoints_CollectionChanged;
                 }
-                ((ObservableCollection<Point>)e.NewValue).CollectionChanged += geo.MyPoints_CollectionChanged;
+
+                if (e.NewValue is ObservableCollection<Point> newPs)
+                {
+                    newPs.CollectionChanged += geo.MyPoints_CollectionChanged;
+                }
+                //((ObservableCollection<Point>)e.NewValue).CollectionChanged += geo.MyPoints_CollectionChanged;
 
                 geo.MyUpdateVisual();
             }

@@ -1108,6 +1108,8 @@ namespace _20260510
         //[ObservableProperty] private double _angle; // 回転角度
         public Rect LayoutTransformedRect { get; internal set; }
 
+        // 表示している要素自体を記録用、画像として保存とかに使う
+        [ObservableProperty] private FrameworkElement? _content;
 
 
         // 自身の座標変更時は親要素を変更しないほうが良さそう、負荷が高いのも在る

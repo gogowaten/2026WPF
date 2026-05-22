@@ -57,10 +57,14 @@ namespace _20260510
             if (MyContent is FrameworkElement element)
             {
                 element.SizeChanged += Element_SizeChanged;
+
+                // Dataに要素を記録しておく、画像として保存とかに使う
+                MyData.Content = this.MyContent;
             }
 
             // 右クリックメニュー作成
             this.ContextMenu = CreateMyContextMenu(MyData);
+
         }
 
         private void Element_SizeChanged(object sender, SizeChangedEventArgs e)
