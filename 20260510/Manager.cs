@@ -7,6 +7,7 @@ using System.Text;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using System.Windows.Shapes;
 
 namespace _20260510
 {
@@ -44,7 +45,7 @@ namespace _20260510
                 }
             }
             catch (Exception ex)
-            {                
+            {
                 //throw new Exception("保存できなかった",ex);
                 Debug.WriteLine($"保存できなかった： {ex}");
             }
@@ -62,20 +63,42 @@ namespace _20260510
             return bmp;
         }
 
-        //// MyContentからBitmap作成
-        //public static RenderTargetBitmap? MakeMyContentRenderBitmap(CustomThumb item)
-        //{
-        //    if (item?.MyData is Data MyData)
-        //    {
-        //        int width = (int)MyData.Width;
-        //        int height = (int)MyData.Height;
-        //        double dpi = MyData.RootData is null ? 96.0 : MyData.RootData.MyDPI;
-        //        RenderTargetBitmap bmp = new(width, height, dpi, dpi, PixelFormats.Pbgra32);
-        //        bmp.Render(item.MyContent);
-        //        return bmp;
-        //    }
-        //    return null;
-        //}
+        // 要素からBitmap作成
+        public static RenderTargetBitmap? MakeBitmapFromElement2(FrameworkElement item, FrameworkElement parent)
+        {
+            var anc = item.TransformToAncestor(parent);
+            var des = parent.TransformToDescendant(item);
+            var lay = item.LayoutTransform;
+            var ren = item.RenderTransform;
+
+            Rect orir = new(0, 0, item.ActualWidth, item.ActualHeight);
+            List<Rect> rects = [];
+            if (lay is TransformGroup group)
+            {
+                TransformCollection chil = group.Children;
+                foreach (var tfc in group.Children)
+                {
+                    orir = tfc.TransformBounds(orir);
+                    rects.Add(tfc.TransformBounds(new(0, 0, item.ActualWidth, item.ActualHeight)));
+                }
+            }
+
+
+            double dpi = 96.0 * PresentationSource.FromVisual(item).CompositionTarget.TransformFromDevice.M11;
+            GeneralTransform TF = item.TransformToVisual(parent);
+            Rect bounds = TF.TransformBounds(new Rect(0, 0, item.ActualWidth, item.ActualHeight));
+            Rect rect = new(new Point(), bounds.Size);
+            DrawingVisual dv = new();
+            using (var context = dv.RenderOpen())
+            {
+                VisualBrush brush = new(item);
+                context.DrawRectangle(brush, null, rect);
+            }
+
+            RenderTargetBitmap bmp = new((int)bounds.Width, (int)bounds.Height, dpi, dpi, PixelFormats.Pbgra32);
+            bmp.Render(dv);
+            return bmp;
+        }
 
 
     }

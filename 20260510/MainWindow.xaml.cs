@@ -131,10 +131,18 @@ namespace _20260510
 
         private void check_Click(object sender, RoutedEventArgs e)
         {
-            DependencyObject containeer = MyRootItems.ItemContainerGenerator.ContainerFromItem(MyData);
-            ItemContainerGenerator neko = MyRootItems.ItemContainerGenerator;
-            ReadOnlyCollection<object> inu = neko.Items;
-            object uma = inu[0];
+            GeneralTransform tran = MyEllipse.TransformToVisual(this);
+            Rect tranRect = tran.TransformBounds(new Rect(0, 0, MyEllipse.ActualWidth, MyEllipse.ActualHeight));
+            
+
+            var acW = MyEllipse.ActualWidth;
+            var bmp = Manager.MakeBitmapFromElement(acW, MyEllipse.ActualHeight, MyEllipse);
+            var bmp2 = Manager.MakeBitmapFromElement(MyEllipse.DesiredSize.Width, MyEllipse.DesiredSize.Height, MyEllipse);
+            var bmp3 = Manager.MakeBitmapFromElement2(MyEllipse, MyCanvas);
+            var bmp4 = Manager.MakeBitmapFromElement2(MyEllipse, this);
+
+            var contentBounds = VisualTreeHelper.GetContentBounds(MyEllipse);
+            var parentBo = VisualTreeHelper.GetDescendantBounds(MyCanvas);
 
             var clicked = MyData.ClickedItemData;
             var rootcliked = MyRootItems.MyData.MyClickedItem?.MyData;

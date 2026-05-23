@@ -93,6 +93,17 @@ namespace BitmapSourceVisualizer
             Clipboard.SetData("PNG", ms);
         }
 
+        // 要素からBitmap作成
+        public static RenderTargetBitmap MakeBitmapFromElement(double width, double height, FrameworkElement item)
+        {
+            int w = (int)width;
+            int h = (int)height;
+            double dpi = 96.0 * PresentationSource.FromVisual(item).CompositionTarget.TransformFromDevice.M11;
+            RenderTargetBitmap bmp = new(w, h, dpi, dpi, PixelFormats.Pbgra32);
+            bmp.Render(item);
+            return bmp;
+        }
+
         private void ButtonCopyToClipboard_Click(object sender, RoutedEventArgs e)
         {
             if (MyBitmapSource is not null)
@@ -184,6 +195,12 @@ namespace BitmapSourceVisualizer
             if (value < min) { result = min; }
             else if (value > max) { result = max; }
             return result;
+        }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            var bmp = MakeBitmapFromElement(ImageControl.ActualWidth, ImageControl.ActualHeight, ImageControl);
+            BitmapToPngImageToClipboard(bmp);
         }
     }
 }

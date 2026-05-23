@@ -24,7 +24,14 @@
     </ScrollViewer>
 
     <Canvas x:Name="MyCanvas">
-
+      <Ellipse Canvas.Left="50" Canvas.Top="40" x:Name="MyEllipse" Width="12" Height="4" Fill="Green">
+        <Ellipse.LayoutTransform>
+          <TransformGroup>
+            <ScaleTransform ScaleX="10" ScaleY="10"/>
+            <RotateTransform Angle="20"/>
+          </TransformGroup>
+        </Ellipse.LayoutTransform>
+      </Ellipse>
     </Canvas>
 
     <StackPanel Grid.Column="1">

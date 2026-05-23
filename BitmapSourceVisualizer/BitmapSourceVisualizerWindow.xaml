@@ -84,6 +84,7 @@ https://seizu.dev/2013/06/11/post2437.html-->
                 Margin="10"/>
 
       <Button Content="コピー" Click="ButtonCopyToClipboard_Click"/>
+      <Button Content="コピー見た目通り" Click="Button_Click"/>
       <Button Content="保存" Click="ButtonSave_Click"/>
 
       <Separator/>
