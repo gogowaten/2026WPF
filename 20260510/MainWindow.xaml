@@ -28,7 +28,7 @@
         <Ellipse.LayoutTransform>
           <TransformGroup>
             <ScaleTransform ScaleX="10" ScaleY="10"/>
-            <RotateTransform Angle="20"/>
+            <!--<RotateTransform Angle="20"/>-->
           </TransformGroup>
         </Ellipse.LayoutTransform>
       </Ellipse>

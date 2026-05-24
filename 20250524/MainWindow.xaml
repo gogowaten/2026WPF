@@ -1,68 +1,25 @@
-﻿<Window x:Class="BitmapSourceVisualizer.BitmapSourceVisualizerWindow"
+﻿<Window x:Class="_20250524.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:local="clr-namespace:BitmapSourceVisualizer"
-        Title="BitmapSource Visualizer"
-        Width="800" Height="600"
-        WindowStartupLocation="CenterOwner"
-        ResizeMode="CanResizeWithGrip"
-        DataContext="{Binding}">
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:_20250524"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="367" Width="654">
   <Grid>
     <Grid.ColumnDefinitions>
       <ColumnDefinition/>
-      <ColumnDefinition Width="150"/>
+      <ColumnDefinition Width="200"/>
     </Grid.ColumnDefinitions>
+
     <ScrollViewer HorizontalScrollBarVisibility="Auto"
                   VerticalScrollBarVisibility="Auto">
-      <ScrollViewer.Style>
-        <Style TargetType="ScrollViewer">
-          <Setter Property="Background">
-            <Setter.Value>
-
-              <!--市松模様をXAMLだけで描く方法 | Seizu Development Forge
-https://seizu.dev/2013/06/11/post2437.html-->
-
-              <DrawingBrush Viewport="0,0,32,32" TileMode="Tile" ViewportUnits="Absolute">
-                <DrawingBrush.Drawing>
-                  <DrawingGroup>
-
-                    <GeometryDrawing Brush="#eee">
-                      <GeometryDrawing.Geometry>
-                        <RectangleGeometry Rect="0,0,64,64"/>
-                      </GeometryDrawing.Geometry>
-                    </GeometryDrawing>
-
-                    <GeometryDrawing Brush="#fafafa">
-                      <GeometryDrawing.Geometry>
-                        <GeometryGroup>
-                          <RectangleGeometry Rect="0,0,32,32"/>
-                          <RectangleGeometry Rect="32,32,32,32"/>
-                        </GeometryGroup>
-                      </GeometryDrawing.Geometry>
-                    </GeometryDrawing>
-
-                  </DrawingGroup>
-                </DrawingBrush.Drawing>
-              </DrawingBrush>
-
-            </Setter.Value>
-          </Setter>
-          <Style.Triggers>
-            <DataTrigger Binding="{Binding ElementName=IsBackground, Path=IsChecked}" Value="true">
-              <Setter Property="Background" Value="Transparent"/>
-            </DataTrigger>
-          </Style.Triggers>
-        </Style>
-      </ScrollViewer.Style>
-
       <Image x:Name="ImageControl"
              Stretch="None"
              SnapsToDevicePixels="True"
              RenderOptions.BitmapScalingMode="NearestNeighbor"
              UseLayoutRounding="True"
              RenderOptions.EdgeMode="Aliased"
-             HorizontalAlignment="Left"
-             VerticalAlignment="Top"
              >
         <Image.LayoutTransform>
           <ScaleTransform ScaleX="{Binding MyImageScale}"
@@ -70,6 +27,7 @@ https://seizu.dev/2013/06/11/post2437.html-->
         </Image.LayoutTransform>
       </Image>
     </ScrollViewer>
+
     <StackPanel Grid.Column="1">
       <StackPanel.Resources>
         <Style TargetType="TextBlock">
@@ -86,7 +44,7 @@ https://seizu.dev/2013/06/11/post2437.html-->
                 Margin="10"/>
 
       <Button Content="コピー" Click="ButtonCopyToClipboard_Click"/>
-      <Button Content="コピー見た目通り" Click="ButtonCopyToClipboardExterior_Click"/>
+      <Button Content="コピー見た目通り" Click="Button_Click"/>
       <Button Content="保存" Click="ButtonSave_Click"/>
 
       <Separator/>
@@ -121,18 +79,6 @@ https://seizu.dev/2013/06/11/post2437.html-->
           <Button Content="Uniform" Click="ButtonChangeStretchUniform_Click"/>
           <Button Content="UniformToFill" Click="ButtonChangeStretchUniformToFill_Click"/>
           <Button Content="Fill" Click="ButtonChangeStretchFill_Click"/>
-        </StackPanel>
-      </GroupBox>
-      <GroupBox Header="RenderOptions">
-        <StackPanel>
-          <GroupBox Header="BitmapScalingMode">
-            <StackPanel>
-              <TextBlock Text="{Binding Path=(RenderOptions.BitmapScalingMode)}" HorizontalAlignment="Center"/>
-              <Button Content="最近傍補間" Click="ButtonScalingModeNearestNeighbor_Click"/>
-              <Button Content="Linear" Click="ButtonScalingModeLinear_Click"/>
-              <Button Content="Fant" Click="ButtonScalingModeFant_Click"/>
-            </StackPanel>
-          </GroupBox>
         </StackPanel>
       </GroupBox>
     </StackPanel>

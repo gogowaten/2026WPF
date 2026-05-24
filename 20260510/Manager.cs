@@ -70,8 +70,11 @@ namespace _20260510
             var des = parent.TransformToDescendant(item);
             var lay = item.LayoutTransform;
             var ren = item.RenderTransform;
-
             Rect orir = new(0, 0, item.ActualWidth, item.ActualHeight);
+
+            Rect neko = item.LayoutTransform.TransformBounds(orir);
+
+
             List<Rect> rects = [];
             if (lay is TransformGroup group)
             {

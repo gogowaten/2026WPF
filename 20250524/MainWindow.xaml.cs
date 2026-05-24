@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
+﻿using System.IO;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
@@ -9,29 +7,28 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-// Visual Studio用、BitmapSourceVisualizerに「ファイルに保存」と「コピー」を追加した - 午後わてんのブログ
-// https://gogowaten.hatenablog.com/entry/2026/05/20/233726
-
-namespace BitmapSourceVisualizer
+namespace _20250524
 {
     /// <summary>
-    /// BitmapSourceVisualizerWindow.xaml の相互作用ロジック
+    /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class BitmapSourceVisualizerWindow : Window
+    public partial class MainWindow : Window
     {
         public BitmapSource MyBitmapSource;
         private readonly double ImageScaleMin = 0.01;
         private readonly double ImageScaleMax = 50.0;
 
-        public BitmapSourceVisualizerWindow()
+        public MainWindow()
         {
             InitializeComponent();
-            ContextMenu = CreateContextMenu();
             DataContext = this;
+            BitmapImage bi = new(new Uri("C:\\Users\\waten\\Documents\\20260518_221026.png"));
+            MyBitmapSource = bi;
+            ImageControl.Source = MyBitmapSource;
         }
-
 
         public double MyImageScale
         {
@@ -104,28 +101,6 @@ namespace BitmapSourceVisualizer
             return bmp;
         }
 
-        // 要素からBitmap作成、拡大対応
-        public static RenderTargetBitmap MakeBitmapFromElement2(FrameworkElement item, FrameworkElement parent)
-        {
-            double dpi = 96.0 * PresentationSource.FromVisual(item).CompositionTarget.TransformFromDevice.M11;
-            VisualBrush brush = new(item);
-
-            Rect bounds = new(0, 0, item.ActualWidth, item.ActualHeight);
-            GeneralTransform TF = item.TransformToVisual(parent);
-            var neko = TF.TransformBounds(bounds);
-            Rect inu = new(new Point(), neko.Size);
-
-            DrawingVisual dv = new();
-            using (DrawingContext context = dv.RenderOpen())
-            {
-                //context.PushTransform(item.LayoutTransform);
-                context.DrawRectangle(brush, null, inu);
-            }
-            RenderTargetBitmap bmp = new((int)neko.Width, (int)neko.Height, dpi, dpi, PixelFormats.Pbgra32);
-            bmp.Render(item);
-            return bmp;
-        }
-
         private void ButtonCopyToClipboard_Click(object sender, RoutedEventArgs e)
         {
             if (MyBitmapSource is not null)
@@ -174,20 +149,7 @@ namespace BitmapSourceVisualizer
             }
         }
 
-
-        private void ButtonScalingModeNearestNeighbor_Click(object sender, RoutedEventArgs e)
-        {
-            RenderOptions.SetBitmapScalingMode(ImageControl, BitmapScalingMode.NearestNeighbor);
-        }
-        private void ButtonScalingModeLinear_Click(object sender, RoutedEventArgs e)
-        {
-            RenderOptions.SetBitmapScalingMode(ImageControl, BitmapScalingMode.Linear);
-        }
-
-        private void ButtonScalingModeFant_Click(object sender, RoutedEventArgs e)
-        {
-            RenderOptions.SetBitmapScalingMode(ImageControl, BitmapScalingMode.Fant);
-        }
+      
 
         private void ButtonSetScale_Click(object sender, RoutedEventArgs e)
         {
@@ -219,9 +181,9 @@ namespace BitmapSourceVisualizer
             return result;
         }
 
-        private void ButtonCopyToClipboardExterior_Click(object sender, RoutedEventArgs e)
+        private void Button_Click(object sender, RoutedEventArgs e)
         {
-            var bmp = MakeBitmapFromElement2(ImageControl, this);
+            var bmp = MakeBitmapFromElement(ImageControl.ActualWidth, ImageControl.ActualHeight, ImageControl);
             BitmapToPngImageToClipboard(bmp);
         }
     }
