@@ -12,7 +12,7 @@
       <ColumnDefinition Width="200"/>
     </Grid.ColumnDefinitions>
 
-    <ScrollViewer HorizontalScrollBarVisibility="Auto"
+    <ScrollViewer x:Name="MyScrollViewer" HorizontalScrollBarVisibility="Auto"
                   VerticalScrollBarVisibility="Auto">
       <Image x:Name="ImageControl"
              Stretch="None"
@@ -22,8 +22,12 @@
              RenderOptions.EdgeMode="Aliased"
              >
         <Image.LayoutTransform>
-          <ScaleTransform ScaleX="{Binding MyImageScale}"
+          <TransformGroup>
+            <RotateTransform Angle="20"/>
+            <ScaleTransform ScaleX="{Binding MyImageScale}"
                           ScaleY="{Binding MyImageScale}"/>
+          </TransformGroup>
+
         </Image.LayoutTransform>
       </Image>
     </ScrollViewer>
@@ -72,15 +76,6 @@
       <Separator/>
 
 
-      <GroupBox Header="StretchMode">
-        <StackPanel>
-          <TextBlock Text="{Binding Stretch}" HorizontalAlignment="Center"/>
-          <Button Content="None" Click="ButtonChangeStretchNone_Click"/>
-          <Button Content="Uniform" Click="ButtonChangeStretchUniform_Click"/>
-          <Button Content="UniformToFill" Click="ButtonChangeStretchUniformToFill_Click"/>
-          <Button Content="Fill" Click="ButtonChangeStretchFill_Click"/>
-        </StackPanel>
-      </GroupBox>
     </StackPanel>
   </Grid>
 </Window>
