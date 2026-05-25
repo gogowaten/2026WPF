@@ -1,12 +1,16 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using System.IO;
 using System.Text;
 using System.Windows;
+using System.Windows.Markup;
 using System.Windows.Media;
+using System.Windows.Media.Imaging;
 using System.Windows.Media.Media3D;
 using System.Xml.Linq;
 
@@ -95,6 +99,8 @@ namespace _20260510
 
                 // 編集可否判定通知
                 EditingCurrentGroupCommand.NotifyCanExecuteChanged();
+
+                SaveCurrentItemToPngImageFileCommand.NotifyCanExecuteChanged();
             }
         }
 
@@ -165,6 +171,7 @@ namespace _20260510
                     ZtoBottomCommand.NotifyCanExecuteChanged();
                     AddGroupFromSelectedItemsCommand.NotifyCanExecuteChanged();
                     UnGroupCurrentCommand.NotifyCanExecuteChanged();
+                    SaveCurrentItemToPngImageFileCommand.NotifyCanExecuteChanged();
                 }
             }
             else if (e.Action == NotifyCollectionChangedAction.Remove)
@@ -182,12 +189,42 @@ namespace _20260510
                     AddGroupFromSelectedItemsCommand.NotifyCanExecuteChanged();
                     //UnGroupCommand.NotifyCanExecuteChanged();
                     UnGroupCurrentCommand.NotifyCanExecuteChanged();
+                    SaveCurrentItemToPngImageFileCommand.NotifyCanExecuteChanged();
                 }
             }
         }
 
 
         #region メソッド
+        private bool CanCurrentSave()
+        {
+            return (CurrentItemData is not null) && CurrentItemData.Content is not null;
+        }
+
+        [RelayCommand(CanExecute = nameof(CanCurrentSave))]
+        public void SaveCurrentItemToPngImageFile()
+        {
+            if (CurrentItemData is null) { return; }
+            if (CurrentItemData.Content is null) { return; }
+
+            // ファイル保存Dialog作成
+            SaveFileDialog dialog = Manager.MakeSaveFileDialogFileNameyyyyMMddHHmmss();
+
+            // Dialog表示、pngで保存
+            if (dialog.ShowDialog() == true)
+            {
+
+                string filePath = dialog.FileName;
+                var bmp = Manager.MakeBitmapFromLayoutTransformElement(CurrentItemData.Content);
+
+                PngBitmapEncoder encoder = new();
+                encoder.Frames.Add(BitmapFrame.Create(bmp));
+
+                using FileStream stream = File.OpenWrite(filePath);
+                encoder.Save(stream);
+            }
+
+        }
 
         #region パブリックメソッド
 

@@ -1,4 +1,6 @@
-﻿using Microsoft.Win32;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -306,8 +308,10 @@ namespace _20260510
 
 
 
-    public class RootItemsControl : ItemsControl
+    public partial class RootItemsControl : ItemsControl
     {
+    
+
         static RootItemsControl()
         {
             DefaultStyleKeyProperty.OverrideMetadata(typeof(RootItemsControl), new FrameworkPropertyMetadata(typeof(RootItemsControl)));
@@ -335,6 +339,43 @@ namespace _20260510
             DependencyProperty.Register(nameof(MyData), typeof(RootData), typeof(RootItemsControl), new PropertyMetadata(null));
 
 
+
+        /// <summary>
+        /// Rootをpng画像として保存
+        /// </summary>
+        public void SaveRootToPngImageFile()
+        {
+            if (MyData.DataList.Count <= 0) { return; }
+
+            // 枠表示保持
+            bool groupWaku = MyData.IsVisbleSelectedBorder;
+            bool selectWaku = MyData.IsVisbleSelectedBorder;
+
+            // ファイル保存Dialog作成
+            SaveFileDialog dialog = Manager.MakeSaveFileDialogFileNameyyyyMMddHHmmss();
+
+            // Dialog表示、pngで保存
+            if (dialog.ShowDialog() == true)
+            {
+                // 枠を非表示
+                MyData.IsVisbleGroupBorder = false;
+                MyData.IsVisbleSelectedBorder = false;
+
+                string filePath = dialog.FileName;
+                var bmp = Manager.MakeBitmapFromLayoutTransformElement(this);
+                //var bmp = Manager.MakeBitmapFromElement(MyData.Width, MyData.Height, this);
+
+                PngBitmapEncoder encoder = new();
+                encoder.Frames.Add(BitmapFrame.Create(bmp));
+
+                using FileStream stream = File.OpenWrite(filePath);
+                encoder.Save(stream);
+            }
+
+            // 枠表示を戻す
+            MyData.IsVisbleGroupBorder = groupWaku;
+            MyData.IsVisbleSelectedBorder = selectWaku;
+        }
     }
 
 

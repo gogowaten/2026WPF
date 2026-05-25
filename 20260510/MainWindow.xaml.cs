@@ -133,13 +133,14 @@ namespace _20260510
         {
             GeneralTransform tran = MyEllipse.TransformToVisual(this);
             Rect tranRect = tran.TransformBounds(new Rect(0, 0, MyEllipse.ActualWidth, MyEllipse.ActualHeight));
-            
+
 
             var acW = MyEllipse.ActualWidth;
             var bmp = Manager.MakeBitmapFromElement(acW, MyEllipse.ActualHeight, MyEllipse);
             var bmp2 = Manager.MakeBitmapFromElement(MyEllipse.DesiredSize.Width, MyEllipse.DesiredSize.Height, MyEllipse);
             var bmp3 = Manager.MakeBitmapFromElement2(MyEllipse, MyCanvas);
             var bmp4 = Manager.MakeBitmapFromElement2(MyEllipse, this);
+            var bmp5 = Manager.MakeBitmapFromLayoutTransformElement(MyEllipse);
 
             var contentBounds = VisualTreeHelper.GetContentBounds(MyEllipse);
             var parentBo = VisualTreeHelper.GetDescendantBounds(MyCanvas);
@@ -172,42 +173,44 @@ namespace _20260510
             }
         }
 
+        /// <summary>
+        /// 全体（Root）を画像として保存
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void ButtonSaveRootToPngImage_Click(object sender, RoutedEventArgs e)
         {
-            // 枠表示保持
-            bool groupWaku = MyData.IsVisbleSelectedBorder;
-            bool selectWaku = MyData.IsVisbleSelectedBorder;
+            MyRootItems.SaveRootToPngImageFile();
 
-            // ファイル保存Dialog作成
-            SaveFileDialog dialog = new()
-            {
-                AddExtension = true,
-                DefaultExt = "png",
-                FileName = DateTime.Now.ToString("yyyyMMdd_HHmmss")
-            };
+            //// 枠表示保持
+            //bool groupWaku = MyData.IsVisbleSelectedBorder;
+            //bool selectWaku = MyData.IsVisbleSelectedBorder;
 
-            // Dialog表示、pngで保存
-            if (dialog.ShowDialog() == true)
-            {
-                // 枠を非表示
-                MyData.IsVisbleGroupBorder = false;
-                MyData.IsVisbleSelectedBorder = false;
+            //// ファイル保存Dialog作成
+            //SaveFileDialog dialog = Manager.MakeSaveFileDialogFileNameyyyyMMddHHmmss();
 
-                string filePath = dialog.FileName;
-                var bmp = Manager.MakeBitmapFromElement(MyData.Width, MyData.Height, MyRootItems);
+            //// Dialog表示、pngで保存
+            //if (dialog.ShowDialog() == true)
+            //{
+            //    // 枠を非表示
+            //    MyData.IsVisbleGroupBorder = false;
+            //    MyData.IsVisbleSelectedBorder = false;
 
-                PngBitmapEncoder encoder = new();
-                encoder.Frames.Add(BitmapFrame.Create(bmp));
+            //    string filePath = dialog.FileName;
+            //    var bmp = Manager.MakeBitmapFromElement(MyData.Width, MyData.Height, MyRootItems);
 
-                using FileStream stream = File.OpenWrite(filePath);
-                encoder.Save(stream);
-            }
+            //    PngBitmapEncoder encoder = new();
+            //    encoder.Frames.Add(BitmapFrame.Create(bmp));
 
-            // 枠表示を戻す
-            MyData.IsVisbleGroupBorder = groupWaku;
-            MyData.IsVisbleSelectedBorder = selectWaku;
+            //    using FileStream stream = File.OpenWrite(filePath);
+            //    encoder.Save(stream);
+            //}
 
+            //// 枠表示を戻す
+            //MyData.IsVisbleGroupBorder = groupWaku;
+            //MyData.IsVisbleSelectedBorder = selectWaku;
         }
+
 
         private void ButtonCurrentToPngImageFile_Click(object sender, RoutedEventArgs e)
         {
@@ -215,6 +218,7 @@ namespace _20260510
             {
                 FrameworkElement? content = data.Content;
                 var bmp = Manager.MakeBitmapFromElement(data.Width, data.Height, data.Content);
+                var bmp2 = Manager.MakeBitmapFromLayoutTransformElement(data.Content);
 
                 var item0 = VisualTreeHelper.GetChild(MyRootItems, 0);
                 var items = MyRootItems.ItemContainerGenerator.Items;
