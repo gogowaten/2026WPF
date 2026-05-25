@@ -9,7 +9,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace _20250524_01_ElementToBitmap
+namespace _20260524_01_ElementToBitmap
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
