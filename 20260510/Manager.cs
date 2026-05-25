@@ -81,46 +81,6 @@ namespace _20260510
             return bmp;
         }
 
-        // 要素からBitmap作成
-        public static RenderTargetBitmap? MakeBitmapFromElement2(FrameworkElement item, FrameworkElement parent)
-        {
-            var anc = item.TransformToAncestor(parent);
-            var des = parent.TransformToDescendant(item);
-            var lay = item.LayoutTransform;
-            var ren = item.RenderTransform;
-            Rect orir = new(0, 0, item.ActualWidth, item.ActualHeight);
-
-            Rect neko = item.LayoutTransform.TransformBounds(orir);
-
-
-            List<Rect> rects = [];
-            if (lay is TransformGroup group)
-            {
-                TransformCollection chil = group.Children;
-                foreach (var tfc in group.Children)
-                {
-                    orir = tfc.TransformBounds(orir);
-                    rects.Add(tfc.TransformBounds(new(0, 0, item.ActualWidth, item.ActualHeight)));
-                }
-            }
-
-
-            double dpi = 96.0 * PresentationSource.FromVisual(item).CompositionTarget.TransformFromDevice.M11;
-            GeneralTransform TF = item.TransformToVisual(parent);
-            Rect bounds = TF.TransformBounds(new Rect(0, 0, item.ActualWidth, item.ActualHeight));
-            Rect rect = new(new Point(), bounds.Size);
-            DrawingVisual dv = new();
-            using (var context = dv.RenderOpen())
-            {
-                VisualBrush brush = new(item);
-                context.DrawRectangle(brush, null, rect);
-            }
-
-            RenderTargetBitmap bmp = new((int)bounds.Width, (int)bounds.Height, dpi, dpi, PixelFormats.Pbgra32);
-            bmp.Render(dv);
-            return bmp;
-        }
-
 
         /// <summary>
         /// 要素からBitmap作成、LayoutTransformによる回転拡大対応

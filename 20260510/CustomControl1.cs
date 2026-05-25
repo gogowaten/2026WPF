@@ -342,6 +342,7 @@ namespace _20260510
 
         /// <summary>
         /// Rootをpng画像として保存
+        /// ホントはDataクラスで行いたいけど、Bitmap作成で自身を送っているからできない
         /// </summary>
         public void SaveRootToPngImageFile()
         {
@@ -363,7 +364,6 @@ namespace _20260510
 
                 string filePath = dialog.FileName;
                 var bmp = Manager.MakeBitmapFromLayoutTransformElement(this);
-                //var bmp = Manager.MakeBitmapFromElement(MyData.Width, MyData.Height, this);
 
                 PngBitmapEncoder encoder = new();
                 encoder.Frames.Add(BitmapFrame.Create(bmp));
@@ -376,6 +376,7 @@ namespace _20260510
             MyData.IsVisbleGroupBorder = groupWaku;
             MyData.IsVisbleSelectedBorder = selectWaku;
         }
+
     }
 
 

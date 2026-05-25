@@ -196,6 +196,11 @@ namespace _20260510
 
 
         #region メソッド
+
+
+
+
+
         private bool CanCurrentSave()
         {
             return (CurrentItemData is not null) && CurrentItemData.Content is not null;
