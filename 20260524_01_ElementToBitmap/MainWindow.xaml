@@ -12,8 +12,12 @@
       <ColumnDefinition Width="200"/>
     </Grid.ColumnDefinitions>
 
-    <ScrollViewer HorizontalScrollBarVisibility="Auto"
-                  VerticalScrollBarVisibility="Auto">
+    <ScrollViewer x:Name="MyScroll"
+                  HorizontalScrollBarVisibility="Auto"
+                  VerticalScrollBarVisibility="Auto"
+                  PreviewMouseLeftButtonDown="MyScroll_PreviewMouseLeftButtonDown"
+                  MouseLeftButtonUp="MyScroll_MouseLeftButtonUp"
+                  MouseMove="MyScroll_MouseMove">
       <Image x:Name="ImageControl"
              Stretch="None"
              SnapsToDevicePixels="True"

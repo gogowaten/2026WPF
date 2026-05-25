@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System.Diagnostics;
+using System.IO;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
@@ -17,6 +18,7 @@ namespace _20260524_01_ElementToBitmap
     /// </summary>
     public partial class MainWindow : Window
     {
+        private Point MyPoint;
         public BitmapSource MyBitmapSource;
         private readonly double ImageScaleMin = 0.01;
         private readonly double ImageScaleMax = 50.0;
@@ -208,9 +210,66 @@ namespace _20260524_01_ElementToBitmap
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
+            using (System.Diagnostics.PerformanceCounter ramcounter = new("Memory", "Available MBytes"))
+            {
+                float availableMemoryMB = ramcounter.NextValue();
+                Debug.WriteLine($"空きメモリ：{availableMemoryMB} MB");
+            }
+
             //var bmp = MakeBitmapFromElement2(ImageControl, this);
             var bmp = MakeBitmapFromElement3(ImageControl);
             BitmapToPngImageToClipboard(bmp);
         }
+
+
+        #region マウスドラッグ移動でスクロールバーを移動させる
+
+        // Previewじゃないと反応しないのでPreview版を購読、クリック座標を記録
+        private void MyScroll_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            MyPoint = e.GetPosition(this);
+            MyScroll.CaptureMouse();
+        }
+
+        //      WPF、ScrollViewerの中の要素をマウスドラッグ移動しているように見せかける - 午後わてんのブログ
+        //https://gogowaten.hatenablog.com/entry/15755956
+
+        // ボタンを離した時
+        private void MyScroll_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            MyScroll.Cursor = Cursors.Arrow;
+            MyScroll.ReleaseMouseCapture();
+        }
+
+        // マウスの移動距離をスクロールバーに加算する
+        private void MyScroll_MouseMove(object sender, MouseEventArgs e)
+        {
+            //マウスドラッグ移動の距離だけスクロールさせるには
+            //(直前のカーソル位置 - 今のカーソル位置) + (スクロールバーのOffset位置)
+            //この値をSetOffsetする
+            if (e.LeftButton == MouseButtonState.Pressed)
+            {
+                MyScroll.Cursor = Cursors.ScrollAll;//カーソル形状を変更
+                //今のマウスの座標
+                var nowPoint = e.GetPosition(this);
+                //マウスの移動距離＝直前の座標と今の座標の差
+                var xd = MyPoint.X - nowPoint.X;
+                var yd = MyPoint.Y - nowPoint.Y;
+                //xd *= 2;//2倍速
+                //yd *= 2;
+
+                //移動距離＋今のスクロール位置
+                xd += MyScroll.HorizontalOffset;
+                yd += MyScroll.VerticalOffset;
+
+                //スクロール位置の指定
+                MyScroll.ScrollToHorizontalOffset(xd);
+                MyScroll.ScrollToVerticalOffset(yd);
+
+                MyPoint = nowPoint;//直前の座標を今の座標に変更
+            }
+        }
+
+        #endregion マウスドラッグ移動でスクロールバーを移動させる
     }
 }

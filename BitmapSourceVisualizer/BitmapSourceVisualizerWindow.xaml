@@ -6,11 +6,11 @@
         Width="800" Height="600"
         WindowStartupLocation="CenterOwner"
         ResizeMode="CanResizeWithGrip"
-        DataContext="{Binding}">
+        >
   <Grid>
     <Grid.ColumnDefinitions>
       <ColumnDefinition/>
-      <ColumnDefinition Width="150"/>
+      <ColumnDefinition Width="160"/>
     </Grid.ColumnDefinitions>
     <ScrollViewer HorizontalScrollBarVisibility="Auto"
                   VerticalScrollBarVisibility="Auto">
@@ -73,27 +73,37 @@ https://seizu.dev/2013/06/11/post2437.html-->
         <Style TargetType="TextBlock">
           <Setter Property="Margin" Value="5"/>
         </Style>
-        <Style TargetType="GroupBox">
-          <Setter Property="Margin" Value="4"/>
-        </Style>
         <Style TargetType="Button">
-          <Setter Property="Margin" Value="15,4"/>
+          <Setter Property="Margin" Value="15,8"/>
         </Style>
       </StackPanel.Resources>
       <CheckBox x:Name="IsBackground" Content="背景無し" IsChecked="False"
-                Margin="10"/>
+                Margin="10" HorizontalAlignment="Center" VerticalContentAlignment="Center"/>
 
       <Button Content="コピー(等倍)" Click="ButtonCopyToClipboard_Click"/>
       <Button Content="保存" Click="ButtonSave_Click"/>
 
-      <Separator/>
+      <Separator Margin="10"/>
 
-      <TextBlock Text="{Binding MyImageScale, StringFormat='表示倍率 = {0:0.0}'}"/>
-      <Button Content="コピー(拡大後)" Click="ButtonCopyToClipboardExterior_Click"/>
+      <TextBlock x:Name="MyTextBlockScale" Text="{Binding MyImageScale, StringFormat='表示倍率 = {0:0.0}'}" HorizontalAlignment="Center"/>
+
+      <UniformGrid Columns="4" Rows="1" Margin="2">
+        <UniformGrid.Resources>
+          <Style TargetType="Button">
+            <Setter Property="Margin" Value="2"/>
+          </Style>
+        </UniformGrid.Resources>
+        <Button Content="x 0.1" Tag="0.1" Click="ButtonSetMathScale_Click"/>
+        <Button Content="x 0.5" Tag="0.5" Click="ButtonSetMathScale_Click"/>
+        <Button Content="x 2" Tag="2" Click="ButtonSetMathScale_Click"/>
+        <Button Content="x 10" Tag="10" Click="ButtonSetMathScale_Click"/>
+      </UniformGrid>
+
       <Slider x:Name="ImageScale" Minimum="1" Maximum="30" Value="{Binding MyImageScale}"
               SmallChange="1" LargeChange="1"
               Margin="10,5" TickFrequency="1.0"/>
-      <UniformGrid Columns="4" Rows="2">
+      
+      <UniformGrid Columns="4" Rows="1" Margin="2">
         <UniformGrid.Resources>
           <Style TargetType="Button">
             <Setter Property="Margin" Value="2"/>
@@ -103,12 +113,10 @@ https://seizu.dev/2013/06/11/post2437.html-->
         <Button Content="3" Tag="3" Click="ButtonSetScale_Click"/>
         <Button Content="10" Tag="10" Click="ButtonSetScale_Click"/>
         <Button Content="50" Tag="50" Click="ButtonSetScale_Click"/>
-        <Button Content="x 2" Tag="2" Click="ButtonSetMathScale_Click"/>
-        <Button Content="x 10" Tag="10" Click="ButtonSetMathScale_Click"/>
-        <Button Content="x 0.5" Tag="0.5" Click="ButtonSetMathScale_Click"/>
-        <Button Content="x 0.1" Tag="0.1" Click="ButtonSetMathScale_Click"/>
       </UniformGrid>
-
+      
+      <Button Content="コピー(拡大後)" Click="ButtonCopyToClipboardExterior_Click"/>
+      <Button Content="保存(拡大後)" Click="ButtonSaveExterior_Click"/>
     </StackPanel>
   </Grid>
 </Window>
