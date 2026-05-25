@@ -61,8 +61,6 @@ https://seizu.dev/2013/06/11/post2437.html-->
              RenderOptions.BitmapScalingMode="NearestNeighbor"
              UseLayoutRounding="True"
              RenderOptions.EdgeMode="Aliased"
-             HorizontalAlignment="Left"
-             VerticalAlignment="Top"
              >
         <Image.LayoutTransform>
           <ScaleTransform ScaleX="{Binding MyImageScale}"
@@ -85,13 +83,13 @@ https://seizu.dev/2013/06/11/post2437.html-->
       <CheckBox x:Name="IsBackground" Content="背景無し" IsChecked="False"
                 Margin="10"/>
 
-      <Button Content="コピー" Click="ButtonCopyToClipboard_Click"/>
-      <Button Content="コピー見た目通り" Click="ButtonCopyToClipboardExterior_Click"/>
+      <Button Content="コピー(等倍)" Click="ButtonCopyToClipboard_Click"/>
       <Button Content="保存" Click="ButtonSave_Click"/>
 
       <Separator/>
 
       <TextBlock Text="{Binding MyImageScale, StringFormat='表示倍率 = {0:0.0}'}"/>
+      <Button Content="コピー(拡大後)" Click="ButtonCopyToClipboardExterior_Click"/>
       <Slider x:Name="ImageScale" Minimum="1" Maximum="30" Value="{Binding MyImageScale}"
               SmallChange="1" LargeChange="1"
               Margin="10,5" TickFrequency="1.0"/>
@@ -111,30 +109,6 @@ https://seizu.dev/2013/06/11/post2437.html-->
         <Button Content="x 0.1" Tag="0.1" Click="ButtonSetMathScale_Click"/>
       </UniformGrid>
 
-      <Separator/>
-
-
-      <GroupBox Header="StretchMode">
-        <StackPanel>
-          <TextBlock Text="{Binding Stretch}" HorizontalAlignment="Center"/>
-          <Button Content="None" Click="ButtonChangeStretchNone_Click"/>
-          <Button Content="Uniform" Click="ButtonChangeStretchUniform_Click"/>
-          <Button Content="UniformToFill" Click="ButtonChangeStretchUniformToFill_Click"/>
-          <Button Content="Fill" Click="ButtonChangeStretchFill_Click"/>
-        </StackPanel>
-      </GroupBox>
-      <GroupBox Header="RenderOptions">
-        <StackPanel>
-          <GroupBox Header="BitmapScalingMode">
-            <StackPanel>
-              <TextBlock Text="{Binding Path=(RenderOptions.BitmapScalingMode)}" HorizontalAlignment="Center"/>
-              <Button Content="最近傍補間" Click="ButtonScalingModeNearestNeighbor_Click"/>
-              <Button Content="Linear" Click="ButtonScalingModeLinear_Click"/>
-              <Button Content="Fant" Click="ButtonScalingModeFant_Click"/>
-            </StackPanel>
-          </GroupBox>
-        </StackPanel>
-      </GroupBox>
     </StackPanel>
   </Grid>
 </Window>

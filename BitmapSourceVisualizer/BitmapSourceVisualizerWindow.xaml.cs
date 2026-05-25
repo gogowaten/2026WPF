@@ -22,8 +22,8 @@ namespace BitmapSourceVisualizer
     public partial class BitmapSourceVisualizerWindow : Window
     {
         public BitmapSource MyBitmapSource;
-        private readonly double ImageScaleMin = 0.01;
-        private readonly double ImageScaleMax = 50.0;
+        private readonly double ImageScaleMin = 0.01; // 拡大率下限
+        private readonly double ImageScaleMax = 50.0; // 拡大率上限
 
         public BitmapSourceVisualizerWindow()
         {
@@ -56,7 +56,7 @@ namespace BitmapSourceVisualizer
         private ContextMenu CreateContextMenu()
         {
             ContextMenu menu = new();
-            MenuItem item = new() { Header = "コピー" };
+            MenuItem item = new() { Header = "コピー(等倍)" };
             menu.Items.Add(item);
             item.Click += (s, e) =>
             {
@@ -65,6 +65,17 @@ namespace BitmapSourceVisualizer
                     BitmapToPngImageToClipboard(MyBitmapSource);
                 }
             };
+
+            item = new() { Header = "コピー(拡大後)" };
+            menu.Items.Add(item);
+            item.Click += (s, e) =>
+            {
+                if (MyBitmapSource is not null)
+                {
+                    CopyToClipboardExterior(ImageControl);
+                }
+            };
+
             item = new() { Header = "保存(png)" };
             menu.Items.Add(item);
             item.Click += (s, e) =>
@@ -104,27 +115,6 @@ namespace BitmapSourceVisualizer
             return bmp;
         }
 
-        // 要素からBitmap作成、拡大対応
-        public static RenderTargetBitmap MakeBitmapFromElement2(FrameworkElement item, FrameworkElement parent)
-        {
-            double dpi = 96.0 * PresentationSource.FromVisual(item).CompositionTarget.TransformFromDevice.M11;
-            VisualBrush brush = new(item);
-
-            Rect bounds = new(0, 0, item.ActualWidth, item.ActualHeight);
-            GeneralTransform TF = item.TransformToVisual(parent);
-            var neko = TF.TransformBounds(bounds);
-            Rect inu = new(new Point(), neko.Size);
-
-            DrawingVisual dv = new();
-            using (DrawingContext context = dv.RenderOpen())
-            {
-                //context.PushTransform(item.LayoutTransform);
-                context.DrawRectangle(brush, null, inu);
-            }
-            RenderTargetBitmap bmp = new((int)neko.Width, (int)neko.Height, dpi, dpi, PixelFormats.Pbgra32);
-            bmp.Render(item);
-            return bmp;
-        }
 
         private void ButtonCopyToClipboard_Click(object sender, RoutedEventArgs e)
         {
@@ -134,22 +124,6 @@ namespace BitmapSourceVisualizer
             }
         }
 
-        private void ButtonChangeStretchNone_Click(object sender, RoutedEventArgs e)
-        {
-            ImageControl.Stretch = Stretch.None;
-        }
-        private void ButtonChangeStretchUniform_Click(object sender, RoutedEventArgs e)
-        {
-            ImageControl.Stretch = Stretch.Uniform;
-        }
-        private void ButtonChangeStretchFill_Click(object sender, RoutedEventArgs e)
-        {
-            ImageControl.Stretch = Stretch.Fill;
-        }
-        private void ButtonChangeStretchUniformToFill_Click(object sender, RoutedEventArgs e)
-        {
-            ImageControl.Stretch = Stretch.UniformToFill;
-        }
 
 
         private void ButtonSave_Click(object sender, RoutedEventArgs e)
@@ -175,19 +149,6 @@ namespace BitmapSourceVisualizer
         }
 
 
-        private void ButtonScalingModeNearestNeighbor_Click(object sender, RoutedEventArgs e)
-        {
-            RenderOptions.SetBitmapScalingMode(ImageControl, BitmapScalingMode.NearestNeighbor);
-        }
-        private void ButtonScalingModeLinear_Click(object sender, RoutedEventArgs e)
-        {
-            RenderOptions.SetBitmapScalingMode(ImageControl, BitmapScalingMode.Linear);
-        }
-
-        private void ButtonScalingModeFant_Click(object sender, RoutedEventArgs e)
-        {
-            RenderOptions.SetBitmapScalingMode(ImageControl, BitmapScalingMode.Fant);
-        }
 
         private void ButtonSetScale_Click(object sender, RoutedEventArgs e)
         {
@@ -219,10 +180,42 @@ namespace BitmapSourceVisualizer
             return result;
         }
 
+        // 完成版：要素からBitmap作成、LayoutTransformによる回転拡大対応
+        public static RenderTargetBitmap MakeBitmapFromLayoutTransformElement(FrameworkElement item)
+        {
+            double dpi = 96.0 * PresentationSource.FromVisual(item).CompositionTarget.TransformFromDevice.M11;
+            Rect bounds = new(0, 0, item.ActualWidth, item.ActualHeight); // 元のBounds
+            var ltBounds = item.LayoutTransform.TransformBounds(bounds); // 変形後のBounds
+            DrawingVisual dv = new();
+            dv.Offset = new Vector(-ltBounds.X, -ltBounds.Y);
+
+            using (DrawingContext context = dv.RenderOpen())
+            {
+                VisualBrush brush = new(item) { Stretch = Stretch.None };
+                context.DrawRectangle(brush, null, ltBounds);
+            }
+            RenderTargetBitmap bmp =
+                new(MyCeiling(ltBounds.Width), MyCeiling(ltBounds.Height), dpi, dpi, PixelFormats.Pbgra32);
+            bmp.Render(dv);
+            return bmp;
+        }
+
+        // doubleを切り上げてintに変換
+        public static int MyCeiling(double value)
+        {
+            return (int)Math.Ceiling(value);
+        }
+
+        // LayoutTransformによる変形後の要素からBitmap作成して、クリップボードにコピー
         private void ButtonCopyToClipboardExterior_Click(object sender, RoutedEventArgs e)
         {
-            var bmp = MakeBitmapFromElement2(ImageControl, this);
-            BitmapToPngImageToClipboard(bmp);
+            CopyToClipboardExterior(ImageControl);
+        }
+
+        // LayoutTransformによる変形後の要素からBitmap作成して、クリップボードにコピー
+        public static void CopyToClipboardExterior(FrameworkElement element)
+        {
+            BitmapToPngImageToClipboard(MakeBitmapFromLayoutTransformElement(element));
         }
     }
 }
