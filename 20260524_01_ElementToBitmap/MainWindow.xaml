@@ -5,8 +5,73 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:_20260524_01_ElementToBitmap"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
-    <Grid>
+        Title="MainWindow" Height="367" Width="654">
+  <Grid>
+    <Grid.ColumnDefinitions>
+      <ColumnDefinition/>
+      <ColumnDefinition Width="200"/>
+    </Grid.ColumnDefinitions>
 
-    </Grid>
+    <ScrollViewer HorizontalScrollBarVisibility="Auto"
+                  VerticalScrollBarVisibility="Auto">
+      <Image x:Name="ImageControl"
+             Stretch="None"
+             SnapsToDevicePixels="True"
+             RenderOptions.BitmapScalingMode="NearestNeighbor"
+             UseLayoutRounding="True"
+             RenderOptions.EdgeMode="Aliased"
+             >
+        <Image.LayoutTransform>
+          <TransformGroup>
+            <RotateTransform Angle="20"/>
+            <ScaleTransform ScaleX="{Binding MyImageScale}"
+                          ScaleY="{Binding MyImageScale}"/>
+          </TransformGroup>
+        </Image.LayoutTransform>
+      </Image>
+    </ScrollViewer>
+
+    <StackPanel Grid.Column="1">
+      <StackPanel.Resources>
+        <Style TargetType="TextBlock">
+          <Setter Property="Margin" Value="5"/>
+        </Style>
+        <Style TargetType="GroupBox">
+          <Setter Property="Margin" Value="4"/>
+        </Style>
+        <Style TargetType="Button">
+          <Setter Property="Margin" Value="15,4"/>
+        </Style>
+      </StackPanel.Resources>
+      
+      <CheckBox x:Name="IsBackground" Content="背景無し" IsChecked="False"
+                Margin="10"/>
+      <Button Content="コピー" Click="ButtonCopyToClipboard_Click"/>
+      <Button Content="コピー見た目通り" Click="Button_Click"/>
+      <Button Content="保存" Click="ButtonSave_Click"/>
+
+      <Separator/>
+
+      <TextBlock Text="{Binding MyImageScale, StringFormat='表示倍率 = {0:0.0}'}"/>
+      <Slider x:Name="ImageScale" Minimum="1" Maximum="30" Value="{Binding MyImageScale}"
+              SmallChange="1" LargeChange="1"
+              Margin="10,5" TickFrequency="1.0"/>
+      <UniformGrid Columns="4" Rows="2">
+        <UniformGrid.Resources>
+          <Style TargetType="Button">
+            <Setter Property="Margin" Value="2"/>
+          </Style>
+        </UniformGrid.Resources>
+        <Button Content="1" Tag="1" Click="ButtonSetScale_Click"/>
+        <Button Content="3" Tag="3" Click="ButtonSetScale_Click"/>
+        <Button Content="10" Tag="10" Click="ButtonSetScale_Click"/>
+        <Button Content="50" Tag="50" Click="ButtonSetScale_Click"/>
+        <Button Content="x 2" Tag="2" Click="ButtonSetMathScale_Click"/>
+        <Button Content="x 10" Tag="10" Click="ButtonSetMathScale_Click"/>
+        <Button Content="x 0.5" Tag="0.5" Click="ButtonSetMathScale_Click"/>
+        <Button Content="x 0.1" Tag="0.1" Click="ButtonSetMathScale_Click"/>
+      </UniformGrid>
+
+    </StackPanel>
+  </Grid>
 </Window>
