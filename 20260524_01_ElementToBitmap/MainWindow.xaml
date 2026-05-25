@@ -27,9 +27,9 @@
              >
         <Image.LayoutTransform>
           <TransformGroup>
-            <RotateTransform Angle="20"/>
+            <RotateTransform x:Name="MyRotate" Angle="20"/>
             <ScaleTransform ScaleX="{Binding MyImageScale}"
-                          ScaleY="{Binding MyImageScale}"/>
+                            ScaleY="{Binding MyImageScale}"/>
           </TransformGroup>
         </Image.LayoutTransform>
       </Image>
@@ -48,12 +48,18 @@
         </Style>
       </StackPanel.Resources>
       
-      <CheckBox x:Name="IsBackground" Content="背景無し" IsChecked="False"
-                Margin="10"/>
       <Button Content="コピー" Click="ButtonCopyToClipboard_Click"/>
-      <Button Content="コピー見た目通り" Click="Button_Click"/>
+      <Button Content="コピー（変形後）" Click="Button_Click"/>
       <Button Content="保存" Click="ButtonSave_Click"/>
-
+      <Button Content="保存(変形後)" Click="ButtonSaveExterior_Click"/>
+      <Button x:Name="ButtonNaname" Content="斜めボタン" Click="ButtonNaname_Click">
+        <Button.LayoutTransform>
+          <TransformGroup>
+            <RotateTransform Angle="30"/>
+            <ScaleTransform ScaleX="2" ScaleY="2"/>
+          </TransformGroup>
+        </Button.LayoutTransform>
+      </Button>
       <Separator/>
 
       <TextBlock Text="{Binding MyImageScale, StringFormat='表示倍率 = {0:0.0}'}"/>
@@ -76,6 +82,11 @@
         <Button Content="x 0.1" Tag="0.1" Click="ButtonSetMathScale_Click"/>
       </UniformGrid>
 
+      <Separator/>
+
+      <TextBlock Text="{Binding ElementName=MyRotate, Path=Angle, StringFormat='角度 = {0:000}度'}"/>
+      <Slider Minimum="0" Maximum="360" Value="{Binding ElementName=MyRotate, Path=Angle}"
+              SmallChange="10" LargeChange="10" TickFrequency="10"/>
     </StackPanel>
   </Grid>
 </Window>

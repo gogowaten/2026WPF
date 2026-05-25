@@ -22,6 +22,7 @@ namespace BitmapSourceVisualizer
     /// </summary>
     public partial class BitmapSourceVisualizerWindow : Window
     {
+        private Point MyPoint; // マウスドラッグ移動処理で使う
         public BitmapSource MyBitmapSource;
         private readonly double ImageScaleMin = 0.01; // 拡大率下限
         private readonly double ImageScaleMax = 50.0; // 拡大率上限
@@ -311,5 +312,55 @@ namespace BitmapSourceVisualizer
             return result;
         }
         #endregion チェック系
+
+        #region マウスドラッグ移動でスクロールバーを移動させる
+
+        // Previewじゃないと反応しないのでPreview版を購読、クリック座標を記録
+        private void MyScroll_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            MyPoint = e.GetPosition(this);
+            MyScroll.CaptureMouse();
+        }
+
+        //      WPF、ScrollViewerの中の要素をマウスドラッグ移動しているように見せかける - 午後わてんのブログ
+        //https://gogowaten.hatenablog.com/entry/15755956
+
+        // ボタンを離した時
+        private void MyScroll_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            MyScroll.Cursor = Cursors.Arrow;
+            MyScroll.ReleaseMouseCapture();
+        }
+
+        // マウスの移動距離をスクロールバーに加算する
+        private void MyScroll_MouseMove(object sender, MouseEventArgs e)
+        {
+            //マウスドラッグ移動の距離だけスクロールさせるには
+            //(直前のカーソル位置 - 今のカーソル位置) + (スクロールバーのOffset位置)
+            //この値をSetOffsetする
+            if (e.LeftButton == MouseButtonState.Pressed)
+            {
+                MyScroll.Cursor = Cursors.ScrollAll;//カーソル形状を変更
+                //今のマウスの座標
+                var nowPoint = e.GetPosition(this);
+                //マウスの移動距離＝直前の座標と今の座標の差
+                var xd = MyPoint.X - nowPoint.X;
+                var yd = MyPoint.Y - nowPoint.Y;
+                //xd *= 2;//2倍速
+                //yd *= 2;
+
+                //移動距離＋今のスクロール位置
+                xd += MyScroll.HorizontalOffset;
+                yd += MyScroll.VerticalOffset;
+
+                //スクロール位置の指定
+                MyScroll.ScrollToHorizontalOffset(xd);
+                MyScroll.ScrollToVerticalOffset(yd);
+
+                MyPoint = nowPoint;//直前の座標を今の座標に変更
+            }
+        }
+
+        #endregion マウスドラッグ移動でスクロールバーを移動させる
     }
 }

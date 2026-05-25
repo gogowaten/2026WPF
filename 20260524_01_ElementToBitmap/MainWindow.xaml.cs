@@ -174,6 +174,7 @@ namespace _20260524_01_ElementToBitmap
                 //context.DrawRectangle(new BitmapCacheBrush(item), null, ltBounds);
             }
             //RenderTargetBitmap bmp = new((int)tfvBounds.Width, (int)tfvBounds.Height, dpi, dpi, PixelFormats.Pbgra32);
+            // 画像サイズの小数点以下はceilingで切り上げ
             RenderTargetBitmap bmp =
                 new(MyCeiling(ltBounds.Width), MyCeiling(ltBounds.Height), dpi, dpi, PixelFormats.Pbgra32);
             bmp.Render(dv);
@@ -181,26 +182,28 @@ namespace _20260524_01_ElementToBitmap
         }
 
         // 完成版：要素からBitmap作成、LayoutTransformによる回転拡大対応
-        public static RenderTargetBitmap MakeBitmapFromElement3(FrameworkElement item)
+        public static RenderTargetBitmap MakeBitmapFromLayoutTransformElement(FrameworkElement element)
         {
-            double dpi = 96.0 * PresentationSource.FromVisual(item).CompositionTarget.TransformFromDevice.M11;
-            Rect bounds = new(0, 0, item.ActualWidth, item.ActualHeight); // 元のBounds
-            var ltBounds = item.LayoutTransform.TransformBounds(bounds); // 変形後のBounds
-            DrawingVisual dv = new();
-            dv.Offset = new Vector(-ltBounds.X, -ltBounds.Y);
+            double dpi = 96.0 * PresentationSource.FromVisual(element).CompositionTarget.TransformFromDevice.M11;
+            Rect bounds = new(0, 0, element.ActualWidth, element.ActualHeight); // 元のBounds
+            Rect ltBounds = element.LayoutTransform.TransformBounds(bounds); // 変形後のBounds
+            DrawingVisual visual = new();
+            visual.Offset = new Vector(-ltBounds.X, -ltBounds.Y);
 
-            using (DrawingContext context = dv.RenderOpen())
+            using (DrawingContext context = visual.RenderOpen())
             {
-                VisualBrush brush = new(item) { Stretch = Stretch.None };
+                // 念のためStretchはnoneを指定（既定値はFill）
+                VisualBrush brush = new(element) { Stretch = Stretch.None };
                 context.DrawRectangle(brush, null, ltBounds);
-                //context.DrawRectangle(new VisualBrush(item), null, ltBounds);
+                //context.DrawRectangle(new VisualBrush(item), null, ltBounds); // こっちでも問題ない
             }
             RenderTargetBitmap bmp =
                 new(MyCeiling(ltBounds.Width), MyCeiling(ltBounds.Height), dpi, dpi, PixelFormats.Pbgra32);
-            bmp.Render(dv);
+            bmp.Render(visual);
             return bmp;
         }
 
+        // 切り上げ
         public static int MyCeiling(double value)
         {
             return (int)Math.Ceiling(value);
@@ -217,11 +220,81 @@ namespace _20260524_01_ElementToBitmap
             }
 
             //var bmp = MakeBitmapFromElement2(ImageControl, this);
-            var bmp = MakeBitmapFromElement3(ImageControl);
+            var bmp = MakeBitmapFromLayoutTransformElement(ImageControl);
             BitmapToPngImageToClipboard(bmp);
         }
 
+        // 変形後の要素を画像としてファイルに保存
+        private void ButtonSaveExterior_Click(object sender, RoutedEventArgs e)
+        {
+            SaveExteriorToImageFile();
+        }
+        private void SaveExteriorToImageFile()
+        {
+            // 処理に伴うメモリ量と処理続行の確認してから
+            if (CheckMemoryAndConfirmConsent(ImageControl))
+            {
+                SaveBitmapSource(MakeBitmapFromLayoutTransformElement(ImageControl));
+            }
+        }
+        #region チェック系
 
+        /// <summary>
+        /// 要素のBitmap化の処理で1GB以上のメモリを使用する場合にtrueを返す
+        /// LayoutTransformにより変形された要素に対応
+        /// RenderTransformにより変形された要素には未対応
+        /// </summary>
+        /// <param name="element"></param>
+        /// <returns></returns>
+        private static bool IsOver1GigaByte(FrameworkElement element)
+        {
+            Rect bounds = new(0, 0, element.ActualWidth, element.ActualHeight); // 元のBounds
+            var ltBounds = element.LayoutTransform.TransformBounds(bounds); // 変形後のBounds
+
+            if (ltBounds.Width * ltBounds.Height > 1000 * 1000 * 1000)
+            {
+                return true;
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// 要素のBitmap化で1GB以上のメモリを使用する場合の処理続行の確認
+        /// </summary>
+        /// <param name="element"></param>
+        /// <returns></returns>
+        private static bool CheckMemoryAndConfirmConsent(FrameworkElement element)
+        {
+            if (IsOver1GigaByte(element))
+            {
+                if (MessageBox.Show("使用メモリが1GBを超えるけど、処理続行する？", "", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+                {
+                    return true;
+                }
+                else { return false; }
+            }
+            else
+            {
+                return true;
+            }
+        }
+
+        /// <summary>
+        /// 空きメモリ容量取得、MB
+        /// </summary>
+        /// <returns></returns>
+        public float GetFreeMemoryCapacity()
+        {
+            float result = 0;
+            using (System.Diagnostics.PerformanceCounter ramcounter = new("Memory", "Available MBytes"))
+            {
+                float availableMemoryMB = ramcounter.NextValue();
+                result = availableMemoryMB;
+                Debug.WriteLine($"空きメモリ：{availableMemoryMB} MB");
+            }
+            return result;
+        }
+        #endregion チェック系
         #region マウスドラッグ移動でスクロールバーを移動させる
 
         // Previewじゃないと反応しないのでPreview版を購読、クリック座標を記録
@@ -271,5 +344,10 @@ namespace _20260524_01_ElementToBitmap
         }
 
         #endregion マウスドラッグ移動でスクロールバーを移動させる
+
+        private void ButtonNaname_Click(object sender, RoutedEventArgs e)
+        {
+            SaveBitmapSource(MakeBitmapFromLayoutTransformElement(ButtonNaname));
+        }
     }
 }
