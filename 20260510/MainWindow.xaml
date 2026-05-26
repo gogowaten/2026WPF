@@ -24,19 +24,13 @@
     </ScrollViewer>
 
     <Canvas x:Name="MyCanvas">
-      <Ellipse Canvas.Left="50" Canvas.Top="40" x:Name="MyEllipse" Width="12" Height="4" Fill="Green">
-        <Ellipse.LayoutTransform>
-          <TransformGroup>
-            <ScaleTransform ScaleX="10" ScaleY="10"/>
-            <!--<RotateTransform Angle="20"/>-->
-          </TransformGroup>
-        </Ellipse.LayoutTransform>
-      </Ellipse>
+      
     </Canvas>
 
     <StackPanel Grid.Column="1">
       <CheckBox Content="選択状態枠表示" IsChecked="{Binding MyData.IsVisbleSelectedBorder}"/>
       <CheckBox Content="Group枠表示" IsChecked="{Binding MyData.IsVisbleGroupBorder}"/>
+      
       <Button x:Name="check" Content="check" Click="check_Click"/>
       <Button Content="グループ化" Command="{Binding MyData.AddGroupFromSelectedItemsCommand}"/>
       <Button Content="グループ解除" Command="{Binding MyData.UnGroupCurrentCommand}"/>
@@ -47,7 +41,8 @@
       <Button Content="1個上を編集する" Command="{Binding MyData.EditingUpperGroupCommand}"/>
       <Button Content="全体をpng画像で保存" Click="ButtonSaveRootToPngImage_Click"/>
       <Button Content="currentを画像保存" Command="{Binding MyData.SaveCurrentItemToPngImageFileCommand}"/>
-
+      <Button Content="追加Rect"/>
+      
       <GroupBox Header="CurrentData" DataContext="{Binding MyData.CurrentItemData}">
         <StackPanel>
           <TextBlock Text="{Binding StringFormat=' {0: 0; -0; 0}'}"/>

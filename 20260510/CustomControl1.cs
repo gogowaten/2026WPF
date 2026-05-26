@@ -107,44 +107,44 @@ namespace _20260510
             return menu;
         }
 
-        // MyContentをpngで保存する
-        private void SaveMyContentToPngImage()
-        {
+        //// MyContentをpngで保存する
+        //private void SaveMyContentToPngImage()
+        //{
 
 
-            // ファイル保存Dialog作成
-            SaveFileDialog dialog = new()
-            {
-                AddExtension = true,
-                DefaultExt = "png",
-                FileName = DateTime.Now.ToString("yyyyMMdd_HHmmss")
-            };
+        //    // ファイル保存Dialog作成
+        //    SaveFileDialog dialog = new()
+        //    {
+        //        AddExtension = true,
+        //        DefaultExt = "png",
+        //        FileName = DateTime.Now.ToString("yyyyMMdd_HHmmss")
+        //    };
 
-            // Dialog表示、pngで保存
-            if (dialog.ShowDialog() == true)
-            {
-                string filePath = dialog.FileName;
-                var bmp = MakeMyContentRenderBitmap();
+        //    // Dialog表示、pngで保存
+        //    if (dialog.ShowDialog() == true)
+        //    {
+        //        string filePath = dialog.FileName;
+        //        var bmp = MakeMyContentRenderBitmap();
 
-                PngBitmapEncoder encoder = new();
-                encoder.Frames.Add(BitmapFrame.Create(bmp));
+        //        PngBitmapEncoder encoder = new();
+        //        encoder.Frames.Add(BitmapFrame.Create(bmp));
 
-                using FileStream stream = File.OpenWrite(filePath);
-                encoder.Save(stream);
-            }
-        }
+        //        using FileStream stream = File.OpenWrite(filePath);
+        //        encoder.Save(stream);
+        //    }
+        //}
 
 
-        // MyContentからBitmap作成
-        public RenderTargetBitmap MakeMyContentRenderBitmap()
-        {
-            int width = (int)MyData.Width;
-            int height = (int)MyData.Height;
-            double dpi = MyData.RootData is null ? 96.0 : MyData.RootData.MyDPI;
-            RenderTargetBitmap bmp = new(width, height, dpi, dpi, PixelFormats.Pbgra32);
-            bmp.Render(MyContent);
-            return bmp;
-        }
+        //// MyContentからBitmap作成
+        //public RenderTargetBitmap MakeMyContentRenderBitmap()
+        //{
+        //    int width = (int)MyData.Width;
+        //    int height = (int)MyData.Height;
+        //    double dpi = MyData.RootData is null ? 96.0 : MyData.RootData.MyDPI;
+        //    RenderTargetBitmap bmp = new(width, height, dpi, dpi, PixelFormats.Pbgra32);
+        //    bmp.Render(MyContent);
+        //    return bmp;
+        //}
 
 
         #region クリックイベント時

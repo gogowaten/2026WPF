@@ -23,9 +23,13 @@ namespace _20260510
         // Groupの枠線表示の有無
         [ObservableProperty] private bool _isVisbleGroupBorder = true;
 
+        // 編集グループにData追加する時の、Dataの追加座標決定に使う、Currentからの距離
+        [ObservableProperty] private double _shiftHorizontal = 32.0;
+        [ObservableProperty] private double _shiftVertical = 32.0;
 
-        // システムのDPI
-        public double MyDPI { get; set; } = 96.0;
+
+        //// システムのDPI
+        //public double MyDPI { get; set; } = 96.0;
 
         // TextBlock追加時に使う文字列用
         [NotifyCanExecuteChangedFor(nameof(AddTextBlockDataCommand))]
@@ -232,8 +236,25 @@ namespace _20260510
         }
 
         #region パブリックメソッド
+        // 追加先のZの種類は以下を選べるようにしたい
+        // CurrentのZの1個上
+        // CurrentのZの1個下
+        // 編集グループ内の一番上
+        // 編集グループ内の一番下
 
-
+        // Dataを編集グループに追加、Currentの近傍に追加
+        public void AddDataToCurrentNeighborhood(Data data)
+        {
+            if(CurrentItemData is null) { return; }
+            double x = CurrentItemData.X;
+            double y = CurrentItemData.Y;
+            x += ShiftHorizontal;
+            y += ShiftVertical;
+            data.X = x;
+            data.Y = y;
+            data.RootData = this;
+            EditingGroupData.AddData
+        }
 
         /// <summary>
         /// EditingGroupのDataListにDataを挿入
@@ -790,6 +811,9 @@ namespace _20260510
         }
 
 
+
+
+        // テスト用：Data追加
         public new void AddData(Data data)
         {
             data.RootData = this;

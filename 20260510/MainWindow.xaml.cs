@@ -131,8 +131,14 @@ namespace _20260510
 
         private void check_Click(object sender, RoutedEventArgs e)
         {
-            
-          
+            RectangleData data = new()
+            {
+                Width = 50,
+                Height = 50,
+                Fill = Brushes.DeepSkyBlue,
+
+            };
+            //MyData.AddData()
         }
 
         /// <summary>
