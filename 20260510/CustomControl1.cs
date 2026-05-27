@@ -107,60 +107,13 @@ namespace _20260510
             return menu;
         }
 
-        //// MyContentをpngで保存する
-        //private void SaveMyContentToPngImage()
-        //{
 
 
-        //    // ファイル保存Dialog作成
-        //    SaveFileDialog dialog = new()
-        //    {
-        //        AddExtension = true,
-        //        DefaultExt = "png",
-        //        FileName = DateTime.Now.ToString("yyyyMMdd_HHmmss")
-        //    };
 
-        //    // Dialog表示、pngで保存
-        //    if (dialog.ShowDialog() == true)
-        //    {
-        //        string filePath = dialog.FileName;
-        //        var bmp = MakeMyContentRenderBitmap();
-
-        //        PngBitmapEncoder encoder = new();
-        //        encoder.Frames.Add(BitmapFrame.Create(bmp));
-
-        //        using FileStream stream = File.OpenWrite(filePath);
-        //        encoder.Save(stream);
-        //    }
-        //}
-
-
-        //// MyContentからBitmap作成
-        //public RenderTargetBitmap MakeMyContentRenderBitmap()
-        //{
-        //    int width = (int)MyData.Width;
-        //    int height = (int)MyData.Height;
-        //    double dpi = MyData.RootData is null ? 96.0 : MyData.RootData.MyDPI;
-        //    RenderTargetBitmap bmp = new(width, height, dpi, dpi, PixelFormats.Pbgra32);
-        //    bmp.Render(MyContent);
-        //    return bmp;
-        //}
 
 
         #region クリックイベント時
 
-
-        //private void CustomThumb_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
-        //{
-        //    MyData.RootData?.ClickedItemData = MyData;
-        //    MyData.RootData?.MyClickedItem = this;
-        //}
-
-
-        //private void CustomThumb_MouseUp(object sender, MouseButtonEventArgs e)
-        //{
-
-        //}
 
         // クリック直前
         private void CustomThumb_PreviewMouseDown(object sender, MouseButtonEventArgs e)
@@ -179,6 +132,7 @@ namespace _20260510
         }
 
         // ドラッグ移動中
+        // Selectedをすべて移動させる
         private void CustomThumb_DragDelta(object sender, DragDeltaEventArgs e)
         {
             if (MyData.RootData is null) { return; }
@@ -310,7 +264,7 @@ namespace _20260510
 
     public partial class RootItemsControl : ItemsControl
     {
-    
+
 
         static RootItemsControl()
         {
@@ -329,6 +283,19 @@ namespace _20260510
             //MyData.MyDPI = 96.0 * PresentationSource.FromVisual(this).CompositionTarget.TransformFromDevice.M11;
         }
 
+        // すべてのDataのRootDataにMyDataを登録する
+        private static void SetRootData(GroupData group)
+        {
+            foreach (var item in group.DataList)
+            {
+                item.RootData = group.RootData;
+                if (item is GroupData groupData)
+                {
+                    SetRootData(groupData);
+                }
+            }
+        }
+
 
         public RootData MyData
         {
@@ -336,8 +303,24 @@ namespace _20260510
             set { SetValue(MyDataProperty, value); }
         }
         public static readonly DependencyProperty MyDataProperty =
-            DependencyProperty.Register(nameof(MyData), typeof(RootData), typeof(RootItemsControl), new PropertyMetadata(null));
+            DependencyProperty.Register(nameof(MyData), typeof(RootData), typeof(RootItemsControl), new PropertyMetadata(null, OnMyDataChanged));
+        private static void OnMyDataChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            if (d is RootItemsControl root && e.NewValue is RootData data)
+            {
+                // MyDataのチェック
+                // すべてのDataのRootDataにMyDataを登録する
+                foreach (var item in data.DataList)
+                {
+                    item.RootData = data;
+                    if (item is GroupData group)
+                    {
+                        SetRootData(group);
+                    }
+                }
 
+            }
+        }
 
 
         /// <summary>

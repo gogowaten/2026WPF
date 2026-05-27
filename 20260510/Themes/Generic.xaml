@@ -51,6 +51,14 @@
     </local:CustomThumb>
   </DataTemplate>
 
+  <DataTemplate DataType="{x:Type local:RectangleData}">
+    <local:CustomThumb>
+      <Rectangle Width="{Binding Width}"
+                 Height="{Binding Height}"
+                 Fill="{Binding Fill}"/>
+    </local:CustomThumb>
+  </DataTemplate>
+
   <DataTemplate DataType="{x:Type local:EllipseData}">
     <local:CustomThumb>
       <Ellipse Width="{Binding Width}"

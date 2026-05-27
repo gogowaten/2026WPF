@@ -5,9 +5,12 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using System.ComponentModel;
+using System.Globalization;
 using System.IO;
 using System.Text;
 using System.Windows;
+using System.Windows.Data;
 using System.Windows.Markup;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
@@ -16,6 +19,39 @@ using System.Xml.Linq;
 
 namespace _20260510
 {
+    /// <summary>
+    /// Enumとboolの変換、ModeZIndexのラジオボタンで使っている
+    /// </summary>
+    public class MyConvEnumToBool : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value is null || parameter is null) { return false; }
+            return value.ToString() == parameter.ToString();
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value is null || !(bool)value)
+            {
+                return DependencyProperty.UnsetValue;
+            }
+
+            string? mode = parameter.ToString();
+            if (string.IsNullOrEmpty(mode))
+            {
+                return DependencyProperty.UnsetValue;
+            }
+            return Enum.Parse(targetType, mode);
+        }
+    }
+
+    /// <summary>
+    /// Data追加時のZIndexの指定モード
+    /// </summary>
+    public enum ModeAddZIndex { Upper = 0, Under, Top, Bottom }
+
+
     public partial class RootData : GroupData
     {
         // 選択状態の要素の枠線表示の有無
@@ -26,6 +62,7 @@ namespace _20260510
         // 編集グループにData追加する時の、Dataの追加座標決定に使う、Currentからの距離
         [ObservableProperty] private double _shiftHorizontal = 32.0;
         [ObservableProperty] private double _shiftVertical = 32.0;
+        [ObservableProperty] private ModeAddZIndex _shiftZIndexMode = ModeAddZIndex.Upper;
 
 
         //// システムのDPI
@@ -236,24 +273,56 @@ namespace _20260510
         }
 
         #region パブリックメソッド
-        // 追加先のZの種類は以下を選べるようにしたい
+
+        // 追加先のZを選定
+        private int GetInsertZIndex()
+        {
+            if (CurrentItemData is null) { return 0; }
+            return ShiftZIndexMode switch
+            {
+                ModeAddZIndex.Upper => CurrentItemData.Z + 1,
+                ModeAddZIndex.Under => CurrentItemData.Z,
+                ModeAddZIndex.Top => EditingGroupData.DataList.Count,
+                ModeAddZIndex.Bottom => 0,
+                _ => 0,
+            };
+        }
+
+        // 追加先のZの種類は以下、ShiftZに従って決定
         // CurrentのZの1個上
         // CurrentのZの1個下
         // 編集グループ内の一番上
         // 編集グループ内の一番下
-
-        // Dataを編集グループに追加、Currentの近傍に追加
-        public void AddDataToCurrentNeighborhood(Data data)
+        /// <summary>
+        /// Dataを編集グループに追加、Currentの近傍に追加、Zの指定がない場合はShiftZに従う
+        /// 通常はZ指定は必要ない
+        /// </summary>
+        /// <param name="data"></param>
+        /// <param name="zIndex"></param>
+        public void AddDataToCurrentNeighborhood(Data data, int zIndex = -1)
         {
-            if(CurrentItemData is null) { return; }
-            double x = CurrentItemData.X;
-            double y = CurrentItemData.Y;
-            x += ShiftHorizontal;
-            y += ShiftVertical;
-            data.X = x;
-            data.Y = y;
             data.RootData = this;
-            EditingGroupData.AddData
+            data.X = 0;
+            data.Y = 0;
+            if (CurrentItemData is not null)
+            {
+                data.X = ShiftHorizontal + CurrentItemData.X;
+                data.Y = ShiftVertical + CurrentItemData.Y;
+            }
+
+            // 追加先Z、指定無しor範囲外の場合は選定
+            if (zIndex == -1 || zIndex > EditingGroupData.DataList.Count)
+            {
+                zIndex = GetInsertZIndex();
+            }
+            // 編集グループにData追加
+            EditingGroupData.DataList.Insert(zIndex, data);
+
+            // Selectedを空にする
+            ClearSelectedItems();
+
+            // Selectedに追加する
+            AddDataToSelectedItems(data);
         }
 
         /// <summary>
@@ -335,73 +404,6 @@ namespace _20260510
         }
 
 
-        ///// <summary>
-        ///// 現在選択されているグループ項目をグループ解除し、子要素を親グループに移動させ、選択状態と位置を更新します。
-        ///// </summary>
-        ///// <remarks>このメソッドは、現在の項目がグループであり、かつ編集グループが存在する場合にのみ使用できます。
-        ///// グループ解除後、グループのすべての子要素が選択され、親グループに対する位置が調整されます。
-        ///// グループ自体は親グループから削除されます。この操作により、
-        ///// 選択状態が更新され、必要に応じてコマンド状態の変更が通知されます。
-        ///// </remarks>
-        //[RelayCommand(CanExecute = nameof(CanUnGroup))]
-        //private void UnGroup()
-        //{
-        //    if (CurrentItemData is not GroupData) { return; }
-        //    if (EditingGroupData is null) { return; }
-
-        //    if (CurrentItemData is GroupData targetGroupData)
-        //    {
-        //        // ClickedItemチェック
-        //        if (ClickedItemData == targetGroupData) { ClickedItemData = null; }
-
-        //        // 親要素のDataListにバラした要素を順番に挿入
-        //        int z = targetGroupData.Z;
-        //        for (int i = targetGroupData.DataList.Count - 1; i >= 0; i--)
-        //        {
-        //            var item = targetGroupData.DataList[i];
-        //            EditingGroupData.DataList.Insert(z, item);
-        //            item.IsSelectable = true;
-        //            item.IsSelected = true;
-        //        }
-
-        //        // 子要素の座標調整
-        //        foreach (var item in targetGroupData.DataList)
-        //        {
-        //            item.X += targetGroupData.X;
-        //            item.Y += targetGroupData.Y;
-        //        }
-
-        //        // 子要素全体のZを整える
-        //        for (int i = 0; i < EditingGroupData.DataList.Count; i++)
-        //        {
-        //            EditingGroupData.DataList[i].Z = i;
-        //        }
-        //        // 選択Itemを整える、解除したグループの子要素を選択状態にする
-        //        ClearSelectedItems();
-        //        foreach (var item in targetGroupData.DataList)
-        //        {
-        //            AddDataToSelectedItems(item);
-        //        }
-
-        //        // 解除するDataを外す
-        //        EditingGroupData.DataList.Remove(targetGroupData);
-        //        //RemoveDataFromSelect(targetGroupData);
-        //        targetGroupData.IsClicked = false;
-        //        targetGroupData.IsSelectable = false;
-        //        targetGroupData.IsSelected = false;
-        //        targetGroupData.DataList.Clear(); // 要る？
-
-        //        // 選択ItemにClickedItemが在ればそれをCurrentItemにする
-        //        if (ClickedItemData is not null && ClickedItemData.IsSelected) { CurrentItemData = ClickedItemData; }
-
-
-        //        UnGroupCommand.NotifyCanExecuteChanged();
-        //    }
-
-
-
-
-        //}
 
         /// <summary>
         /// グループ化チェック
@@ -468,7 +470,8 @@ namespace _20260510
                 item.Y -= newBounds.Y;
                 item.IsSelectable = false;
                 item.IsSelected = false;
-                newGroup.AddData(item);
+                //newGroup.AddData(item);
+                newGroup.DataList.Add(item);
             }
 
             // 親要素に新グループを追加（挿入）
@@ -651,7 +654,7 @@ namespace _20260510
         #region SelectedItems
 
         /// <summary>
-        /// SelectedItemsに指定したDataを追加する
+        /// DataをSelectedItemsに追加する
         /// 追加後にCurrentItemDataに指定する
         /// </summary>
         /// <param name="data"></param>
@@ -813,30 +816,6 @@ namespace _20260510
 
 
 
-        // テスト用：Data追加
-        public new void AddData(Data data)
-        {
-            data.RootData = this;
-
-            if (data is GroupData group)
-            {
-                SetRootData(group);
-            }
-
-            void SetRootData(GroupData gd)
-            {
-                foreach (Data item in gd.DataList)
-                {
-                    item.RootData = this;
-                    if (item is GroupData internalData)
-                    {
-                        SetRootData(internalData);
-                    }
-                }
-            }
-
-            DataList.Add(data);
-        }
 
         #endregion メソッド
 
@@ -1048,17 +1027,7 @@ namespace _20260510
 
         #region パブリックメソッド
 
-        public void AddData(Data data)
-        {
-            data.RootData = this.RootData;
-            // RootのDataListに追加するときはok
-            // Groupに追加するときは、GroupのDataにRootがあればそれでいいけど
-            // ない場合はnullのまま
-            // で、Rootに追加するのがGroupだった場合は、GroupのRootDataを指定するのはもちろんで、
-            // 子要素以下全てのDataのRootDataを指定する
-            data.ParentData = this;
-            DataList.Add(data);
-        }
+
 
         #endregion パブリックメソッド
 

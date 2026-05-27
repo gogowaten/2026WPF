@@ -39,16 +39,18 @@ namespace _20260510
         {
             RootData root = new();
             EllipseData ellipse = new() { X = 20, Y = 30, Fill = Brushes.Olive, Width = 130, Height = 30 };
-            root.AddData(ellipse);
+            root.DataList.Add(ellipse);
 
             EllipseData ellipseBlue = new() { Fill = Brushes.Blue, Width = 30, Height = 30 };
             GroupData group = new();
-            group.AddData(ellipseBlue);
-            group.AddData(new EllipseData() { X = 10, Y = 50, Fill = Brushes.Orange, Width = 30, Height = 30 });
-            root.AddData(group);
+            group.DataList.Add(ellipseBlue);
+            group.DataList.Add(new EllipseData() { X = 10, Y = 50, Fill = Brushes.Orange, Width = 30, Height = 30 });
+            //group.AddData(ellipseBlue);
+            //group.AddData(new EllipseData() { X = 10, Y = 50, Fill = Brushes.Orange, Width = 30, Height = 30 });
+            root.DataList.Add(group);
 
-            root.AddData(CreateGeoLineGroupData());
-            root.AddData(CreateGeoLineData());
+            root.DataList.Add(CreateGeoLineGroupData());
+            root.DataList.Add(CreateGeoLineData());
             return root;
         }
 
@@ -86,7 +88,7 @@ namespace _20260510
                 //IsVertexHandle = true,
             };
             GroupData group = new() { X = 100, Y = 100 };
-            group.AddData(geo);
+            group.DataList.Add(geo);
 
             geo = new()
             {
@@ -99,7 +101,7 @@ namespace _20260510
                 //IsCanDragMove = true,
                 //IsVertexHandle = true,
             };
-            group.AddData(geo);
+            group.DataList.Add(geo);
             return group;
         }
 
@@ -138,7 +140,7 @@ namespace _20260510
                 Fill = Brushes.DeepSkyBlue,
 
             };
-            //MyData.AddData()
+            MyData.AddDataToCurrentNeighborhood(data);
         }
 
         /// <summary>

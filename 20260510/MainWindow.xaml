@@ -19,18 +19,38 @@
                   VerticalAlignment="Top">
       <local:RootItemsControl x:Name="MyRootItems"
                               UseLayoutRounding="True"
-                              MyData="{Binding MyData}"/>
+                              MyData="{Binding MyData}"
+                              />
 
     </ScrollViewer>
 
     <Canvas x:Name="MyCanvas">
-      
+
     </Canvas>
 
     <StackPanel Grid.Column="1">
       <CheckBox Content="選択状態枠表示" IsChecked="{Binding MyData.IsVisbleSelectedBorder}"/>
       <CheckBox Content="Group枠表示" IsChecked="{Binding MyData.IsVisbleGroupBorder}"/>
-      
+      <GroupBox Header="Data追加時のZモード">
+        <GroupBox.Resources>
+          <local:MyConvEnumToBool x:Key="EnumToBool"/>
+        </GroupBox.Resources>
+        <UniformGrid Rows="3" Columns="2">
+          <RadioButton Content="Currentの上"
+                       IsChecked="{Binding MyData.ShiftZIndexMode, Converter={StaticResource EnumToBool},
+            ConverterParameter=Upper}"/>
+          <RadioButton Content="一番上"
+                       IsChecked="{Binding MyData.ShiftZIndexMode, Converter={StaticResource EnumToBool},
+            ConverterParameter=Top}"/>
+          <RadioButton Content="Currentの下"
+                       IsChecked="{Binding MyData.ShiftZIndexMode, Converter={StaticResource EnumToBool},
+            ConverterParameter=Under}"/>
+          <RadioButton Content="一番下"
+                       IsChecked="{Binding MyData.ShiftZIndexMode, Converter={StaticResource EnumToBool},
+            ConverterParameter=Bottom}"/>
+          <TextBlock Text="{Binding MyData.ShiftZIndexMode, StringFormat='ZMode = {0}'}"/>
+        </UniformGrid>
+      </GroupBox>
       <Button x:Name="check" Content="check" Click="check_Click"/>
       <Button Content="グループ化" Command="{Binding MyData.AddGroupFromSelectedItemsCommand}"/>
       <Button Content="グループ解除" Command="{Binding MyData.UnGroupCurrentCommand}"/>
@@ -42,7 +62,7 @@
       <Button Content="全体をpng画像で保存" Click="ButtonSaveRootToPngImage_Click"/>
       <Button Content="currentを画像保存" Command="{Binding MyData.SaveCurrentItemToPngImageFileCommand}"/>
       <Button Content="追加Rect"/>
-      
+
       <GroupBox Header="CurrentData" DataContext="{Binding MyData.CurrentItemData}">
         <StackPanel>
           <TextBlock Text="{Binding StringFormat=' {0: 0; -0; 0}'}"/>
