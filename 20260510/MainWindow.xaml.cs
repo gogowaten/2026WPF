@@ -133,14 +133,7 @@ namespace _20260510
 
         private void check_Click(object sender, RoutedEventArgs e)
         {
-            RectangleData data = new()
-            {
-                Width = 50,
-                Height = 50,
-                Fill = Brushes.DeepSkyBlue,
-
-            };
-            MyData.AddDataToCurrentNeighborhood(data);
+            
         }
 
         /// <summary>
@@ -153,5 +146,16 @@ namespace _20260510
             MyRootItems.SaveRootToPngImageFile();
         }
 
+        private void ButtonTestAddRect_Click(object sender, RoutedEventArgs e)
+        {
+            RectangleData data = new()
+            {
+                Width = 50,
+                Height = 50,
+                Fill = Brushes.DeepSkyBlue,
+
+            };
+            MyData.AddDataToCurrentNeighborhood(data);
+        }
     }
 }

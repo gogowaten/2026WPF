@@ -251,12 +251,18 @@ namespace _20260510
         private bool CanSelectedItemsRemove()
         {
             int selectCount = SelectedItemsData.Count;
-            int totalCount = EditingGroupData.DataList.Count;
-            int nokori = totalCount - selectCount;
+            if (selectCount == 0) { return false; }
 
-            if (nokori >= 1) { return true; }
-            if (EditingGroupData is RootData && nokori >= 0) { return true; }
-            return false;
+            int nokori = EditingGroupData.DataList.Count - selectCount;
+            if (nokori >= 1)
+            {
+                return true;
+            }
+            else if (nokori == 0 && EditingGroupData is RootData)
+            {
+                return true;
+            }
+            else { return false; }
         }
 
         // グループ解除の可否判定
@@ -684,20 +690,28 @@ namespace _20260510
         [RelayCommand(CanExecute = nameof(CanSelectedItemsRemove))]
         public void RemoveSelectedItems()
         {
-            int nokori = EditingGroupData.DataList.Count - SelectedItemsData.Count;
-            if (SelectedItemsData.Count == 0) { return; }
+            int selectedCount = SelectedItemsData.Count;
+            if (selectedCount == 0) { return; }
 
 
-            // Editingの子要素すべてが選択されていた場合は、Group自体も削除する
-            if (nokori == 0 && EditingGroupData is not null && EditingGroupData is RootData)
+            int nokori = EditingGroupData.DataList.Count - selectedCount;
+            if (nokori >= 1 || EditingGroupData is RootData)
             {
-                // Group自体を削除
-                // Editingを1個上にする
+                // 削除後にSelectedにするDataを決めておく
+                int removeDataZ = SelectedItemsData[0].Z;
+                Data? nextCurrent = null;
+                if (selectedCount == 1 && nokori >= 1)
+                {
+                    if (removeDataZ >= 1)
+                    {
+                        nextCurrent = EditingGroupData.DataList[removeDataZ - 1];
+                    }
+                    else
+                    {
+                        nextCurrent = EditingGroupData.DataList[removeDataZ + 1];
+                    }
+                }
 
-                // 
-            }
-            else
-            {
                 // 通常削除
                 // リストから削除
                 foreach (var item in SelectedItemsData)
@@ -712,6 +726,19 @@ namespace _20260510
 
                 // 選択状態解除
                 ClearSelectedItems();
+
+                // 次のItemをSelectedとCurrentにする
+                if (nextCurrent is not null)
+                {
+                    _ = AddDataToSelectedItems(nextCurrent);
+                }
+            }
+            else
+            {
+                // Editingの子要素すべてが選択されていた場合は、Group自体も削除する
+                // Group自体を削除
+                // Editingを1個上にする
+
             }
 
 
@@ -903,7 +930,8 @@ namespace _20260510
                 {
                     newData.Z = e.NewStartingIndex; // Zを追加先Indexに合わせる
                     newData.ParentData = this;
-                    newData.ParentData.UpdateSize();
+                    //newData.ParentData.UpdateSize();
+                    newData.ParentData.UpdateBoundsToRoot();
 
                     // 追加先Index以降のItemのZをIndexに合わせるために＋１する
                     for (int i = e.NewStartingIndex + 1; i < DataList.Count; i++)
@@ -934,7 +962,8 @@ namespace _20260510
                     oldData.IsSelected = false;
                     oldData.IsCurrent = false;
 
-                    oldData.ParentData?.UpdateSize();
+                    oldData.ParentData?.UpdateBoundsToRoot();
+                    //oldData.ParentData?.UpdateSize();
                     oldData.ParentData = null; // Parentをリサイズしてからnullにする
                 }
             }
