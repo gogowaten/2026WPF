@@ -19,6 +19,8 @@ using System.Xml.Linq;
 
 namespace _20260510
 {
+    #region Data追加時のZIndexの指定モード
+
     /// <summary>
     /// Enumとboolの変換、ModeZIndexのラジオボタンで使っている
     /// </summary>
@@ -50,7 +52,7 @@ namespace _20260510
     /// Data追加時のZIndexの指定モード
     /// </summary>
     public enum ModeAddZIndex { Upper = 0, Under, Top, Bottom }
-
+    #endregion Data追加時のZIndexの指定モード
 
     public partial class RootData : GroupData
     {
@@ -236,124 +238,28 @@ namespace _20260510
         }
 
 
-        #region メソッド
 
 
-
-
-
+        #region Can～コマンドの実行可否の判定
+        // Currentを画像として保存の可否判定
         private bool CanCurrentSave()
         {
             return (CurrentItemData is not null) && CurrentItemData.Content is not null;
         }
 
-        [RelayCommand(CanExecute = nameof(CanCurrentSave))]
-        public void SaveCurrentItemToPngImageFile()
+        // 選択状態のItemすべてを削除できるかの判定
+        private bool CanSelectedItemsRemove()
         {
-            if (CurrentItemData is null) { return; }
-            if (CurrentItemData.Content is null) { return; }
+            int selectCount = SelectedItemsData.Count;
+            int totalCount = EditingGroupData.DataList.Count;
+            int nokori = totalCount - selectCount;
 
-            // ファイル保存Dialog作成
-            SaveFileDialog dialog = Manager.MakeSaveFileDialogFileNameyyyyMMddHHmmss();
-
-            // Dialog表示、pngで保存
-            if (dialog.ShowDialog() == true)
-            {
-
-                string filePath = dialog.FileName;
-                var bmp = Manager.MakeBitmapFromLayoutTransformElement(CurrentItemData.Content);
-
-                PngBitmapEncoder encoder = new();
-                encoder.Frames.Add(BitmapFrame.Create(bmp));
-
-                using FileStream stream = File.OpenWrite(filePath);
-                encoder.Save(stream);
-            }
-
+            if (nokori >= 1) { return true; }
+            if (EditingGroupData is RootData && nokori >= 0) { return true; }
+            return false;
         }
 
-        #region パブリックメソッド
-
-        // 追加先のZを選定
-        private int GetInsertZIndex()
-        {
-            if (CurrentItemData is null) { return 0; }
-            return ShiftZIndexMode switch
-            {
-                ModeAddZIndex.Upper => CurrentItemData.Z + 1,
-                ModeAddZIndex.Under => CurrentItemData.Z,
-                ModeAddZIndex.Top => EditingGroupData.DataList.Count,
-                ModeAddZIndex.Bottom => 0,
-                _ => 0,
-            };
-        }
-
-        // 追加先のZの種類は以下、ShiftZに従って決定
-        // CurrentのZの1個上
-        // CurrentのZの1個下
-        // 編集グループ内の一番上
-        // 編集グループ内の一番下
-        /// <summary>
-        /// Dataを編集グループに追加、Currentの近傍に追加、Zの指定がない場合はShiftZに従う
-        /// 通常はZ指定は必要ない
-        /// </summary>
-        /// <param name="data"></param>
-        /// <param name="zIndex"></param>
-        public void AddDataToCurrentNeighborhood(Data data, int zIndex = -1)
-        {
-            data.RootData = this;
-            data.X = 0;
-            data.Y = 0;
-            if (CurrentItemData is not null)
-            {
-                data.X = ShiftHorizontal + CurrentItemData.X;
-                data.Y = ShiftVertical + CurrentItemData.Y;
-            }
-
-            // 追加先Z、指定無しor範囲外の場合は選定
-            if (zIndex == -1 || zIndex > EditingGroupData.DataList.Count)
-            {
-                zIndex = GetInsertZIndex();
-            }
-            // 編集グループにData追加
-            EditingGroupData.DataList.Insert(zIndex, data);
-
-            // Selectedを空にする
-            ClearSelectedItems();
-
-            // Selectedに追加する
-            AddDataToSelectedItems(data);
-        }
-
-        /// <summary>
-        /// EditingGroupのDataListにDataを挿入
-        /// </summary>
-        /// <param name="data"></param>
-        /// <param name="insert"></param>
-        public void AddDataToEditingGroup(Data data, int insert)
-        {
-            data.RootData = this;
-            EditingGroupData.DataList.Insert(insert, data);
-        }
-
-        /// <summary>
-        /// EditingGroupのDataListの末尾にDataを追加
-        /// </summary>
-        /// <param name="data"></param>
-        public void AddDataToEditingGroup(Data data)
-        {
-            data.RootData = this;
-            EditingGroupData.DataList.Add(data);
-        }
-
-
-
-
-        #endregion パブリックメソッド
-
-        #region グループ化
-
-
+        // グループ解除の可否判定
         private bool CanUnGroup()
         {
             if (SelectedItemsData.Count == 0) { return false; }
@@ -361,6 +267,83 @@ namespace _20260510
             if (EditingGroupData is null) { return false; }
             return true;
         }
+
+        /// <summary>
+        /// グループ化の可否判定
+        /// </summary>
+        /// <returns></returns>
+        private bool CanAddGroupFromSelectedItems()
+        {
+            return EditingGroupData is not null
+                && SelectedItemsData.Count > 1
+                && EditingGroupData.DataList.Count >= 1;
+
+            //if (EditingGroupData is null) { return false; } // 編集中グループがない
+            //if (SelectedItemsData.Count <= 1) { return false; } // 選択Item個数が1個以下
+            //if (EditingGroupData.DataList.Count < 1) { return false; } // 編集中グループのこ要素数が1未満
+
+            //return true;
+
+        }
+
+        // ZDownの可否判定
+        private bool CanZDown()
+        {
+            // 編集中モードのグループが在る
+            if (EditingGroupData is null) { return false; }
+
+            // 選択Item在る
+            int selectCount = SelectedItemsData.Count;
+            if (selectCount == 0) { return false; }
+
+            // 選択Item個数は子要素個数より少ない
+            if (selectCount >= EditingGroupData.DataList.Count) { return false; }
+
+            // 選択Itemに最下層のItemが含まれていない
+            foreach (var item in SelectedItemsData)
+            {
+                if (item.Z == 0) { return false; }
+            }
+            return true;
+        }
+
+        // ZUpの可否判定
+        private bool CanZUp()
+        {
+            // 編集モードのグループが在る
+            if (EditingGroupData is null) { return false; }
+
+            // 選択Item在る
+            int selectCount = SelectedItemsData.Count;
+            if (selectCount == 0) { return false; }
+
+            // 選択Item個数は子要素個数より少ない
+            if (selectCount >= EditingGroupData.DataList.Count) { return false; }
+
+            // 選択Itemに最上層のItemが含まれていない
+            int max = EditingGroupData.DataList.Count - 1;
+            foreach (var item in SelectedItemsData)
+            {
+                if (item.Z == max) { return false; }
+            }
+            return true;
+        }
+
+
+        // TextBlock追加できるかの判定用
+        private bool CanAddTextBlockData()
+        {
+            // 文字が入力されている ＆ 編集モードのグループがある
+            return !string.IsNullOrEmpty(AddText) && (EditingGroupData is not null);
+        }
+
+        #endregion Can～コマンドの実行可否の判定
+
+        #region メソッド
+
+
+        #region グループ化
+
 
 
         /// <summary>
@@ -404,24 +387,6 @@ namespace _20260510
         }
 
 
-
-        /// <summary>
-        /// グループ化チェック
-        /// </summary>
-        /// <returns></returns>
-        private bool CanAddGroupFromSelectedItems()
-        {
-            return EditingGroupData is not null
-                && SelectedItemsData.Count > 1
-                && EditingGroupData.DataList.Count >= 1;
-
-            //if (EditingGroupData is null) { return false; } // 編集中グループがない
-            //if (SelectedItemsData.Count <= 1) { return false; } // 選択Item個数が1個以下
-            //if (EditingGroupData.DataList.Count < 1) { return false; } // 編集中グループのこ要素数が1未満
-
-            //return true;
-
-        }
 
         /// <summary>
         /// グループ化
@@ -489,10 +454,7 @@ namespace _20260510
 
         #endregion グループ化
 
-
-
-
-        #region Z
+        #region Z移動
 
         // 選択Itemを最背面へ移動
         [RelayCommand(CanExecute = nameof(CanZDown))]
@@ -554,26 +516,6 @@ namespace _20260510
             ZtoTopCommand.NotifyCanExecuteChanged();
         }
 
-        private bool CanZDown()
-        {
-            // 編集モードのグループが在る
-            if (EditingGroupData is null) { return false; }
-
-            // 選択Item在る
-            int selectCount = SelectedItemsData.Count;
-            if (selectCount == 0) { return false; }
-
-            // 選択Item個数は子要素個数より少ない
-            if (selectCount >= EditingGroupData.DataList.Count) { return false; }
-
-            // 選択Itemに最下層のItemが含まれていない
-            foreach (var item in SelectedItemsData)
-            {
-                if (item.Z == 0) { return false; }
-            }
-            return true;
-        }
-
 
 
 
@@ -600,27 +542,7 @@ namespace _20260510
 
 
 
-        private bool CanZUp()
-        {
-            // 編集モードのグループが在る
-            if (EditingGroupData is null) { return false; }
-
-            // 選択Item在る
-            int selectCount = SelectedItemsData.Count;
-            if (selectCount == 0) { return false; }
-
-            // 選択Item個数は子要素個数より少ない
-            if (selectCount >= EditingGroupData.DataList.Count) { return false; }
-
-            // 選択Itemに最上層のItemが含まれていない
-            int max = EditingGroupData.DataList.Count - 1;
-            foreach (var item in SelectedItemsData)
-            {
-                if (item.Z == max) { return false; }
-            }
-            return true;
-        }
-        #endregion Z
+        #endregion Z移動
 
         #region 編集モード
 
@@ -756,34 +678,154 @@ namespace _20260510
         #endregion SelectedItems
 
 
+        #region 削除
 
         // 選択状態のItemすべてをDataListから削除 ＆ 選択リストもクリア
         [RelayCommand(CanExecute = nameof(CanSelectedItemsRemove))]
         public void RemoveSelectedItems()
         {
-            if (EditingGroupData is null) { return; }
+            int nokori = EditingGroupData.DataList.Count - SelectedItemsData.Count;
+            if (SelectedItemsData.Count == 0) { return; }
 
-            // リストから削除
-            foreach (var item in SelectedItemsData)
+
+            // Editingの子要素すべてが選択されていた場合は、Group自体も削除する
+            if (nokori == 0 && EditingGroupData is not null && EditingGroupData is RootData)
             {
-                EditingGroupData.DataList.Remove(item);
-                if (item.IsClicked)
+                // Group自体を削除
+                // Editingを1個上にする
+
+                // 
+            }
+            else
+            {
+                // 通常削除
+                // リストから削除
+                foreach (var item in SelectedItemsData)
                 {
-                    ClickedItemData = null;
-                    MyClickedItem = null;
+                    EditingGroupData.DataList.Remove(item);
+                    if (item.IsClicked)
+                    {
+                        ClickedItemData = null;
+                        MyClickedItem = null;
+                    }
                 }
+
+                // 選択状態解除
+                ClearSelectedItems();
             }
 
-            // 選択状態解除
-            ClearSelectedItems();
+
+
         }
 
+        #endregion 削除
 
-        // 選択状態のItemすべてを削除できるかの判定
-        private bool CanSelectedItemsRemove()
+        #region 画像として保存
+
+        /// <summary>
+        /// Currentをpng画像として保存
+        /// </summary>
+        [RelayCommand(CanExecute = nameof(CanCurrentSave))]
+        public void SaveCurrentItemToPngImageFile()
         {
-            return SelectedItemsData.Count > 0;
+            if (CurrentItemData is null) { return; }
+            if (CurrentItemData.Content is null) { return; }
+
+            // ファイル保存Dialog作成
+            SaveFileDialog dialog = Manager.MakeSaveFileDialogFileNameyyyyMMddHHmmss();
+
+            // Dialog表示、pngで保存
+            if (dialog.ShowDialog() == true)
+            {
+
+                string filePath = dialog.FileName;
+                var bmp = Manager.MakeBitmapFromLayoutTransformElement(CurrentItemData.Content);
+
+                PngBitmapEncoder encoder = new();
+                encoder.Frames.Add(BitmapFrame.Create(bmp));
+
+                using FileStream stream = File.OpenWrite(filePath);
+                encoder.Save(stream);
+            }
+
         }
+
+        #endregion 画像として保存
+
+        #region Data追加
+
+        // 追加先のZを選定
+        private int GetInsertZIndex()
+        {
+            if (CurrentItemData is null) { return 0; }
+            return ShiftZIndexMode switch
+            {
+                ModeAddZIndex.Upper => CurrentItemData.Z + 1,
+                ModeAddZIndex.Under => CurrentItemData.Z,
+                ModeAddZIndex.Top => EditingGroupData.DataList.Count,
+                ModeAddZIndex.Bottom => 0,
+                _ => 0,
+            };
+        }
+
+        // 追加先のZの種類は以下、ShiftZに従って決定
+        // CurrentのZの1個上
+        // CurrentのZの1個下
+        // 編集グループ内の一番上
+        // 編集グループ内の一番下
+        /// <summary>
+        /// Dataを編集グループに追加、Currentの近傍に追加、Zの指定がない場合はShiftZに従う
+        /// 通常はZ指定は必要ない
+        /// </summary>
+        /// <param name="data"></param>
+        /// <param name="zIndex"></param>
+        public void AddDataToCurrentNeighborhood(Data data, int zIndex = -1)
+        {
+            data.RootData = this;
+            data.X = 0;
+            data.Y = 0;
+            if (CurrentItemData is not null)
+            {
+                data.X = ShiftHorizontal + CurrentItemData.X;
+                data.Y = ShiftVertical + CurrentItemData.Y;
+            }
+
+            // 追加先Z、指定無しor範囲外の場合は選定
+            if (zIndex == -1 || zIndex > EditingGroupData.DataList.Count)
+            {
+                zIndex = GetInsertZIndex();
+            }
+            // 編集グループにData追加
+            EditingGroupData.DataList.Insert(zIndex, data);
+
+            // Selectedを空にする
+            ClearSelectedItems();
+
+            // Selectedに追加する
+            AddDataToSelectedItems(data);
+        }
+
+        /// <summary>
+        /// EditingGroupのDataListにDataを挿入
+        /// </summary>
+        /// <param name="data"></param>
+        /// <param name="insert"></param>
+        public void AddDataToEditingGroup(Data data, int insert)
+        {
+            data.RootData = this;
+            EditingGroupData.DataList.Insert(insert, data);
+        }
+
+        /// <summary>
+        /// EditingGroupのDataListの末尾にDataを追加
+        /// </summary>
+        /// <param name="data"></param>
+        public void AddDataToEditingGroup(Data data)
+        {
+            data.RootData = this;
+            EditingGroupData.DataList.Add(data);
+        }
+
 
 
         // TextBlockを追加するテスト
@@ -806,12 +848,7 @@ namespace _20260510
 
         }
 
-        // TextBlock追加できるかの判定用
-        private bool CanAddTextBlockData()
-        {
-            // 文字が入力されている ＆ 編集モードのグループがある
-            return !string.IsNullOrEmpty(AddText) && (EditingGroupData is not null);
-        }
+        #endregion Data追加
 
 
 

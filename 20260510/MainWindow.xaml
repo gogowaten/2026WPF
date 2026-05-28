@@ -45,9 +45,12 @@
           <RadioButton Content="Currentの下"
                        IsChecked="{Binding MyData.ShiftZIndexMode, Converter={StaticResource EnumToBool},
             ConverterParameter=Under}"/>
+          <!--<RadioButton Content="一番下"
+                       IsChecked="{Binding MyData.ShiftZIndexMode, Converter={StaticResource EnumToBool},
+            ConverterParameter=Bottom}"/>-->
           <RadioButton Content="一番下"
                        IsChecked="{Binding MyData.ShiftZIndexMode, Converter={StaticResource EnumToBool},
-            ConverterParameter=Bottom}"/>
+            ConverterParameter={x:Static local:ModeAddZIndex.Bottom}}"/>
           <TextBlock Text="{Binding MyData.ShiftZIndexMode, StringFormat='ZMode = {0}'}"/>
         </UniformGrid>
       </GroupBox>
@@ -132,7 +135,7 @@
           </HierarchicalDataTemplate>
         </TreeView.ItemTemplate>
       </TreeView>
-
+      <Button Content="選択Itemを削除" Command="{Binding MyData.RemoveSelectedItemsCommand}"/>
       <ListBox ItemsSource="{Binding MyData.SelectedItemsData}" IsHitTestVisible="False">
         <ListBox.ItemsPanel>
           <ItemsPanelTemplate>

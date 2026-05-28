@@ -120,7 +120,7 @@ namespace _20260510
 
         private void ButtonGroup_Click(object sender, RoutedEventArgs e)
         {
-
+            MyData.RemoveSelectedItems();
         }
 
         private void ContextMenu_Click(object sender, RoutedEventArgs e)
