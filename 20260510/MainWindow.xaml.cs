@@ -143,7 +143,7 @@ namespace _20260510
         /// <param name="e"></param>
         private void ButtonSaveRootToPngImage_Click(object sender, RoutedEventArgs e)
         {
-            MyRootItems.SaveRootToPngImageFile();
+            //MyRootItems.SaveRootToPngImageFile();
         }
 
         private void ButtonTestAddRect_Click(object sender, RoutedEventArgs e)

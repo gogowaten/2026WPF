@@ -66,7 +66,6 @@ namespace _20260510
 
             // 右クリックメニュー作成
             this.ContextMenu = CreateMyContextMenu(MyData);
-
         }
 
         private void Element_SizeChanged(object sender, SizeChangedEventArgs e)
@@ -276,7 +275,8 @@ namespace _20260510
         }
 
         private void RootItemsControl_Loaded(object sender, RoutedEventArgs e)
-        {
+        {            
+
             // システムのDPIを記録したいけど
             // 、XAML画面でエラーになるけど、動くことは動く
 
@@ -319,46 +319,12 @@ namespace _20260510
                     }
                 }
 
+                // 自身をDataのContentに登録、自身を画像として保存に使う
+                root.MyData.Content = root;
             }
         }
 
 
-        /// <summary>
-        /// Rootをpng画像として保存
-        /// ホントはDataクラスで行いたいけど、Bitmap作成で自身を送っているからできない
-        /// </summary>
-        public void SaveRootToPngImageFile()
-        {
-            if (MyData.DataList.Count <= 0) { return; }
-
-            // 枠表示保持
-            bool groupWaku = MyData.IsVisbleSelectedBorder;
-            bool selectWaku = MyData.IsVisbleSelectedBorder;
-
-            // ファイル保存Dialog作成
-            SaveFileDialog dialog = Manager.MakeSaveFileDialogFileNameyyyyMMddHHmmss();
-
-            // Dialog表示、pngで保存
-            if (dialog.ShowDialog() == true)
-            {
-                // 枠を非表示
-                MyData.IsVisbleGroupBorder = false;
-                MyData.IsVisbleSelectedBorder = false;
-
-                string filePath = dialog.FileName;
-                var bmp = Manager.MakeBitmapFromLayoutTransformElement(this);
-
-                PngBitmapEncoder encoder = new();
-                encoder.Frames.Add(BitmapFrame.Create(bmp));
-
-                using FileStream stream = File.OpenWrite(filePath);
-                encoder.Save(stream);
-            }
-
-            // 枠表示を戻す
-            MyData.IsVisbleGroupBorder = groupWaku;
-            MyData.IsVisbleSelectedBorder = selectWaku;
-        }
 
     }
 

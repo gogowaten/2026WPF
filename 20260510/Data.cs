@@ -99,7 +99,7 @@ namespace _20260510
         {
             Name = "RootDataです";
             EditingGroupData = this;
-            //MyInit();
+            RootData = this;
             SelectedItemsData.CollectionChanged += SelectedItems_CollectionChanged;
 
         }
@@ -241,6 +241,17 @@ namespace _20260510
 
 
         #region Can～コマンドの実行可否の判定
+
+        // Rootを画像として保存の可否判定
+        private bool CanSaveRootToPngImageFile()
+        {
+            // true：Itemが存在 ＆ Contentに自身が入っている
+            return DataList.Count > 0 && Content is not null;
+        }
+
+        // 編集モードをParentに移行するの可否判定
+        public bool CanEditingUpperGroup() => EditingGroupData?.ParentData is not null;
+
         // Currentを画像として保存の可否判定
         private bool CanCurrentSave()
         {
@@ -250,19 +261,7 @@ namespace _20260510
         // 選択状態のItemすべてを削除できるかの判定
         private bool CanSelectedItemsRemove()
         {
-            int selectCount = SelectedItemsData.Count;
-            if (selectCount == 0) { return false; }
-
-            int nokori = EditingGroupData.DataList.Count - selectCount;
-            if (nokori >= 1)
-            {
-                return true;
-            }
-            else if (nokori == 0 && EditingGroupData is RootData)
-            {
-                return true;
-            }
-            else { return false; }
+            return SelectedItemsData.Count > 0;
         }
 
         // グループ解除の可否判定
@@ -350,10 +349,46 @@ namespace _20260510
 
         #region グループ化
 
+        // 指定グループをグループ解除する
+        private void UnGroup(GroupData group)
+        {
+            if (group.ParentData is null) { return; }
+
+            // 対象グループのZIndexを記録、これが分解したData群の追加先基準になる
+            int zIndex = group.Z;
+
+            var parent = group.ParentData;
+
+            // 親要素から対象グループのData削除
+            group.ParentData.DataList.Remove(group);
+
+            // Selectedを空する
+            ClearSelectedItems();
+
+            // CurrentDataにするDataのZIndex
+            int newCurrentDataZIndex = zIndex;
+
+            // 親要素にData群を追加、同時に選択状態にする
+            for (int i = 0; i < group.DataList.Count; i++)
+            {
+                var data = group.DataList[i];
+                if (data.IsClicked) { newCurrentDataZIndex += i; } // Clickedがあれば、それのZIndexを記録
+                data.IsSelectable = true; // 選択状態可能にしておく
+                data.X += group.X; // Data群のx,y調整
+                data.Y += group.Y;
+                AddDataToGroup(parent, data, i + zIndex);// zの調整は追加メソッド先で行われる
+                //AddDataToEditingGroup(data, i + zIndex); 
+                AddDataToSelectedItems(data); // 選択状態にする
+            }
+
+            //CurrentItemData = DataList[newCurrentDataZIndex];
+
+            UnGroupCurrentCommand.NotifyCanExecuteChanged();
+        }
 
 
         /// <summary>
-        /// 今のグループを解除する
+        /// グループ解除する。Currentがグループの場合のみ
         /// </summary>
         [RelayCommand(CanExecute = nameof(CanUnGroup))]
         private void UnGroupCurrent()
@@ -407,7 +442,7 @@ namespace _20260510
             int newGroupZIndex = SelectedItemsData.Max(n => n.Z) - (SelectedItemsData.Count - 1);
 
             // 選択アイテムのBoundsを計算、これが新GのBoundsになるし、その子要素の座標調整にも使う
-            var newBounds = GetBounds(SelectedItemsData);
+            var newBounds = Manager.GetBounds(SelectedItemsData);
 
             // 新グループ作成
             var newGroup = new GroupData()
@@ -556,14 +591,22 @@ namespace _20260510
         public void MigrateEditingGroup(GroupData group) { EditingGroupData = group; }
 
 
-        public bool CanEditingUpperGroup() => EditingGroupData?.ParentData is not null;
-
         // 1つ上を編集モードにする
+        /// <summary>
+        /// 編集モードをParentに移行する
+        /// もし、子要素が1個の場合はグループ解除により移行する
+        /// </summary>
         [RelayCommand(CanExecute = nameof(CanEditingUpperGroup))]
         public void EditingUpperGroup()
         {
             if (EditingGroupData?.ParentData is GroupData upper)
             {
+                // 子要素が1個の場合はグループ解除してから移行する
+                if (EditingGroupData.DataList.Count == 1)
+                {
+                    UnGroup(EditingGroupData);
+                }
+
                 EditingGroupData = upper;
             }
         }
@@ -687,6 +730,10 @@ namespace _20260510
         #region 削除
 
         // 選択状態のItemすべてをDataListから削除 ＆ 選択リストもクリア
+        /// <summary>
+        /// 選択されているItemを削除する
+        /// すべての子要素が選択されている場合はGroup自体を削除する
+        /// </summary>
         [RelayCommand(CanExecute = nameof(CanSelectedItemsRemove))]
         public void RemoveSelectedItems()
         {
@@ -735,10 +782,14 @@ namespace _20260510
             }
             else
             {
-                // Editingの子要素すべてが選択されていた場合は、Group自体も削除する
-                // Group自体を削除
-                // Editingを1個上にする
+                // Editingの子要素すべてが選択されていた場合は、Group自体を削除する
+                GroupData group = EditingGroupData;
 
+                // Editingを1個上にする
+                EditingUpperGroup();
+
+                // Group自体を削除
+                _ = EditingGroupData.DataList.Remove(group);
             }
 
 
@@ -748,6 +799,46 @@ namespace _20260510
         #endregion 削除
 
         #region 画像として保存
+
+        /// <summary>
+        /// Rootをpng画像として保存
+        /// ホントはDataクラスで行いたいけど、Bitmap作成で自身を送っているからできない
+        /// →できた、Contentプロパティに自身を入れておくだけだった
+        /// </summary>
+        [RelayCommand(CanExecute = nameof(CanSaveRootToPngImageFile))]
+        public void SaveRootToPngImageFile()
+        {
+            if (DataList.Count <= 0) { return; }
+            if (Content is null) { return; }
+
+            // 枠表示保持
+            bool groupWaku = IsVisbleSelectedBorder;
+            bool selectWaku = IsVisbleSelectedBorder;
+
+            // ファイル保存Dialog作成
+            SaveFileDialog dialog = Manager.MakeSaveFileDialogFileNameyyyyMMddHHmmss();
+
+            // Dialog表示、pngで保存
+            if (dialog.ShowDialog() == true)
+            {
+                // 枠を非表示
+                IsVisbleGroupBorder = false;
+                IsVisbleSelectedBorder = false;
+
+                string filePath = dialog.FileName;
+                var bmp = Manager.MakeBitmapFromLayoutTransformElement(Content);
+
+                PngBitmapEncoder encoder = new();
+                encoder.Frames.Add(BitmapFrame.Create(bmp));
+
+                using FileStream stream = File.OpenWrite(filePath);
+                encoder.Save(stream);
+            }
+
+            // 枠表示を戻す
+            IsVisbleGroupBorder = groupWaku;
+            IsVisbleSelectedBorder = selectWaku;
+        }
 
         /// <summary>
         /// Currentをpng画像として保存
@@ -854,6 +945,17 @@ namespace _20260510
         }
 
 
+        /// <summary>
+        /// 任意のグループにDataを追加する
+        /// </summary>
+        /// <param name="group"></param>
+        /// <param name="data"></param>
+        /// <param name="insert"></param>
+        private void AddDataToGroup(GroupData group, Data data, int insert)
+        {
+            data.RootData = this;
+            group.DataList.Insert(insert, data);
+        }
 
         // TextBlockを追加するテスト
         // 追加後はSelectedをクリアして、追加Itemを選択状態にする、Currentにする
@@ -945,6 +1047,7 @@ namespace _20260510
                         newData.IsSelectable = true;
                     }
                 }
+                RootData?.SaveRootToPngImageFileCommand.NotifyCanExecuteChanged();
             }
             else if (e.Action == NotifyCollectionChangedAction.Remove)
             {
@@ -966,6 +1069,7 @@ namespace _20260510
                     //oldData.ParentData?.UpdateSize();
                     oldData.ParentData = null; // Parentをリサイズしてからnullにする
                 }
+                RootData?.SaveRootToPngImageFileCommand.NotifyCanExecuteChanged();
             }
             else if (e.Action == NotifyCollectionChangedAction.Move)
             {
@@ -1036,31 +1140,26 @@ namespace _20260510
         /// <param name="group"></param>
         public void UpdateBoundsToRoot(GroupData group)
         {
-            double right = 0;
-            double bottom = 0;
-            double left = double.MaxValue;
-            double top = double.MaxValue;
-            foreach (var item in group.DataList)
-            {
-                left = Math.Min(left, item.X);
-                top = Math.Min(top, item.Y);
-                right = Math.Max(right, item.X + item.Width);
-                bottom = Math.Max(bottom, item.Y + item.Height);
-            }
+            // 子要素全体のBounds取得
+            var rect = Manager.GetBounds(group.DataList);
 
             // サイズ更新
-            group.Width = right - left;
-            group.Height = bottom - top;
+            group.Width = rect.Width;
+            group.Height = rect.Height;
 
             // 子要素の座標更新
-            foreach (Data item in group.DataList) { item.X -= left; item.Y -= top; }
+            if (rect.Top != 0 || rect.Left != 0)
+            {
+                foreach (Data item in group.DataList) { item.X -= rect.Left; item.Y -= rect.Top; }
+            }
 
             // 自身の座標更新
-            X += left;
-            Y += top;
+            X += rect.Left;
+            Y += rect.Top;
 
             // 親要素へ伝播
             group.ParentData?.UpdateBoundsToRoot(group.ParentData);
+
         }
 
         public void UpdateBoundsToRoot()
@@ -1068,28 +1167,28 @@ namespace _20260510
             UpdateBoundsToRoot(this);
         }
 
-        // DataListのBoundsを計算
-        public Rect GetBounds(ObservableCollection<Data> datas)
-        {
-            if (datas.Count == 0) { return new Rect(); }
-            double right = 0;
-            double bottom = 0;
-            double left = double.MaxValue;
-            double top = double.MaxValue;
-            foreach (var item in datas)
-            {
-                left = Math.Min(left, item.X);
-                top = Math.Min(top, item.Y);
-                right = Math.Max(right, item.X + item.Width);
-                bottom = Math.Max(bottom, item.Y + item.Height);
-            }
-            Rect r = new(left, top, right, bottom)
-            {
-                Width = right - left,
-                Height = bottom - top
-            };
-            return r;
-        }
+        //// DataListのBoundsを計算
+        //public Rect GetBounds(ObservableCollection<Data> datas)
+        //{
+        //    if (datas.Count == 0) { return new Rect(); }
+        //    double right = 0;
+        //    double bottom = 0;
+        //    double left = double.MaxValue;
+        //    double top = double.MaxValue;
+        //    foreach (var item in datas)
+        //    {
+        //        left = Math.Min(left, item.X);
+        //        top = Math.Min(top, item.Y);
+        //        right = Math.Max(right, item.X + item.Width);
+        //        bottom = Math.Max(bottom, item.Y + item.Height);
+        //    }
+        //    Rect r = new(left, top, right, bottom)
+        //    {
+        //        Width = right - left,
+        //        Height = bottom - top
+        //    };
+        //    return r;
+        //}
 
         #region パブリックメソッド
 

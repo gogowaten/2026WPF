@@ -62,7 +62,8 @@
       <Button Content="ZupCommand" Command="{Binding MyData.ZUpSelectedItemsCommand}"/>
       <Button Content="Currentを編集する" Command="{Binding MyData.EditingCurrentGroupCommand}"/>
       <Button Content="1個上を編集する" Command="{Binding MyData.EditingUpperGroupCommand}"/>
-      <Button Content="全体をpng画像で保存" Click="ButtonSaveRootToPngImage_Click"/>
+      <Button Content="全体をpng画像で保存" Command="{Binding MyData.SaveRootToPngImageFileCommand}"/>
+      <!--<Button Content="全体をpng画像で保存" Click="ButtonSaveRootToPngImage_Click"/>-->
       <Button Content="currentを画像保存" Command="{Binding MyData.SaveCurrentItemToPngImageFileCommand}"/>
       <Button Content="Test追加Rect" Click="ButtonTestAddRect_Click"/>
 
@@ -120,22 +121,6 @@
         </StackPanel>
       </GroupBox>
 
-      <TreeView ItemsSource="{Binding MyData.DataList}">
-        <TreeView.ItemContainerStyle>
-          <Style TargetType="TreeViewItem">
-            <Setter Property="IsExpanded" Value="True"/>
-          </Style>
-        </TreeView.ItemContainerStyle>
-        <TreeView.ItemTemplate>
-          <HierarchicalDataTemplate DataType="{x:Type local:GroupData}" ItemsSource="{Binding DataList}">
-            <StackPanel Orientation="Horizontal">
-              <TextBlock Text="{Binding Z, StringFormat='Z={0:0 }'}"/>
-              <TextBlock Text="{Binding Name}"/>
-            </StackPanel>
-          </HierarchicalDataTemplate>
-        </TreeView.ItemTemplate>
-      </TreeView>
-      
       <Button Content="選択Itemを削除" Command="{Binding MyData.RemoveSelectedItemsCommand}"/>
       <ListBox ItemsSource="{Binding MyData.SelectedItemsData}" IsHitTestVisible="False">
         <ListBox.ItemsPanel>
@@ -152,6 +137,22 @@
         </ListBox.ItemTemplate>
       </ListBox>
 
+
+      <TreeView ItemsSource="{Binding MyData.DataList}">
+        <TreeView.ItemContainerStyle>
+          <Style TargetType="TreeViewItem">
+            <Setter Property="IsExpanded" Value="True"/>
+          </Style>
+        </TreeView.ItemContainerStyle>
+        <TreeView.ItemTemplate>
+          <HierarchicalDataTemplate DataType="{x:Type local:GroupData}" ItemsSource="{Binding DataList}">
+            <StackPanel Orientation="Horizontal">
+              <TextBlock Text="{Binding Z, StringFormat='Z={0:0 }'}"/>
+              <TextBlock Text="{Binding Name}"/>
+            </StackPanel>
+          </HierarchicalDataTemplate>
+        </TreeView.ItemTemplate>
+      </TreeView>
     </StackPanel>
   </Grid>
 </Window>

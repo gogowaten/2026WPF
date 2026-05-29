@@ -3,6 +3,7 @@ using CommunityToolkit.Mvvm.Input;
 using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
 using System.Text;
@@ -17,6 +18,30 @@ namespace _20260510
 
     public static class Manager
     {
+
+        // DataListのBoundsを計算
+        public static Rect GetBounds(ObservableCollection<Data> datas)
+        {
+            if (datas.Count == 0) { return new Rect(); }
+            double right = 0;
+            double bottom = 0;
+            double left = double.MaxValue;
+            double top = double.MaxValue;
+            foreach (var item in datas)
+            {
+                left = Math.Min(left, item.X);
+                top = Math.Min(top, item.Y);
+                right = Math.Max(right, item.X + item.Width);
+                bottom = Math.Max(bottom, item.Y + item.Height);
+            }
+            Rect r = new(left, top, right, bottom)
+            {
+                Width = right - left,
+                Height = bottom - top
+            };
+            return r;
+        }
+
 
         /// <summary>
         /// SaveFileDialogを作成、初期ファイル名は年月日_時分秒
