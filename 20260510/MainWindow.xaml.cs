@@ -38,12 +38,12 @@ namespace _20260510
         private RootData CreateRootData()
         {
             RootData root = new();
+
             EllipseData ellipse = new() { X = 20, Y = 30, Fill = Brushes.Olive, Width = 130, Height = 30 };
             root.DataList.Add(ellipse);
 
-            EllipseData ellipseBlue = new() { Fill = Brushes.Blue, Width = 30, Height = 30 };
             GroupData group = new();
-            group.DataList.Add(ellipseBlue);
+            group.DataList.Add(new EllipseData() { Fill = Brushes.Blue, Width = 30, Height = 30 });
             group.DataList.Add(new EllipseData() { X = 10, Y = 50, Fill = Brushes.Orange, Width = 30, Height = 30 });
             //group.AddData(ellipseBlue);
             //group.AddData(new EllipseData() { X = 10, Y = 50, Fill = Brushes.Orange, Width = 30, Height = 30 });
@@ -51,6 +51,7 @@ namespace _20260510
 
             root.DataList.Add(CreateGeoLineGroupData());
             root.DataList.Add(CreateGeoLineData());
+                        
             return root;
         }
 

@@ -376,7 +376,7 @@ namespace _20260510
                 data.IsSelectable = true; // 選択状態可能にしておく
                 data.X += group.X; // Data群のx,y調整
                 data.Y += group.Y;
-                AddDataToGroup(parent, data, i + zIndex);// zの調整は追加メソッド先で行われる
+                AddDataToGroup(parent, data, i + zIndex, isUpdateBounds: false);// zの調整は追加メソッド先で行われる
                 //AddDataToEditingGroup(data, i + zIndex); 
                 AddDataToSelectedItems(data); // 選択状態にする
             }
@@ -417,7 +417,9 @@ namespace _20260510
                     data.IsSelectable = true; // 選択状態可能にしておく
                     data.X += targetGroupData.X; // Data群のx,y調整
                     data.Y += targetGroupData.Y;
-                    AddDataToEditingGroup(data, i + zIndex); // zの調整は追加メソッド先で行われる
+
+                    // Data追加、zの調整は追加メソッド先で行われる
+                    AddDataToEditingGroup(data, i + zIndex, IsUpdateBounds: false);
                     AddDataToSelectedItems(data); // 選択状態にする
                 }
 
@@ -477,11 +479,13 @@ namespace _20260510
                 item.IsSelectable = false;
                 item.IsSelected = false;
                 //newGroup.AddData(item);
+                item.RootData = this;
+                item.ParentData = newGroup;
                 newGroup.DataList.Add(item);
             }
 
             // 親要素に新グループを追加（挿入）
-            AddDataToEditingGroup(newGroup, newGroupZIndex);
+            AddDataToEditingGroup(newGroup, newGroupZIndex, IsUpdateBounds: true);
 
             // 新グループをSelectedにする            
             AddDataToSelectedItems(newGroup);
@@ -763,7 +767,7 @@ namespace _20260510
                 // リストから削除
                 foreach (var item in SelectedItemsData)
                 {
-                    EditingGroupData.DataList.Remove(item);
+                    _ = EditingGroupData.DataList.Remove(item);
                     if (item.IsClicked)
                     {
                         ClickedItemData = null;
@@ -792,7 +796,8 @@ namespace _20260510
                 _ = EditingGroupData.DataList.Remove(group);
             }
 
-
+            // 処理後のBounds更新
+            UpdateBoundsToRoot(EditingGroupData);
 
         }
 
@@ -897,7 +902,8 @@ namespace _20260510
         /// </summary>
         /// <param name="data"></param>
         /// <param name="zIndex"></param>
-        public void AddDataToCurrentNeighborhood(Data data, int zIndex = -1)
+        /// <param name="isUpdateBounds">Data追加後にRootまでBounds更新する</param>
+        public void AddDataToCurrentNeighborhood(Data data, int zIndex = -1, bool isUpdateBounds = true)
         {
             data.RootData = this;
             data.X = 0;
@@ -921,6 +927,12 @@ namespace _20260510
 
             // Selectedに追加する
             AddDataToSelectedItems(data);
+
+            // Boundsの更新
+            if (isUpdateBounds)
+            {
+                UpdateBoundsEditingToRoot();
+            }
         }
 
         /// <summary>
@@ -928,21 +940,28 @@ namespace _20260510
         /// </summary>
         /// <param name="data"></param>
         /// <param name="insert"></param>
-        public void AddDataToEditingGroup(Data data, int insert)
+        public void AddDataToEditingGroup(Data data, int insert, bool IsUpdateBounds = true)
         {
             data.RootData = this;
             EditingGroupData.DataList.Insert(insert, data);
+
+
+            // Boundsの更新
+            if (IsUpdateBounds)
+            {
+                UpdateBoundsEditingToRoot();
+            }
         }
 
-        /// <summary>
-        /// EditingGroupのDataListの末尾にDataを追加
-        /// </summary>
-        /// <param name="data"></param>
-        public void AddDataToEditingGroup(Data data)
-        {
-            data.RootData = this;
-            EditingGroupData.DataList.Add(data);
-        }
+        ///// <summary>
+        ///// EditingGroupのDataListの末尾にDataを追加
+        ///// </summary>
+        ///// <param name="data"></param>
+        //public void AddDataToEditingGroup(Data data)
+        //{
+        //    data.RootData = this;
+        //    EditingGroupData.DataList.Add(data);
+        //}
 
 
         /// <summary>
@@ -951,10 +970,11 @@ namespace _20260510
         /// <param name="group"></param>
         /// <param name="data"></param>
         /// <param name="insert"></param>
-        private void AddDataToGroup(GroupData group, Data data, int insert)
+        private void AddDataToGroup(GroupData group, Data data, int insert, bool isUpdateBounds)
         {
             data.RootData = this;
             group.DataList.Insert(insert, data);
+            if (isUpdateBounds) { UpdateBoundsToRoot(group); }
         }
 
         // TextBlockを追加するテスト
@@ -979,9 +999,76 @@ namespace _20260510
 
         #endregion Data追加
 
+        #region Bounds更新
 
 
+        /// <summary>
+        /// 指定GroupのBounds更新して、Rootまで行くBounds更新
+        /// </summary>
+        /// <param name="group"></param>
+        public void UpdateBoundsToRoot(GroupData group)
+        {
+            // 子要素全体のBounds取得
+            var rect = Manager.GetBounds(group.DataList);
 
+            // サイズ更新
+            group.Width = rect.Width;
+            group.Height = rect.Height;
+
+            // 子要素の座標更新
+            if (rect.Top != 0 || rect.Left != 0)
+            {
+                foreach (Data item in group.DataList) { item.X -= rect.Left; item.Y -= rect.Top; }
+            }
+
+            // 自身の座標更新
+            group.X += rect.Left;
+            group.Y += rect.Top;
+
+            // 親要素へ伝播
+            if (group.ParentData is not null)
+            {
+                UpdateBoundsToRoot(group.ParentData);
+            }
+            //group.ParentData?.UpdateBoundsToRoot(group.ParentData);
+
+        }
+
+        public void UpdateBoundsEditingToRoot()
+        {
+            UpdateBoundsToRoot(EditingGroupData);
+        }
+
+        #endregion Bounds更新
+
+
+        #region グループのサイズ更新
+
+        /// <summary>
+        /// 全グループのサイズの再計算、更新
+        /// </summary>
+        public void UpdateSizeAllDescendant()
+        {
+            UpdateSizeAllDescendant(this);
+        }
+
+        /// <summary>
+        /// 指定グループの全子孫のサイズの再計算、更新
+        /// </summary>
+        /// <param name="group"></param>
+        public void UpdateSizeAllDescendant(GroupData group)
+        {
+            foreach (var data in group.DataList)
+            {
+                if (data is GroupData groupData)
+                {
+                    UpdateSizeAllDescendant(groupData);
+                }
+            }
+            group.UpdateSize();
+        }
+
+        #endregion グループのサイズ更新
 
         #endregion メソッド
 
@@ -1032,8 +1119,6 @@ namespace _20260510
                 {
                     newData.Z = e.NewStartingIndex; // Zを追加先Indexに合わせる
                     newData.ParentData = this;
-                    //newData.ParentData.UpdateSize();
-                    newData.ParentData.UpdateBoundsToRoot();
 
                     // 追加先Index以降のItemのZをIndexに合わせるために＋１する
                     for (int i = e.NewStartingIndex + 1; i < DataList.Count; i++)
@@ -1041,7 +1126,7 @@ namespace _20260510
                         DataList[i].Z++;
                     }
 
-                    // 自身が編集中なら、子要素を選択可能にする
+                    // 自身が編集モードなら、子要素を選択可能にする
                     if (this.IsEditing)
                     {
                         newData.IsSelectable = true;
@@ -1065,9 +1150,7 @@ namespace _20260510
                     oldData.IsSelected = false;
                     oldData.IsCurrent = false;
 
-                    oldData.ParentData?.UpdateBoundsToRoot();
-                    //oldData.ParentData?.UpdateSize();
-                    oldData.ParentData = null; // Parentをリサイズしてからnullにする
+                    //oldData.ParentData = null; // Parentをリサイズしてからnullにする
                 }
                 RootData?.SaveRootToPngImageFileCommand.NotifyCanExecuteChanged();
             }
@@ -1134,61 +1217,39 @@ namespace _20260510
         }
 
 
-        /// <summary>
-        /// 指定GroupのBounds更新して、Rootまで行くBounds更新
-        /// </summary>
-        /// <param name="group"></param>
-        public void UpdateBoundsToRoot(GroupData group)
-        {
-            // 子要素全体のBounds取得
-            var rect = Manager.GetBounds(group.DataList);
-
-            // サイズ更新
-            group.Width = rect.Width;
-            group.Height = rect.Height;
-
-            // 子要素の座標更新
-            if (rect.Top != 0 || rect.Left != 0)
-            {
-                foreach (Data item in group.DataList) { item.X -= rect.Left; item.Y -= rect.Top; }
-            }
-
-            // 自身の座標更新
-            X += rect.Left;
-            Y += rect.Top;
-
-            // 親要素へ伝播
-            group.ParentData?.UpdateBoundsToRoot(group.ParentData);
-
-        }
-
-        public void UpdateBoundsToRoot()
-        {
-            UpdateBoundsToRoot(this);
-        }
-
-        //// DataListのBoundsを計算
-        //public Rect GetBounds(ObservableCollection<Data> datas)
+        ///// <summary>
+        ///// 指定GroupのBounds更新して、Rootまで行くBounds更新
+        ///// </summary>
+        ///// <param name="group"></param>
+        //public void UpdateBoundsToRoot(GroupData group)
         //{
-        //    if (datas.Count == 0) { return new Rect(); }
-        //    double right = 0;
-        //    double bottom = 0;
-        //    double left = double.MaxValue;
-        //    double top = double.MaxValue;
-        //    foreach (var item in datas)
+        //    // 子要素全体のBounds取得
+        //    var rect = Manager.GetBounds(group.DataList);
+
+        //    // サイズ更新
+        //    group.Width = rect.Width;
+        //    group.Height = rect.Height;
+
+        //    // 子要素の座標更新
+        //    if (rect.Top != 0 || rect.Left != 0)
         //    {
-        //        left = Math.Min(left, item.X);
-        //        top = Math.Min(top, item.Y);
-        //        right = Math.Max(right, item.X + item.Width);
-        //        bottom = Math.Max(bottom, item.Y + item.Height);
+        //        foreach (Data item in group.DataList) { item.X -= rect.Left; item.Y -= rect.Top; }
         //    }
-        //    Rect r = new(left, top, right, bottom)
-        //    {
-        //        Width = right - left,
-        //        Height = bottom - top
-        //    };
-        //    return r;
+
+        //    // 自身の座標更新
+        //    X += rect.Left;
+        //    Y += rect.Top;
+
+        //    // 親要素へ伝播
+        //    group.ParentData?.UpdateBoundsToRoot(group.ParentData);
+
         //}
+
+        //public void UpdateBoundsToRoot()
+        //{
+        //    UpdateBoundsToRoot(this);
+        //}
+
 
         #region パブリックメソッド
 

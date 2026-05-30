@@ -68,9 +68,14 @@ namespace _20260510
             this.ContextMenu = CreateMyContextMenu(MyData);
         }
 
+        // サイズ変更時、RootまでBoundsの更新
         private void Element_SizeChanged(object sender, SizeChangedEventArgs e)
         {
-            MyData?.ParentData?.UpdateBoundsToRoot();
+            //MyData?.ParentData?.UpdateBoundsToRoot();
+            if (MyData?.ParentData is GroupData parent)
+            {
+                MyData.RootData?.UpdateBoundsToRoot(parent);
+            }
         }
 
         // 右クリックメニュー作成
@@ -218,7 +223,11 @@ namespace _20260510
             }
 
 
-            MyData?.ParentData?.UpdateBoundsToRoot();
+            //MyData?.ParentData?.UpdateBoundsToRoot();
+            if(MyData?.ParentData is GroupData group)
+            {
+                MyData?.RootData?.UpdateBoundsToRoot(group);
+            }
         }
         #endregion クリックイベント時
 
@@ -321,6 +330,9 @@ namespace _20260510
 
                 // 自身をDataのContentに登録、自身を画像として保存に使う
                 root.MyData.Content = root;
+
+                // 全子孫のサイズの再計算
+                root.MyData.UpdateSizeAllDescendant();
             }
         }
 
