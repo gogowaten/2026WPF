@@ -70,10 +70,9 @@
 
       <GroupBox Header="CurrentData" DataContext="{Binding MyData.CurrentItemData}">
         <StackPanel>
-          <TextBlock Text="{Binding StringFormat=' {0: 0; -0; 0}'}"/>
+          <TextBlock Text="{Binding Name}"/>
           <TextBlock Text="{Binding Width, StringFormat='Width = {0: 0; -0; 0}'}"/>
           <TextBlock Text="{Binding Height, StringFormat='Height = {0: 0; -0; 0}'}"/>
-          <TextBlock Text="{Binding Points, StringFormat='Points = {0: 0; -0; 0}'}"/>
           <TextBlock Text="{Binding X, StringFormat='X = {0: 0; -0; 0}'}"/>
           <TextBlock Text="{Binding Y, StringFormat='Y = {0: 0; -0; 0}'}"/>
           <TextBlock Text="{Binding Z, StringFormat='Z = {0: 0; -0; 0}'}"/>
@@ -82,9 +81,9 @@
           <TextBlock Text="{Binding StrokeThickness, StringFormat='StrokeThickness = {0: 0; -0; 0}'}"/>
           <Slider Value="{Binding StrokeThickness}" Minimum="1" Maximum="50"
                   SmallChange="10" LargeChange="10"/>
-          <!--<Viewbox Width="50" Height="50" Stretch="Uniform">
+          <Viewbox Width="50" Height="50" Stretch="Uniform">
             <ContentControl Content="{Binding}"/>
-          </Viewbox>-->
+          </Viewbox>
 
         </StackPanel>
       </GroupBox>
@@ -96,14 +95,16 @@
           <TextBlock Text="{Binding SelectedItemsData.Count, StringFormat='選択Item個数 = {0:0}'}"/>
         </StackPanel>
       </GroupBox>
+      
       <GroupBox Header="ClickedItemData" DataContext="{Binding MyData.ClickedItemData}">
         <StackPanel>
           <TextBlock Text="{Binding Name}"/>
-          <Viewbox Stretch="Uniform" Height="50">
-            <ContentPresenter Content="{Binding Content}"/>
+          <Viewbox Stretch="Uniform" Width="50" Height="50">
+            <ContentPresenter Content="{Binding}"/>
           </Viewbox>
         </StackPanel>
       </GroupBox>
+      
       <!--<GroupBox Header="MyClickedItem" DataContext="{Binding MyData.MyClickedItem}">
         <StackPanel>
           -->
