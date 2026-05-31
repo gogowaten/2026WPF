@@ -122,6 +122,9 @@ namespace _20260510
             {
                 newValue.IsClicked = true;
             }
+
+            // Clickedを編集モード移行の可否判定通知
+            MigreteEditingFromClickedCommand.NotifyCanExecuteChanged();
         }
 
 
@@ -177,11 +180,12 @@ namespace _20260510
                     item.IsSelectable = true;
                 }
 
-                // クリックItemが子要素に在れば、それを選択状態にしてCurrentに指定する
-                if (ClickedItemData is not null && newValue.DataList.Contains(ClickedItemData))
-                {
-                    AddDataToSelectedItems(ClickedItemData);
-                }
+                // 中止：個々で処理するべきではない気がする
+                //// クリックItemが子要素に在れば、それを選択状態にしてCurrentに指定する
+                //if (ClickedItemData is not null && newValue.DataList.Contains(ClickedItemData))
+                //{
+                //    AddDataToSelectedItems(ClickedItemData);
+                //}
             }
 
             // 編集可否判定通知
@@ -242,6 +246,16 @@ namespace _20260510
 
         #region Can～コマンドの実行可否の判定
 
+        // Clickedの編集モード移行可否判定通知
+        public bool CanMigrateEditingFromClicked()
+        {
+            return ClickedItemData is GroupData;
+        }
+
+
+        // CurrentItemDataが編集モード移行可否
+        public bool CanEditingCurrentGroup() => CurrentItemData is GroupData;
+
         // Rootを画像として保存の可否判定
         private bool CanSaveRootToPngImageFile()
         {
@@ -257,6 +271,13 @@ namespace _20260510
         {
             return (CurrentItemData is not null) && CurrentItemData.Content is not null;
         }
+
+        // 全削除の可否判定
+        private bool CanRemoveAll()
+        {
+            return DataList.Count >= 1;
+        }
+
 
         // 選択状態のItemすべてを削除できるかの判定
         private bool CanSelectedItemsRemove()
@@ -591,8 +612,23 @@ namespace _20260510
 
         #region 編集モード
 
+        /// <summary>
+        /// Clickedを編集モードへ移行
+        /// </summary>
+        [RelayCommand(CanExecute = nameof(CanMigrateEditingFromClicked))]
+        public void MigreteEditingFromClicked()
+        {
+            if (ClickedItemData is GroupData group)
+            {
+                MigrateEditingGroup(group);
+            }
+        }
+
         // 指定グループを編集モードにする
-        public void MigrateEditingGroup(GroupData group) { EditingGroupData = group; }
+        public void MigrateEditingGroup(GroupData group)
+        {
+            EditingGroupData = group;
+        }
 
 
         // 1つ上を編集モードにする
@@ -603,19 +639,24 @@ namespace _20260510
         [RelayCommand(CanExecute = nameof(CanEditingUpperGroup))]
         public void EditingUpperGroup()
         {
-            if (EditingGroupData?.ParentData is GroupData upper)
+            if (EditingGroupData?.ParentData is GroupData parent)
             {
+                // 処理後にCurrentにするため、元のグループDataを記録
+                Data nextCurrentData = EditingGroupData;
+
                 // 子要素が1個の場合はグループ解除してから移行する
                 if (EditingGroupData.DataList.Count == 1)
                 {
+                    nextCurrentData = EditingGroupData.DataList[0];
                     UnGroup(EditingGroupData);
                 }
 
-                EditingGroupData = upper;
+                // 移行してから、 元のグループを選択状態にする
+                EditingGroupData = parent;
+                AddDataToSelectedItems(nextCurrentData);
             }
         }
 
-        public bool CanEditingCurrentGroup() => CurrentItemData is GroupData;
 
         // Currentを編集モードにする
         [RelayCommand(CanExecute = nameof(CanEditingCurrentGroup))]
@@ -733,6 +774,27 @@ namespace _20260510
 
         #region 削除
 
+        /// <summary>
+        /// 全削除
+        /// </summary>
+        [RelayCommand(CanExecute = nameof(CanRemoveAll))]
+        public void RemoveAll()
+        {
+
+            DataList.Clear();
+            // その他Clearするのは、Selected、Current、Clicked、
+            ClearSelectedItems();
+            CurrentItemData = null;
+            MyClickedItem = null;
+            ClickedItemData = null;
+
+
+            // EditingGroupをRootに移行
+            MigrateEditingGroup(this);
+
+            UpdateBoundsEditingToRoot();
+        }
+
         // 選択状態のItemすべてをDataListから削除 ＆ 選択リストもクリア
         /// <summary>
         /// 選択されているItemを削除する
@@ -746,6 +808,7 @@ namespace _20260510
 
 
             int nokori = EditingGroupData.DataList.Count - selectedCount;
+            // 削除後にItemが1個以上残る or Rootが編集モード
             if (nokori >= 1 || EditingGroupData is RootData)
             {
                 // 削除後にSelectedにするDataを決めておく
@@ -784,15 +847,26 @@ namespace _20260510
                     _ = AddDataToSelectedItems(nextCurrent);
                 }
             }
+            // Item全削除 & Root以外が編集モードの時
             else
             {
-                // Editingの子要素すべてが選択されていた場合は、Group自体を削除する
+                // 先にItemを削除
+                foreach (var data in SelectedItemsData)
+                {
+                    _ = EditingGroupData.DataList.Remove(data);
+                    if (data.IsClicked)
+                    {
+                        ClickedItemData = null;
+                        MyClickedItem = null;
+                    }
+                }
+                // 今のEditingGroupを保持
                 GroupData group = EditingGroupData;
 
-                // Editingを1個上にする
+                // Editingを1個上に以降
                 EditingUpperGroup();
 
-                // Group自体を削除
+                // 元のGroup自体を削除
                 _ = EditingGroupData.DataList.Remove(group);
             }
 

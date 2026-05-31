@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:_20260510" d:DataContext="{d:DesignInstance Type=local:MainWindow}"
         mc:Ignorable="d"
-        Title="MainWindow" Height="567" Width="854">
+        Title="MainWindow" Height="867" Width="854">
   <Grid>
     <Grid.ColumnDefinitions>
       <ColumnDefinition/>
@@ -60,7 +60,8 @@
       <Button Content="ContextMenu" Click="ContextMenu_Click"/>
       <Button Content="ZDown" Command="{Binding MyData.ZDownSelectedItemsCommand}"/>
       <Button Content="ZupCommand" Command="{Binding MyData.ZUpSelectedItemsCommand}"/>
-      <Button Content="Currentを編集する" Command="{Binding MyData.EditingCurrentGroupCommand}"/>
+      <Button Content="Currentを編集モードに移行" Command="{Binding MyData.EditingCurrentGroupCommand}"/>
+      <Button Content="Clickedを編集モードに移行" Command="{Binding MyData.MigreteEditingFromClickedCommand}"/>
       <Button Content="1個上を編集する" Command="{Binding MyData.EditingUpperGroupCommand}"/>
       <Button Content="全体をpng画像で保存" Command="{Binding MyData.SaveRootToPngImageFileCommand}"/>
       <!--<Button Content="全体をpng画像で保存" Click="ButtonSaveRootToPngImage_Click"/>-->
@@ -95,6 +96,14 @@
           <TextBlock Text="{Binding SelectedItemsData.Count, StringFormat='選択Item個数 = {0:0}'}"/>
         </StackPanel>
       </GroupBox>
+      <GroupBox Header="ClickedItemData" DataContext="{Binding MyData.ClickedItemData}">
+        <StackPanel>
+          <TextBlock Text="{Binding Name}"/>
+          <Viewbox Stretch="Uniform" Height="50">
+            <ContentPresenter Content="{Binding Content}"/>
+          </Viewbox>
+        </StackPanel>
+      </GroupBox>
       <!--<GroupBox Header="MyClickedItem" DataContext="{Binding MyData.MyClickedItem}">
         <StackPanel>
           -->
@@ -121,6 +130,7 @@
         </StackPanel>
       </GroupBox>
 
+      <Button Content="全削除" Command="{Binding MyData.RemoveAllCommand}"/>
       <Button Content="選択Itemを削除" Command="{Binding MyData.RemoveSelectedItemsCommand}"/>
       <ListBox ItemsSource="{Binding MyData.SelectedItemsData}" IsHitTestVisible="False">
         <ListBox.ItemsPanel>
