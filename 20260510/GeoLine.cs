@@ -32,7 +32,7 @@ namespace _20260510
 
         public GeoLineEX()
         {
-            SetMyBind();
+            //SetMyBind();
             Loaded += GeoLineEX_Loaded;
 
             // 右クリックメニュー作成
@@ -63,6 +63,9 @@ namespace _20260510
 
         private void GeoLineEX_Loaded(object sender, RoutedEventArgs e)
         {
+            // MyStrokePenがXAMLの方でバインドされていなければ、自身のプロパティでバインド
+            if (MyStrokePen is null) { SetMyBind(); }
+
             ReplaceAllPointsToBoundsZero();
 
             // AdornerLayer確保
