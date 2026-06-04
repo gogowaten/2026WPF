@@ -32,7 +32,7 @@ namespace _20260510
 
         public GeoLineEX()
         {
-            SetMyBind();
+            //SetMyBind();
             Loaded += GeoLineEX_Loaded;
 
             // 右クリックメニュー作成
@@ -63,6 +63,9 @@ namespace _20260510
 
         private void GeoLineEX_Loaded(object sender, RoutedEventArgs e)
         {
+            // MyStrokePenがXAMLの方でバインドされていなければ、自身のプロパティでバインド
+            if (MyStrokePen is null) { SetMyBind(); }
+
             ReplaceAllPointsToBoundsZero();
 
             // AdornerLayer確保
@@ -218,12 +221,16 @@ namespace _20260510
         public static readonly DependencyProperty MyBackgroundProperty =
             DependencyProperty.Register(nameof(MyBackground), typeof(Brush), typeof(GeoLineEX), new PropertyMetadata(Brushes.Gray));
 
-
+        /// <summary>
+        /// Pen
+        /// </summary>
         public Pen MyStrokePen
         {
             get { return (Pen)GetValue(MyStrokePenProperty); }
             set { SetValue(MyStrokePenProperty, value); }
         }
+        //public static readonly DependencyProperty MyStrokePenProperty =
+        //    DependencyProperty.Register(nameof(MyStrokePen), typeof(Pen), typeof(GeoLineEX), new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.AffectsMeasure, OnMyStrokePenChanged));
         public static readonly DependencyProperty MyStrokePenProperty =
             DependencyProperty.Register(nameof(MyStrokePen), typeof(Pen), typeof(GeoLineEX), new PropertyMetadata(null, OnMyStrokePenChanged));
 
@@ -339,10 +346,14 @@ namespace _20260510
         /// </remarks>
         public void ReplaceAllPointsToBoundsZero()
         {
-            if (MyPoints is null) { return; }
-            if (_cachedGeometry is null) { return; }
+            //var neko = DefiningGeometry;
+            // DefiningGeometryを参照するとDefiningGeometryが更新される？ので_cachedGeometryも更新されてnullにはならない？と言うか、_cachedGeometryじゃなくて最初からDefiningGeometryを使って計算すれば良い、DefiningGeometryはnullになることはない
 
-            Rect bounds = GetRenderBoundsWithPen(_cachedGeometry, MyStrokePen);
+            if (MyPoints is null) { return; }
+            //if (_cachedGeometry is null) { return; }
+
+            Rect bounds = GetRenderBoundsWithPen(DefiningGeometry, MyStrokePen);
+            //Rect bounds = GetRenderBoundsWithPen(_cachedGeometry, strokePen);
 
             // 誤差程度なら更新しない
             if (Math.Abs(bounds.X + bounds.Y) < 0.01)

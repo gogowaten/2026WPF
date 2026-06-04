@@ -1382,8 +1382,46 @@ namespace _20260510
         [ObservableProperty] private PenLineCap _strokeStartLineCap = PenLineCap.Flat;
         [ObservableProperty] private PenLineJoin _strokeLineJoin = PenLineJoin.Miter;
         [ObservableProperty] private double _strokeMiterLimit = 10.0;
-        //[ObservableProperty] private Pen? _strokePen; // 保存対象外にする
+        [ObservableProperty] private Pen _strokePen; // 保存対象外にする
 
+        public ShapeData()
+        {
+            _strokePen = new(_stroke, _strokeThickness)
+            {
+                EndLineCap = _strokeEndLineCap,
+                StartLineCap = _strokeStartLineCap,
+                LineJoin = _strokeLineJoin,
+                MiterLimit = _strokeMiterLimit,
+            };
+        }
+
+        partial void OnStrokeLineJoinChanged(PenLineJoin oldValue, PenLineJoin newValue)
+        {
+            StrokePen.LineJoin = newValue;
+        }
+        partial void OnStrokeMiterLimitChanged(double oldValue, double newValue)
+        {
+            StrokePen.MiterLimit = newValue;
+        }
+        partial void OnStrokeStartLineCapChanged(PenLineCap oldValue, PenLineCap newValue)
+        {
+            StrokePen.StartLineCap = newValue;
+        }
+        partial void OnStrokeEndLineCapChanged(PenLineCap oldValue, PenLineCap newValue)
+        {
+            StrokePen.EndLineCap = newValue;
+        }
+        partial void OnStrokeThicknessChanged(double oldValue, double newValue)
+        {
+            StrokePen.Thickness = newValue;
+        }
+
+        //partial void OnStrokeThicknessChanging(double oldValue, double newValue)
+        //{
+                        
+        //    StrokePen.Thickness = newValue;
+            
+        //}
 
     }
     #endregion 図形

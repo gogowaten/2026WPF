@@ -79,6 +79,7 @@ https://gootara.org/library/2017/01/wpfao.html-->
         Height="{Binding Height, Mode=OneWayToSource}"
         MyOffsetLeft="{Binding X, Mode=TwoWay}"
         MyOffsetTop="{Binding Y, Mode=TwoWay}"
+        MyStrokePen="{Binding StrokePen, UpdateSourceTrigger=PropertyChanged}"
         >
         <!--<local:GeoLineEX.LayoutTransform>
           <RotateTransform Angle="{Binding Angle}"/>
