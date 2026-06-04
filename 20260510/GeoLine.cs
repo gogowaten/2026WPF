@@ -32,7 +32,7 @@ namespace _20260510
 
         public GeoLineEX()
         {
-            SetMyBind();
+            //SetMyBind();
             Loaded += GeoLineEX_Loaded;
 
             // 右クリックメニュー作成
@@ -49,16 +49,16 @@ namespace _20260510
 
 
         #region 初期化
-        private void SetMyBind()
-        {
-            MultiBinding mb = new() { Converter = new ConvStrokePen() };
-            mb.Bindings.Add(new Binding() { Source = this, Path = new PropertyPath(StrokeThicknessProperty) });
-            mb.Bindings.Add(new Binding() { Source = this, Path = new PropertyPath(StrokeMiterLimitProperty) });
-            mb.Bindings.Add(new Binding() { Source = this, Path = new PropertyPath(StrokeEndLineCapProperty) });
-            mb.Bindings.Add(new Binding() { Source = this, Path = new PropertyPath(StrokeStartLineCapProperty) });
-            mb.Bindings.Add(new Binding() { Source = this, Path = new PropertyPath(StrokeLineJoinProperty) });
-            SetBinding(MyStrokePenProperty, mb);
-        }
+        //private void SetMyBind()
+        //{
+        //    MultiBinding mb = new() { Converter = new ConvStrokePen() };
+        //    mb.Bindings.Add(new Binding() { Source = this, Path = new PropertyPath(StrokeThicknessProperty) });
+        //    mb.Bindings.Add(new Binding() { Source = this, Path = new PropertyPath(StrokeMiterLimitProperty) });
+        //    mb.Bindings.Add(new Binding() { Source = this, Path = new PropertyPath(StrokeEndLineCapProperty) });
+        //    mb.Bindings.Add(new Binding() { Source = this, Path = new PropertyPath(StrokeStartLineCapProperty) });
+        //    mb.Bindings.Add(new Binding() { Source = this, Path = new PropertyPath(StrokeLineJoinProperty) });
+        //    SetBinding(MyStrokePenProperty, mb);
+        //}
 
 
         private void GeoLineEX_Loaded(object sender, RoutedEventArgs e)
@@ -218,7 +218,9 @@ namespace _20260510
         public static readonly DependencyProperty MyBackgroundProperty =
             DependencyProperty.Register(nameof(MyBackground), typeof(Brush), typeof(GeoLineEX), new PropertyMetadata(Brushes.Gray));
 
-
+        /// <summary>
+        /// Pen
+        /// </summary>
         public Pen MyStrokePen
         {
             get { return (Pen)GetValue(MyStrokePenProperty); }
