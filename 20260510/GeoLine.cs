@@ -340,8 +340,9 @@ namespace _20260510
         public void ReplaceAllPointsToBoundsZero()
         {
             if (MyPoints is null) { return; }
+            if (_cachedGeometry is null) { return; }
 
-            var bounds = GetRenderBoundsWithPen();
+            Rect bounds = GetRenderBoundsWithPen(_cachedGeometry, MyStrokePen);
 
             // 誤差程度なら更新しない
             if (Math.Abs(bounds.X + bounds.Y) < 0.01)
@@ -373,22 +374,45 @@ namespace _20260510
 
 
 
-
-
         // 図形がピッタリ収まるRectを返す
         // 内部的な計算なので見た目とは位置が異なる
-        public Rect GetRenderBoundsWithPen()
+        public Rect GetRenderBoundsWithPen(Geometry geo, Pen pen)
         {
-            if (DefiningGeometry is null || DefiningGeometry == Geometry.Empty)
+            //if (_cachedGeometry is not null)
+            //{
+            //    Debug.WriteLine($"cache {_cachedGeometry.ToString()}");
+            //    Debug.WriteLine($"Defini {DefiningGeometry.ToString()}");
+
+            //}
+            //else
+            //{
+            //    Debug.WriteLine($"cache is null");
+            //}
+
+            if (geo is null || geo == Geometry.Empty)
             {
                 return Rect.Empty;
             }
             else
             {
-                return DefiningGeometry.GetRenderBounds(MyStrokePen);
+                return geo.GetRenderBounds(pen);
             }
-
         }
+
+
+        //// 図形がピッタリ収まるRectを返す
+        //// 内部的な計算なので見た目とは位置が異なる
+        //public Rect GetRenderBoundsWithPen()
+        //{   
+        //    if (DefiningGeometry is null || DefiningGeometry == Geometry.Empty)
+        //    {
+        //        return Rect.Empty;
+        //    }
+        //    else
+        //    {
+        //        return DefiningGeometry.GetRenderBounds(MyStrokePen);
+        //    }
+        //}
 
         //// 使わない？OnRender実行になる
         //public void RedBG()
@@ -404,13 +428,13 @@ namespace _20260510
             // not null & 編集中 = ブラシ
             // not null & 通常 ブラシ
             // null & 通常 = null
-            if (MyBackground is not null)
+            if (MyBackground is not null && _cachedGeometry is not null)
             {
-                drawingContext.DrawRectangle(MyBackground, null, GetRenderBoundsWithPen());
+                drawingContext.DrawRectangle(MyBackground, null, GetRenderBoundsWithPen(_cachedGeometry, MyStrokePen));
             }
-            else if (IsVertexHandle && MyBackground is null)
+            else if (IsVertexHandle && MyBackground is null && _cachedGeometry is not null)
             {
-                drawingContext.DrawRectangle(Brushes.Transparent, null, GetRenderBoundsWithPen());
+                drawingContext.DrawRectangle(Brushes.Transparent, null, GetRenderBoundsWithPen(_cachedGeometry, MyStrokePen));
             }
 
 
@@ -438,7 +462,7 @@ namespace _20260510
 
     public class GeoLine : Shape
     {
-        private Geometry? _cachedGeometry; // キャッシュ用Geometry
+        internal Geometry? _cachedGeometry; // キャッシュ用Geometry
 
         protected override Geometry DefiningGeometry
         {

@@ -134,7 +134,7 @@ namespace _20260510
 
         private void check_Click(object sender, RoutedEventArgs e)
         {
-            
+            MyData.GroupBorderEditingColor = Brushes.Magenta;
         }
 
         /// <summary>

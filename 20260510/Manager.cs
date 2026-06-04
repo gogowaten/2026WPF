@@ -34,6 +34,12 @@ namespace _20260510
                 right = Math.Max(right, item.X + item.Width);
                 bottom = Math.Max(bottom, item.Y + item.Height);
             }
+
+            if (double.IsNaN(right) || double.IsNaN(bottom))
+            {
+                return Rect.Empty;
+            }
+
             Rect r = new(left, top, right, bottom)
             {
                 Width = right - left,

@@ -61,6 +61,10 @@ namespace _20260510
         // Groupの枠線表示の有無
         [ObservableProperty] private bool _isVisbleGroupBorder = true;
 
+        [ObservableProperty] private Brush _groupBorderNormalColor = Brushes.DeepSkyBlue;
+        [ObservableProperty] private Brush _groupBorderEditingColor = Brushes.Red;
+        //[ObservableProperty] private Brush _groupBorderColor = Brushes.DeepSkyBlue;
+
         // 編集グループにData追加する時の、Dataの追加座標決定に使う、Currentからの距離
         [ObservableProperty] private double _shiftHorizontal = 32.0;
         [ObservableProperty] private double _shiftVertical = 32.0;
@@ -161,6 +165,7 @@ namespace _20260510
             if (oldValue is not null)
             {
                 oldValue.IsEditing = false;
+                //oldValue.WakuIro = GroupBorderNormalColor;
                 // 子要素のIs系の更新
                 foreach (var item in oldValue.DataList)
                 {
@@ -174,6 +179,8 @@ namespace _20260510
             if (newValue is not null)
             {
                 newValue.IsEditing = true;
+                //newValue.WakuIro = GroupBorderEditingColor;
+
                 // 子要素を選択可能にする
                 foreach (var item in newValue.DataList)
                 {
@@ -190,7 +197,8 @@ namespace _20260510
 
             // 編集可否判定通知
             EditingUpperGroupCommand.NotifyCanExecuteChanged();
-
+            MigreteEditingFromClickedCommand.NotifyCanExecuteChanged();
+            EditingCurrentGroupCommand.NotifyCanExecuteChanged();
         }
 
 
@@ -249,7 +257,8 @@ namespace _20260510
         // Clickedの編集モード移行可否判定通知
         public bool CanMigrateEditingFromClicked()
         {
-            return ClickedItemData is GroupData;
+            return ClickedItemData is GroupData group
+                && !group.IsEditing;
         }
 
 
@@ -466,6 +475,7 @@ namespace _20260510
 
             // 選択アイテムのBoundsを計算、これが新GのBoundsになるし、その子要素の座標調整にも使う
             var newBounds = Manager.GetBounds(SelectedItemsData);
+            if (newBounds.IsEmpty) { return; }
 
             // 新グループ作成
             var newGroup = new GroupData()
@@ -1084,6 +1094,7 @@ namespace _20260510
         {
             // 子要素全体のBounds取得
             var rect = Manager.GetBounds(group.DataList);
+            if (rect.IsEmpty) { return; }
 
             // サイズ更新
             group.Width = rect.Width;
@@ -1160,6 +1171,7 @@ namespace _20260510
 
     public partial class GroupData : Data
     {
+        //[ObservableProperty] private Brush _wakuIro = Brushes.Green;
         [ObservableProperty] private bool _isEditing; // 編集状態
         [ObservableProperty] private ObservableCollection<Data> _dataList = [];
 
@@ -1251,6 +1263,18 @@ namespace _20260510
         }
 
 
+        //partial void OnIsEditingChanged(bool oldValue, bool newValue)
+        //{
+        //    if (newValue)
+        //    {
+        //        WakuIro = Brushes.Red;
+        //    }
+        //    else
+        //    {
+        //        WakuIro = Brushes.Blue;
+        //    }
+        //}
+
         ///// <summary>
         ///// 特別、TextBlockなどサイズが確定していない要素を
         ///// まっさらなRootに追加した直後にRootのサイズを決定するのに使う
@@ -1290,39 +1314,6 @@ namespace _20260510
             Height = bottom;
         }
 
-
-        ///// <summary>
-        ///// 指定GroupのBounds更新して、Rootまで行くBounds更新
-        ///// </summary>
-        ///// <param name="group"></param>
-        //public void UpdateBoundsToRoot(GroupData group)
-        //{
-        //    // 子要素全体のBounds取得
-        //    var rect = Manager.GetBounds(group.DataList);
-
-        //    // サイズ更新
-        //    group.Width = rect.Width;
-        //    group.Height = rect.Height;
-
-        //    // 子要素の座標更新
-        //    if (rect.Top != 0 || rect.Left != 0)
-        //    {
-        //        foreach (Data item in group.DataList) { item.X -= rect.Left; item.Y -= rect.Top; }
-        //    }
-
-        //    // 自身の座標更新
-        //    X += rect.Left;
-        //    Y += rect.Top;
-
-        //    // 親要素へ伝播
-        //    group.ParentData?.UpdateBoundsToRoot(group.ParentData);
-
-        //}
-
-        //public void UpdateBoundsToRoot()
-        //{
-        //    UpdateBoundsToRoot(this);
-        //}
 
 
         #region パブリックメソッド

@@ -21,6 +21,46 @@
 
 
 
+  <Style TargetType="{x:Type local:CustomThumb}">
+    <Setter Property="MyData" Value="{Binding}"/>
+    <Setter Property="Canvas.Left" Value="{Binding X, Mode=TwoWay}"/>
+    <Setter Property="Canvas.Top" Value="{Binding Y, Mode=TwoWay}"/>
+    <Setter Property="Template">
+      <Setter.Value>
+        <ControlTemplate TargetType="{x:Type local:CustomThumb}">
+          <Grid>
+            <ContentPresenter Content="{TemplateBinding MyContent}"/>
+
+            <Border x:Name="SelectedBorder" Visibility="Collapsed"
+                    BorderBrush="Orange" BorderThickness="1"
+                    Margin="-10"
+                    IsHitTestVisible="False"/>
+          </Grid>
+          <ControlTemplate.Triggers>
+            <MultiDataTrigger>
+              <MultiDataTrigger.Conditions>
+                <Condition Binding="{Binding Path=IsSelected}" Value="true"/>
+                <Condition Binding="{Binding RelativeSource={RelativeSource Mode=Self}, Path=MyData.RootData.IsVisbleSelectedBorder}" Value="true"/>
+                <!--<Condition Binding="{Binding Path=MyData.RootData.IsVisbleSelectedBorder}" Value="true"/>-->
+                <!--<Condition Binding="{Binding RelativeSource={RelativeSource AncestorType=local:CustomThumb}, Path=MyData.RootData.IsVisbleSelectedBorder}" Value="true"/>-->
+              </MultiDataTrigger.Conditions>
+              <Setter TargetName="SelectedBorder" Property="Visibility" Value="Visible"/>
+            </MultiDataTrigger>
+          </ControlTemplate.Triggers>
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+  </Style>
+
+  <!--MultiDataTriggerの使い方-->
+  <!--[WPF] 複数のトリガー条件を組み合わせた時に AND だけでなく OR で判断する方法 - ぐーたら書房
+https://gootara.org/library/2017/01/wpfao.html-->
+
+  
+
+
+
+
   <DataTemplate DataType="{x:Type local:GeoLineData}">
     <local:CustomThumb>
       <!--MyData="{Binding}"-->
@@ -67,22 +107,52 @@
     </local:CustomThumb>
   </DataTemplate>
 
+  <!--<Style x:Key="myTest" TargetType="Rectangle">
+    <Setter Property="Stroke" Value="Red"/>
+    <Setter Property="StrokeThickness" Value="1"/>
+    <Setter Property="Margin" Value="-2"/>
+    <Style.Triggers>
+      <MultiDataTrigger>
+        <MultiDataTrigger.Conditions>
+          <Condition Binding="{Binding RelativeSource={RelativeSource AncestorType=local:CustomThumb}, Path=MyData.RootData.IsVisbleGroupBorder}" Value="true"/>
+          <Condition Binding="{Binding IsEditing}" Value="true"/>
+        </MultiDataTrigger.Conditions>
+        <Setter Property="Stroke" Value="Green"/>
+      </MultiDataTrigger>
+    </Style.Triggers>
+  </Style>-->
+
+
   <DataTemplate DataType="{x:Type local:GroupData}">
     <DataTemplate.Resources>
       <local:MyConvBoolToVisible x:Key="isVisible"/>
+      <local:MyConvGroupWakuColor x:Key="WakuColor"/>
     </DataTemplate.Resources>
     <local:CustomThumb>
       <Grid d:DataContext="{d:DesignInstance Type=local:GroupData}">
-        <Rectangle x:Name="GroupWaku" Stroke="Blue" StrokeThickness="1" StrokeDashArray="2,2"
-                   Visibility="{Binding Converter={StaticResource isVisible}, RelativeSource={RelativeSource AncestorType=local:CustomThumb}, Path=MyData.RootData.IsVisbleGroupBorder}" Margin="-2"/>
-        <!--<Rectangle x:Name="GroupWaku" Stroke="Blue" StrokeThickness="1" StrokeDashArray="2,2"
-                   Visibility="{Binding Converter={StaticResource isVisible}, RelativeSource={RelativeSource Mode=Self}, Path=RootData.IsVisbleGroupBorder}" Margin="-2"/>-->
-        <!--<Rectangle x:Name="GroupWaku" Stroke="Blue" StrokeThickness="1" StrokeDashArray="2,2"
-                   Visibility="Visible" Margin="-2"/>-->
+        <Rectangle x:Name="GroupWaku" StrokeThickness="1" StrokeDashArray="2,2" Margin="-2"
+                   IsHitTestVisible="False"
+                   Visibility="{Binding Converter={StaticResource isVisible},
+                        RelativeSource={RelativeSource AncestorType=local:CustomThumb},
+                        Path=MyData.RootData.IsVisbleGroupBorder}"
+                   >
+          <!--枠の色、編集モードと通常時-->
+          <Rectangle.Stroke>
+            <MultiBinding Converter="{StaticResource WakuColor}">
+              <MultiBinding.Bindings>
+                <Binding Path="IsEditing"/>
+                <Binding RelativeSource="{RelativeSource AncestorType=local:CustomThumb}"
+                         Path="MyData.RootData.GroupBorderNormalColor"/>
+                <Binding RelativeSource="{RelativeSource AncestorType=local:CustomThumb}"
+                         Path="MyData.RootData.GroupBorderEditingColor"/>
+              </MultiBinding.Bindings>
+            </MultiBinding>
+          </Rectangle.Stroke>
+        </Rectangle>
+        
         <ItemsControl ItemsSource="{Binding DataList}"
                       Width="{Binding Width}"
                       Height="{Binding Height}"
-                      Background="Transparent"
                       ItemContainerStyle="{StaticResource CanvasItemContaier}">
           <ItemsControl.ItemsPanel>
             <ItemsPanelTemplate>
@@ -97,40 +167,37 @@
 
 
 
-
-  <Style TargetType="{x:Type local:CustomThumb}">
-    <Setter Property="MyData" Value="{Binding}"/>
-    <Setter Property="Canvas.Left" Value="{Binding X, Mode=TwoWay}"/>
-    <Setter Property="Canvas.Top" Value="{Binding Y, Mode=TwoWay}"/>
-    <Setter Property="Template">
-      <Setter.Value>
-        <ControlTemplate TargetType="{x:Type local:CustomThumb}">
-          <Grid>
-            <ContentPresenter Content="{TemplateBinding MyContent}"/>
-
-            <Border x:Name="SelectedBorder" Visibility="Collapsed"
-                    BorderBrush="Orange" BorderThickness="1"
-                    Margin="-10"/>
-          </Grid>
-          <ControlTemplate.Triggers>
-            <MultiDataTrigger>
-              <MultiDataTrigger.Conditions>
-                <Condition Binding="{Binding Path=IsSelected}" Value="true"/>
-                <Condition Binding="{Binding RelativeSource={RelativeSource Mode=Self}, Path=MyData.RootData.IsVisbleSelectedBorder}" Value="true"/>
-                <!--<Condition Binding="{Binding Path=MyData.RootData.IsVisbleSelectedBorder}" Value="true"/>-->
-                <!--<Condition Binding="{Binding RelativeSource={RelativeSource AncestorType=local:CustomThumb}, Path=MyData.RootData.IsVisbleSelectedBorder}" Value="true"/>-->
-              </MultiDataTrigger.Conditions>
-              <Setter TargetName="SelectedBorder" Property="Visibility" Value="Visible"/>
-            </MultiDataTrigger>
-          </ControlTemplate.Triggers>
-        </ControlTemplate>
-      </Setter.Value>
-    </Setter>
-  </Style>
-  
-  <!--MultiDataTriggerの使い方-->
-  <!--[WPF] 複数のトリガー条件を組み合わせた時に AND だけでなく OR で判断する方法 - ぐーたら書房
-https://gootara.org/library/2017/01/wpfao.html-->
+  <!--<DataTemplate DataType="{x:Type local:GroupData}">
+    <DataTemplate.Resources>
+      <local:MyConvBoolToVisible x:Key="isVisible"/>
+    </DataTemplate.Resources>
+    <local:CustomThumb>
+      <Grid d:DataContext="{d:DesignInstance Type=local:GroupData}">
+        <Rectangle x:Name="GroupWaku" Stroke="Blue" StrokeThickness="1" StrokeDashArray="2,2" Margin="-2"
+                   Visibility="{
+          Binding Converter={StaticResource isVisible},
+          RelativeSource={RelativeSource AncestorType=local:CustomThumb},
+          Path=MyData.RootData.IsVisbleGroupBorder}"/>
+        -->
+  <!--<Rectangle x:Name="GroupWaku" Stroke="Blue" StrokeThickness="1" StrokeDashArray="2,2"
+                   Visibility="{Binding Converter={StaticResource isVisible}, RelativeSource={RelativeSource Mode=Self}, Path=RootData.IsVisbleGroupBorder}" Margin="-2"/>-->
+  <!--<Rectangle x:Name="GroupWaku" Stroke="Blue" StrokeThickness="1" StrokeDashArray="2,2"
+                   Visibility="Visible" Margin="-2"/>-->
+  <!--
+        <ItemsControl ItemsSource="{Binding DataList}"
+                      Width="{Binding Width}"
+                      Height="{Binding Height}"
+                      Background="Transparent"
+                      ItemContainerStyle="{StaticResource CanvasItemContaier}">
+          <ItemsControl.ItemsPanel>
+            <ItemsPanelTemplate>
+              <Canvas IsItemsHost="True"/>
+            </ItemsPanelTemplate>
+          </ItemsControl.ItemsPanel>
+        </ItemsControl>
+      </Grid>
+    </local:CustomThumb>
+  </DataTemplate>-->
 
 
 
@@ -144,8 +211,6 @@ https://gootara.org/library/2017/01/wpfao.html-->
     <Setter Property="ItemsSource" Value="{Binding RelativeSource={RelativeSource Mode=Self}, Path=MyData.DataList}"/>
     <Setter Property="Width" Value="{Binding RelativeSource={RelativeSource Mode=Self}, Path=MyData.Width}"/>
     <Setter Property="Height" Value="{Binding RelativeSource={RelativeSource Mode=Self}, Path=MyData.Height}"/>
-    <!--<Setter Property="Width" Value="300"/>
-    <Setter Property="Height" Value="300"/>-->
 
     <Setter Property="ItemsPanel">
       <Setter.Value>
