@@ -1416,6 +1416,13 @@ namespace _20260510
             StrokePen.Thickness = newValue;
         }
 
+        //partial void OnStrokeThicknessChanging(double oldValue, double newValue)
+        //{
+                        
+        //    StrokePen.Thickness = newValue;
+            
+        //}
+
     }
     #endregion 図形
 

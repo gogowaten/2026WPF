@@ -32,7 +32,7 @@ namespace _20260510
 
         public GeoLineEX()
         {
-            //SetMyBind();
+            SetMyBind();
             Loaded += GeoLineEX_Loaded;
 
             // 右クリックメニュー作成
@@ -49,16 +49,16 @@ namespace _20260510
 
 
         #region 初期化
-        //private void SetMyBind()
-        //{
-        //    MultiBinding mb = new() { Converter = new ConvStrokePen() };
-        //    mb.Bindings.Add(new Binding() { Source = this, Path = new PropertyPath(StrokeThicknessProperty) });
-        //    mb.Bindings.Add(new Binding() { Source = this, Path = new PropertyPath(StrokeMiterLimitProperty) });
-        //    mb.Bindings.Add(new Binding() { Source = this, Path = new PropertyPath(StrokeEndLineCapProperty) });
-        //    mb.Bindings.Add(new Binding() { Source = this, Path = new PropertyPath(StrokeStartLineCapProperty) });
-        //    mb.Bindings.Add(new Binding() { Source = this, Path = new PropertyPath(StrokeLineJoinProperty) });
-        //    SetBinding(MyStrokePenProperty, mb);
-        //}
+        private void SetMyBind()
+        {
+            MultiBinding mb = new() { Converter = new ConvStrokePen() };
+            mb.Bindings.Add(new Binding() { Source = this, Path = new PropertyPath(StrokeThicknessProperty) });
+            mb.Bindings.Add(new Binding() { Source = this, Path = new PropertyPath(StrokeMiterLimitProperty) });
+            mb.Bindings.Add(new Binding() { Source = this, Path = new PropertyPath(StrokeEndLineCapProperty) });
+            mb.Bindings.Add(new Binding() { Source = this, Path = new PropertyPath(StrokeStartLineCapProperty) });
+            mb.Bindings.Add(new Binding() { Source = this, Path = new PropertyPath(StrokeLineJoinProperty) });
+            SetBinding(MyStrokePenProperty, mb);
+        }
 
 
         private void GeoLineEX_Loaded(object sender, RoutedEventArgs e)
@@ -226,6 +226,8 @@ namespace _20260510
             get { return (Pen)GetValue(MyStrokePenProperty); }
             set { SetValue(MyStrokePenProperty, value); }
         }
+        //public static readonly DependencyProperty MyStrokePenProperty =
+        //    DependencyProperty.Register(nameof(MyStrokePen), typeof(Pen), typeof(GeoLineEX), new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.AffectsMeasure, OnMyStrokePenChanged));
         public static readonly DependencyProperty MyStrokePenProperty =
             DependencyProperty.Register(nameof(MyStrokePen), typeof(Pen), typeof(GeoLineEX), new PropertyMetadata(null, OnMyStrokePenChanged));
 
@@ -341,10 +343,14 @@ namespace _20260510
         /// </remarks>
         public void ReplaceAllPointsToBoundsZero()
         {
-            if (MyPoints is null) { return; }
-            if (_cachedGeometry is null) { return; }
+            //var neko = DefiningGeometry;
+            // DefiningGeometryを参照するとDefiningGeometryが更新される？ので_cachedGeometryも更新されてnullにはならない？と言うか、_cachedGeometryじゃなくて最初からDefiningGeometryを使って計算すれば良い、DefiningGeometryはnullになることはない
 
-            Rect bounds = GetRenderBoundsWithPen(_cachedGeometry, MyStrokePen);
+            if (MyPoints is null) { return; }
+            //if (_cachedGeometry is null) { return; }
+
+            Rect bounds = GetRenderBoundsWithPen(DefiningGeometry, MyStrokePen);
+            //Rect bounds = GetRenderBoundsWithPen(_cachedGeometry, strokePen);
 
             // 誤差程度なら更新しない
             if (Math.Abs(bounds.X + bounds.Y) < 0.01)
