@@ -66,7 +66,9 @@ namespace _20260510
             // MyStrokePenがXAMLの方でバインドされていなければ、自身のプロパティでバインド
             if (MyStrokePen is null) { SetMyBind(); }
 
-            ReplaceAllPointsToBoundsZero();
+            //ReplaceAllPointsToBoundsZero();
+            //InvalidateVisual();
+            UpdateRenderBounds();
 
             // AdornerLayer確保
             if (AdornerLayer.GetAdornerLayer(this) is AdornerLayer layer)
@@ -129,6 +131,49 @@ namespace _20260510
 
         #region 依存関係プロパティ
 
+        public void UpdateRenderBounds()
+        {
+            if (DefiningGeometry is null || Geometry.Empty == DefiningGeometry)
+            {
+                MyRenderBounds = Rect.Empty;
+                Height = 0;
+                Width = 0;
+            }
+            else
+            {
+                MyRenderBounds = DefiningGeometry.GetRenderBounds(MyStrokePen);
+                Height = MyRenderBounds.Height;
+                Width = MyRenderBounds.Width;
+            }
+        }
+
+        public Rect MyRenderBounds
+        {
+            get { return (Rect)GetValue(MyRenderBoundsProperty); }
+            set { SetValue(MyRenderBoundsProperty, value); }
+        }
+        public static readonly DependencyProperty MyRenderBoundsProperty =
+            DependencyProperty.Register(nameof(MyRenderBounds), typeof(Rect), typeof(GeoLineEX), new PropertyMetadata(Rect.Empty));
+
+        //public double MyRenderWidth
+        //{
+        //    get { return (double)GetValue(MyRenderWidthProperty); }
+        //    set { SetValue(MyRenderWidthProperty, value); }
+        //}
+        //public static readonly DependencyProperty MyRenderWidthProperty =
+        //    DependencyProperty.Register(nameof(MyRenderWidth), typeof(double), typeof(GeoLineEX), new PropertyMetadata(0.0));
+
+        //public double MyRenderHeight
+        //{
+        //    get { return (double)GetValue(MyRenderHeightProperty); }
+        //    set { SetValue(MyRenderHeightProperty, value); }
+        //}
+        //public static readonly DependencyProperty MyRenderHeightProperty =
+        //    DependencyProperty.Register(nameof(MyRenderHeight), typeof(double), typeof(GeoLineEX), new PropertyMetadata(0.0));
+
+
+        #region 右クリックメニュー
+
         // 右クリックメニューの有無
         public bool IsEnableContextMenu
         {
@@ -161,6 +206,8 @@ namespace _20260510
             }
             return baseValue;
         }
+        #endregion 右クリックメニュー
+        #region 頂点ハンドル
 
         // 頂点ハンドル色
 
@@ -208,6 +255,7 @@ namespace _20260510
                 }
             }
         }
+        #endregion 頂点ハンドル
 
 
         /// <summary>
@@ -238,7 +286,8 @@ namespace _20260510
         {
             if (d is GeoLineEX geo)
             {
-                geo.ReplaceAllPointsToBoundsZero();
+                geo.UpdateRenderBounds();
+                //geo.ReplaceAllPointsToBoundsZero();
             }
         }
 
@@ -267,6 +316,7 @@ namespace _20260510
         internal override void MyPoints_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
         {
             base.MyPoints_CollectionChanged(sender, e);
+            UpdateRenderBounds();
 
             if (e.Action == NotifyCollectionChangedAction.Add)
             {
@@ -276,8 +326,8 @@ namespace _20260510
                     {
                         // 頂点ハンドルを追加後に図形の更新
                         MyVertexAdorner?.AddOrInsertHandle(ii, points[ii]);
-                        ReplaceAllPointsToBoundsZero();
-
+                        //ReplaceAllPointsToBoundsZero();
+            
                         //InvalidateVisual(); // 再描画、ここでは必要ないのは基底クラスで行っているから？
                     }
                 }
@@ -290,7 +340,8 @@ namespace _20260510
                     {
                         // 該当ハンドルを削除後に図形の更新
                         MyVertexAdorner?.RemoveHandle(ii);
-                        ReplaceAllPointsToBoundsZero();
+                        //ReplaceAllPointsToBoundsZero();
+                        
                     }
                 }
             }
@@ -344,44 +395,44 @@ namespace _20260510
         /// 描画BoundsのXYが0になるように、Pointsを置き換える
         /// 再描画を1回で済ませるためにPointsを新たに作成して、それと入れ替える
         /// </remarks>
-        public void ReplaceAllPointsToBoundsZero()
-        {
-            //var neko = DefiningGeometry;
-            // DefiningGeometryを参照するとDefiningGeometryが更新される？ので_cachedGeometryも更新されてnullにはならない？と言うか、_cachedGeometryじゃなくて最初からDefiningGeometryを使って計算すれば良い、DefiningGeometryはnullになることはない
+        //public void ReplaceAllPointsToBoundsZero()
+        //{
+        //    //var neko = DefiningGeometry;
+        //    // DefiningGeometryを参照するとDefiningGeometryが更新される？ので_cachedGeometryも更新されてnullにはならない？と言うか、_cachedGeometryじゃなくて最初からDefiningGeometryを使って計算すれば良い、DefiningGeometryはnullになることはない
 
-            if (MyPoints is null) { return; }
-            //if (_cachedGeometry is null) { return; }
+        //    if (MyPoints is null) { return; }
+        //    //if (_cachedGeometry is null) { return; }
 
-            Rect bounds = GetRenderBoundsWithPen(DefiningGeometry, MyStrokePen);
-            //Rect bounds = GetRenderBoundsWithPen(_cachedGeometry, strokePen);
+        //    Rect bounds = GetRenderBoundsWithPen(DefiningGeometry, MyStrokePen);
+        //    //Rect bounds = GetRenderBoundsWithPen(_cachedGeometry, strokePen);
 
-            // 誤差程度なら更新しない
-            if (Math.Abs(bounds.X + bounds.Y) < 0.01)
-            {
-                if ((Math.Abs(bounds.Width - Width) +
-               Math.Abs(bounds.Height - Height)) < 0.01)
-                {
-                    return;
-                }
-            }
+        //    // 誤差程度なら更新しない
+        //    if (Math.Abs(bounds.X + bounds.Y) < 0.01)
+        //    {
+        //        if ((Math.Abs(bounds.Width - Width) +
+        //       Math.Abs(bounds.Height - Height)) < 0.01)
+        //        {
+        //            return;
+        //        }
+        //    }
 
-            Width = bounds.Width;
-            Height = bounds.Height;
-            MyOffsetLeft += bounds.X;
-            MyOffsetTop += bounds.Y;
+        //    Width = bounds.Width;
+        //    Height = bounds.Height;
+        //    MyOffsetLeft += bounds.X;
+        //    MyOffsetTop += bounds.Y;
 
-            // Points更新はCollection自体を入れ替えすることで
-            // Point1つごとの更新処理を省く
-            var ps = new ObservableCollection<Point>();
-            foreach (Point item in MyPoints)
-            {
-                ps.Add(new Point(item.X - bounds.X, item.Y - bounds.Y));
-            }
-            MyPoints = ps; // Collection入れ替え
+        //    // Points更新はCollection自体を入れ替えすることで
+        //    // Point1つごとの更新処理を省く
+        //    var ps = new ObservableCollection<Point>();
+        //    foreach (Point item in MyPoints)
+        //    {
+        //        ps.Add(new Point(item.X - bounds.X, item.Y - bounds.Y));
+        //    }
+        //    MyPoints = ps; // Collection入れ替え
 
-            // 頂点編集時ならハンドルの位置調整
-            MyVertexAdorner?.SyncAllThumbPoition();
-        }
+        //    // 頂点編集時ならハンドルの位置調整
+        //    MyVertexAdorner?.SyncAllThumbPoition();
+        //}
 
 
 
@@ -435,18 +486,30 @@ namespace _20260510
         // 描画、背景色
         protected override void OnRender(DrawingContext drawingContext)
         {
-            // null & 編集中 = transparent
-            // not null & 編集中 = ブラシ
-            // not null & 通常 ブラシ
-            // null & 通常 = null
-            if (MyBackground is not null && _cachedGeometry is not null)
-            {
-                drawingContext.DrawRectangle(MyBackground, null, GetRenderBoundsWithPen(_cachedGeometry, MyStrokePen));
-            }
-            else if (IsVertexHandle && MyBackground is null && _cachedGeometry is not null)
-            {
-                drawingContext.DrawRectangle(Brushes.Transparent, null, GetRenderBoundsWithPen(_cachedGeometry, MyStrokePen));
-            }
+            //// null & 編集中 = transparent
+            //// not null & 編集中 = ブラシ
+            //// not null & 通常 ブラシ
+            //// null & 通常 = null
+            //if (MyBackground is not null && _cachedGeometry is not null)
+            //{
+            //    drawingContext.DrawRectangle(MyBackground, null, GetRenderBoundsWithPen(_cachedGeometry, MyStrokePen));
+            //}
+            //else if (IsVertexHandle && MyBackground is null && _cachedGeometry is not null)
+            //{
+            //    drawingContext.DrawRectangle(Brushes.Transparent, null, GetRenderBoundsWithPen(_cachedGeometry, MyStrokePen));
+            //}
+
+            if (MyBackground is not null)
+            { }
+            
+            var uma = MyPoints;
+            var pen = MyStrokePen;
+            //UpdateRenderBounds();
+            
+            var tako = Height;
+            var tt = new TranslateTransform(-MyRenderBounds.X, -MyRenderBounds.Y);
+            //drawingContext.PushTransform(tt);
+            drawingContext.DrawRectangle(MyBackground, null, MyRenderBounds);
 
 
             base.OnRender(drawingContext);
@@ -458,13 +521,6 @@ namespace _20260510
 
 
     }
-
-
-    //public partial class ObPoint : ObservableObject
-    //{
-    //    [ObservableProperty] private double _x;
-    //    [ObservableProperty] private double _y;
-    //}
 
 
 
@@ -832,7 +888,7 @@ namespace _20260510
         {
             //MyDragCompleted?.Invoke(this, e);
 
-            MyTargetGeoShape.ReplaceAllPointsToBoundsZero();
+            //MyTargetGeoShape.ReplaceAllPointsToBoundsZero();
             MyTargetGeoShape.MyUpdateVisual();
         }
 
