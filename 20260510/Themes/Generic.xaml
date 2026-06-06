@@ -88,7 +88,6 @@ https://gootara.org/library/2017/01/wpfao.html-->
       <!--MyRenderBounds="{Binding Bounds, Mode=OneWayToSource}"-->
       <!--Width="{Binding Bounds.Width}"
                        Height="{Binding Bounds.Height}"-->
-
     </local:CustomThumb>
   </DataTemplate>
 

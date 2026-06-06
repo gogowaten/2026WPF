@@ -142,6 +142,8 @@ namespace _20260510
             else
             {
                 MyRenderBounds = DefiningGeometry.GetRenderBounds(MyStrokePen);
+                //Height = MyRenderBounds.Height + MyRenderBounds.Y;
+                //Width = MyRenderBounds.Width + MyRenderBounds.X;
                 Height = MyRenderBounds.Height;
                 Width = MyRenderBounds.Width;
             }
@@ -154,6 +156,26 @@ namespace _20260510
         }
         public static readonly DependencyProperty MyRenderBoundsProperty =
             DependencyProperty.Register(nameof(MyRenderBounds), typeof(Rect), typeof(GeoLineEX), new PropertyMetadata(Rect.Empty));
+
+        // 外部座標（オフセット後の座標）
+
+        public double MyXOffset
+        {
+            get { return (double)GetValue(MyXOffsetProperty); }
+            set { SetValue(MyXOffsetProperty, value); }
+        }
+        public static readonly DependencyProperty MyXOffsetProperty =
+            DependencyProperty.Register(nameof(MyXOffset), typeof(double), typeof(GeoLineEX), new PropertyMetadata(0.0));
+
+        public double MyYOffset
+        {
+            get { return (double)GetValue(MyYOffsetProperty); }
+            set { SetValue(MyYOffsetProperty, value); }
+        }
+        public static readonly DependencyProperty MyYOffsetProperty =
+            DependencyProperty.Register(nameof(MyYOffset), typeof(double), typeof(GeoLineEX), new PropertyMetadata(0.0));
+
+
 
         //public double MyRenderWidth
         //{
