@@ -15,10 +15,8 @@
     <ScrollViewer x:Name="MyScroll"
                   HorizontalScrollBarVisibility="Auto"
                   VerticalScrollBarVisibility="Auto"
+                  PreviewMouseWheel="MyScroll_MouseWheel"
                   >
-                  <!--PreviewMouseLeftButtonDown="MyScroll_PreviewMouseLeftButtonDown"
-                  MouseLeftButtonUp="MyScroll_MouseLeftButtonUp"
-                  MouseMove="MyScroll_MouseMove"-->
       <ScrollViewer.Style>
         <Style TargetType="ScrollViewer">
           <Setter Property="Background">
@@ -66,10 +64,9 @@ https://seizu.dev/2013/06/11/post2437.html-->
              RenderOptions.BitmapScalingMode="NearestNeighbor"
              UseLayoutRounding="True"
              RenderOptions.EdgeMode="Aliased"
-             PreviewMouseLeftButtonDown="ImageControl_PreviewMouseLeftButtonDown_1"
+             PreviewMouseLeftButtonDown="ImageControl_PreviewMouseLeftButtonDown"
              MouseLeftButtonUp="ImageControl_MouseLeftButtonUp"
              MouseMove="ImageControl_MouseMove"
-             MouseWheel="MyScroll_MouseWheel"
              >
         <Image.LayoutTransform>
           <ScaleTransform ScaleX="{Binding MyImageScale}"
@@ -94,7 +91,7 @@ https://seizu.dev/2013/06/11/post2437.html-->
 
       <Separator Margin="10"/>
 
-      <TextBlock x:Name="MyTextBlockScale" Text="{Binding MyImageScale, StringFormat='表示倍率 = {0:0.0}'}" HorizontalAlignment="Center"/>
+      <TextBlock x:Name="MyTextBlockScale" Text="{Binding MyImageScale, StringFormat='表示倍率 = {0:0.00}'}" HorizontalAlignment="Center"/>
 
       <UniformGrid Columns="4" Rows="2" Margin="2">
         <UniformGrid.Resources>
@@ -131,6 +128,14 @@ https://seizu.dev/2013/06/11/post2437.html-->
       <Button Content="コピー(拡大後)" Click="ButtonCopyToClipboardExterior_Click"/>
       <Button Content="保存(拡大後)" Click="ButtonSaveExterior_Click"/>
       <TextBlock Text="{Binding MyImageClickPoint}"/>
+      <TextBlock Text="{Binding ElementName=MyScroll, Path=HorizontalOffset, StringFormat=hori {0}}"/>
+      <TextBlock Text="{Binding ElementName=MyScroll, Path=VerticalOffset, StringFormat=vert {0}}"/>
+      <TextBlock Text="{Binding MyColor, StringFormat='Color = {0}'}"/>
+      <UniformGrid Columns="2">
+        <TextBlock Text="{Binding MyPixelX, StringFormat='X = {0}'}" HorizontalAlignment="Center"/>
+        <TextBlock Text="{Binding MyPixelY, StringFormat='Y = {0}'}" HorizontalAlignment="Center"/>
+      </UniformGrid>
+      <Border Height="20" Background="{Binding MySolidColorBrush}"/>
     </StackPanel>
   </Grid>
 </Window>

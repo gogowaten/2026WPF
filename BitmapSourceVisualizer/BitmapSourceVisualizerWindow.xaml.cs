@@ -41,13 +41,29 @@ namespace BitmapSourceVisualizer
         #region 依存関係プロパティ
 
 
+        public int MyPixelX
+        {
+            get { return (int)GetValue(MyPixelXProperty); }
+            set { SetValue(MyPixelXProperty, value); }
+        }
+        public static readonly DependencyProperty MyPixelXProperty =
+            DependencyProperty.Register(nameof(MyPixelX), typeof(int), typeof(Window), new PropertyMetadata(0));
+
+        public int MyPixelY
+        {
+            get { return (int)GetValue(MyPixelYProperty); }
+            set { SetValue(MyPixelYProperty, value); }
+        }
+        public static readonly DependencyProperty MyPixelYProperty =
+            DependencyProperty.Register(nameof(MyPixelY), typeof(int), typeof(Window), new PropertyMetadata(0));
+
         public Point MyImageClickPoint
         {
             get { return (Point)GetValue(MyImageClickPointProperty); }
             set { SetValue(MyImageClickPointProperty, value); }
         }
         public static readonly DependencyProperty MyImageClickPointProperty =
-            DependencyProperty.Register(nameof(MyImageClickPoint), typeof(Point), typeof(BitmapSourceVisualizerWindow), new PropertyMetadata(null));
+            DependencyProperty.Register(nameof(MyImageClickPoint), typeof(Point), typeof(Window), new PropertyMetadata(null));
 
 
         public double MyImageScale
@@ -338,61 +354,41 @@ namespace BitmapSourceVisualizer
 
 
 
-        private void ImageControl_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
-        {
-            MyImageClickPoint = e.GetPosition(this);
-        }
-
-
 
         private void MyScroll_MouseWheel(object sender, MouseWheelEventArgs e)
         {
-            //// 今の倍率が1より大きい
-            //if (MyImageScale >= 1)
-            //{
-            //    var scale = MyImageScale;
-            //    // 大きくするときは＋１する
-            //    if (e.Delta > 0)
-            //    {
-            //        MyImageScale = (int)scale++;
-            //    }
-            //    else
-            //    {
-            //        // 小さくする時は、-1する
-            //        // 1以上の整数値になるようにする
-            //        if (scale >= 2) { scale = (int)scale--; }
-            //        else { scale = 1; }
-            //        MyImageScale = scale;
-            //    }
-            //    e.Handled = true;
-            //}
-            //// 今の倍率が1以下のとき
-            //else
-            //{
-            //    if (e.Delta > 0)
-            //    {
-            //        // 大きくするときは、1にする
-            //        MyImageScale = 1;
-            //    }
-            //    else
-            //    {
-            //        // 小さくする時は、今の半分にする
-            //        MyImageScale = MyImageScale / 2.0;
-            //    }
-            //    e.Handled = true;
-            //}
 
+            var resultScale = MyImageScale;
+            // 拡大時
             if (e.Delta > 0)
             {
-                if (MyImageScale >= 1) { MyImageScale++; }
-                else { MyImageScale = 1.0; }
+                // 今の倍率が
+                // 20以上なら+10
+                // 1以上なら+1
+                // 1未満なら2倍にする
+                if (resultScale >= 20.0) { resultScale += 10.0; }
+                else if (resultScale >= 1) { resultScale++; }
+                else if (resultScale > 0.5) { resultScale = (int)(resultScale * 2.0); }
+                else { resultScale *= 2; }
+                MyImageScale = GetClampedImageScale(resultScale);
+
                 e.Handled = true;
             }
+            // 縮小時
             else
             {
-                if (MyImageScale <= 1) { MyImageScale = MyImageScale / 2.0; }
-                if (MyImageScale >= 2) { MyImageScale = (int)MyImageScale--; }
-                else { MyImageScale = 1.0; }
+                // 今の倍率が
+                // 20以上なら-10
+                // 2以上なら-1してから小数以下を切り捨て
+                if (resultScale >= 20.0) { resultScale -= 10.0; }
+                else if (resultScale >= 2) { resultScale = (int)(resultScale - 1.0); }
+                // 2未満1より大きいなら1.0にする
+                else if (resultScale > 1) { resultScale = 1.0; }
+                // 1以下なら半分にする
+                else { resultScale = resultScale / 2.0; }
+
+                MyImageScale = GetClampedImageScale(resultScale);
+
                 e.Handled = true;
             }
 
@@ -401,9 +397,40 @@ namespace BitmapSourceVisualizer
 
         #region マウスドラッグ移動でスクロールバーを移動させる
 
-        // 通常のMouseDownでは反応しないので、Preview版でクリック座標を記録
-        private void ImageControl_PreviewMouseLeftButtonDown_1(object sender, MouseButtonEventArgs e)
+
+
+        public SolidColorBrush MySolidColorBrush
         {
+            get { return (SolidColorBrush)GetValue(MySolidColorBrushProperty); }
+            set { SetValue(MySolidColorBrushProperty, value); }
+        }
+        public static readonly DependencyProperty MySolidColorBrushProperty =
+            DependencyProperty.Register(nameof(MySolidColorBrush), typeof(SolidColorBrush), typeof(Window), new PropertyMetadata(null));
+
+
+        public Color MyColor
+        {
+            get { return (Color)GetValue(MyColorProperty); }
+            set { SetValue(MyColorProperty, value); }
+        }
+        public static readonly DependencyProperty MyColorProperty =
+            DependencyProperty.Register(nameof(MyColor), typeof(Color), typeof(Window), new PropertyMetadata(Colors.Transparent));
+
+
+        // 通常のMouseDownでは反応しないので、Preview版でクリック座標を記録
+        private void ImageControl_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            //MyImageClickPoint = e.GetPosition(ImageControl);
+            //MyPixelX = (int)MyImageClickPoint.X;
+            //MyPixelY = (int)MyImageClickPoint.Y;
+            //CroppedBitmap cropBmp = new(MyBitmapSource, new Int32Rect(MyPixelX, MyPixelY, 1, 1));
+            //FormatConvertedBitmap bgraBmp = new(cropBmp, PixelFormats.Bgra32, null, 0);
+            //byte[] pixels = new byte[40];
+            //bgraBmp.CopyPixels(pixels, 4, 0);
+            //MyColor = Color.FromArgb(pixels[3], pixels[2], pixels[1], pixels[0]);
+            //MySolidColorBrush = new SolidColorBrush(MyColor);
+
+
             MyPoint = e.GetPosition(this);
             ImageControl.CaptureMouse();
         }
@@ -445,8 +472,31 @@ namespace BitmapSourceVisualizer
 
                 MyPoint = nowPoint;//直前の座標を今の座標に変更
             }
+
+            MyImageClickPoint = e.GetPosition(ImageControl);
+            int px = (int)MyImageClickPoint.X;
+            int py = (int)MyImageClickPoint.Y;
+            if (px >= MyBitmapSource.PixelWidth) { px = MyBitmapSource.PixelWidth - 1; }
+            if (py >= MyBitmapSource.PixelHeight) { py = MyBitmapSource.PixelHeight - 1; }
+
+            if (px != MyPixelX || py != MyPixelY)
+            {
+                MyPixelX = px;
+                MyPixelY = py;
+                CroppedBitmap cropBmp = new(MyBitmapSource, new Int32Rect(MyPixelX, MyPixelY, 1, 1));
+                FormatConvertedBitmap bgraBmp = new(cropBmp, PixelFormats.Bgra32, null, 0);
+                byte[] pixels = new byte[40];
+                bgraBmp.CopyPixels(pixels, 4, 0);
+                MyColor = Color.FromArgb(pixels[3], pixels[2], pixels[1], pixels[0]);
+                MySolidColorBrush = new SolidColorBrush(MyColor);
+
+            }
+
         }
+
         #endregion マウスドラッグ移動でスクロールバーを移動させる
+
+
 
     }
 }
