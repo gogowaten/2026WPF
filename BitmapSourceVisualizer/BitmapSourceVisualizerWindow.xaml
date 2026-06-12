@@ -15,9 +15,10 @@
     <ScrollViewer x:Name="MyScroll"
                   HorizontalScrollBarVisibility="Auto"
                   VerticalScrollBarVisibility="Auto"
-                  PreviewMouseLeftButtonDown="MyScroll_PreviewMouseLeftButtonDown"
+                  >
+                  <!--PreviewMouseLeftButtonDown="MyScroll_PreviewMouseLeftButtonDown"
                   MouseLeftButtonUp="MyScroll_MouseLeftButtonUp"
-                  MouseMove="MyScroll_MouseMove">
+                  MouseMove="MyScroll_MouseMove"-->
       <ScrollViewer.Style>
         <Style TargetType="ScrollViewer">
           <Setter Property="Background">
@@ -65,6 +66,10 @@ https://seizu.dev/2013/06/11/post2437.html-->
              RenderOptions.BitmapScalingMode="NearestNeighbor"
              UseLayoutRounding="True"
              RenderOptions.EdgeMode="Aliased"
+             PreviewMouseLeftButtonDown="ImageControl_PreviewMouseLeftButtonDown_1"
+             MouseLeftButtonUp="ImageControl_MouseLeftButtonUp"
+             MouseMove="ImageControl_MouseMove"
+             MouseWheel="MyScroll_MouseWheel"
              >
         <Image.LayoutTransform>
           <ScaleTransform ScaleX="{Binding MyImageScale}"
@@ -125,6 +130,7 @@ https://seizu.dev/2013/06/11/post2437.html-->
       
       <Button Content="コピー(拡大後)" Click="ButtonCopyToClipboardExterior_Click"/>
       <Button Content="保存(拡大後)" Click="ButtonSaveExterior_Click"/>
+      <TextBlock Text="{Binding MyImageClickPoint}"/>
     </StackPanel>
   </Grid>
 </Window>

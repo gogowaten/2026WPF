@@ -30,11 +30,24 @@ namespace BitmapSourceVisualizer
         public BitmapSourceVisualizerWindow()
         {
             InitializeComponent();
-            ContextMenu = CreateContextMenu();
+            ImageControl.ContextMenu = CreateContextMenu();
+            //ContextMenu = CreateContextMenu();
             DataContext = this;
             MyTextBlockScale.FontSize = this.FontSize * 1.5;
             IsBackground.FontSize = this.FontSize * 1.5;
         }
+
+
+        #region 依存関係プロパティ
+
+
+        public Point MyImageClickPoint
+        {
+            get { return (Point)GetValue(MyImageClickPointProperty); }
+            set { SetValue(MyImageClickPointProperty, value); }
+        }
+        public static readonly DependencyProperty MyImageClickPointProperty =
+            DependencyProperty.Register(nameof(MyImageClickPoint), typeof(Point), typeof(BitmapSourceVisualizerWindow), new PropertyMetadata(null));
 
 
         public double MyImageScale
@@ -44,7 +57,7 @@ namespace BitmapSourceVisualizer
         }
         public static readonly DependencyProperty MyImageScaleProperty =
             DependencyProperty.Register(nameof(MyImageScale), typeof(double), typeof(Window), new PropertyMetadata(1.0));
-
+        #endregion 依存関係プロパティ
 
         public void SetImage(BitmapSource bitmap)
         {
@@ -105,6 +118,9 @@ namespace BitmapSourceVisualizer
             return menu;
         }
 
+        #region 画像処理
+
+
         //アルファ値を失わずに画像のコピペできた、.NET WPFのClipboard - 午後わてんのブログ
         //        https://gogowaten.hatenablog.com/entry/2021/02/10/134406
         //より
@@ -130,6 +146,35 @@ namespace BitmapSourceVisualizer
             bmp.Render(item);
             return bmp;
         }
+
+        // 完成版：要素からBitmap作成、LayoutTransformによる回転拡大対応
+        public static RenderTargetBitmap MakeBitmapFromLayoutTransformElement(FrameworkElement element)
+        {
+            double dpi = 96.0 * PresentationSource.FromVisual(element).CompositionTarget.TransformFromDevice.M11;
+            Rect bounds = new(0, 0, element.ActualWidth, element.ActualHeight); // 元のBounds
+            Rect ltBounds = element.LayoutTransform.TransformBounds(bounds); // 変形後のBounds
+            DrawingVisual dv = new();
+            dv.Offset = new Vector(-ltBounds.X, -ltBounds.Y);
+
+            using (DrawingContext context = dv.RenderOpen())
+            {
+                VisualBrush brush = new(element) { Stretch = Stretch.None };
+                context.DrawRectangle(brush, null, ltBounds);
+            }
+            RenderTargetBitmap bmp =
+                new(MyCeiling(ltBounds.Width), MyCeiling(ltBounds.Height), dpi, dpi, PixelFormats.Pbgra32);
+            bmp.Render(dv);
+            return bmp;
+        }
+
+
+        // doubleを切り上げてintに変換
+        public static int MyCeiling(double value)
+        {
+            return (int)Math.Ceiling(value);
+        }
+
+        #endregion 画像処理
 
 
         private void ButtonCopyToClipboard_Click(object sender, RoutedEventArgs e)
@@ -178,50 +223,28 @@ namespace BitmapSourceVisualizer
         {
             if (sender is Button button && double.TryParse(button.Tag.ToString(), out double scale))
             {
-                MyImageScale = Clamp(MyImageScale * scale, ImageScaleMin, ImageScaleMax);
+                MyImageScale = GetClampedImageScale(MyImageScale * scale);
+                //MyImageScale = Clamp(MyImageScale * scale, ImageScaleMin, ImageScaleMax);
             }
+        }
+
+        private double GetClampedImageScale(double scale)
+        {
+            return Clamp(scale, ImageScaleMin, ImageScaleMax);
         }
 
         // クランプ。値を上限下限内に収めて返す
         private static double Clamp(double value, double min, double max)
         {
-            if (min > max)
-            {
-                (max, min) = (min, max);
-            }
+            if (min > max) { (max, min) = (min, max); }
 
             double result = value;
             if (value < min) { result = min; }
             else if (value > max) { result = max; }
+
             return result;
         }
 
-        // 完成版：要素からBitmap作成、LayoutTransformによる回転拡大対応
-        public static RenderTargetBitmap MakeBitmapFromLayoutTransformElement(FrameworkElement element)
-        {
-            double dpi = 96.0 * PresentationSource.FromVisual(element).CompositionTarget.TransformFromDevice.M11;
-            Rect bounds = new(0, 0, element.ActualWidth, element.ActualHeight); // 元のBounds
-            Rect ltBounds = element.LayoutTransform.TransformBounds(bounds); // 変形後のBounds
-            DrawingVisual dv = new();
-            dv.Offset = new Vector(-ltBounds.X, -ltBounds.Y);
-
-            using (DrawingContext context = dv.RenderOpen())
-            {
-                VisualBrush brush = new(element) { Stretch = Stretch.None };
-                context.DrawRectangle(brush, null, ltBounds);
-            }
-            RenderTargetBitmap bmp =
-                new(MyCeiling(ltBounds.Width), MyCeiling(ltBounds.Height), dpi, dpi, PixelFormats.Pbgra32);
-            bmp.Render(dv);
-            return bmp;
-        }
-
-
-        // doubleを切り上げてintに変換
-        public static int MyCeiling(double value)
-        {
-            return (int)Math.Ceiling(value);
-        }
 
         // LayoutTransformによる変形後の要素からBitmap作成して、クリップボードにコピー
         private void ButtonCopyToClipboardExterior_Click(object sender, RoutedEventArgs e)
@@ -313,34 +336,97 @@ namespace BitmapSourceVisualizer
         }
         #endregion チェック系
 
+
+
+        private void ImageControl_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            MyImageClickPoint = e.GetPosition(this);
+        }
+
+
+
+        private void MyScroll_MouseWheel(object sender, MouseWheelEventArgs e)
+        {
+            //// 今の倍率が1より大きい
+            //if (MyImageScale >= 1)
+            //{
+            //    var scale = MyImageScale;
+            //    // 大きくするときは＋１する
+            //    if (e.Delta > 0)
+            //    {
+            //        MyImageScale = (int)scale++;
+            //    }
+            //    else
+            //    {
+            //        // 小さくする時は、-1する
+            //        // 1以上の整数値になるようにする
+            //        if (scale >= 2) { scale = (int)scale--; }
+            //        else { scale = 1; }
+            //        MyImageScale = scale;
+            //    }
+            //    e.Handled = true;
+            //}
+            //// 今の倍率が1以下のとき
+            //else
+            //{
+            //    if (e.Delta > 0)
+            //    {
+            //        // 大きくするときは、1にする
+            //        MyImageScale = 1;
+            //    }
+            //    else
+            //    {
+            //        // 小さくする時は、今の半分にする
+            //        MyImageScale = MyImageScale / 2.0;
+            //    }
+            //    e.Handled = true;
+            //}
+
+            if (e.Delta > 0)
+            {
+                if (MyImageScale >= 1) { MyImageScale++; }
+                else { MyImageScale = 1.0; }
+                e.Handled = true;
+            }
+            else
+            {
+                if (MyImageScale <= 1) { MyImageScale = MyImageScale / 2.0; }
+                if (MyImageScale >= 2) { MyImageScale = (int)MyImageScale--; }
+                else { MyImageScale = 1.0; }
+                e.Handled = true;
+            }
+
+
+        }
+
         #region マウスドラッグ移動でスクロールバーを移動させる
 
-        // Previewじゃないと反応しないのでPreview版を購読、クリック座標を記録
-        private void MyScroll_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        // 通常のMouseDownでは反応しないので、Preview版でクリック座標を記録
+        private void ImageControl_PreviewMouseLeftButtonDown_1(object sender, MouseButtonEventArgs e)
         {
             MyPoint = e.GetPosition(this);
-            MyScroll.CaptureMouse();
+            ImageControl.CaptureMouse();
         }
 
         //      WPF、ScrollViewerの中の要素をマウスドラッグ移動しているように見せかける - 午後わてんのブログ
         //https://gogowaten.hatenablog.com/entry/15755956
 
         // ボタンを離した時
-        private void MyScroll_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        private void ImageControl_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
-            MyScroll.Cursor = Cursors.Arrow;
-            MyScroll.ReleaseMouseCapture();
+            ImageControl.Cursor = Cursors.Arrow;
+            ImageControl.ReleaseMouseCapture();
         }
 
         // マウスの移動距離をスクロールバーに加算する
-        private void MyScroll_MouseMove(object sender, MouseEventArgs e)
+        private void ImageControl_MouseMove(object sender, MouseEventArgs e)
         {
             //マウスドラッグ移動の距離だけスクロールさせるには
             //(直前のカーソル位置 - 今のカーソル位置) + (スクロールバーのOffset位置)
             //この値をSetOffsetする
             if (e.LeftButton == MouseButtonState.Pressed)
             {
-                MyScroll.Cursor = Cursors.ScrollAll;//カーソル形状を変更
+                ImageControl.Cursor = Cursors.ScrollAll;//カーソル形状を変更
                 //今のマウスの座標
                 var nowPoint = e.GetPosition(this);
                 //マウスの移動距離＝直前の座標と今の座標の差
@@ -360,7 +446,7 @@ namespace BitmapSourceVisualizer
                 MyPoint = nowPoint;//直前の座標を今の座標に変更
             }
         }
-
         #endregion マウスドラッグ移動でスクロールバーを移動させる
+
     }
 }

@@ -1,4 +1,9 @@
-﻿# v1.2
+﻿# v1.3
+* 細かな修正
+* 画像のドラッグ移動をScrollViewerからImageに変更した
+* 
+
+# v1.2
 https://gogowaten.hatenablog.com/entry/2026/05/26/155642
 
 * Stretchによる引き伸ばし表示の廃止
