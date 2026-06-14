@@ -35,6 +35,8 @@ namespace _20260612
             var inu3 = MyRect.TransformToVisual(MyScroll);
             var tako3 = MyRect.TransformToAncestor(MyScroll);
 
+            var pos = Mouse.GetPosition(MyRect);
+            var bpos = Mouse.GetPosition(MyScroll);
         }
 
         private void MyRect_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)

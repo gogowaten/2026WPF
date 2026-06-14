@@ -15,7 +15,8 @@
     <ScrollViewer x:Name="MyScroll"
                   HorizontalScrollBarVisibility="Auto"
                   VerticalScrollBarVisibility="Auto"
-                  PreviewMouseWheel="MyScroll_MouseWheel"
+                  PreviewMouseWheel="MyScroll_PreviewMouseWheel"
+                  ScrollChanged="MyScroll_ScrollChanged"
                   >
       <ScrollViewer.Style>
         <Style TargetType="ScrollViewer">
@@ -112,7 +113,7 @@ https://seizu.dev/2013/06/11/post2437.html-->
       <Slider x:Name="ImageScale" Minimum="1" Maximum="30" Value="{Binding MyImageScale}"
               SmallChange="1" LargeChange="1"
               Margin="10,5" TickFrequency="1.0"/>
-      
+
       <UniformGrid Columns="4" Rows="1" Margin="2">
         <UniformGrid.Resources>
           <Style TargetType="Button">
@@ -124,17 +125,17 @@ https://seizu.dev/2013/06/11/post2437.html-->
         <Button Content="10" Tag="10" Click="ButtonSetScale_Click"/>
         <Button Content="50" Tag="50" Click="ButtonSetScale_Click"/>
       </UniformGrid>
-      
+
       <Button Content="コピー(拡大後)" Click="ButtonCopyToClipboardExterior_Click"/>
       <Button Content="保存(拡大後)" Click="ButtonSaveExterior_Click"/>
-      <TextBlock Text="{Binding MyImageClickPoint}"/>
-      <TextBlock Text="{Binding ElementName=MyScroll, Path=HorizontalOffset, StringFormat=hori {0}}"/>
-      <TextBlock Text="{Binding ElementName=MyScroll, Path=VerticalOffset, StringFormat=vert {0}}"/>
-      <TextBlock Text="{Binding MyColor, StringFormat='Color = {0}'}"/>
+
+      <Separator/>
+      
       <UniformGrid Columns="2">
         <TextBlock Text="{Binding MyPixelX, StringFormat='X = {0}'}" HorizontalAlignment="Center"/>
         <TextBlock Text="{Binding MyPixelY, StringFormat='Y = {0}'}" HorizontalAlignment="Center"/>
       </UniformGrid>
+      <TextBlock Text="{Binding MyColor, StringFormat='Color = {0}'}"/>
       <Border Height="20" Background="{Binding MySolidColorBrush}"/>
     </StackPanel>
   </Grid>

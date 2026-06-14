@@ -12,7 +12,7 @@
       <ColumnDefinition Width="200"/>
     </Grid.ColumnDefinitions>
 
-    <ScrollViewer x:Name="MyScroll">
+    <ScrollViewer x:Name="MyScroll" HorizontalScrollBarVisibility="Auto">
       <Rectangle x:Name="MyRect" Width="100" Height="100" Fill="red"
                  PreviewMouseLeftButtonDown="MyRect_PreviewMouseLeftButtonDown">
         <Rectangle.LayoutTransform>
