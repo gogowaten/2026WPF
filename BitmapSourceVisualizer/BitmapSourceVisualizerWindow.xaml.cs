@@ -420,9 +420,6 @@ namespace BitmapSourceVisualizer
                 else if (resultScale >= 1) { resultScale++; }
                 else if (resultScale > 0.5) { resultScale = (int)(resultScale * 2.0); }
                 else { resultScale *= 2; }
-                //var clamped = GetClampedImageScale(resultScale);
-                //if(clamped == MyImageScale) { return false; }
-                //MyImageScale = clamped;
             }
             // 縮小時
             else
@@ -436,10 +433,6 @@ namespace BitmapSourceVisualizer
                 else if (resultScale > 1) { resultScale = 1.0; }
                 // 1以下なら半分にする
                 else { resultScale = resultScale / 2.0; }
-
-                //var clamped = GetClampedImageScale(resultScale);
-                //if (clamped == MyImageScale) { return false; }
-                //MyImageScale = clamped;
 
             }
             var clamped = GetClampedImageScale(resultScale);
