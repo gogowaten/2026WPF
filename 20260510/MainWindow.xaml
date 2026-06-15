@@ -25,7 +25,7 @@
     </ScrollViewer>
 
     <Canvas x:Name="MyCanvas">
-      <local:GeoLineEX MyPoints="0,0 100,100" Stroke="Red" StrokeThickness="40" MyBackground="Beige"
+      <local:GeoLineEX MyPoints="0,0 100,10" Stroke="Red" StrokeThickness="40" MyBackground="Beige"
                        Canvas.Left="40" Canvas.Top="20"/>
     </Canvas>
 

@@ -88,7 +88,6 @@ https://gootara.org/library/2017/01/wpfao.html-->
       <!--MyRenderBounds="{Binding Bounds, Mode=OneWayToSource}"-->
       <!--Width="{Binding Bounds.Width}"
                        Height="{Binding Bounds.Height}"-->
-
     </local:CustomThumb>
   </DataTemplate>
 
@@ -224,6 +223,7 @@ https://gootara.org/library/2017/01/wpfao.html-->
     <Setter Property="Template">
       <Setter.Value>
         <ControlTemplate TargetType="{x:Type local:RootItemsControl}">
+          <!--<Grid Background="#88334455">-->
           <Grid Background="WhiteSmoke">
             <ItemsPresenter x:Name="MyPresenter"
                             Width="{Binding Width}"

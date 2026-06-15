@@ -49,7 +49,7 @@ namespace _20260510
             //group.AddData(new EllipseData() { X = 10, Y = 50, Fill = Brushes.Orange, Width = 30, Height = 30 });
             root.DataList.Add(group);
 
-            root.DataList.Add(CreateGeoLineGroupData());
+            //root.DataList.Add(CreateGeoLineGroupData());
             root.DataList.Add(CreateGeoLineData());
                         
             return root;
@@ -135,6 +135,11 @@ namespace _20260510
         private void check_Click(object sender, RoutedEventArgs e)
         {
             MyData.GroupBorderEditingColor = Brushes.Magenta;
+            var data = MyData.DataList;
+            if(MyRootItems.MyData.CurrentItemData is GeoShapeData geo)
+            {
+                geo.Points.RemoveAt(0);// = [new Point(), new Point(100, 40)];
+            }
         }
 
         /// <summary>
