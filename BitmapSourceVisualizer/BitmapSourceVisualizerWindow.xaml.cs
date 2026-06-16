@@ -13,6 +13,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 //using static System.Windows.Forms.VisualStyles.VisualStyleElement;
+//using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 // Visual Studio用、BitmapSourceVisualizerに「ファイルに保存」と「コピー」を追加した - 午後わてんのブログ
 // https://gogowaten.hatenablog.com/entry/2026/05/20/233726
@@ -102,7 +103,33 @@ namespace BitmapSourceVisualizer
             set { SetValue(MyImageScaleProperty, value); }
         }
         public static readonly DependencyProperty MyImageScaleProperty =
-            DependencyProperty.Register(nameof(MyImageScale), typeof(double), typeof(BitmapSourceVisualizerWindow), new PropertyMetadata(1.0));
+            DependencyProperty.Register(nameof(MyImageScale), typeof(double), typeof(BitmapSourceVisualizerWindow), new PropertyMetadata(1.0, OnMyImageScale));
+
+        private static void OnMyImageScale(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            if (d is BitmapSourceVisualizerWindow main)
+            {
+                if (main.ImageControl.IsMouseOver)
+                {
+                    AdjustOffset(main.MyScroll, main.MyBitmapSource, (double)e.NewValue, main.MyPixelX, main.MyPixelY);
+                }
+            }
+        }
+
+        private static void AdjustOffset(ScrollViewer scroll, BitmapSource bmp, double scale, int currentXPos, int currentYPos)
+        {
+            var bmpViewSize = bmp.PixelWidth * scale;
+            var maxOffset = bmpViewSize - scroll.ActualWidth;
+            var ratePos = currentXPos / bmp.PixelWidth;
+            var pos = maxOffset * ratePos;
+            scroll.ScrollToHorizontalOffset(pos);
+
+            bmpViewSize = bmp.PixelHeight * scale;
+            maxOffset = bmpViewSize - scroll.ActualHeight;
+            ratePos = currentYPos / bmp.PixelHeight;
+            pos = maxOffset * ratePos;
+            scroll.ScrollToVerticalOffset(pos);
+        }
         #endregion 依存関係プロパティ
 
         public void SetImage(BitmapSource bitmap)
@@ -390,15 +417,17 @@ namespace BitmapSourceVisualizer
         // マウスホイールでの倍率変更
         private void MyScroll_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
         {
-            // 拡大率変更
-            if (ChangeScaleWithMouseWheel(e.Delta))
-            {
-                // スクロール位置調整
-                AdjustScrollOffset();
-            }
+            ChangeScaleWithMouseWheel(e.Delta);
+
+            //// 拡大率変更
+            //if (ChangeScaleWithMouseWheel(e.Delta))
+            //{
+            //    // スクロール位置調整
+            //    AdjustScrollOffset();
+            //}
             e.Handled = true;
 
-            
+
         }
 
         // マウスホイールでの倍率変更
@@ -527,9 +556,34 @@ namespace BitmapSourceVisualizer
 
         #region スクロール系、拡大率変更時に位置調整
 
-        // スクロール追従
-        // スクロール位置調整の調整、割合を保つ
-        private void AdjustScrollOffset()
+        //// スクロール追従
+        //// スクロール位置調整の調整、割合を保つ
+        //private void AdjustScrollOffset()
+        //{
+        //    if (MyScroll.ScrollableWidth > 0)
+        //    {
+        //        var actSize = MyScroll.ActualWidth;
+        //        var bmpSize = MyBitmapSource.PixelWidth * MyImageScale;
+        //        var maxScroll = bmpSize - actSize;
+        //        if (maxScroll < 0) { maxScroll = 0; }
+
+        //        var offset = maxScroll * MyPreHScroll; // スクロール最大値 * 位置の割合
+        //        MyScroll.ScrollToHorizontalOffset(offset);
+        //    }
+
+        //    if (MyScroll.ScrollableHeight > 0)
+        //    {
+        //        var actSize = MyScroll.ActualHeight;
+        //        var bmpSize = MyBitmapSource.PixelHeight * MyImageScale;
+        //        var maxScroll = bmpSize - actSize;
+        //        if (maxScroll < 0) { maxScroll = 0; }
+
+        //        var offset = maxScroll * MyPreVScroll; // スクロール最大値 * 位置の割合
+        //        MyScroll.ScrollToVerticalOffset(offset);
+        //    }
+        //}
+
+        private void AdjustScrollOffset2()
         {
             if (MyScroll.ScrollableWidth > 0)
             {
@@ -553,6 +607,8 @@ namespace BitmapSourceVisualizer
                 MyScroll.ScrollToVerticalOffset(offset);
             }
         }
+
+
 
         // スクロール時
         private void MyScroll_ScrollChanged(object sender, ScrollChangedEventArgs e)

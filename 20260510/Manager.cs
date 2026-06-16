@@ -20,18 +20,18 @@ namespace _20260510
 
     public static class Manager
     {
-        // ネイティブオブジェクト解放用のAPI
-        [System.Runtime.InteropServices.DllImport("gdi32.dll")]
-        private static extern bool DeleteObject(IntPtr hObject);
-        // Windows API の宣言（仮想ウィンドウの描画内容をHDCへ転送するための関数）
-        [System.Runtime.InteropServices.DllImport("user32.dll", SetLastError = true)]
-        private static extern bool PrintWindow(IntPtr hwnd, IntPtr hdcBlt, uint nFlags);
+        //// ネイティブオブジェクト解放用のAPI
+        //[System.Runtime.InteropServices.DllImport("gdi32.dll")]
+        //private static extern bool DeleteObject(IntPtr hObject);
+        //// Windows API の宣言（仮想ウィンドウの描画内容をHDCへ転送するための関数）
+        //[System.Runtime.InteropServices.DllImport("user32.dll", SetLastError = true)]
+        //private static extern bool PrintWindow(IntPtr hwnd, IntPtr hdcBlt, uint nFlags);
 
-        private static void PrintWindowContents(IntPtr hwnd, IntPtr hdc)
-        {
-            // PW_RENDERFULLCONTENT (0x00000002) を指定して画面外や非表示領域も強制的にレンダリングさせる
-            PrintWindow(hwnd, hdc, 0x00000002);
-        }
+        //private static void PrintWindowContents(IntPtr hwnd, IntPtr hdc)
+        //{
+        //    // PW_RENDERFULLCONTENT (0x00000002) を指定して画面外や非表示領域も強制的にレンダリングさせる
+        //    PrintWindow(hwnd, hdc, 0x00000002);
+        //}
 
 
 

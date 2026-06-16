@@ -14,9 +14,10 @@
 
     <ScrollViewer x:Name="MyScroll" HorizontalScrollBarVisibility="Auto">
       <Rectangle x:Name="MyRect" Width="100" Height="100" Fill="red"
-                 PreviewMouseLeftButtonDown="MyRect_PreviewMouseLeftButtonDown">
+                 PreviewMouseLeftButtonDown="MyRect_PreviewMouseLeftButtonDown"
+                 MouseMove="MyRect_MouseMove">
         <Rectangle.LayoutTransform>
-          <ScaleTransform ScaleX="10" ScaleY="10"/>
+          <ScaleTransform ScaleX="1" ScaleY="1"/>
         </Rectangle.LayoutTransform>
       </Rectangle>
     </ScrollViewer>

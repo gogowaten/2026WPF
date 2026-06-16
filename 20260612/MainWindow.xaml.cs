@@ -21,6 +21,32 @@ namespace _20260612
             InitializeComponent();
         }
 
+
+        public int MyX
+        {
+            get { return (int)GetValue(MyXProperty); }
+            set { SetValue(MyXProperty, value); }
+        }
+        public static readonly DependencyProperty MyXProperty =
+            DependencyProperty.Register(nameof(MyX), typeof(int), typeof(MainWindow), new PropertyMetadata(0));
+
+        public int MyY
+        {
+            get { return (int)GetValue(MyYProperty); }
+            set { SetValue(MyYProperty, value); }
+        }
+        public static readonly DependencyProperty MyYProperty =
+            DependencyProperty.Register(nameof(MyY), typeof(int), typeof(MainWindow), new PropertyMetadata(0));
+
+
+        public double MyScale
+        {
+            get { return (double)GetValue(MyScaleProperty); }
+            set { SetValue(MyScaleProperty, value); }
+        }
+        public static readonly DependencyProperty MyScaleProperty =
+            DependencyProperty.Register(nameof(MyScale), typeof(double), typeof(MainWindow), new PropertyMetadata(0.0));
+
         private void Button_Click(object sender, RoutedEventArgs e)
         {
             GeneralTransform neko = MyScroll.TransformToAncestor(this);
@@ -37,12 +63,26 @@ namespace _20260612
 
             var pos = Mouse.GetPosition(MyRect);
             var bpos = Mouse.GetPosition(MyScroll);
+
+            var rectmouse = MyRect.IsMouseOver;
         }
 
         private void MyRect_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             var point = e.GetPosition(MyScroll);
             var neko = e.GetPosition(MyRect);
+
+            var rectmouse = MyRect.IsMouseOver;
+        }
+
+        private void MyRect_MouseMove(object sender, MouseEventArgs e)
+        {
+
+        }
+
+        private void UpdatePos()
+        {
+            
         }
     }
 }
