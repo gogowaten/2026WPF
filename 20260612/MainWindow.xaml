@@ -21,7 +21,7 @@
       <Image x:Name="MainImage" Stretch="None"
              RenderOptions.BitmapScalingMode="NearestNeighbor">
         <Image.LayoutTransform>
-          <ScaleTransform x:Name="ImageScale" ScaleX="10.0" ScaleY="10.0"/>
+          <ScaleTransform x:Name="ImageScale" ScaleX="1.0" ScaleY="1.0"/>
         </Image.LayoutTransform>
       </Image>
 

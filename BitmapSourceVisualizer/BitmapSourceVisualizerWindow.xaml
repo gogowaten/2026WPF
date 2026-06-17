@@ -19,6 +19,7 @@
                   HorizontalScrollBarVisibility="Auto"
                   VerticalScrollBarVisibility="Auto"
                   PreviewMouseWheel="MyScroll_PreviewMouseWheel"
+                  ScrollChanged="MyScroll_ScrollChanged"
                   >
       <ScrollViewer.Style>
         <Style TargetType="ScrollViewer">
@@ -116,7 +117,7 @@ https://seizu.dev/2013/06/11/post2437.html-->
               SmallChange="1" LargeChange="1"
               Margin="10,5" TickFrequency="1.0"/>
 
-      <UniformGrid Columns="4" Rows="1" Margin="2">
+      <!--<UniformGrid Columns="4" Rows="1" Margin="2">
         <UniformGrid.Resources>
           <Style TargetType="Button">
             <Setter Property="Margin" Value="2"/>
@@ -126,7 +127,7 @@ https://seizu.dev/2013/06/11/post2437.html-->
         <Button Content="3" Tag="3" Click="ButtonSetScale_Click"/>
         <Button Content="10" Tag="10" Click="ButtonSetScale_Click"/>
         <Button Content="50" Tag="50" Click="ButtonSetScale_Click"/>
-      </UniformGrid>
+      </UniformGrid>-->
 
       <Button Content="コピー(拡大後)" Click="ButtonCopyToClipboardExterior_Click"/>
       <Button Content="保存(拡大後)" Click="ButtonSaveExterior_Click"/>
@@ -140,6 +141,14 @@ https://seizu.dev/2013/06/11/post2437.html-->
       <TextBlock Text="{Binding MyColor, StringFormat='ColorHex = {0}'}" TextWrapping="Wrap"/>
       <TextBlock Text="{Binding MyColor, StringFormat='ColorARGB = {0}', Converter={StaticResource textARGB}}" TextWrapping="Wrap"/>
       <Border Height="20" Background="{Binding MySolidColorBrush}" Margin="10"/>
+
+      <Separator/>
+
+      <Canvas x:Name="MiniMapCanvas" Width="200" Height="150">
+        <Image x:Name="MiniMapImage" Width="200" Height="150" Stretch="Uniform"/>
+        <Rectangle x:Name="ViewBoundsRect" Stroke="Red" StrokeThickness="2" Fill="#20FF0000"/>
+      </Canvas>
+
     </StackPanel>
   </Grid>
 </Window>
