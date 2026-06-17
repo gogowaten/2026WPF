@@ -45,10 +45,40 @@ namespace _20260612
             set { SetValue(MyScaleProperty, value); }
         }
         public static readonly DependencyProperty MyScaleProperty =
-            DependencyProperty.Register(nameof(MyScale), typeof(double), typeof(MainWindow), new PropertyMetadata(0.0));
+            DependencyProperty.Register(nameof(MyScale), typeof(double), typeof(MainWindow), new PropertyMetadata(1.0, OnMyScale));
+        private static void OnMyScale(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            if (d is MainWindow main && main.MyRect.IsMouseOver)
+            {
+                AdjustOffset(main.MyScroll, main.MyRect, main.MyScale, main.MyX, main.MyY);
+            }
+        }
+        private static void AdjustOffset(ScrollViewer scroll, Rectangle rect, double scale, int currentXPos, int currentYPos)
+        {
+            var bmpViewSize = rect.Width * scale;
+            var maxOffset = bmpViewSize - scroll.ActualWidth;
+            if (maxOffset > 0)
+            {
+                var ratePos = currentXPos / rect.Width;
+                var pos = maxOffset * ratePos;
+                scroll.ScrollToHorizontalOffset(pos);
+            }
+
+            bmpViewSize = rect.Height * scale;
+            maxOffset = bmpViewSize - scroll.ActualHeight;
+            if (maxOffset > 0)
+            {
+                var ratePos = currentYPos / rect.Height;
+                var pos = maxOffset * ratePos;
+                scroll.ScrollToVerticalOffset(pos);
+            }
+        }
+
+
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
+            var able = MyScroll.ScrollableWidth;
             GeneralTransform neko = MyScroll.TransformToAncestor(this);
             //var inu = MyScroll.TransformToDescendant(this); // 子孫じゃない
             var tako = MyScroll.TransformToVisual(this);
@@ -77,12 +107,26 @@ namespace _20260612
 
         private void MyRect_MouseMove(object sender, MouseEventArgs e)
         {
-
+            var pos = e.GetPosition(MyRect);
+            MyX = (int)pos.X;
+            MyY = (int)pos.Y;
         }
 
-        private void UpdatePos()
+
+
+
+        private void MyRect_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
         {
-            
+            if (e.Delta > 0)
+            {
+                MyScale++;
+                e.Handled = true;
+            }
+            else if (e.Delta < 0 && MyScale - 1 > 0)
+            {
+                MyScale--;
+                e.Handled = true;
+            }
         }
     }
 }

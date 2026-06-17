@@ -152,13 +152,12 @@ namespace _20260510
             // Bgra32は非対応
             //RenderTargetBitmap bmp2 =
             //    new(MyCeiling(ltBounds.Width), MyCeiling(ltBounds.Height), dpi, dpi, PixelFormats.Bgra32);
-            var bmp3 = new FormatConvertedBitmap(bmp, PixelFormats.Bgra32,null,0);
+
+            RenderTargetBitmap bmp2 =
+                new(MyCeiling(ltBounds.Width), MyCeiling(ltBounds.Height), dpi, dpi, PixelFormats.Default);
+
 
             bmp.Render(dv);
-            //var bmp4 = SaveAsAccuratePng(bmp);
-            //var bmp5 = SaveLargeElementToBgra32Png(element);
-            //var bmp6 = SaveElementToPerfectBgra32Png(element);
-            //SaveElementToPerfectBgra32Png(element, "C:\\Users\\waten\\Documents\\20260613_230106.png");
 
             return bmp;
         }

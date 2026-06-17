@@ -6,17 +6,19 @@
         Width="800" Height="600"
         WindowStartupLocation="CenterOwner"
         ResizeMode="CanResizeWithGrip"
-        >
+        DataContext="{Binding RelativeSource={RelativeSource Mode=Self}}">
+  <Window.Resources>
+    <local:MyConvColorToTextARGB x:Key="textARGB"/>
+  </Window.Resources>
   <Grid>
     <Grid.ColumnDefinitions>
       <ColumnDefinition/>
-      <ColumnDefinition Width="160"/>
+      <ColumnDefinition Width="200"/>
     </Grid.ColumnDefinitions>
     <ScrollViewer x:Name="MyScroll"
                   HorizontalScrollBarVisibility="Auto"
                   VerticalScrollBarVisibility="Auto"
                   PreviewMouseWheel="MyScroll_PreviewMouseWheel"
-                  ScrollChanged="MyScroll_ScrollChanged"
                   >
       <ScrollViewer.Style>
         <Style TargetType="ScrollViewer">
@@ -135,8 +137,9 @@ https://seizu.dev/2013/06/11/post2437.html-->
         <TextBlock Text="{Binding MyPixelX, StringFormat='X = {0}'}" HorizontalAlignment="Center"/>
         <TextBlock Text="{Binding MyPixelY, StringFormat='Y = {0}'}" HorizontalAlignment="Center"/>
       </UniformGrid>
-      <TextBlock Text="{Binding MyColor, StringFormat='Color = {0}'}"/>
-      <Border Height="20" Background="{Binding MySolidColorBrush}"/>
+      <TextBlock Text="{Binding MyColor, StringFormat='ColorHex = {0}'}" TextWrapping="Wrap"/>
+      <TextBlock Text="{Binding MyColor, StringFormat='ColorARGB = {0}', Converter={StaticResource textARGB}}" TextWrapping="Wrap"/>
+      <Border Height="20" Background="{Binding MySolidColorBrush}" Margin="10"/>
     </StackPanel>
   </Grid>
 </Window>

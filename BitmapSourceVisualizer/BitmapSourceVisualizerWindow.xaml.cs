@@ -12,8 +12,6 @@ using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
-//using static System.Windows.Forms.VisualStyles.VisualStyleElement;
-//using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 // Visual Studio用、BitmapSourceVisualizerに「ファイルに保存」と「コピー」を追加した - 午後わてんのブログ
 // https://gogowaten.hatenablog.com/entry/2026/05/20/233726
@@ -29,13 +27,11 @@ namespace BitmapSourceVisualizer
         public BitmapSource MyBitmapSource;
         private readonly double ImageScaleMin = 0.01; // 拡大率下限
         private readonly double ImageScaleMax = 50.0; // 拡大率上限
-        private double MyPreHScroll; // スクロール位置の記録用
-        private double MyPreVScroll;
 
 
-        // ネイティブオブジェクト解放用のAPI
-        [System.Runtime.InteropServices.DllImport("gdi32.dll")]
-        private static extern bool DeleteObject(IntPtr hObject);
+        //// ネイティブオブジェクト解放用のAPI
+        //[System.Runtime.InteropServices.DllImport("gdi32.dll")]
+        //private static extern bool DeleteObject(IntPtr hObject);
 
 
         public BitmapSourceVisualizerWindow()
@@ -107,29 +103,13 @@ namespace BitmapSourceVisualizer
 
         private static void OnMyImageScale(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
+            // 倍率変更時、スクロールの位置を固定する
             if (d is BitmapSourceVisualizerWindow main)
             {
-                if (main.ImageControl.IsMouseOver)
-                {
-                    AdjustOffset(main.MyScroll, main.MyBitmapSource, (double)e.NewValue, main.MyPixelX, main.MyPixelY);
-                }
+                AdjustOffset2(main.MyScroll, main.MyBitmapSource, (double)e.OldValue, (double)e.NewValue);
             }
         }
 
-        private static void AdjustOffset(ScrollViewer scroll, BitmapSource bmp, double scale, int currentXPos, int currentYPos)
-        {
-            var bmpViewSize = bmp.PixelWidth * scale;
-            var maxOffset = bmpViewSize - scroll.ActualWidth;
-            var ratePos = currentXPos / bmp.PixelWidth;
-            var pos = maxOffset * ratePos;
-            scroll.ScrollToHorizontalOffset(pos);
-
-            bmpViewSize = bmp.PixelHeight * scale;
-            maxOffset = bmpViewSize - scroll.ActualHeight;
-            ratePos = currentYPos / bmp.PixelHeight;
-            pos = maxOffset * ratePos;
-            scroll.ScrollToVerticalOffset(pos);
-        }
         #endregion 依存関係プロパティ
 
         public void SetImage(BitmapSource bitmap)
@@ -188,7 +168,52 @@ namespace BitmapSourceVisualizer
                 }
             };
 
+            item = new() { Header = $"コピー（色:#AARRGGBB）" };
+            menu.Items.Add(item);
+            item.Click += (s, e) =>
+            {
+                if (MyBitmapSource is not null)
+                {
+                    SetTextToClipboard(MyColor.ToString());
+                }
+            };
+
+            item = new() { Header = $"コピー（色:A, R, G, B）" };
+            menu.Items.Add(item);
+            item.Click += (s, e) =>
+            {
+                if (MyBitmapSource is not null)
+                {
+                    string argb = $"{MyColor.A}, {MyColor.R}, {MyColor.G}, {MyColor.B}";
+                    SetTextToClipboard(argb);
+                }
+            };
+
+
+
             return menu;
+        }
+
+        // wpf Clipboard.SetText 応答に時間がかかる at DuckDuckGo
+        // https://duckduckgo.com/?q=wpf+Clipboard.SetText+%E5%BF%9C%E7%AD%94%E3%81%AB%E6%99%82%E9%96%93%E3%81%8C%E3%81%8B%E3%81%8B%E3%82%8B&ia=web
+        // c# - クリップボードのSetTextは失敗するが、SetDataObjectは失敗する - Stack Overflow
+        // https://stackoverflow.com/questions/44538513/clipboard-settext-fails-whereas-setdataobject-does-not?rq=3
+        // クリップボードに文字列をコピー（セットする）
+        private static void SetTextToClipboard(string text)
+        {
+            for (int i = 0; i < 3; i++)
+            {
+                try
+                {
+                    //Clipboard.SetText(text);// これは応答時間が長過ぎる、3秒くらいかかる
+                    Clipboard.SetDataObject(text);
+                    break;// 成功したらループを抜ける
+                }
+                catch (Exception)
+                {
+                    System.Threading.Thread.Sleep(100); // 100ms 待機してリトライ
+                }
+            }
         }
 
         #region 画像処理
@@ -299,7 +324,6 @@ namespace BitmapSourceVisualizer
             if (sender is Button button && double.TryParse(button.Tag.ToString(), out double scale))
             {
                 MyImageScale = GetClampedImageScale(MyImageScale * scale);
-                //MyImageScale = Clamp(MyImageScale * scale, ImageScaleMin, ImageScaleMax);
             }
         }
 
@@ -325,7 +349,6 @@ namespace BitmapSourceVisualizer
         private void ButtonCopyToClipboardExterior_Click(object sender, RoutedEventArgs e)
         {
             CopyToClipboardExterior(ImageControl);
-
         }
 
         // LayoutTransformによる変形後の要素からBitmap作成して、クリップボードにコピー
@@ -419,15 +442,7 @@ namespace BitmapSourceVisualizer
         {
             ChangeScaleWithMouseWheel(e.Delta);
 
-            //// 拡大率変更
-            //if (ChangeScaleWithMouseWheel(e.Delta))
-            //{
-            //    // スクロール位置調整
-            //    AdjustScrollOffset();
-            //}
             e.Handled = true;
-
-
         }
 
         // マウスホイールでの倍率変更
@@ -554,78 +569,89 @@ namespace BitmapSourceVisualizer
 
         #endregion マウスドラッグ移動でスクロールバーを移動させる
 
-        #region スクロール系、拡大率変更時に位置調整
+        #region 拡大率変更時にスクロール位置固定
 
-        //// スクロール追従
-        //// スクロール位置調整の調整、割合を保つ
-        //private void AdjustScrollOffset()
+
+        // 倍率変更時、スクロールの位置を固定する
+        private static void AdjustOffset2(ScrollViewer scroll, BitmapSource bmp, double oldScale, double newScale)
+        {
+            // スクロールバーの幅を取得
+            double oldSize = bmp.PixelWidth * oldScale;
+            double oldMaxOffset = oldSize - scroll.ActualWidth;
+            double scrollBarWidth = scroll.ScrollableWidth - oldMaxOffset;
+            // スクロールバーの幅を取得には下記で良いはずなんだけど、何故かずれる
+            //double scrollBarWidth = SystemParameters.HorizontalScrollBarHeight;
+
+            // 横スクロール位置
+            // 倍率変更前のスクロール位置（割合）を取得
+            double rateOffset = 0;
+            if (scroll.ScrollableWidth > 0)
+            {
+                rateOffset = scroll.HorizontalOffset / scroll.ScrollableWidth;
+            }
+
+            // 倍率変更後のスクロールの最大値を計算
+            // 最大値 = (画像サイズ) - (ScrollViewerサイズ)
+            double newSize = bmp.PixelWidth * newScale;
+            double maxOffset = newSize - scroll.ActualWidth + scrollBarWidth;
+
+            // スクロール位置設定
+            // スクロール位置 = 最大値 * 割合
+            if (maxOffset > 0)
+            {
+                //MessageBox.Show($"scrollBarWidth = {scrollBarWidth}{Environment.NewLine}" +
+                //    $"HorizontalScrollBarHeight = {SystemParameters.HorizontalScrollBarHeight}");
+                double pos = maxOffset * rateOffset;
+                scroll.ScrollToHorizontalOffset(pos);
+            }
+
+            // 縦スクロール位置
+            newSize = bmp.PixelHeight * newScale;
+            oldSize = bmp.PixelHeight * oldScale;
+            oldMaxOffset = oldSize - scroll.ActualHeight;
+            scrollBarWidth = scroll.ScrollableHeight - oldMaxOffset;
+
+            rateOffset = 0;
+            if (scroll.ScrollableHeight > 0)
+            {
+                rateOffset = scroll.VerticalOffset / scroll.ScrollableHeight;
+            }
+
+            maxOffset = newSize - scroll.ActualHeight + scrollBarWidth;
+            if (maxOffset > 0)
+            {
+                double pos = maxOffset * rateOffset;
+                scroll.ScrollToVerticalOffset(pos);
+            }
+        }
+
+        //private static void AdjustOffset(ScrollViewer scroll, BitmapSource bmp, double scale, int currentXPos, int currentYPos)
         //{
-        //    if (MyScroll.ScrollableWidth > 0)
+        //    var bmpViewSize = bmp.PixelWidth * scale;
+        //    var maxOffset = bmpViewSize - scroll.ActualWidth;
+        //    if (maxOffset > 0)
         //    {
-        //        var actSize = MyScroll.ActualWidth;
-        //        var bmpSize = MyBitmapSource.PixelWidth * MyImageScale;
-        //        var maxScroll = bmpSize - actSize;
-        //        if (maxScroll < 0) { maxScroll = 0; }
+        //        double ratePos = currentXPos / (double)bmp.PixelWidth;
+        //        double pos = maxOffset * ratePos;
+        //        //MessageBox.Show($"maxOffset = {maxOffset}{Environment.NewLine}" + 
+        //        //    $" ratePos = {ratePos}" + 
+        //        //    $" currentXPos = {currentXPos}" +
+        //        //    $" MyPixelXProperty = {MyPixelXProperty}");
+        //        scroll.ScrollToHorizontalOffset(pos);
 
-        //        var offset = maxScroll * MyPreHScroll; // スクロール最大値 * 位置の割合
-        //        MyScroll.ScrollToHorizontalOffset(offset);
         //    }
 
-        //    if (MyScroll.ScrollableHeight > 0)
+        //    bmpViewSize = bmp.PixelHeight * scale;
+        //    maxOffset = bmpViewSize - scroll.ActualHeight;
+        //    if (maxOffset > 0)
         //    {
-        //        var actSize = MyScroll.ActualHeight;
-        //        var bmpSize = MyBitmapSource.PixelHeight * MyImageScale;
-        //        var maxScroll = bmpSize - actSize;
-        //        if (maxScroll < 0) { maxScroll = 0; }
-
-        //        var offset = maxScroll * MyPreVScroll; // スクロール最大値 * 位置の割合
-        //        MyScroll.ScrollToVerticalOffset(offset);
+        //        double ratePos = currentYPos / (double)bmp.PixelHeight;
+        //        double pos = maxOffset * ratePos;
+        //        scroll.ScrollToVerticalOffset(pos);
         //    }
         //}
 
-        private void AdjustScrollOffset2()
-        {
-            if (MyScroll.ScrollableWidth > 0)
-            {
-                var actSize = MyScroll.ActualWidth;
-                var bmpSize = MyBitmapSource.PixelWidth * MyImageScale;
-                var maxScroll = bmpSize - actSize;
-                if (maxScroll < 0) { maxScroll = 0; }
 
-                var offset = maxScroll * MyPreHScroll; // スクロール最大値 * 位置の割合
-                MyScroll.ScrollToHorizontalOffset(offset);
-            }
-
-            if (MyScroll.ScrollableHeight > 0)
-            {
-                var actSize = MyScroll.ActualHeight;
-                var bmpSize = MyBitmapSource.PixelHeight * MyImageScale;
-                var maxScroll = bmpSize - actSize;
-                if (maxScroll < 0) { maxScroll = 0; }
-
-                var offset = maxScroll * MyPreVScroll; // スクロール最大値 * 位置の割合
-                MyScroll.ScrollToVerticalOffset(offset);
-            }
-        }
-
-
-
-        // スクロール時
-        private void MyScroll_ScrollChanged(object sender, ScrollChangedEventArgs e)
-        {
-            // スクロール位置を記録
-            if (MyScroll.ScrollableWidth > 0)
-            {
-                MyPreHScroll = MyScroll.HorizontalOffset / MyScroll.ScrollableWidth;
-            }
-            else { MyPreHScroll = 0; }
-            if (MyScroll.ScrollableHeight > 0)
-            {
-                MyPreVScroll = MyScroll.VerticalOffset / MyScroll.ScrollableHeight;
-            }
-            else { MyPreVScroll = 0; }
-        }
-
-        #endregion スクロール系
+        #endregion 拡大率変更時にスクロール位置固定
     }
 }

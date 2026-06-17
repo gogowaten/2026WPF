@@ -5,7 +5,8 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:_20260612"
         mc:Ignorable="d"
-        Title="MainWindow" Height="367" Width="654">
+        Title="MainWindow" Height="367" Width="654"
+        DataContext="{Binding RelativeSource={RelativeSource Mode=Self}}">
   <Grid>
     <Grid.ColumnDefinitions>
       <ColumnDefinition/>
@@ -15,9 +16,10 @@
     <ScrollViewer x:Name="MyScroll" HorizontalScrollBarVisibility="Auto">
       <Rectangle x:Name="MyRect" Width="100" Height="100" Fill="red"
                  PreviewMouseLeftButtonDown="MyRect_PreviewMouseLeftButtonDown"
-                 MouseMove="MyRect_MouseMove">
+                 MouseMove="MyRect_MouseMove"
+                 PreviewMouseWheel="MyRect_PreviewMouseWheel">
         <Rectangle.LayoutTransform>
-          <ScaleTransform ScaleX="1" ScaleY="1"/>
+          <ScaleTransform ScaleX="{Binding MyScale}" ScaleY="{Binding MyScale}"/>
         </Rectangle.LayoutTransform>
       </Rectangle>
     </ScrollViewer>
@@ -27,6 +29,9 @@
 
     <StackPanel Grid.Column="1">
       <Button Content="test1" Click="Button_Click"/>
+      <TextBlock Text="{Binding MyX, StringFormat='x = {0}'}"/>
+      <TextBlock Text="{Binding MyY, StringFormat='y = {0}'}"/>
+      
     </StackPanel>
   </Grid>
 </Window>
