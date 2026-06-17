@@ -659,11 +659,19 @@ namespace BitmapSourceVisualizer
         private void MyScroll_ScrollChanged(object sender, ScrollChangedEventArgs e)
         {
             if (ImageControl.ActualHeight == 0 || ImageControl.ActualWidth == 0) { return; }
-            Navi();
+            NaviWaku();
         }
 
-        private void Navi()
+        private void NaviWaku()
         {
+            // スクロール位置の割合、スクロールバーなしなら0
+            double rateScrollX = MyScroll.ScrollableWidth == 0 ? 0 : MyScroll.HorizontalOffset / MyScroll.ScrollableWidth;
+            double rateScrollY = MyScroll.ScrollableHeight == 0 ? 0 : MyScroll.VerticalOffset / MyScroll.ScrollableHeight;
+
+            // ナビ枠の位置の最小値
+            double zeroXPos = (MiniMapCanvas.Width - MiniMapImage.ActualWidth) / 2.0;
+            double zeroYPos = (MiniMapCanvas.Height - MiniMapImage.ActualHeight) / 2.0;
+
             // スケール後の画像サイズ            
             double scaledImageWidth = MyBitmapSource.PixelWidth * MyImageScale;
             double scaledImageHeight = MyBitmapSource.PixelHeight * MyImageScale;
@@ -675,23 +683,20 @@ namespace BitmapSourceVisualizer
             // ScrollViewer内に見えている部分（Viewport）の、全体からの比率
             double rateViewWidth = viewWidth / scaledImageWidth;
             double rateViewHeight = viewHeight / scaledImageHeight;
-            // ナビ枠のサイズ決定
-            ViewBoundsRect.Width = MiniMapImage.ActualWidth * rateViewWidth;
-            ViewBoundsRect.Height = MiniMapImage.ActualHeight * rateViewHeight;
 
-            // ナビ枠の位置の最小値
-            double zeroXPos = (MiniMapCanvas.Width - MiniMapImage.ActualWidth) / 2.0;
-            double zeroYPos = (MiniMapCanvas.Height - MiniMapImage.ActualHeight) / 2.0;
+            // ナビ枠のサイズ決定
+            double naviWidth = MiniMapImage.ActualWidth * rateViewWidth;
+            if (rateViewWidth > 1.0) { naviWidth = MiniMapImage.ActualWidth; }
+            ViewBoundsRect.Width = naviWidth;
+            double naviHeight = MiniMapImage.ActualHeight * rateViewHeight;
+            if (rateViewHeight > 1.0) { naviHeight = MiniMapImage.ActualHeight; }
+            ViewBoundsRect.Height = naviHeight;
 
             // スクロール最大幅
             double maxScrollX = MiniMapImage.ActualWidth - ViewBoundsRect.Width;
             double maxScrollY = MiniMapImage.ActualHeight - ViewBoundsRect.Height;
 
-            // スクロール位置の割合
-            double rateScrollX = MyScroll.HorizontalOffset / MyScroll.ScrollableWidth;
-            double rateScrollY = MyScroll.VerticalOffset / MyScroll.ScrollableHeight;
-
-
+            // ナビ枠の位置を指定
             double xPos = zeroXPos + maxScrollX * rateScrollX;
             double yPos = zeroYPos + maxScrollY * rateScrollY;
             Canvas.SetLeft(ViewBoundsRect, xPos);

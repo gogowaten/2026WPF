@@ -84,15 +84,27 @@ https://seizu.dev/2013/06/11/post2437.html-->
           <Setter Property="Margin" Value="5"/>
         </Style>
         <Style TargetType="Button">
-          <Setter Property="Margin" Value="15,8"/>
+          <Setter Property="Margin" Value="5,8"/>
         </Style>
       </StackPanel.Resources>
+
+
+
+      <Canvas x:Name="MiniMapCanvas" Width="200" Height="150">
+        <Image x:Name="MiniMapImage" Width="200" Height="150" Stretch="Uniform"/>
+        <Rectangle x:Name="ViewBoundsRect" Stroke="Red" StrokeThickness="2" Fill="#20FF0000"/>
+      </Canvas>
+
+      <Separator/>
+
       <CheckBox x:Name="IsBackground" Content="背景無し" IsChecked="False"
                 Margin="10" HorizontalAlignment="Center" VerticalContentAlignment="Center"/>
 
-      <Button Content="コピー(等倍)" Click="ButtonCopyToClipboard_Click"/>
-      <Button Content="保存" Click="ButtonSave_Click"/>
-
+      <UniformGrid Columns="2">
+        <Button Content="コピー(等倍)" Click="ButtonCopyToClipboard_Click"/>
+        <Button Content="保存" Click="ButtonSave_Click"/>
+      </UniformGrid>
+      
       <Separator Margin="10"/>
 
       <TextBlock x:Name="MyTextBlockScale" Text="{Binding MyImageScale, StringFormat='表示倍率 = {0:0.00}'}" HorizontalAlignment="Center"/>
@@ -133,7 +145,7 @@ https://seizu.dev/2013/06/11/post2437.html-->
       <Button Content="保存(拡大後)" Click="ButtonSaveExterior_Click"/>
 
       <Separator/>
-      
+
       <UniformGrid Columns="2">
         <TextBlock Text="{Binding MyPixelX, StringFormat='X = {0}'}" HorizontalAlignment="Center"/>
         <TextBlock Text="{Binding MyPixelY, StringFormat='Y = {0}'}" HorizontalAlignment="Center"/>
@@ -141,13 +153,6 @@ https://seizu.dev/2013/06/11/post2437.html-->
       <TextBlock Text="{Binding MyColor, StringFormat='ColorHex = {0}'}" TextWrapping="Wrap"/>
       <TextBlock Text="{Binding MyColor, StringFormat='ColorARGB = {0}', Converter={StaticResource textARGB}}" TextWrapping="Wrap"/>
       <Border Height="20" Background="{Binding MySolidColorBrush}" Margin="10"/>
-
-      <Separator/>
-
-      <Canvas x:Name="MiniMapCanvas" Width="200" Height="150">
-        <Image x:Name="MiniMapImage" Width="200" Height="150" Stretch="Uniform"/>
-        <Rectangle x:Name="ViewBoundsRect" Stroke="Red" StrokeThickness="2" Fill="#20FF0000"/>
-      </Canvas>
 
     </StackPanel>
   </Grid>
