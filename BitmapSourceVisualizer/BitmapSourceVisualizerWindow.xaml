@@ -81,7 +81,7 @@ https://seizu.dev/2013/06/11/post2437.html-->
     <StackPanel Grid.Column="1">
       <StackPanel.Resources>
         <Style TargetType="TextBlock">
-          <Setter Property="Margin" Value="5"/>
+          <Setter Property="Margin" Value="5,4"/>
         </Style>
         <Style TargetType="Button">
           <Setter Property="Margin" Value="5,4"/>
@@ -90,46 +90,49 @@ https://seizu.dev/2013/06/11/post2437.html-->
 
 
 
-      <Canvas x:Name="MiniMapCanvas" Width="200" Height="150">
+      <Canvas x:Name="MiniMapCanvas" Width="200" Height="150"
+              PreviewMouseLeftButtonDown="MiniMapCanvas_PreviewMouseLeftButtonDown"
+              PreviewMouseLeftButtonUp="MiniMapCanvas_PreviewMouseLeftButtonUp"
+              MouseMove="MiniMapCanvas_MouseMove">
         <Image x:Name="MiniMapImage" Width="200" Height="150" Stretch="Uniform"/>
         <Rectangle x:Name="ViewBoundsRect" Stroke="Red" StrokeThickness="2" Fill="#20FF0000"
-                   PreviewMouseLeftButtonDown="ViewBoundsRect_PreviewMouseLeftButtonDown"
-                   PreviewMouseLeftButtonUp="ViewBoundsRect_PreviewMouseLeftButtonUp"/>
+                   />
       </Canvas>
 
       <Separator/>
 
-      <CheckBox x:Name="IsBackground" Content="背景無し" IsChecked="False"
+      <CheckBox x:Name="IsBackground" Content="市松模様" IsChecked="False"
                 Margin="10" HorizontalAlignment="Center" VerticalContentAlignment="Center"/>
 
       <UniformGrid Columns="2">
         <Button Content="コピー(等倍)" Click="ButtonCopyToClipboard_Click"/>
         <Button Content="保存" Click="ButtonSave_Click"/>
       </UniformGrid>
-      
+
       <Separator Margin="10"/>
 
       <TextBlock x:Name="MyTextBlockScale" Text="{Binding MyImageScale, StringFormat='表示倍率 = {0:0.00}'}" HorizontalAlignment="Center"/>
 
-      <UniformGrid Columns="4" Rows="2" Margin="2">
+      <UniformGrid Columns="3" Rows="2" Margin="2">
         <UniformGrid.Resources>
           <Style TargetType="Button">
             <Setter Property="Margin" Value="2"/>
           </Style>
         </UniformGrid.Resources>
-        <Button Content="x 0.5" Tag="0.5" Click="ButtonSetMathScale_Click"/>
-        <Button Content="x 0.1" Tag="0.1" Click="ButtonSetMathScale_Click"/>
-        <Button Content="4" Tag="4" Click="ButtonSetScale_Click"/>
-        <Button Content="8" Tag="8" Click="ButtonSetScale_Click"/>
-        <Button Content="x 2" Tag="2" Click="ButtonSetMathScale_Click"/>
-        <Button Content="x 10" Tag="10" Click="ButtonSetMathScale_Click"/>
-        <Button Content="16" Tag="16" Click="ButtonSetScale_Click"/>
-        <Button Content="32" Tag="32" Click="ButtonSetScale_Click"/>
+        <Button Content="0.5倍" Tag="0.5" Click="ButtonSetMathScale_Click"/>
+        <Button Content="0.1倍" Tag="0.1" Click="ButtonSetMathScale_Click"/>
+        <Button Content="等倍" Tag="1" Click="ButtonSetScale_Click"/>
+        <Button Content="2倍" Tag="2" Click="ButtonSetMathScale_Click"/>
+        <Button Content="10倍" Tag="10" Click="ButtonSetMathScale_Click"/>
       </UniformGrid>
 
-      <Slider x:Name="ImageScale" Minimum="1" Maximum="30" Value="{Binding MyImageScale}"
+      <DockPanel >
+        <Button Content="等倍" Tag="1" Click="ButtonSetScale_Click"/>
+        <Button DockPanel.Dock="Right" Content="最大" Tag="50" Click="ButtonSetScale_Click"/>
+        <Slider x:Name="ImageScale" Minimum="1" Maximum="30" Value="{Binding MyImageScale}"
               SmallChange="1" LargeChange="1"
-              Margin="10,5" TickFrequency="1.0"/>
+              Margin="4,5" TickFrequency="1.0"/>
+      </DockPanel>
 
       <!--<UniformGrid Columns="4" Rows="1" Margin="2">
         <UniformGrid.Resources>
@@ -155,6 +158,10 @@ https://seizu.dev/2013/06/11/post2437.html-->
       <TextBlock Text="{Binding MyColor, StringFormat='ColorHex = {0}'}" TextWrapping="Wrap"/>
       <TextBlock Text="{Binding MyColor, StringFormat='ColorARGB = {0}', Converter={StaticResource textARGB}}" TextWrapping="Wrap"/>
       <Border Height="20" Background="{Binding MySolidColorBrush}" Margin="10"/>
+      <UniformGrid Columns="2">
+        <Button Content="コピー#ARGB" Click="Button_ClickCopyHexARGB"/>
+        <Button Content="コピーA,R,G,B" Click="Button_ClickCopyARGB"/>
+      </UniformGrid>
 
     </StackPanel>
   </Grid>

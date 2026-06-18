@@ -23,6 +23,14 @@ namespace BitmapSourceVisualizer
     /// </summary>
     public partial class BitmapSourceVisualizerWindow : Window
     {
+        private bool IsMouseDraged; // 枠Rectのドラッグ移動フラグ
+        private Point MyClickedPoint; // MiniMapをクリックした場所
+        private double MyRateMoveX; // スクロール可動範囲の比率
+        private double MyRateMoveY;
+        private double MyClickedScrollXOffset; // スクロール位置の記録
+        private double MyClickedScrollYOffset;
+
+
         private Point MyPoint; // マウスドラッグ移動処理で使う
         public BitmapSource MyBitmapSource;
         private readonly double ImageScaleMin = 0.01; // 拡大率下限
@@ -128,7 +136,7 @@ namespace BitmapSourceVisualizer
         private ContextMenu CreateContextMenu()
         {
             ContextMenu menu = new();
-            MenuItem item = new() { Header = "コピー(等倍)" };
+            MenuItem item = new() { Header = "画像コピー(等倍)" };
             menu.Items.Add(item);
             item.Click += (s, e) =>
             {
@@ -138,7 +146,7 @@ namespace BitmapSourceVisualizer
                 }
             };
 
-            item = new() { Header = "保存(png)" };
+            item = new() { Header = "画像保存(png)" };
             menu.Items.Add(item);
             item.Click += (s, e) =>
             {
@@ -150,7 +158,7 @@ namespace BitmapSourceVisualizer
 
             menu.Items.Add(new Separator());
 
-            item = new() { Header = "コピー(拡大後)" };
+            item = new() { Header = "画像コピー(拡大後)" };
             menu.Items.Add(item);
             item.Click += (s, e) =>
             {
@@ -160,7 +168,7 @@ namespace BitmapSourceVisualizer
                 }
             };
 
-            item = new() { Header = "保存(拡大後)(png)" };
+            item = new() { Header = "画像保存(拡大後)(png)" };
             menu.Items.Add(item);
             item.Click += (s, e) =>
             {
@@ -170,7 +178,9 @@ namespace BitmapSourceVisualizer
                 }
             };
 
-            item = new() { Header = $"コピー（色:#AARRGGBB）" };
+            menu.Items.Add(new Separator());
+
+            item = new() { Header = $"色コピー（#ARGB）" };
             menu.Items.Add(item);
             item.Click += (s, e) =>
             {
@@ -180,7 +190,7 @@ namespace BitmapSourceVisualizer
                 }
             };
 
-            item = new() { Header = $"コピー（色:A, R, G, B）" };
+            item = new() { Header = $"色コピー（A, R, G, B）" };
             menu.Items.Add(item);
             item.Click += (s, e) =>
             {
@@ -680,7 +690,8 @@ namespace BitmapSourceVisualizer
             double viewWidth = MyScroll.ViewportWidth;
             double viewHeight = MyScroll.ViewportHeight;
 
-            // ScrollViewer内に見えている部分（Viewport）の、全体からの比率
+            // ScrollViewer内に見えている部分（Viewport）の画像サイズの全体からの比率
+            // 見えている部分 / 全体サイズ
             double rateViewWidth = viewWidth / scaledImageWidth;
             double rateViewHeight = viewHeight / scaledImageHeight;
 
@@ -696,6 +707,11 @@ namespace BitmapSourceVisualizer
             double maxScrollX = MiniMapImage.ActualWidth - ViewBoundsRect.Width;
             double maxScrollY = MiniMapImage.ActualHeight - ViewBoundsRect.Height;
 
+            // スクロール可動範囲の比率を記録は、枠移動で使うため
+            // ScrollViewer / ナビ枠
+            MyRateMoveX = MyScroll.ScrollableWidth / maxScrollX;
+            MyRateMoveY = MyScroll.ScrollableHeight / maxScrollY;
+
             // ナビ枠の位置を指定
             double xPos = zeroXPos + maxScrollX * rateScrollX;
             double yPos = zeroYPos + maxScrollY * rateScrollY;
@@ -704,14 +720,98 @@ namespace BitmapSourceVisualizer
 
         }
 
-        private void ViewBoundsRect_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+
+        #region 枠移動
+        // 実質は枠移動じゃなくてスクロール調整
+
+        // MiniMapCanvasクリック時、
+        // クリック位置に枠が来るようにスクロール位置を調整する
+        private void MiniMapCanvas_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            e.GetPosition(ViewBoundsRect);
+            IsMouseDraged = true;
+            MyClickedPoint = e.GetPosition(MiniMapCanvas);
+            // CuptureMouseは実行するとMouseMoveイベントが発行されるのでGetPositionより後にする
+            MiniMapCanvas.CaptureMouse();
+
+            // 枠内クリックの場合は調整しない
+            // スクロール位置だけ記録する
+            if (MiniMapCanvas.InputHitTest(MyClickedPoint) is Rectangle)
+            {
+                MyClickedScrollXOffset = MyScroll.HorizontalOffset;
+                MyClickedScrollYOffset = MyScroll.VerticalOffset;
+                return;
+            }
+
+            // ここからスクロール位置調整処理
+            // クリック位置と枠の位置の差
+            var xDiff = MyClickedPoint.X - Canvas.GetLeft(ViewBoundsRect);
+            var yDiff = MyClickedPoint.Y - Canvas.GetTop(ViewBoundsRect);
+
+            // スクロール位置 = 今のスクロール位置 + （位置の差 * ScrollViewerと枠サイズの率）
+            double xOffset = MyScroll.HorizontalOffset + (xDiff * MyRateMoveX);
+            double yOffset = MyScroll.VerticalOffset + (yDiff * MyRateMoveY);
+            // クリック位置に枠の中心を合わせる
+            xOffset -= ViewBoundsRect.ActualWidth * MyRateMoveX / 2.0;
+            yOffset -= ViewBoundsRect.ActualHeight * MyRateMoveY / 2.0;
+
+            // スクロール位置（値）をクランプしてセット
+            xOffset = Clamp(xOffset, 0, MyScroll.ScrollableWidth);
+            yOffset = Clamp(yOffset, 0, MyScroll.ScrollableHeight);
+            MyScroll.ScrollToHorizontalOffset(xOffset);
+            MyScroll.ScrollToVerticalOffset(yOffset);
+
+            // スクロール位置を記録しておく
+            MyClickedScrollXOffset = xOffset;
+            MyClickedScrollYOffset = yOffset;
         }
 
-        private void ViewBoundsRect_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        // マウス移動時
+        private void MiniMapCanvas_MouseMove(object sender, MouseEventArgs e)
         {
+            // ドラッグ移動フラグ確認、無ければ何もしない
+            if (IsMouseDraged == false) { return; }
 
+            // マウス移動距離、0なら何もしない、終わり
+            var pos = e.GetPosition(MiniMapCanvas);
+            var horizontalChanged = pos.X - MyClickedPoint.X;
+            var verticalChanged = pos.Y - MyClickedPoint.Y;
+            if (horizontalChanged == 0 && verticalChanged == 0) { return; }
+
+            // マウス移動していた場合、スクロール位置調整
+            else
+            {
+                // スクロール位置計算
+                // スクロール位置 = クリックした時の位置 + （マウス移動距離 * 比率）
+                double xOffset = MyClickedScrollXOffset + (horizontalChanged * MyRateMoveX);
+                double yOffset = MyClickedScrollYOffset + (verticalChanged * MyRateMoveY);
+
+                // スクロール位置（値）をクランプしてセット
+                xOffset = Clamp(xOffset, 0, MyScroll.ScrollableWidth);
+                yOffset = Clamp(yOffset, 0, MyScroll.ScrollableHeight);
+                MyScroll.ScrollToHorizontalOffset(xOffset);
+                MyScroll.ScrollToVerticalOffset(yOffset);
+            }
+        }
+
+        // クリック離した時
+        private void MiniMapCanvas_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            // ドラッグ移動フラグ解除
+            IsMouseDraged = false;
+            MiniMapCanvas.ReleaseMouseCapture();
+        }
+
+        #endregion 枠移動
+
+        private void Button_ClickCopyHexARGB(object sender, RoutedEventArgs e)
+        {
+            SetTextToClipboard(MyColor.ToString());
+        }
+
+        private void Button_ClickCopyARGB(object sender, RoutedEventArgs e)
+        {
+            string argb = $"{MyColor.A}, {MyColor.R}, {MyColor.G}, {MyColor.B}";
+            SetTextToClipboard(argb);
         }
     }
 }
