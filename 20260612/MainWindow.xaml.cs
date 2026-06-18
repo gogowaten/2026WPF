@@ -16,20 +16,16 @@ namespace _20260612
     /// </summary>
     public partial class MainWindow : Window
     {
-        private bool IsMouseDraged;
-        private Point MyClickedPoint;
-        private double MyMinWakuX;
-        private double MyMinWakuY;
-        private double MaxWakuX;
-        private double MaxWakuY;
-        private double MyRateMoveX;
+        private bool IsMouseDraged; // 枠Rectのドラッグ移動フラグ
+        private Point MyClickedPoint; // MiniMapをクリックした場所
+        private double MyRateMoveX; // スクロール可動範囲の比率
         private double MyRateMoveY;
-        private double MyClickedScrollXOffset;
+        private double MyClickedScrollXOffset; // スクロール位置の記録
         private double MyClickedScrollYOffset;
 
 
         private readonly string MyImagePath = @"D:\ブログ用\テスト用画像\collection5.png";
-        //private readonly string MyImagePath = @"D:\ブログ用\テスト用画像\テスト結果用\NEC_0541_2017_07_21_午後わてん_p6_32color.png";
+        //private readonly string MyImagePath = @"D:\ブログ用\テスト用画像\NEC_0541_2017_07_21_午後わてん_20260618_.jpg";
         //private readonly string MyImagePath = @"D:\ブログ用\テスト用画像\連結テスト\WP_20210327_11_20_32_Pro_2021_03_27_午後わてん.jpg";
         public BitmapImage MyImage { get; set; }
 
@@ -223,8 +219,6 @@ namespace _20260612
             // ナビ枠の位置の最小値
             double zeroXPos = (MiniMapCanvas.Width - MiniMapImage.ActualWidth) / 2.0;
             double zeroYPos = (MiniMapCanvas.Height - MiniMapImage.ActualHeight) / 2.0;
-            MyMinWakuX = zeroXPos;
-            MyMinWakuY = zeroYPos;
 
             // スケール後の画像サイズ            
             double scaledImageWidth = MyImage.PixelWidth * ImageScale.ScaleX;
@@ -234,7 +228,8 @@ namespace _20260612
             double viewWidth = MyScroll.ViewportWidth;
             double viewHeight = MyScroll.ViewportHeight;
 
-            // ScrollViewer内に見えている部分（Viewport）の、全体からの比率
+            // ScrollViewer内に見えている部分（Viewport）の画像サイズの全体からの比率
+            // 見えている部分 / 全体サイズ
             double rateViewWidth = viewWidth / scaledImageWidth;
             double rateViewHeight = viewHeight / scaledImageHeight;
 
@@ -250,6 +245,8 @@ namespace _20260612
             double maxScrollX = MiniMapImage.ActualWidth - ViewBoundsRect.Width;
             double maxScrollY = MiniMapImage.ActualHeight - ViewBoundsRect.Height;
 
+            // スクロール可動範囲の比率を記録は、枠移動で使うため
+            // ScrollViewer / ナビ枠
             MyRateMoveX = MyScroll.ScrollableWidth / maxScrollX;
             MyRateMoveY = MyScroll.ScrollableHeight / maxScrollY;
 
@@ -261,21 +258,6 @@ namespace _20260612
 
         }
 
-        private void ViewBoundsRect_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
-        {
-
-
-        }
-
-        private void ViewBoundsRect_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
-        {
-
-        }
-
-        private void ViewBoundsRect_MouseMove(object sender, MouseEventArgs e)
-        {
-
-        }
         private static double Clamp(double value, double min, double max)
         {
             if (min > max) { (max, min) = (min, max); }
@@ -285,13 +267,20 @@ namespace _20260612
             return value;
         }
 
-        // MiniMapCanvasクリック時、クリック位置に枠が来るようにスクロール位置を調整する
+        #region 枠移動
+        // 実質は枠移動じゃなくてスクロール調整
+
+        // MiniMapCanvasクリック時、
+        // クリック位置に枠が来るようにスクロール位置を調整する
         private void MiniMapCanvas_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             IsMouseDraged = true;
             MyClickedPoint = e.GetPosition(MiniMapCanvas);
-            
-            // 枠内クリックの場合は移動処理はしない
+            // CuptureMouseは実行するとMouseMoveイベントが発行されるのでGetPositionより後にする
+            MiniMapCanvas.CaptureMouse(); 
+
+            // 枠内クリックの場合は調整しない
+            // スクロール位置だけ記録する
             if (MiniMapCanvas.InputHitTest(MyClickedPoint) is Rectangle)
             {
                 MyClickedScrollXOffset = MyScroll.HorizontalOffset;
@@ -299,6 +288,7 @@ namespace _20260612
                 return;
             }
 
+            // ここからスクロール位置調整処理
             // クリック位置と枠の位置の差
             var xDiff = MyClickedPoint.X - Canvas.GetLeft(ViewBoundsRect);
             var yDiff = MyClickedPoint.Y - Canvas.GetTop(ViewBoundsRect);
@@ -310,42 +300,57 @@ namespace _20260612
             xOffset -= ViewBoundsRect.ActualWidth * MyRateMoveX / 2.0;
             yOffset -= ViewBoundsRect.ActualHeight * MyRateMoveY / 2.0;
 
+            // スクロール位置（値）をクランプしてセット
             xOffset = Clamp(xOffset, 0, MyScroll.ScrollableWidth);
             yOffset = Clamp(yOffset, 0, MyScroll.ScrollableHeight);
-
             MyScroll.ScrollToHorizontalOffset(xOffset);
             MyScroll.ScrollToVerticalOffset(yOffset);
+
+            // スクロール位置を記録しておく
             MyClickedScrollXOffset = xOffset;
             MyClickedScrollYOffset = yOffset;
 
         }
 
-
-        private void MiniMapCanvas_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
-        {
-            IsMouseDraged = false;
-        }
-
+        // マウス移動時
         private void MiniMapCanvas_MouseMove(object sender, MouseEventArgs e)
         {
+            // ドラッグ移動フラグ確認、無ければ何もしない
             if (IsMouseDraged == false) { return; }
+
+            // マウス移動距離、0なら何もしない、終わり
+            var pos = e.GetPosition(MiniMapCanvas);
+            var horizontalChanged = pos.X - MyClickedPoint.X;
+            var verticalChanged = pos.Y - MyClickedPoint.Y;
+            if (horizontalChanged == 0 && verticalChanged == 0) { return; }
+
+            // マウス移動していた場合、スクロール位置調整
             else
             {
-                var neko = e.GetPosition(MiniMapCanvas);
-                var xDiff = neko.X - MyClickedPoint.X;
-                var yDiff = neko.Y - MyClickedPoint.Y;
-                double xOffset = MyClickedScrollXOffset + xDiff * MyRateMoveX;
-                double yOffset = MyClickedScrollYOffset + yDiff * MyRateMoveY;
+                // スクロール位置計算
+                // スクロール位置 = クリックした時の位置 + （マウス移動距離 * 比率）
+                double xOffset =  MyClickedScrollXOffset + (horizontalChanged * MyRateMoveX);
+                double yOffset =  MyClickedScrollYOffset + (verticalChanged * MyRateMoveY);
+
+                // スクロール位置（値）をクランプしてセット
                 xOffset = Clamp(xOffset, 0, MyScroll.ScrollableWidth);
                 yOffset = Clamp(yOffset, 0, MyScroll.ScrollableHeight);
                 MyScroll.ScrollToHorizontalOffset(xOffset);
                 MyScroll.ScrollToVerticalOffset(yOffset);
             }
-
         }
-        // 移動量に応じてスクロール位置を調整
-        //MyScroll.ScrollToHorizontalOffset();
 
+        // クリック離した時
+        private void MiniMapCanvas_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            // ドラッグ移動フラグ解除
+            IsMouseDraged = false;
+            MiniMapCanvas.ReleaseMouseCapture();
+        }
+
+        #endregion 枠移動
+
+       
     }
 }
 
