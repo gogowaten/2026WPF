@@ -703,5 +703,15 @@ namespace BitmapSourceVisualizer
             Canvas.SetTop(ViewBoundsRect, yPos);
 
         }
+
+        private void ViewBoundsRect_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            e.GetPosition(ViewBoundsRect);
+        }
+
+        private void ViewBoundsRect_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+
+        }
     }
 }

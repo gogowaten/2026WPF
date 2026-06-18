@@ -16,10 +16,24 @@ namespace _20260612
     /// </summary>
     public partial class MainWindow : Window
     {
+        private bool IsMouseDraged;
+        private Point MyClickedPoint;
+        private double MyMinWakuX;
+        private double MyMinWakuY;
+        private double MaxWakuX;
+        private double MaxWakuY;
+        private double MyRateMoveX;
+        private double MyRateMoveY;
+        private double MyClickedScrollXOffset;
+        private double MyClickedScrollYOffset;
+
+
         private readonly string MyImagePath = @"D:\ブログ用\テスト用画像\collection5.png";
         //private readonly string MyImagePath = @"D:\ブログ用\テスト用画像\テスト結果用\NEC_0541_2017_07_21_午後わてん_p6_32color.png";
         //private readonly string MyImagePath = @"D:\ブログ用\テスト用画像\連結テスト\WP_20210327_11_20_32_Pro_2021_03_27_午後わてん.jpg";
         public BitmapImage MyImage { get; set; }
+
+
         public MainWindow()
         {
             InitializeComponent();
@@ -35,6 +49,7 @@ namespace _20260612
 
         }
 
+        #region 依存関係プロパティ
 
         public int MyX
         {
@@ -59,34 +74,43 @@ namespace _20260612
             set { SetValue(MyScaleProperty, value); }
         }
         public static readonly DependencyProperty MyScaleProperty =
-            DependencyProperty.Register(nameof(MyScale), typeof(double), typeof(MainWindow), new PropertyMetadata(1.0, OnMyScale));
-        private static void OnMyScale(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            //if (d is MainWindow main && main.MyRect.IsMouseOver)
-            //{
-            //    AdjustOffset(main.MyScroll, main.MyRect, main.MyScale, main.MyX, main.MyY);
-            //}
-        }
-        private static void AdjustOffset(ScrollViewer scroll, Rectangle rect, double scale, int currentXPos, int currentYPos)
-        {
-            var bmpViewSize = rect.Width * scale;
-            var maxOffset = bmpViewSize - scroll.ActualWidth;
-            if (maxOffset > 0)
-            {
-                var ratePos = currentXPos / rect.Width;
-                var pos = maxOffset * ratePos;
-                scroll.ScrollToHorizontalOffset(pos);
-            }
+            DependencyProperty.Register(nameof(MyScale), typeof(double), typeof(MainWindow), new PropertyMetadata(1.0));
 
-            bmpViewSize = rect.Height * scale;
-            maxOffset = bmpViewSize - scroll.ActualHeight;
-            if (maxOffset > 0)
-            {
-                var ratePos = currentYPos / rect.Height;
-                var pos = maxOffset * ratePos;
-                scroll.ScrollToVerticalOffset(pos);
-            }
-        }
+
+
+        #endregion 依存関係プロパティ
+
+
+
+
+        //private static void OnMyScale(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        //{
+        //    //if (d is MainWindow main && main.MyRect.IsMouseOver)
+        //    //{
+        //    //    AdjustOffset(main.MyScroll, main.MyRect, main.MyScale, main.MyX, main.MyY);
+        //    //}
+        //}
+
+        //private static void AdjustOffset(ScrollViewer scroll, Rectangle rect, double scale, int currentXPos, int currentYPos)
+        //{
+        //    var bmpViewSize = rect.Width * scale;
+        //    var maxOffset = bmpViewSize - scroll.ActualWidth;
+        //    if (maxOffset > 0)
+        //    {
+        //        var ratePos = currentXPos / rect.Width;
+        //        var pos = maxOffset * ratePos;
+        //        scroll.ScrollToHorizontalOffset(pos);
+        //    }
+
+        //    bmpViewSize = rect.Height * scale;
+        //    maxOffset = bmpViewSize - scroll.ActualHeight;
+        //    if (maxOffset > 0)
+        //    {
+        //        var ratePos = currentYPos / rect.Height;
+        //        var pos = maxOffset * ratePos;
+        //        scroll.ScrollToVerticalOffset(pos);
+        //    }
+        //}
 
 
 
@@ -199,6 +223,8 @@ namespace _20260612
             // ナビ枠の位置の最小値
             double zeroXPos = (MiniMapCanvas.Width - MiniMapImage.ActualWidth) / 2.0;
             double zeroYPos = (MiniMapCanvas.Height - MiniMapImage.ActualHeight) / 2.0;
+            MyMinWakuX = zeroXPos;
+            MyMinWakuY = zeroYPos;
 
             // スケール後の画像サイズ            
             double scaledImageWidth = MyImage.PixelWidth * ImageScale.ScaleX;
@@ -220,9 +246,12 @@ namespace _20260612
             if (rateViewHeight > 1.0) { naviHeight = MiniMapImage.ActualHeight; }
             ViewBoundsRect.Height = naviHeight;
 
-            // スクロール最大幅
+            // ナビ枠の位置の最大値、可動範囲の最大値
             double maxScrollX = MiniMapImage.ActualWidth - ViewBoundsRect.Width;
             double maxScrollY = MiniMapImage.ActualHeight - ViewBoundsRect.Height;
+
+            MyRateMoveX = MyScroll.ScrollableWidth / maxScrollX;
+            MyRateMoveY = MyScroll.ScrollableHeight / maxScrollY;
 
             // ナビ枠の位置を指定
             double xPos = zeroXPos + maxScrollX * rateScrollX;
@@ -232,10 +261,91 @@ namespace _20260612
 
         }
 
+        private void ViewBoundsRect_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
 
 
+        }
 
+        private void ViewBoundsRect_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+
+        }
+
+        private void ViewBoundsRect_MouseMove(object sender, MouseEventArgs e)
+        {
+
+        }
+        private static double Clamp(double value, double min, double max)
+        {
+            if (min > max) { (max, min) = (min, max); }
+
+            if (value < min) { value = min; }
+            if (value > max) { value = max; }
+            return value;
+        }
+
+        // MiniMapCanvasクリック時、クリック位置に枠が来るようにスクロール位置を調整する
+        private void MiniMapCanvas_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            IsMouseDraged = true;
+            MyClickedPoint = e.GetPosition(MiniMapCanvas);
+            
+            // 枠内クリックの場合は移動処理はしない
+            if (MiniMapCanvas.InputHitTest(MyClickedPoint) is Rectangle)
+            {
+                MyClickedScrollXOffset = MyScroll.HorizontalOffset;
+                MyClickedScrollYOffset = MyScroll.VerticalOffset;
+                return;
+            }
+
+            // クリック位置と枠の位置の差
+            var xDiff = MyClickedPoint.X - Canvas.GetLeft(ViewBoundsRect);
+            var yDiff = MyClickedPoint.Y - Canvas.GetTop(ViewBoundsRect);
+
+            // スクロール位置 = 今のスクロール位置 + （位置の差 * ScrollViewerと枠サイズの率）
+            double xOffset = MyScroll.HorizontalOffset + (xDiff * MyRateMoveX);
+            double yOffset = MyScroll.VerticalOffset + (yDiff * MyRateMoveY);
+            // クリック位置に枠の中心を合わせる
+            xOffset -= ViewBoundsRect.ActualWidth * MyRateMoveX / 2.0;
+            yOffset -= ViewBoundsRect.ActualHeight * MyRateMoveY / 2.0;
+
+            xOffset = Clamp(xOffset, 0, MyScroll.ScrollableWidth);
+            yOffset = Clamp(yOffset, 0, MyScroll.ScrollableHeight);
+
+            MyScroll.ScrollToHorizontalOffset(xOffset);
+            MyScroll.ScrollToVerticalOffset(yOffset);
+            MyClickedScrollXOffset = xOffset;
+            MyClickedScrollYOffset = yOffset;
+
+        }
+
+
+        private void MiniMapCanvas_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            IsMouseDraged = false;
+        }
+
+        private void MiniMapCanvas_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (IsMouseDraged == false) { return; }
+            else
+            {
+                var neko = e.GetPosition(MiniMapCanvas);
+                var xDiff = neko.X - MyClickedPoint.X;
+                var yDiff = neko.Y - MyClickedPoint.Y;
+                double xOffset = MyClickedScrollXOffset + xDiff * MyRateMoveX;
+                double yOffset = MyClickedScrollYOffset + yDiff * MyRateMoveY;
+                xOffset = Clamp(xOffset, 0, MyScroll.ScrollableWidth);
+                yOffset = Clamp(yOffset, 0, MyScroll.ScrollableHeight);
+                MyScroll.ScrollToHorizontalOffset(xOffset);
+                MyScroll.ScrollToVerticalOffset(yOffset);
+            }
+
+        }
+        // 移動量に応じてスクロール位置を調整
+        //MyScroll.ScrollToHorizontalOffset();
 
     }
-
 }
+

@@ -17,24 +17,14 @@
 
     <ScrollViewer x:Name="MyScroll" HorizontalScrollBarVisibility="Auto"
                   ScrollChanged="MyScroll_ScrollChanged">
-      <!--<Image x:Name="MainImage" Stretch="None" Width="1000" Height="1000"/>-->
       <Image x:Name="MainImage" Stretch="None"
              RenderOptions.BitmapScalingMode="NearestNeighbor">
         <Image.LayoutTransform>
-          <ScaleTransform x:Name="ImageScale" ScaleX="1.0" ScaleY="1.0"/>
+          <ScaleTransform x:Name="ImageScale" ScaleX="10.0" ScaleY="10.0"/>
         </Image.LayoutTransform>
       </Image>
 
     </ScrollViewer>
-
-    <!--<Rectangle x:Name="MyRect" Width="100" Height="100" Fill="red"
-                 PreviewMouseLeftButtonDown="MyRect_PreviewMouseLeftButtonDown"
-                 MouseMove="MyRect_MouseMove"
-                 PreviewMouseWheel="MyRect_PreviewMouseWheel">
-      <Rectangle.LayoutTransform>
-        <ScaleTransform ScaleX="{Binding MyScale}" ScaleY="{Binding MyScale}"/>
-      </Rectangle.LayoutTransform>
-    </Rectangle>-->
 
     <Canvas x:Name="MyCanvas">
 
@@ -44,9 +34,15 @@
       <Button Content="test1" Click="Button_Click"/>
       <TextBlock Text="{Binding MyX, StringFormat='x = {0}'}"/>
       <TextBlock Text="{Binding MyY, StringFormat='y = {0}'}"/>
-      <Canvas x:Name="MiniMapCanvas" Height="150" Width="200" Background="WhiteSmoke">
+      <Canvas x:Name="MiniMapCanvas" Height="150" Width="200" Background="WhiteSmoke"
+              PreviewMouseLeftButtonDown="MiniMapCanvas_PreviewMouseLeftButtonDown"
+              PreviewMouseLeftButtonUp="MiniMapCanvas_PreviewMouseLeftButtonUp"
+              MouseMove="MiniMapCanvas_MouseMove">
         <Image x:Name="MiniMapImage" Width="200" Height="150" Stretch="Uniform"/>
-        <Rectangle x:Name="ViewBoundsRect" Stroke="Red" StrokeThickness="2" Fill="#20FF0000"/>
+        <Rectangle x:Name="ViewBoundsRect" Stroke="Red" StrokeThickness="2" Fill="#20FF0000"
+                   PreviewMouseLeftButtonDown="ViewBoundsRect_PreviewMouseLeftButtonDown"
+                   PreviewMouseLeftButtonUp="ViewBoundsRect_PreviewMouseLeftButtonUp"
+                   MouseMove="ViewBoundsRect_MouseMove"/>
       </Canvas>
     </StackPanel>
   </Grid>

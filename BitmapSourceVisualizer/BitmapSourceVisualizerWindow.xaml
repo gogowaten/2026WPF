@@ -84,7 +84,7 @@ https://seizu.dev/2013/06/11/post2437.html-->
           <Setter Property="Margin" Value="5"/>
         </Style>
         <Style TargetType="Button">
-          <Setter Property="Margin" Value="5,8"/>
+          <Setter Property="Margin" Value="5,4"/>
         </Style>
       </StackPanel.Resources>
 
@@ -92,7 +92,9 @@ https://seizu.dev/2013/06/11/post2437.html-->
 
       <Canvas x:Name="MiniMapCanvas" Width="200" Height="150">
         <Image x:Name="MiniMapImage" Width="200" Height="150" Stretch="Uniform"/>
-        <Rectangle x:Name="ViewBoundsRect" Stroke="Red" StrokeThickness="2" Fill="#20FF0000"/>
+        <Rectangle x:Name="ViewBoundsRect" Stroke="Red" StrokeThickness="2" Fill="#20FF0000"
+                   PreviewMouseLeftButtonDown="ViewBoundsRect_PreviewMouseLeftButtonDown"
+                   PreviewMouseLeftButtonUp="ViewBoundsRect_PreviewMouseLeftButtonUp"/>
       </Canvas>
 
       <Separator/>
