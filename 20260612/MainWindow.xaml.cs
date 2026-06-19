@@ -113,6 +113,7 @@ namespace _20260612
         private void Button_Click(object sender, RoutedEventArgs e)
         {
             var imageActW = MainImage.ActualWidth;
+            var neko = MyImage;
         }
 
         private void MyRect_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)

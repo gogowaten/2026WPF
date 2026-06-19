@@ -11,6 +11,19 @@ using System.Windows.Media;
 
 namespace BitmapSourceVisualizer
 {
+    public class MyConvColorToSolidBrush : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            Color col = (Color)value;
+            return new SolidColorBrush(col);
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
     public class MyConvBoolToVisible : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
