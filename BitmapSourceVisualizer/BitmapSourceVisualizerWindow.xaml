@@ -10,6 +10,7 @@
   <Window.Resources>
     <local:MyConvColorToTextARGB x:Key="textARGB"/>
     <local:MyConvBoolToVisible x:Key="boolVisible"/>
+    <local:MyConvHsvToText x:Key="textHsv"/>
   </Window.Resources>
   <Grid>
     <Grid.ColumnDefinitions>
@@ -206,6 +207,19 @@ https://seizu.dev/2013/06/11/post2437.html-->
               <Button Content="copy" Click="Button_ClickCopyClickedPixelARGB"/>
               <TextBlock Text="{Binding MyClickedColor, StringFormat='ARGB = {0}', Converter={StaticResource textARGB}}"/>
             </StackPanel>
+
+            <StackPanel Orientation="Horizontal">
+              <!--<TextBlock Text="{Binding MyClickedHsv}"/>-->
+            </StackPanel>
+            <!--<TextBlock Text="{Binding MyClickedHsv, StringFormat='HSV = {0.00}'}"/>-->
+            <TextBlock Text="{Binding MyClickedHsv, StringFormat='HSV = {0}', Converter={StaticResource textHsv}}"/>
+            <!--<TextBlock Text="{Binding MyClickedHsv.Hue}"/>-->
+            <!--<StackPanel Orientation="Horizontal">
+              <TextBlock Text="{Binding MyClickedHsv.Hue, StringFormat='H = {0.00}'}"/>
+              <TextBlock Text="{Binding MyClickedHsv.Saturation, StringFormat='S = {0.00}'}"/>
+              <TextBlock Text="{Binding MyClickedHsv.Value, StringFormat='V = {0.00}'}"/>
+            </StackPanel>-->
+
           </StackPanel>
 
 

@@ -11,6 +11,34 @@ using System.Windows.Media;
 
 namespace BitmapSourceVisualizer
 {
+    public class MyConvHsvToText : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            HSV hsv = (HSV)value;
+            string str = $"{hsv.Hue:F1}, {hsv.Saturation:F3}, {hsv.Value:F3}";
+            return str;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+    public class MyConvColorToHsv : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            Color c = (Color)value;
+            HSV hsv = MathHSV.ColorToHsv2(c);
+            return hsv;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
     public class MyConvColorToSolidBrush : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)

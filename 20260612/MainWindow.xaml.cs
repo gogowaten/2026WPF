@@ -24,8 +24,8 @@ namespace _20260612
         private double MyClickedScrollYOffset;
 
 
-        private readonly string MyImagePath = @"D:\ブログ用\テスト用画像\collection5.png";
-        //private readonly string MyImagePath = @"D:\ブログ用\テスト用画像\NEC_0541_2017_07_21_午後わてん_20260618_.jpg";
+        //private readonly string MyImagePath = @"D:\ブログ用\テスト用画像\collection5.png";
+        private readonly string MyImagePath = @"D:\ブログ用\テスト用画像\NEC_0541_2017_07_21_午後わてん_20260618_.jpg";
         //private readonly string MyImagePath = @"D:\ブログ用\テスト用画像\連結テスト\WP_20210327_11_20_32_Pro_2021_03_27_午後わてん.jpg";
         public BitmapImage MyImage { get; set; }
 

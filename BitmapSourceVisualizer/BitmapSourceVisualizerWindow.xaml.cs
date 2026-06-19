@@ -58,6 +58,9 @@ namespace BitmapSourceVisualizer
         private void MyBind()
         {
             SetBinding(MyClickedSolidColorBrushProperty, new Binding() { Source = this, Path = new PropertyPath(MyClickedColorProperty), Converter = new MyConvColorToSolidBrush() });
+            SetBinding(MyClickedHsvProperty, new Binding() { Source = this, Path = new PropertyPath(MyClickedColorProperty), Converter = new MyConvColorToHsv() });
+            Rect r = new();
+            var te = r.ToString();
         }
 
         public void SetImage(BitmapSource bitmap)
@@ -105,6 +108,14 @@ namespace BitmapSourceVisualizer
         }
         public static readonly DependencyProperty MyClickedColorProperty =
             DependencyProperty.Register(nameof(MyClickedColor), typeof(Color), typeof(BitmapSourceVisualizerWindow), new PropertyMetadata(null));
+
+        public HSV MyClickedHsv
+        {
+            get { return (HSV)GetValue(MyClickedHsvProperty); }
+            set { SetValue(MyClickedHsvProperty, value); }
+        }
+        public static readonly DependencyProperty MyClickedHsvProperty =
+            DependencyProperty.Register(nameof(MyClickedHsv), typeof(HSV), typeof(BitmapSourceVisualizerWindow), new PropertyMetadata(null));
 
 
 
