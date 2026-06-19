@@ -9,6 +9,7 @@
         DataContext="{Binding RelativeSource={RelativeSource Mode=Self}}">
   <Window.Resources>
     <local:MyConvColorToTextARGB x:Key="textARGB"/>
+    <local:MyConvBoolToVisible x:Key="boolVisible"/>
   </Window.Resources>
   <Grid>
     <Grid.ColumnDefinitions>
@@ -81,14 +82,26 @@ https://seizu.dev/2013/06/11/post2437.html-->
     <StackPanel Grid.Column="1">
       <StackPanel.Resources>
         <Style TargetType="TextBlock">
-          <Setter Property="Margin" Value="5,4"/>
+          <Setter Property="Margin" Value="2,2"/>
+          <Setter Property="VerticalAlignment" Value="Center"/>
         </Style>
         <Style TargetType="Button">
           <Setter Property="Margin" Value="5,4"/>
+          <Setter Property="VerticalAlignment" Value="Center"/>
+        </Style>
+        <Style TargetType="CheckBox">
+          <Setter Property="HorizontalAlignment" Value="Center"/>
+          <Setter Property="VerticalAlignment" Value="Center"/>
+          <Setter Property="Margin" Value="4"/>
+          <Setter Property="VerticalContentAlignment" Value="Center"/>
         </Style>
       </StackPanel.Resources>
 
 
+      <UniformGrid Columns="2">
+        <CheckBox x:Name="IsBackground" Content="市松模様" IsChecked="False"/>
+        <CheckBox x:Name="IsVisibleNaviWaku" Content="ナビ枠" IsChecked="True" />
+      </UniformGrid>
 
       <Canvas x:Name="MiniMapCanvas" Width="200" Height="150"
               PreviewMouseLeftButtonDown="MiniMapCanvas_PreviewMouseLeftButtonDown"
@@ -96,20 +109,19 @@ https://seizu.dev/2013/06/11/post2437.html-->
               MouseMove="MiniMapCanvas_MouseMove">
         <Image x:Name="MiniMapImage" Width="200" Height="150" Stretch="Uniform"/>
         <Rectangle x:Name="ViewBoundsRect" Stroke="Red" StrokeThickness="2" Fill="#20FF0000"
+                   Visibility="{Binding ElementName=IsVisibleNaviWaku, Path=IsChecked, Converter={StaticResource boolVisible}}"
                    />
       </Canvas>
 
       <Separator/>
 
-      <CheckBox x:Name="IsBackground" Content="市松模様" IsChecked="False"
-                Margin="10" HorizontalAlignment="Center" VerticalContentAlignment="Center"/>
 
       <UniformGrid Columns="2">
         <Button Content="コピー(等倍)" Click="ButtonCopyToClipboard_Click"/>
         <Button Content="保存" Click="ButtonSave_Click"/>
       </UniformGrid>
 
-      <Separator Margin="10"/>
+      <Separator Margin="2"/>
 
       <TextBlock x:Name="MyTextBlockScale" Text="{Binding MyImageScale, StringFormat='表示倍率 = {0:0.00}'}" HorizontalAlignment="Center"/>
 
@@ -130,7 +142,7 @@ https://seizu.dev/2013/06/11/post2437.html-->
         <Button Content="等倍" Tag="1" Click="ButtonSetScale_Click"/>
         <Button DockPanel.Dock="Right" Content="最大" Tag="50" Click="ButtonSetScale_Click"/>
         <Slider x:Name="ImageScale" Minimum="1" Maximum="30" Value="{Binding MyImageScale}"
-              SmallChange="1" LargeChange="1"
+              SmallChange="1.0" LargeChange="1.0" IsSnapToTickEnabled="True"
               Margin="4,5" TickFrequency="1.0"/>
       </DockPanel>
 
@@ -146,22 +158,57 @@ https://seizu.dev/2013/06/11/post2437.html-->
         <Button Content="50" Tag="50" Click="ButtonSetScale_Click"/>
       </UniformGrid>-->
 
-      <Button Content="コピー(拡大後)" Click="ButtonCopyToClipboardExterior_Click"/>
-      <Button Content="保存(拡大後)" Click="ButtonSaveExterior_Click"/>
+      <UniformGrid Columns="2">
+        <Button Content="コピー(拡大後)" Click="ButtonCopyToClipboardExterior_Click"/>
+        <Button Content="保存(拡大後)" Click="ButtonSaveExterior_Click"/>
+      </UniformGrid>
 
       <Separator/>
 
-      <UniformGrid Columns="2">
-        <TextBlock Text="{Binding MyPixelX, StringFormat='X = {0}'}" HorizontalAlignment="Center"/>
-        <TextBlock Text="{Binding MyPixelY, StringFormat='Y = {0}'}" HorizontalAlignment="Center"/>
-      </UniformGrid>
-      <TextBlock Text="{Binding MyColor, StringFormat='ColorHex = {0}'}" TextWrapping="Wrap"/>
-      <TextBlock Text="{Binding MyColor, StringFormat='ColorARGB = {0}', Converter={StaticResource textARGB}}" TextWrapping="Wrap"/>
-      <Border Height="20" Background="{Binding MySolidColorBrush}" Margin="10"/>
-      <UniformGrid Columns="2">
-        <Button Content="コピー#ARGB" Click="Button_ClickCopyHexARGB"/>
-        <Button Content="コピーA,R,G,B" Click="Button_ClickCopyARGB"/>
-      </UniformGrid>
+      <GroupBox Header="カーソル位置のピクセル">
+        <StackPanel>
+          <UniformGrid Columns="3">
+            <Border Background="{Binding MySolidColorBrush}" Margin="2,0"
+                      Height="{Binding RelativeSource={RelativeSource AncestorType=UniformGrid}, Path=DesiredSize.Height}"/>
+            <TextBlock Text="{Binding MyPixelX, StringFormat='X = {0}'}" HorizontalAlignment="Center"/>
+            <TextBlock Text="{Binding MyPixelY, StringFormat='Y = {0}'}" HorizontalAlignment="Center"/>
+          </UniformGrid>
+
+          <StackPanel>
+            <StackPanel Orientation="Horizontal">
+              <!--<Button Content="copy" Margin="4,2" Click="Button_ClickCopyHexARGB"/>-->
+              <TextBlock Text="{Binding MyColor, StringFormat='Hex = {0}'}"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal">
+              <!--<Button Content="copy" Margin="4,2" Click="Button_ClickCopyARGB"/>-->
+              <TextBlock Text="{Binding MyColor, StringFormat='ARGB = {0}', Converter={StaticResource textARGB}}"/>
+            </StackPanel>
+          </StackPanel>
+
+        </StackPanel>
+      </GroupBox>
+      <GroupBox Header="クリック位置のピクセル">
+        <StackPanel>
+          <UniformGrid Columns="3">
+            <Border Background="{Binding MyClickedSolidColorBrush}" Margin="2,0"
+                    Height="{Binding RelativeSource={RelativeSource AncestorType=UniformGrid}, Path=DesiredSize.Height}"/>
+            <TextBlock Text="{Binding MyClickedPixelX, StringFormat='X = {0}'}"/>
+            <TextBlock Text="{Binding MyClickedPixelY, StringFormat='Y = {0}'}"/>
+          </UniformGrid>
+          <StackPanel>
+            <StackPanel Orientation="Horizontal">
+              <Button Content="copy" Click="Button_ClickCopyClickedPixelHex"/>
+              <TextBlock Text="{Binding MyClickedColor, StringFormat='Hex = {0}'}"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal">
+              <Button Content="copy" Click="Button_ClickCopyClickedPixelARGB"/>
+              <TextBlock Text="{Binding MyClickedColor, StringFormat='ARGB = {0}', Converter={StaticResource textARGB}}"/>
+            </StackPanel>
+          </StackPanel>
+          
+
+        </StackPanel>
+      </GroupBox>
 
     </StackPanel>
   </Grid>

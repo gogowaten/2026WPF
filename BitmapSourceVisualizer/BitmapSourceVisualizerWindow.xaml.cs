@@ -48,7 +48,7 @@ namespace BitmapSourceVisualizer
             ImageControl.ContextMenu = CreateContextMenu();
             DataContext = this;
             MyTextBlockScale.FontSize = this.FontSize * 1.5;
-            IsBackground.FontSize = this.FontSize * 1.5;
+            //IsBackground.FontSize = this.FontSize * 1.5;
         }
 
         public void SetImage(BitmapSource bitmap)
@@ -62,6 +62,47 @@ namespace BitmapSourceVisualizer
 
         #region 依存関係プロパティ
 
+        // クリックしたピクセルの座標
+        public int MyClickedPixelX
+        {
+            get { return (int)GetValue(MyClickedPixelXProperty); }
+            set { SetValue(MyClickedPixelXProperty, value); }
+        }
+        public static readonly DependencyProperty MyClickedPixelXProperty =
+            DependencyProperty.Register(nameof(MyClickedPixelX), typeof(int), typeof(BitmapSourceVisualizerWindow), new PropertyMetadata(0));
+
+        public int MyClickedPixelY
+        {
+            get { return (int)GetValue(MyClickedPixelYProperty); }
+            set { SetValue(MyClickedPixelYProperty, value); }
+        }
+        public static readonly DependencyProperty MyClickedPixelYProperty =
+            DependencyProperty.Register(nameof(MyClickedPixelY), typeof(int), typeof(BitmapSourceVisualizerWindow), new PropertyMetadata(0));
+
+        // クリックしたピクセルの色のブラシ
+        public SolidColorBrush MyClickedSolidColorBrush
+        {
+            get { return (SolidColorBrush)GetValue(MyClickedSolidColorBrushProperty); }
+            set { SetValue(MyClickedSolidColorBrushProperty, value); }
+        }
+        public static readonly DependencyProperty MyClickedSolidColorBrushProperty =
+            DependencyProperty.Register(nameof(MyClickedSolidColorBrush), typeof(SolidColorBrush), typeof(Window), new PropertyMetadata(null));
+
+        // クリックしたピクセルの色
+        public Color MyClickedColor
+        {
+            get { return (Color)GetValue(MyClickedColorProperty); }
+            set { SetValue(MyClickedColorProperty, value); }
+        }
+        public static readonly DependencyProperty MyClickedColorProperty =
+            DependencyProperty.Register(nameof(MyClickedColor), typeof(Color), typeof(BitmapSourceVisualizerWindow), new PropertyMetadata(null));
+        private static void OnMyClickedColor(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            if (d is BitmapSourceVisualizerWindow w)
+            {
+                w.MyClickedSolidColorBrush = new SolidColorBrush((Color)e.NewValue);
+            }
+        }
 
 
         // 取得した色の表示用（マウスカーソル位置のピクセルの色）
@@ -469,11 +510,9 @@ namespace BitmapSourceVisualizer
             if (delta > 0)
             {
                 // 今の倍率が
-                // 20以上なら+10
                 // 1以上なら+1
                 // 1未満なら2倍にする
-                if (resultScale >= 20.0) { resultScale += 10.0; }
-                else if (resultScale >= 1) { resultScale++; }
+                if (resultScale >= 1) { resultScale++; }
                 else if (resultScale > 0.5) { resultScale = (int)(resultScale * 2.0); }
                 else { resultScale *= 2; }
             }
@@ -481,10 +520,8 @@ namespace BitmapSourceVisualizer
             else
             {
                 // 今の倍率が
-                // 20より大きいなら-10
                 // 2以上なら-1してから小数以下を切り捨て
-                if (resultScale > 20.0) { resultScale -= 10.0; }
-                else if (resultScale >= 2) { resultScale = (int)(resultScale - 1.0); }
+                if (resultScale >= 2) { resultScale = (int)(resultScale - 1.0); }
                 // 2未満1より大きいなら1.0にする
                 else if (resultScale > 1) { resultScale = 1.0; }
                 // 1以下なら半分にする
@@ -510,6 +547,16 @@ namespace BitmapSourceVisualizer
         {
             MyPoint = e.GetPosition(this);
             ImageControl.CaptureMouse();
+
+            // クリック位置の色
+            int px = (int)MyImageClickPoint.X;
+            int py = (int)MyImageClickPoint.Y;
+            if (px >= MyBitmapSource.PixelWidth) { px = MyBitmapSource.PixelWidth - 1; }
+            if (py >= MyBitmapSource.PixelHeight) { py = MyBitmapSource.PixelHeight - 1; }
+            MyClickedPixelX = px; MyClickedPixelY = py;
+            MyClickedColor = GetPixelColor(MyBitmapSource, px, py);
+            //MyClickedColorBorder.Background = new SolidColorBrush(MyClickedColor);
+
         }
 
         //      WPF、ScrollViewerの中の要素をマウスドラッグ移動しているように見せかける - 午後わてんのブログ
@@ -570,13 +617,23 @@ namespace BitmapSourceVisualizer
             {
                 MyPixelX = px; // マウスカーソル位置のピクセル座標
                 MyPixelY = py;
-                CroppedBitmap cropBmp = new(MyBitmapSource, new Int32Rect(MyPixelX, MyPixelY, 1, 1));
-                FormatConvertedBitmap bgraBmp = new(cropBmp, PixelFormats.Bgra32, null, 0);
-                byte[] pixels = new byte[40];
-                bgraBmp.CopyPixels(pixels, 4, 0);
-                MyColor = Color.FromArgb(pixels[3], pixels[2], pixels[1], pixels[0]);
+                //CroppedBitmap cropBmp = new(MyBitmapSource, new Int32Rect(MyPixelX, MyPixelY, 1, 1));
+                //FormatConvertedBitmap bgraBmp = new(cropBmp, PixelFormats.Bgra32, null, 0);
+                //byte[] pixels = new byte[40];
+                //bgraBmp.CopyPixels(pixels, 4, 0);
+                //MyColor = Color.FromArgb(pixels[3], pixels[2], pixels[1], pixels[0]);
+                MyColor = GetPixelColor(MyBitmapSource, MyPixelX, MyPixelY);
                 MySolidColorBrush = new SolidColorBrush(MyColor);
             }
+        }
+
+        private static Color GetPixelColor(BitmapSource bmp, int x, int y)
+        {
+            CroppedBitmap cropBmp = new(bmp, new Int32Rect(x, y, 1, 1));
+            FormatConvertedBitmap bgraBmp = new(cropBmp, PixelFormats.Bgra32, null, 0);
+            byte[] pixels = new byte[40];
+            bgraBmp.CopyPixels(pixels, 4, 0);
+            return Color.FromArgb(pixels[3], pixels[2], pixels[1], pixels[0]);
         }
 
         #endregion マウスドラッグ移動でスクロールバーを移動させる
@@ -803,15 +860,26 @@ namespace BitmapSourceVisualizer
 
         #endregion 枠移動
 
-        private void Button_ClickCopyHexARGB(object sender, RoutedEventArgs e)
-        {
-            SetTextToClipboard(MyColor.ToString());
-        }
+        //private void Button_ClickCopyHexARGB(object sender, RoutedEventArgs e)
+        //{
+        //    SetTextToClipboard(MyColor.ToString());
+        //}
 
-        private void Button_ClickCopyARGB(object sender, RoutedEventArgs e)
+        //private void Button_ClickCopyARGB(object sender, RoutedEventArgs e)
+        //{
+        //    string argb = $"{MyColor.A}, {MyColor.R}, {MyColor.G}, {MyColor.B}";
+        //    SetTextToClipboard(argb);
+        //}
+
+        private void Button_ClickCopyClickedPixelARGB(object sender, RoutedEventArgs e)
         {
-            string argb = $"{MyColor.A}, {MyColor.R}, {MyColor.G}, {MyColor.B}";
+            string argb = $"{MyClickedColor.A}, {MyClickedColor.R}, {MyClickedColor.G}, {MyClickedColor.B}";
             SetTextToClipboard(argb);
         }
+        private void Button_ClickCopyClickedPixelHex(object sender, RoutedEventArgs e)
+        {
+            SetTextToClipboard(MyClickedColor.ToString());
+        }
+
     }
 }

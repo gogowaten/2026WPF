@@ -153,8 +153,8 @@ namespace _20260510
             //RenderTargetBitmap bmp2 =
             //    new(MyCeiling(ltBounds.Width), MyCeiling(ltBounds.Height), dpi, dpi, PixelFormats.Bgra32);
 
-            RenderTargetBitmap bmp2 =
-                new(MyCeiling(ltBounds.Width), MyCeiling(ltBounds.Height), dpi, dpi, PixelFormats.Default);
+            //RenderTargetBitmap bmp2 =
+            //    new(MyCeiling(ltBounds.Width), MyCeiling(ltBounds.Height), dpi, dpi, PixelFormats.Default);
 
 
             bmp.Render(dv);
