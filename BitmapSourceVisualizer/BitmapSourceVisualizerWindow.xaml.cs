@@ -177,7 +177,12 @@ namespace BitmapSourceVisualizer
             // 倍率変更時、スクロールの位置調整
             if (d is BitmapSourceVisualizerWindow main)
             {
-                AdjustOffset2(main.MyScroll, main.MyBitmapSource, (double)e.OldValue, (double)e.NewValue);
+                double oldScale = (double)e.OldValue;
+                double newScale = (double)e.NewValue;
+                AdjustOffset2(main.MyScroll, main.MyBitmapSource, oldScale, newScale);
+
+                main.MyPanel.Width = newScale * main.MyBitmapSource.PixelWidth;
+                main.MyPanel.Height = newScale * main.MyBitmapSource.PixelHeight;
             }
         }
 
@@ -922,6 +927,15 @@ namespace BitmapSourceVisualizer
         private void ViewBoundsRect_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
         {
             if (ChangeScaleWithMouseWheel(e.Delta)) { e.Handled = true; }
+        }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            Irohyouzitest();
+        }
+        private void Irohyouzitest()
+        {
+
         }
     }
 }

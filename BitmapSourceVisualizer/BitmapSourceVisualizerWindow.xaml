@@ -81,6 +81,8 @@ https://seizu.dev/2013/06/11/post2437.html-->
         </Image.LayoutTransform>
       </Image>
     </ScrollViewer>
+    <WrapPanel x:Name="MyPanel"/>
+
     <StackPanel Grid.Column="1">
       <StackPanel.Resources>
         <Style TargetType="TextBlock">
@@ -99,7 +101,8 @@ https://seizu.dev/2013/06/11/post2437.html-->
         </Style>
       </StackPanel.Resources>
 
-
+      <Button Content="test" Click="Button_Click"/>
+      <TextBlock Text="{Binding ElementName=MyPanel, Path=ActualWidth}"/>
       <UniformGrid Columns="2">
         <CheckBox x:Name="IsBackground" Content="市松模様" IsChecked="False"/>
         <CheckBox x:Name="IsVisibleNaviWaku" Content="ナビ枠" IsChecked="True" />
