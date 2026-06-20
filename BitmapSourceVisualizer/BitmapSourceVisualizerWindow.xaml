@@ -109,9 +109,15 @@ https://seizu.dev/2013/06/11/post2437.html-->
               PreviewMouseLeftButtonDown="MiniMapCanvas_PreviewMouseLeftButtonDown"
               PreviewMouseLeftButtonUp="MiniMapCanvas_PreviewMouseLeftButtonUp"
               MouseMove="MiniMapCanvas_MouseMove">
-        <Image x:Name="MiniMapImage" Width="200" Height="150" Stretch="Uniform"/>
-        <Rectangle x:Name="ViewBoundsRect" Stroke="Red" StrokeThickness="2" Fill="#20FF0000"
-                   Visibility="{Binding ElementName=IsVisibleNaviWaku, Path=IsChecked, Converter={StaticResource boolVisible}}"
+        <Image x:Name="MiniMapImage" Width="200" Height="150" Stretch="Uniform"
+               PreviewMouseWheel="MiniMapImage_PreviewMouseWheel"/>
+        <Rectangle
+          x:Name="ViewBoundsRect"
+          Stroke="Red"
+          StrokeThickness="2"
+          Fill="#20FF0000" 
+          Visibility="{Binding ElementName=IsVisibleNaviWaku, Path=IsChecked, Converter={StaticResource boolVisible}}"
+          PreviewMouseWheel="ViewBoundsRect_PreviewMouseWheel"
                    />
       </Canvas>
 

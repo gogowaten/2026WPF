@@ -149,15 +149,18 @@ namespace _20260510
             }
             RenderTargetBitmap bmp =
                 new(MyCeiling(ltBounds.Width), MyCeiling(ltBounds.Height), dpi, dpi, PixelFormats.Pbgra32);
-            // Bgra32は非対応
+            // Bgra32は非対応。PixelFormats.Defaultの中身はPbgra32
             //RenderTargetBitmap bmp2 =
             //    new(MyCeiling(ltBounds.Width), MyCeiling(ltBounds.Height), dpi, dpi, PixelFormats.Bgra32);
 
-            //RenderTargetBitmap bmp2 =
-            //    new(MyCeiling(ltBounds.Width), MyCeiling(ltBounds.Height), dpi, dpi, PixelFormats.Default);
-
 
             bmp.Render(dv);
+
+            var bmp2 = new FormatConvertedBitmap(bmp, PixelFormats.Gray8, null, 0);
+            BitmapPalette palette = new(bmp, 4);
+            var bmp3 = new FormatConvertedBitmap(bmp, PixelFormats.Indexed2, palette, 0);
+            var bmp4 = new FormatConvertedBitmap(bmp, PixelFormats.Bgr24, null, 0);
+            var bmp5 = new FormatConvertedBitmap(bmp, PixelFormats.BlackWhite, null, 0);
 
             return bmp;
         }

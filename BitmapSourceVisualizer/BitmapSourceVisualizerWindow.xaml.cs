@@ -67,7 +67,7 @@ namespace BitmapSourceVisualizer
         {
             MyBitmapSource = bitmap;
             ImageControl.Source = bitmap;
-            Title = $"BitmapSource Visualizer - {bitmap.PixelWidth} x {bitmap.PixelHeight}";
+            Title = $"BitmapSource Visualizer - {bitmap.PixelWidth} x {bitmap.PixelHeight} , PixelFormat {bitmap.Format} , DPI {bitmap.DpiX}";
             MiniMapImage.Source = bitmap;
         }
 
@@ -138,7 +138,7 @@ namespace BitmapSourceVisualizer
             DependencyProperty.Register(nameof(MyColor), typeof(Color), typeof(Window), new PropertyMetadata(Colors.Transparent));
 
 
-        // 画像のピクセル座標
+        // マウスカーソル位置の画像のピクセル座標
         public int MyPixelX
         {
             get { return (int)GetValue(MyPixelXProperty); }
@@ -163,7 +163,7 @@ namespace BitmapSourceVisualizer
         public static readonly DependencyProperty MyImageClickPointProperty =
             DependencyProperty.Register(nameof(MyImageClickPoint), typeof(Point), typeof(Window), new PropertyMetadata(null));
 
-
+        // 画像のスケール（表示倍率）
         public double MyImageScale
         {
             get { return (double)GetValue(MyImageScaleProperty); }
@@ -174,7 +174,7 @@ namespace BitmapSourceVisualizer
 
         private static void OnMyImageScale(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            // 倍率変更時、スクロールの位置を固定する
+            // 倍率変更時、スクロールの位置調整
             if (d is BitmapSourceVisualizerWindow main)
             {
                 AdjustOffset2(main.MyScroll, main.MyBitmapSource, (double)e.OldValue, (double)e.NewValue);
@@ -362,6 +362,7 @@ namespace BitmapSourceVisualizer
 
         #endregion 画像処理
 
+        #region ボタンクリック
 
         private void ButtonCopyToClipboard_Click(object sender, RoutedEventArgs e)
         {
@@ -397,6 +398,41 @@ namespace BitmapSourceVisualizer
             }
         }
 
+        // LayoutTransformによる変形後の要素からBitmap作成して、クリップボードにコピー
+        private void ButtonCopyToClipboardExterior_Click(object sender, RoutedEventArgs e)
+        {
+            CopyToClipboardExterior(ImageControl);
+        }
+
+        // 変形後の要素を画像としてファイルに保存
+        private void ButtonSaveExterior_Click(object sender, RoutedEventArgs e)
+        {
+            SaveExteriorToImageFile();
+        }
+
+        private void Button_ClickCopyClickedPixelARGB(object sender, RoutedEventArgs e)
+        {
+            string argb = $"{MyClickedColor.A}, {MyClickedColor.R}, {MyClickedColor.G}, {MyClickedColor.B}";
+            SetTextToClipboard(argb);
+        }
+        private void Button_ClickCopyClickedPixelHex(object sender, RoutedEventArgs e)
+        {
+            SetTextToClipboard(MyClickedColor.ToString());
+        }
+
+        private void RepeatButton_ClickDown(object sender, RoutedEventArgs e)
+        {
+            ChangeScaleWithMouseWheel(-1);
+        }
+
+        private void RepeatButton_ClickUp(object sender, RoutedEventArgs e)
+        {
+            ChangeScaleWithMouseWheel(1);
+        }
+
+
+        #endregion ボタンクリック
+
         private double GetClampedImageScale(double scale)
         {
             return Clamp(scale, ImageScaleMin, ImageScaleMax);
@@ -415,11 +451,6 @@ namespace BitmapSourceVisualizer
         }
 
 
-        // LayoutTransformによる変形後の要素からBitmap作成して、クリップボードにコピー
-        private void ButtonCopyToClipboardExterior_Click(object sender, RoutedEventArgs e)
-        {
-            CopyToClipboardExterior(ImageControl);
-        }
 
         // LayoutTransformによる変形後の要素からBitmap作成して、クリップボードにコピー
         public static void CopyToClipboardExterior(FrameworkElement element)
@@ -431,11 +462,6 @@ namespace BitmapSourceVisualizer
             }
         }
 
-        // 変形後の要素を画像としてファイルに保存
-        private void ButtonSaveExterior_Click(object sender, RoutedEventArgs e)
-        {
-            SaveExteriorToImageFile();
-        }
 
         private void SaveExteriorToImageFile()
         {
@@ -884,37 +910,18 @@ namespace BitmapSourceVisualizer
             MiniMapCanvas.ReleaseMouseCapture();
         }
 
+
+
         #endregion 枠移動
 
-        //private void Button_ClickCopyHexARGB(object sender, RoutedEventArgs e)
-        //{
-        //    SetTextToClipboard(MyColor.ToString());
-        //}
-
-        //private void Button_ClickCopyARGB(object sender, RoutedEventArgs e)
-        //{
-        //    string argb = $"{MyColor.A}, {MyColor.R}, {MyColor.G}, {MyColor.B}";
-        //    SetTextToClipboard(argb);
-        //}
-
-        private void Button_ClickCopyClickedPixelARGB(object sender, RoutedEventArgs e)
+        private void MiniMapImage_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
         {
-            string argb = $"{MyClickedColor.A}, {MyClickedColor.R}, {MyClickedColor.G}, {MyClickedColor.B}";
-            SetTextToClipboard(argb);
-        }
-        private void Button_ClickCopyClickedPixelHex(object sender, RoutedEventArgs e)
-        {
-            SetTextToClipboard(MyClickedColor.ToString());
+            _ = ChangeScaleWithMouseWheel(e.Delta);
         }
 
-        private void RepeatButton_ClickDown(object sender, RoutedEventArgs e)
+        private void ViewBoundsRect_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
         {
-            ChangeScaleWithMouseWheel(-1);
-        }
-
-        private void RepeatButton_ClickUp(object sender, RoutedEventArgs e)
-        {
-            ChangeScaleWithMouseWheel(1);
+            if (ChangeScaleWithMouseWheel(e.Delta)) { e.Handled = true; }
         }
     }
 }
