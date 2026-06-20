@@ -20,18 +20,18 @@ namespace _20260510
 
     public static class Manager
     {
-        // ネイティブオブジェクト解放用のAPI
-        [System.Runtime.InteropServices.DllImport("gdi32.dll")]
-        private static extern bool DeleteObject(IntPtr hObject);
-        // Windows API の宣言（仮想ウィンドウの描画内容をHDCへ転送するための関数）
-        [System.Runtime.InteropServices.DllImport("user32.dll", SetLastError = true)]
-        private static extern bool PrintWindow(IntPtr hwnd, IntPtr hdcBlt, uint nFlags);
+        //// ネイティブオブジェクト解放用のAPI
+        //[System.Runtime.InteropServices.DllImport("gdi32.dll")]
+        //private static extern bool DeleteObject(IntPtr hObject);
+        //// Windows API の宣言（仮想ウィンドウの描画内容をHDCへ転送するための関数）
+        //[System.Runtime.InteropServices.DllImport("user32.dll", SetLastError = true)]
+        //private static extern bool PrintWindow(IntPtr hwnd, IntPtr hdcBlt, uint nFlags);
 
-        private static void PrintWindowContents(IntPtr hwnd, IntPtr hdc)
-        {
-            // PW_RENDERFULLCONTENT (0x00000002) を指定して画面外や非表示領域も強制的にレンダリングさせる
-            PrintWindow(hwnd, hdc, 0x00000002);
-        }
+        //private static void PrintWindowContents(IntPtr hwnd, IntPtr hdc)
+        //{
+        //    // PW_RENDERFULLCONTENT (0x00000002) を指定して画面外や非表示領域も強制的にレンダリングさせる
+        //    PrintWindow(hwnd, hdc, 0x00000002);
+        //}
 
 
 
@@ -149,16 +149,18 @@ namespace _20260510
             }
             RenderTargetBitmap bmp =
                 new(MyCeiling(ltBounds.Width), MyCeiling(ltBounds.Height), dpi, dpi, PixelFormats.Pbgra32);
-            // Bgra32は非対応
+            // Bgra32は非対応。PixelFormats.Defaultの中身はPbgra32
             //RenderTargetBitmap bmp2 =
             //    new(MyCeiling(ltBounds.Width), MyCeiling(ltBounds.Height), dpi, dpi, PixelFormats.Bgra32);
-            var bmp3 = new FormatConvertedBitmap(bmp, PixelFormats.Bgra32,null,0);
+
 
             bmp.Render(dv);
-            //var bmp4 = SaveAsAccuratePng(bmp);
-            //var bmp5 = SaveLargeElementToBgra32Png(element);
-            //var bmp6 = SaveElementToPerfectBgra32Png(element);
-            //SaveElementToPerfectBgra32Png(element, "C:\\Users\\waten\\Documents\\20260613_230106.png");
+
+            var bmp2 = new FormatConvertedBitmap(bmp, PixelFormats.Gray8, null, 0);
+            BitmapPalette palette = new(bmp, 4);
+            var bmp3 = new FormatConvertedBitmap(bmp, PixelFormats.Indexed2, palette, 0);
+            var bmp4 = new FormatConvertedBitmap(bmp, PixelFormats.Bgr24, null, 0);
+            var bmp5 = new FormatConvertedBitmap(bmp, PixelFormats.BlackWhite, null, 0);
 
             return bmp;
         }

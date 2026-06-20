@@ -5,27 +5,43 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:_20260612"
         mc:Ignorable="d"
-        Title="MainWindow" Height="367" Width="654">
+        Title="MainWindow" Height="367" Width="654"
+        DataContext="{Binding RelativeSource={RelativeSource Mode=Self}}">
   <Grid>
     <Grid.ColumnDefinitions>
       <ColumnDefinition/>
       <ColumnDefinition Width="200"/>
     </Grid.ColumnDefinitions>
 
-    <ScrollViewer x:Name="MyScroll" HorizontalScrollBarVisibility="Auto">
-      <Rectangle x:Name="MyRect" Width="100" Height="100" Fill="red"
-                 PreviewMouseLeftButtonDown="MyRect_PreviewMouseLeftButtonDown">
-        <Rectangle.LayoutTransform>
-          <ScaleTransform ScaleX="10" ScaleY="10"/>
-        </Rectangle.LayoutTransform>
-      </Rectangle>
+
+
+    <ScrollViewer x:Name="MyScroll" HorizontalScrollBarVisibility="Auto"
+                  ScrollChanged="MyScroll_ScrollChanged">
+      <Image x:Name="MainImage" Stretch="None"
+             RenderOptions.BitmapScalingMode="NearestNeighbor">
+        <Image.LayoutTransform>
+          <ScaleTransform x:Name="ImageScale" ScaleX="10.0" ScaleY="10.0"/>
+        </Image.LayoutTransform>
+      </Image>
+
     </ScrollViewer>
+
     <Canvas x:Name="MyCanvas">
 
     </Canvas>
 
     <StackPanel Grid.Column="1">
       <Button Content="test1" Click="Button_Click"/>
+      <TextBlock Text="{Binding MyX, StringFormat='x = {0}'}"/>
+      <TextBlock Text="{Binding MyY, StringFormat='y = {0}'}"/>
+      <Canvas x:Name="MiniMapCanvas" Height="150" Width="200" Background="WhiteSmoke"
+              PreviewMouseLeftButtonDown="MiniMapCanvas_PreviewMouseLeftButtonDown"
+              PreviewMouseLeftButtonUp="MiniMapCanvas_PreviewMouseLeftButtonUp"
+              MouseMove="MiniMapCanvas_MouseMove">
+        <Image x:Name="MiniMapImage" Width="200" Height="150" Stretch="Uniform"/>
+        <Rectangle x:Name="ViewBoundsRect" Stroke="Red" StrokeThickness="2" Fill="#20FF0000"
+                   />
+      </Canvas>
     </StackPanel>
   </Grid>
 </Window>
