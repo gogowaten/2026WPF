@@ -63,8 +63,8 @@ https://seizu.dev/2013/06/11/post2437.html-->
           </Style.Triggers>
         </Style>
       </ScrollViewer.Style>
-
-      <Image x:Name="ImageControl"
+      <Grid>
+        <Image x:Name="ImageControl"
              Stretch="None"
              SnapsToDevicePixels="True"
              RenderOptions.BitmapScalingMode="NearestNeighbor"
@@ -75,13 +75,15 @@ https://seizu.dev/2013/06/11/post2437.html-->
              MouseMove="ImageControl_MouseMove"
              PreviewMouseDown="ImageControl_PreviewMouseDown"
              >
-        <Image.LayoutTransform>
-          <ScaleTransform ScaleX="{Binding MyImageScale}"
+          <Image.LayoutTransform>
+            <ScaleTransform ScaleX="{Binding MyImageScale}"
                           ScaleY="{Binding MyImageScale}"/>
-        </Image.LayoutTransform>
-      </Image>
+          </Image.LayoutTransform>
+        </Image>
+        <!--IsHitTestVisible="False" クリックとかのイベントを透過-->
+        <WrapPanel x:Name="MyPanel" IsHitTestVisible="False"/>
+      </Grid>
     </ScrollViewer>
-    <WrapPanel x:Name="MyPanel"/>
 
     <StackPanel Grid.Column="1">
       <StackPanel.Resources>

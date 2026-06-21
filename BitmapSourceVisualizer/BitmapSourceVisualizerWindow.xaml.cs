@@ -37,10 +37,6 @@ namespace BitmapSourceVisualizer
         private readonly double ImageScaleMax = 50.0; // 拡大率上限
 
 
-        //// ネイティブオブジェクト解放用のAPI
-        //[System.Runtime.InteropServices.DllImport("gdi32.dll")]
-        //private static extern bool DeleteObject(IntPtr hObject);
-
 
         public BitmapSourceVisualizerWindow()
         {
@@ -49,6 +45,7 @@ namespace BitmapSourceVisualizer
             DataContext = this;
             MyTextBlockScale.FontSize = this.FontSize * 1.5;
             Loaded += BitmapSourceVisualizerWindow_Loaded;
+            
         }
 
         private void BitmapSourceVisualizerWindow_Loaded(object sender, RoutedEventArgs e)
@@ -935,6 +932,27 @@ namespace BitmapSourceVisualizer
         }
         private void Irohyouzitest()
         {
+            MyImageScale = 50;
+            int pixelCount = MyBitmapSource.PixelWidth * 10;
+            //int pixelCount = MyBitmapSource.PixelWidth * MyBitmapSource.PixelHeight;
+            var font = new FontFamily("ＭＳ ゴシック");
+            for (int i = 0; i < pixelCount; i++)
+            {
+                StackPanel stack = new() { Width = 50, Height = 50 };
+
+                TextBlock tb;
+                tb = new() { Text = "A 255", FontFamily = font };
+                stack.Children.Add(tb);
+                tb = new() { Text = "R 255", FontFamily = font };
+                stack.Children.Add(tb);
+                tb = new() { Text = "G 255", FontFamily = font };
+                stack.Children.Add(tb);
+                tb = new() { Text = "B 255", FontFamily = font };
+                stack.Children.Add(tb);
+
+                MyPanel.Children.Add(stack);
+
+            }
 
         }
     }
