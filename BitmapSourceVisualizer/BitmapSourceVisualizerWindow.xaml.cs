@@ -32,9 +32,9 @@ namespace BitmapSourceVisualizer
 
 
         private Point MyPoint; // マウスドラッグ移動処理で使う
-        public BitmapSource MyBitmapSource;
+        //public BitmapSource MyBitmapSource { get; set; }
         private readonly double ImageScaleMin = 0.01; // 拡大率下限
-        private readonly double ImageScaleMax = 50.0; // 拡大率上限
+        private readonly double ImageScaleMax = 100.0; // 拡大率上限
 
 
 
@@ -45,7 +45,7 @@ namespace BitmapSourceVisualizer
             DataContext = this;
             MyTextBlockScale.FontSize = this.FontSize * 1.5;
             Loaded += BitmapSourceVisualizerWindow_Loaded;
-            
+
         }
 
         private void BitmapSourceVisualizerWindow_Loaded(object sender, RoutedEventArgs e)
@@ -70,6 +70,14 @@ namespace BitmapSourceVisualizer
 
 
         #region 依存関係プロパティ
+
+        public BitmapSource MyBitmapSource
+        {
+            get { return (BitmapSource)GetValue(MyBitmapSourceProperty); }
+            set { SetValue(MyBitmapSourceProperty, value); }
+        }
+        public static readonly DependencyProperty MyBitmapSourceProperty =
+            DependencyProperty.Register(nameof(MyBitmapSource), typeof(BitmapSource), typeof(BitmapSourceVisualizerWindow), new PropertyMetadata(null));
 
         // クリックしたピクセルの座標
         public int MyClickedPixelX
@@ -178,8 +186,8 @@ namespace BitmapSourceVisualizer
                 double newScale = (double)e.NewValue;
                 AdjustOffset2(main.MyScroll, main.MyBitmapSource, oldScale, newScale);
 
-                main.MyPanel.Width = newScale * main.MyBitmapSource.PixelWidth;
-                main.MyPanel.Height = newScale * main.MyBitmapSource.PixelHeight;
+                //main.MyPanel.Width = newScale * main.MyBitmapSource.PixelWidth;
+                //main.MyPanel.Height = newScale * main.MyBitmapSource.PixelHeight;
             }
         }
 
@@ -781,6 +789,9 @@ namespace BitmapSourceVisualizer
         {
             if (ImageControl.ActualHeight == 0 || ImageControl.ActualWidth == 0) { return; }
             NaviWaku();
+
+            //描画更新、OnRenderが実行される
+            MyDraw.InvalidateVisual();
         }
 
         private void NaviWaku()
@@ -916,44 +927,58 @@ namespace BitmapSourceVisualizer
 
         #endregion 枠移動
 
+        // ナビ上でのマウスホイール操作で拡大率変化
         private void MiniMapImage_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
         {
             _ = ChangeScaleWithMouseWheel(e.Delta);
         }
 
+        // ナビ枠上でのマウスホイール操作で拡大率変化
         private void ViewBoundsRect_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
         {
             if (ChangeScaleWithMouseWheel(e.Delta)) { e.Handled = true; }
         }
 
-        private void Button_Click(object sender, RoutedEventArgs e)
+        // ARGB表示の切り替え
+        private void Button_ClickChangeDrawARGB(object sender, RoutedEventArgs e)
         {
-            Irohyouzitest();
-        }
-        private void Irohyouzitest()
-        {
-            MyImageScale = 50;
-            int pixelCount = MyBitmapSource.PixelWidth * 10;
-            //int pixelCount = MyBitmapSource.PixelWidth * MyBitmapSource.PixelHeight;
-            var font = new FontFamily("ＭＳ ゴシック");
-            for (int i = 0; i < pixelCount; i++)
+            if (MyDraw.Visibility == Visibility.Visible)
             {
-                StackPanel stack = new() { Width = 50, Height = 50 };
-
-                TextBlock tb;
-                tb = new() { Text = "A 255", FontFamily = font };
-                stack.Children.Add(tb);
-                tb = new() { Text = "R 255", FontFamily = font };
-                stack.Children.Add(tb);
-                tb = new() { Text = "G 255", FontFamily = font };
-                stack.Children.Add(tb);
-                tb = new() { Text = "B 255", FontFamily = font };
-                stack.Children.Add(tb);
-
-                MyPanel.Children.Add(stack);
-
+                MyDraw.Visibility = Visibility.Collapsed;
+            }
+            else
+            {
+                MyDraw.Visibility = Visibility.Visible;
             }
 
+            //Irohyouzitest();
         }
+        //private void Irohyouzitest()
+        //{
+        //    MyImageScale = 50;
+        //    int pixelCount = MyBitmapSource.PixelWidth * 10;
+        //    //int pixelCount = MyBitmapSource.PixelWidth * MyBitmapSource.PixelHeight;
+        //    var font = new FontFamily("ＭＳ ゴシック");
+        //    for (int i = 0; i < pixelCount; i++)
+        //    {
+        //        StackPanel stack = new() { Width = 50, Height = 50 };
+
+        //        TextBlock tb;
+        //        tb = new() { Text = "A 255", FontFamily = font };
+        //        stack.Children.Add(tb);
+        //        tb = new() { Text = "R 255", FontFamily = font };
+        //        stack.Children.Add(tb);
+        //        tb = new() { Text = "G 255", FontFamily = font };
+        //        stack.Children.Add(tb);
+        //        tb = new() { Text = "B 255", FontFamily = font };
+        //        stack.Children.Add(tb);
+
+        //        MyPanel.Children.Add(stack);
+
+        //    }
+
+        //}
+
+
     }
 }

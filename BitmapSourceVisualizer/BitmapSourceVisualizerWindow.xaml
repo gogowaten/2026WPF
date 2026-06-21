@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:local="clr-namespace:BitmapSourceVisualizer"
         Title="BitmapSource Visualizer"
-        Width="800" Height="600"
+        Width="800" Height="640"
         WindowStartupLocation="CenterOwner"
         ResizeMode="CanResizeWithGrip"
         DataContext="{Binding RelativeSource={RelativeSource Mode=Self}}">
@@ -63,7 +63,7 @@ https://seizu.dev/2013/06/11/post2437.html-->
           </Style.Triggers>
         </Style>
       </ScrollViewer.Style>
-      <Grid>
+      <Grid UseLayoutRounding="True">
         <Image x:Name="ImageControl"
              Stretch="None"
              SnapsToDevicePixels="True"
@@ -81,7 +81,17 @@ https://seizu.dev/2013/06/11/post2437.html-->
           </Image.LayoutTransform>
         </Image>
         <!--IsHitTestVisible="False" クリックとかのイベントを透過-->
-        <WrapPanel x:Name="MyPanel" IsHitTestVisible="False"/>
+
+        <!--<local:DrawTextARGB/>-->
+        
+        <local:DrawTextARGB x:Name="MyDraw"
+                            IsHitTestVisible="False"
+                            MyBitmapSource="{Binding MyBitmapSource}"
+                            MyScroll="{Binding ElementName=MyScroll}"
+                            MyPixelSize="{Binding MyImageScale}"/>
+
+        <!--<WrapPanel x:Name="MyPanel" IsHitTestVisible="False"/>-->
+
       </Grid>
     </ScrollViewer>
 
@@ -103,8 +113,8 @@ https://seizu.dev/2013/06/11/post2437.html-->
         </Style>
       </StackPanel.Resources>
 
-      <Button Content="test" Click="Button_Click"/>
-      <TextBlock Text="{Binding ElementName=MyPanel, Path=ActualWidth}"/>
+      <Button Content="ARGB表示切り替え" Click="Button_ClickChangeDrawARGB"/>
+      
       <UniformGrid Columns="2">
         <CheckBox x:Name="IsBackground" Content="市松模様" IsChecked="False"/>
         <CheckBox x:Name="IsVisibleNaviWaku" Content="ナビ枠" IsChecked="True" />
@@ -154,9 +164,9 @@ https://seizu.dev/2013/06/11/post2437.html-->
       <DockPanel >
         <Button Content="等倍" Tag="1" Click="ButtonSetScale_Click"/>
         <RepeatButton Content="&lt;" Click="RepeatButton_ClickDown"/>
-        <Button DockPanel.Dock="Right" Content="最大" Tag="50" Click="ButtonSetScale_Click"/>
+        <Button DockPanel.Dock="Right" Content="最大" Tag="100" Click="ButtonSetScale_Click"/>
         <RepeatButton DockPanel.Dock="Right" Content="&gt;" Click="RepeatButton_ClickUp"/>
-        <Slider x:Name="ImageScale" Minimum="1" Maximum="50" Value="{Binding MyImageScale}"
+        <Slider x:Name="ImageScale" Minimum="1" Maximum="100" Value="{Binding MyImageScale}"
               SmallChange="1.0" LargeChange="1.0" IsSnapToTickEnabled="True"
               Margin="4,5" TickFrequency="1.0" PreviewMouseWheel="MyScroll_PreviewMouseWheel"/>
       </DockPanel>
