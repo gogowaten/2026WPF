@@ -21,6 +21,7 @@ namespace _20260621
         {
             base.OnRender(drawingContext);
 
+            if (Visibility == Visibility.Collapsed || Visibility == Visibility.Hidden) { return; }
             if (MyScroll is null || MyScroll.ViewportWidth == 0 || MyScroll.ViewportHeight == 0) { return; }
             if (MyBitmapSource is null) { return; }
 

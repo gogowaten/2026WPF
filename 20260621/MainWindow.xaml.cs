@@ -16,7 +16,8 @@ namespace _20260621
     /// </summary>
     public partial class MainWindow : Window
     {
-        private string MyPicturePath = "D:\\ブログ用\\テスト用画像\\collection3.png";
+        //private string MyPicturePath = "D:\\ブログ用\\テスト用画像\\collection3.png";
+        private string MyPicturePath = "D:\\ブログ用\\テスト用画像\\NEC_9011_2015_07_23_スイートバジル収穫.jpg";
         //public BitmapImage MyBitmap {  get; set; }
         public MainWindow()
         {
@@ -53,7 +54,20 @@ namespace _20260621
 
         private void MyScroll_ScrollChanged(object sender, ScrollChangedEventArgs e)
         {
+            // 描画更新、OnRenderが実行される
             MyDraw.InvalidateVisual();
+        }
+
+        private void Button_ClickChangeVisibleARGB(object sender, RoutedEventArgs e)
+        {
+            if (MyDraw.Visibility == Visibility.Visible)
+            {
+                MyDraw.Visibility = Visibility.Collapsed;
+            }
+            else
+            {
+                MyDraw.Visibility = Visibility.Visible;
+            }
         }
     }
 }

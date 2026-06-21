@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:_20260621"
         mc:Ignorable="d"
-        Title="MainWindow" Height="167" Width="354"
+        Title="MainWindow" Height="367" Width="654"
         DataContext="{Binding RelativeSource={RelativeSource Mode=Self}}">
   <!--Title="MainWindow" Height="367" Width="654"-->
   <Grid>
@@ -19,7 +19,7 @@
     <ScrollViewer x:Name="MyScroll"
                   HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto"
                   ScrollChanged="MyScroll_ScrollChanged">
-      <Grid>
+      <Grid UseLayoutRounding="True">
         <Image x:Name="MyImage"
              RenderOptions.BitmapScalingMode="NearestNeighbor">
           <Image.LayoutTransform>
@@ -32,13 +32,11 @@
                             MyPixelSize="{Binding ElementName=MyScaleTransform, Path=ScaleX}"/>
       </Grid>
     </ScrollViewer>
-    <Canvas x:Name="MyCanvas">
-
-    </Canvas>
 
     <StackPanel Grid.Column="1">
       <TextBlock Text="{Binding ElementName=MyDraw, Path=ActualHeight, StringFormat='actHeight = {0:0.00}'}"/>
       <TextBlock Text="{Binding ElementName=MyDraw, Path=ActualWidth, StringFormat='actWidth = {0:0.00}'}"/>
+      <Button Content="表示切り替え" Click="Button_ClickChangeVisibleARGB"/>
       <Slider Value="{Binding MyScale}" Minimum="30" Maximum="100"
               SmallChange="1" LargeChange="1" TickFrequency="1.0"
               IsSnapToTickEnabled="True"/>
