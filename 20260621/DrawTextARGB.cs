@@ -22,78 +22,45 @@ namespace _20260621
             base.OnRender(drawingContext);
 
             if (MyScroll is null || MyScroll.ViewportWidth == 0 || MyScroll.ViewportHeight == 0) { return; }
-
-            //if (Rect.Empty == MyDrawBounds) { return; }
             if (MyBitmapSource is null) { return; }
 
-            var vw = MyScroll.ViewportWidth;
-            var vh = MyScroll.ViewportHeight;
+            // 表示されているピクセルの範囲測定、どのピクセルからどのピクセルまで
             int startX = (int)(MyScroll.HorizontalOffset / MyPixelSize);
             int endX = (int)((MyScroll.HorizontalOffset + MyScroll.ViewportWidth) / MyPixelSize) + 1;
+            if (endX > MyBitmapSource.PixelWidth) { endX = MyBitmapSource.PixelWidth; }
             int startY = (int)(MyScroll.VerticalOffset / MyPixelSize);
             int endY = (int)((MyScroll.VerticalOffset + MyScroll.ViewportHeight) / MyPixelSize) + 1;
+            if (endY > MyBitmapSource.PixelHeight) { endY = MyBitmapSource.PixelHeight; }
 
-            Int32Rect cropRect = new(0, 0, 1, 1);
-            double emSize = MyPixelSize / 5.0;
+            Typeface typeface = new Typeface("ＭＳ ゴシック");
+            double emSize = MyPixelSize / 5.0; // フォントの描画サイズ？
+            double pixelsPerDip = VisualTreeHelper.GetDpi(this).PixelsPerDip;
 
             for (int y = startY; y < endY; y++)
             {
                 for (int x = startX; x < endX; x++)
                 {
-                    CroppedBitmap crop = new(MyBitmapSource, new Int32Rect(x,y,1,1));
-                    byte[] pixels = new byte[40];
+                    CroppedBitmap crop = new(MyBitmapSource, new Int32Rect(x, y, 1, 1));
+                    byte[] pixels = new byte[4];
                     crop.CopyPixels(pixels, 4, 0);
                     string argbText = $"A {pixels[3]}\nR {pixels[2]}\nG {pixels[1]}\nB {pixels[0]}\n";
-                    //string argbText = $"A 255\nR 255\nG 255\nB 255\n";
                     FormattedText formattedText = new(
                         argbText,
                         CultureInfo.InvariantCulture,
                         FlowDirection.LeftToRight,
-                        new Typeface("ＭＳ ゴシック"),
+                        typeface,
                         emSize,
-                        MyForeColorBrush,
-                        pixelsPerDip: VisualTreeHelper.GetDpi(this).PixelsPerDip);
-
+                        MyBackColorBrush,
+                        pixelsPerDip);
                     Point textPos = new(x * MyPixelSize + 2, y * MyPixelSize + 2);
                     drawingContext.DrawText(formattedText, textPos);
 
+                    formattedText.SetForegroundBrush(MyForeColorBrush);
+                    textPos = new(x * MyPixelSize + 1, y * MyPixelSize + 1);
+                    drawingContext.DrawText(formattedText, textPos);
                 }
             }
         }
-
-        //protected override void OnRender(DrawingContext drawingContext)
-        //{
-        //    base.OnRender(drawingContext);
-
-        //    for (int y = 0; y < 5; y++)
-        //    {
-        //        for (int x = 0; x < 5; x++)
-        //        {
-        //            string argbText = $"A 255\nR 255\nG 255\nB 255\n";
-        //            FormattedText formattedText = new(
-        //                argbText,
-        //                CultureInfo.InvariantCulture,
-        //                FlowDirection.LeftToRight,
-        //                new Typeface("ＭＳ ゴシック"),
-        //                7.5,
-        //                Brushes.Black,
-        //                pixelsPerDip: VisualTreeHelper.GetDpi(this).PixelsPerDip);
-
-        //            Point textPos = new(x * 30 + 2, y * 30 + 2);
-        //            drawingContext.DrawText(formattedText, textPos);
-
-        //        }
-        //    }
-        //}
-
-
-        public Image MyImage
-        {
-            get { return (Image)GetValue(MyImageProperty); }
-            set { SetValue(MyImageProperty, value); }
-        }
-        public static readonly DependencyProperty MyImageProperty =
-            DependencyProperty.Register(nameof(MyImage), typeof(Image), typeof(DrawTextARGB), new PropertyMetadata(null));
 
 
         public ScrollViewer MyScroll
@@ -118,15 +85,25 @@ namespace _20260621
             set { SetValue(MyForeColorBrushProperty, value); }
         }
         public static readonly DependencyProperty MyForeColorBrushProperty =
-            DependencyProperty.Register(nameof(MyForeColorBrush), typeof(Brush), typeof(DrawTextARGB), new PropertyMetadata(Brushes.Gray));
+            DependencyProperty.Register(nameof(MyForeColorBrush), typeof(Brush), typeof(DrawTextARGB),
+                new PropertyMetadata(new SolidColorBrush(Color.FromArgb(200, 255, 255, 255))));
 
-        public double MyEmSize
+        public Brush MyBackColorBrush
         {
-            get { return (double)GetValue(MyEmSizeProperty); }
-            set { SetValue(MyEmSizeProperty, value); }
+            get { return (Brush)GetValue(MyBackColorBrushProperty); }
+            set { SetValue(MyBackColorBrushProperty, value); }
         }
-        public static readonly DependencyProperty MyEmSizeProperty =
-            DependencyProperty.Register(nameof(MyEmSize), typeof(double), typeof(DrawTextARGB), new PropertyMetadata(10.0));
+        public static readonly DependencyProperty MyBackColorBrushProperty =
+            DependencyProperty.Register(nameof(MyBackColorBrush), typeof(Brush), typeof(DrawTextARGB),
+                new PropertyMetadata(new SolidColorBrush(Color.FromArgb(200, 0, 0, 0))));
+
+        //public double MyEmSize
+        //{
+        //    get { return (double)GetValue(MyEmSizeProperty); }
+        //    set { SetValue(MyEmSizeProperty, value); }
+        //}
+        //public static readonly DependencyProperty MyEmSizeProperty =
+        //    DependencyProperty.Register(nameof(MyEmSize), typeof(double), typeof(DrawTextARGB), new PropertyMetadata(10.0));
 
 
 
@@ -148,13 +125,13 @@ namespace _20260621
 
 
 
-        public Rect MyDrawBounds
-        {
-            get { return (Rect)GetValue(MyDrawBoundsProperty); }
-            set { SetValue(MyDrawBoundsProperty, value); }
-        }
-        public static readonly DependencyProperty MyDrawBoundsProperty =
-            DependencyProperty.Register(nameof(MyDrawBounds), typeof(Rect), typeof(DrawTextARGB), new PropertyMetadata(Rect.Empty));
+        //public Rect MyDrawBounds
+        //{
+        //    get { return (Rect)GetValue(MyDrawBoundsProperty); }
+        //    set { SetValue(MyDrawBoundsProperty, value); }
+        //}
+        //public static readonly DependencyProperty MyDrawBoundsProperty =
+        //    DependencyProperty.Register(nameof(MyDrawBounds), typeof(Rect), typeof(DrawTextARGB), new PropertyMetadata(Rect.Empty));
 
 
 

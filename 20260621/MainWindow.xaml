@@ -28,7 +28,6 @@
         </Image>
         <local:DrawTextARGB x:Name="MyDraw"
                             MyScroll="{Binding ElementName=MyScroll}"
-                            MyImage="{Binding ElementName=MyImage}"
                             MyBitmapSource="{Binding MyBitmap}"
                             MyPixelSize="{Binding ElementName=MyScaleTransform, Path=ScaleX}"/>
       </Grid>
