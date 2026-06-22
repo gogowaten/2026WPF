@@ -15,20 +15,32 @@
 
     <ScrollViewer x:Name="MyScroll" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
       <Grid UseLayoutRounding="True">
+        
         <Image x:Name="MyImage" RenderOptions.BitmapScalingMode="NearestNeighbor"
-               SnapsToDevicePixels="True" Stretch="None">
+               SnapsToDevicePixels="True" Stretch="None"
+               >
           <Image.LayoutTransform>
             <ScaleTransform x:Name="MyScaleTransform"
                             ScaleX="{Binding MyScale}" ScaleY="{Binding MyScale}"/>
           </Image.LayoutTransform>
         </Image>
-        <Image x:Name="GridOverlay" RenderOptions.BitmapScalingMode="NearestNeighbor"
-               SnapsToDevicePixels="True" Stretch="None"/>
+
+        <Image x:Name="GridOverlay" Source="{Binding MyGridBitmap}"
+               SnapsToDevicePixels="True" Stretch="None"
+               HorizontalAlignment="Left"
+               VerticalAlignment="Top"
+               >
+          <Image.RenderTransform>
+            <TranslateTransform X="{Binding MyGridXOffset}" Y="{Binding MyGridYOffset}"/>
+          </Image.RenderTransform>
+        </Image>
+        
       </Grid>
     </ScrollViewer>
 
     <StackPanel Grid.Column="1">
-
+      <Button Content="test" Click="Button_Click"/>
+      <TextBlock Text="{Binding ElementName=GridOverlay, Path=ActualWidth, StringFormat='actWidth = {0:0.00}'}"/>
     </StackPanel>
   </Grid>
 </Window>

@@ -69,8 +69,19 @@ namespace BitmapSourceVisualizer
         }
 
 
+
         #region 依存関係プロパティ
 
+        public WriteableBitmap MyGridBitmap
+        {
+            get { return (WriteableBitmap)GetValue(MyGridBitmapProperty); }
+            set { SetValue(MyGridBitmapProperty, value); }
+        }
+        public static readonly DependencyProperty MyGridBitmapProperty =
+            DependencyProperty.Register(nameof(MyGridBitmap), typeof(WriteableBitmap), typeof(BitmapSourceVisualizerWindow), new PropertyMetadata(null));
+
+
+        // メイン画像
         public BitmapSource MyBitmapSource
         {
             get { return (BitmapSource)GetValue(MyBitmapSourceProperty); }
@@ -298,6 +309,66 @@ namespace BitmapSourceVisualizer
 
         #region 画像処理
 
+        // グリッド線画像作成
+        /// <summary>
+        /// 指定されたセルサイズとセル数から、グリッド線を描画した <see cref="WriteableBitmap"/> を生成します。
+        /// </summary>
+        /// <param name="cellSize">1セルあたりのピクセル数。正の整数を想定します。</param>
+        /// <param name="width">横方向のセル数。</param>
+        /// <param name="height">縦方向のセル数。</param>
+        /// <returns>
+        /// 横幅が <c>width * cellSize</c>、高さが <c>height * cellSize</c> の
+        /// <see cref="WriteableBitmap"/> を返します。ピクセル形式は BGRA32、DPI は 96x96 です。
+        /// グリッド線はセルの境界（セルサイズの倍数の位置）に描画されます。
+        /// </returns>
+        /// <remarks>
+        /// - 線の色は半透明の薄い灰色（A=100, R=200, G=200, B=200）で固定されています。
+        /// - 内部では (bmpWidth * bmpHeight * 4) バイトのピクセルバッファを確保し、<see cref="WriteableBitmap.WritePixels"/> で書き込んでいます。
+        /// - パラメーターの妥当性検査（0以下の値など）は行っていないため、呼び出し側で正の整数を渡してください。
+        /// - 大きなサイズを指定するとメモリ使用量が増加します（bmpWidth * bmpHeight * 4 バイト）。
+        /// </remarks>
+        private WriteableBitmap CreatePixelGrid(int cellSize, int width, int height)
+        {
+            int bmpWidth = width * cellSize;
+            int bmpHeight = height * cellSize;
+
+            WriteableBitmap wbitmap = new(bmpWidth, bmpHeight, 96, 96, PixelFormats.Bgra32, null);
+            int stride = bmpWidth * 4;
+            byte[] pixels = new byte[stride * bmpHeight];
+
+            // グリッド線の色
+            byte r = 200, g = 200, b = 200, a = 100;
+
+            // セルの境界（右端または下端）に線を引く
+            // 縦線描画
+            for (int x = cellSize; x < bmpWidth; x += cellSize)
+            {
+                for (int y = 0; y < bmpHeight; y++)
+                {
+                    int index = (y * stride) + (x * 4);
+                    pixels[index] = b;     // Blue
+                    pixels[index + 1] = g; // Green
+                    pixels[index + 2] = r; // Red
+                    pixels[index + 3] = a; // Alpha
+                }
+            }
+
+            // 横線
+            for (int y = cellSize; y < bmpHeight; y += cellSize)
+            {
+                for (int x = 0; x < bmpWidth; x++)
+                {
+                    int index = (y * stride) + (x * 4);
+                    pixels[index] = b;     // Blue
+                    pixels[index + 1] = g; // Green
+                    pixels[index + 2] = r; // Red
+                    pixels[index + 3] = a; // Alpha
+                }
+            }
+
+            wbitmap.WritePixels(new Int32Rect(0, 0, bmpWidth, bmpHeight), pixels, stride, 0);
+            return wbitmap;
+        }
 
 
         private void SaveBitmapSource(BitmapSource bitmap)
@@ -951,33 +1022,8 @@ namespace BitmapSourceVisualizer
                 MyDraw.Visibility = Visibility.Visible;
             }
 
-            //Irohyouzitest();
         }
-        //private void Irohyouzitest()
-        //{
-        //    MyImageScale = 50;
-        //    int pixelCount = MyBitmapSource.PixelWidth * 10;
-        //    //int pixelCount = MyBitmapSource.PixelWidth * MyBitmapSource.PixelHeight;
-        //    var font = new FontFamily("ＭＳ ゴシック");
-        //    for (int i = 0; i < pixelCount; i++)
-        //    {
-        //        StackPanel stack = new() { Width = 50, Height = 50 };
 
-        //        TextBlock tb;
-        //        tb = new() { Text = "A 255", FontFamily = font };
-        //        stack.Children.Add(tb);
-        //        tb = new() { Text = "R 255", FontFamily = font };
-        //        stack.Children.Add(tb);
-        //        tb = new() { Text = "G 255", FontFamily = font };
-        //        stack.Children.Add(tb);
-        //        tb = new() { Text = "B 255", FontFamily = font };
-        //        stack.Children.Add(tb);
-
-        //        MyPanel.Children.Add(stack);
-
-        //    }
-
-        //}
 
 
     }

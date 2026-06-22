@@ -81,16 +81,13 @@ https://seizu.dev/2013/06/11/post2437.html-->
           </Image.LayoutTransform>
         </Image>
         <!--IsHitTestVisible="False" クリックとかのイベントを透過-->
-
-        <!--<local:DrawTextARGB/>-->
-        
         <local:DrawTextARGB x:Name="MyDraw"
                             IsHitTestVisible="False"
                             MyBitmapSource="{Binding MyBitmapSource}"
                             MyScroll="{Binding ElementName=MyScroll}"
                             MyPixelSize="{Binding MyImageScale}"/>
-
-        <!--<WrapPanel x:Name="MyPanel" IsHitTestVisible="False"/>-->
+        <Image x:Name="GridOverlay"
+               Source="{Binding MyGridBitmap}"/>
 
       </Grid>
     </ScrollViewer>

@@ -18,14 +18,20 @@ namespace _20260622
     {
         private string MyPicturePath = "D:\\ブログ用\\テスト用画像\\collection3.png";
         //private string MyPicturePath = "D:\\ブログ用\\テスト用画像\\NEC_9011_2015_07_23_スイートバジル収穫.jpg";
+        private BitmapImage MyBitmapImage;
         public MainWindow()
         {
             InitializeComponent();
 
-            BitmapImage img = new(new Uri(MyPicturePath));
+            BitmapImage img = new();
+            img.BeginInit();
+            img.UriSource = new Uri(MyPicturePath);
+            img.CacheOption = BitmapCacheOption.OnLoad;
+            img.EndInit();
+            MyBitmapImage = img;
             MyImage.Source = img;
 
-            GridOverlay.Source = CreatePixelGrid((int)MyScale, img.PixelWidth, img.PixelHeight);
+            //GridOverlay.Source = CreatePixelGrid((int)MyScale, img.PixelWidth, img.PixelHeight);
         }
 
         // グリッド線画像作成
@@ -56,7 +62,7 @@ namespace _20260622
             byte[] pixels = new byte[stride * bmpHeight];
 
             // グリッド線の色
-            byte r = 200, g = 200, b = 200, a = 100;
+            byte r = 200, g = 200, b = 200, a = 200;
 
             // セルの境界（右端または下端）に線を引く
             // 縦線描画
@@ -134,5 +140,43 @@ namespace _20260622
         public static readonly DependencyProperty MyScaleProperty =
             DependencyProperty.Register(nameof(MyScale), typeof(double), typeof(MainWindow), new PropertyMetadata(50.0));
 
+
+        public BitmapSource MyGridBitmap
+        {
+            get { return (BitmapSource)GetValue(MyGridBitmapProperty); }
+            set { SetValue(MyGridBitmapProperty, value); }
+        }
+        public static readonly DependencyProperty MyGridBitmapProperty =
+            DependencyProperty.Register(nameof(MyGridBitmap), typeof(BitmapSource), typeof(MainWindow), new PropertyMetadata(null));
+
+        public double MyGridXOffset
+        {
+            get { return (double)GetValue(MyGridXOffsetProperty); }
+            set { SetValue(MyGridXOffsetProperty, value); }
+        }
+        public static readonly DependencyProperty MyGridXOffsetProperty =
+            DependencyProperty.Register(nameof(MyGridXOffset), typeof(double), typeof(MainWindow), new PropertyMetadata(0.0));
+
+        public double MyGridYOffset
+        {
+            get { return (double)GetValue(MyGridYOffsetProperty); }
+            set { SetValue(MyGridYOffsetProperty, value); }
+        }
+        public static readonly DependencyProperty MyGridYOffsetProperty =
+            DependencyProperty.Register(nameof(MyGridYOffset), typeof(double), typeof(MainWindow), new PropertyMetadata(0.0));
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            var hOffset = MyScroll.HorizontalOffset;
+            var vOffset = MyScroll.VerticalOffset;
+            MyGridXOffset = hOffset - (hOffset % MyScale);
+            MyGridYOffset = vOffset - (vOffset % MyScale);
+
+            int width = (int)(MyScroll.ViewportWidth / MyScale) + 1;
+            int height = (int)(MyScroll.ViewportHeight / MyScale) + 1;
+            var gridbmp = CreatePixelGrid((int)MyScale, width, height);
+            MyGridBitmap = gridbmp;
+
+        }
     }
 }
