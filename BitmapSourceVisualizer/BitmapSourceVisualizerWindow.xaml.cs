@@ -72,6 +72,39 @@ namespace BitmapSourceVisualizer
 
         #region 依存関係プロパティ
 
+        // ピクセルグリッド表示の有無
+        public bool MyIsPixelGridVisible
+        {
+            get { return (bool)GetValue(MyIsPixelGridVisibleProperty); }
+            set { SetValue(MyIsPixelGridVisibleProperty, value); }
+        }
+        public static readonly DependencyProperty MyIsPixelGridVisibleProperty =
+            DependencyProperty.Register(nameof(MyIsPixelGridVisible), typeof(bool), typeof(BitmapSourceVisualizerWindow), new PropertyMetadata(true, OnMyIsPixelGridVisible));
+        private static void OnMyIsPixelGridVisible(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            if (d is BitmapSourceVisualizerWindow win)
+            {
+                win.UpdatePixelGrid();
+            }
+        }
+
+        // ピクセルグリッド表示用画像のオフセット値
+        public double MyGridXOffset
+        {
+            get { return (double)GetValue(MyGridXOffsetProperty); }
+            set { SetValue(MyGridXOffsetProperty, value); }
+        }
+        public static readonly DependencyProperty MyGridXOffsetProperty =
+            DependencyProperty.Register(nameof(MyGridXOffset), typeof(double), typeof(BitmapSourceVisualizerWindow), new PropertyMetadata(0.0));
+
+        public double MyGridYOffset
+        {
+            get { return (double)GetValue(MyGridYOffsetProperty); }
+            set { SetValue(MyGridYOffsetProperty, value); }
+        }
+        public static readonly DependencyProperty MyGridYOffsetProperty =
+            DependencyProperty.Register(nameof(MyGridYOffset), typeof(double), typeof(BitmapSourceVisualizerWindow), new PropertyMetadata(0.0));
+
         public WriteableBitmap MyGridBitmap
         {
             get { return (WriteableBitmap)GetValue(MyGridBitmapProperty); }
@@ -327,7 +360,7 @@ namespace BitmapSourceVisualizer
         /// - パラメーターの妥当性検査（0以下の値など）は行っていないため、呼び出し側で正の整数を渡してください。
         /// - 大きなサイズを指定するとメモリ使用量が増加します（bmpWidth * bmpHeight * 4 バイト）。
         /// </remarks>
-        private WriteableBitmap CreatePixelGrid(int cellSize, int width, int height)
+        private WriteableBitmap CreatePixelGridBitmap(int cellSize, int width, int height)
         {
             int bmpWidth = width * cellSize;
             int bmpHeight = height * cellSize;
@@ -861,8 +894,34 @@ namespace BitmapSourceVisualizer
             if (ImageControl.ActualHeight == 0 || ImageControl.ActualWidth == 0) { return; }
             NaviWaku();
 
+            // ピクセルグリッドの更新
+            UpdatePixelGrid();
+
             //描画更新、OnRenderが実行される
             MyDraw.InvalidateVisual();
+        }
+
+        // ピクセルグリッドの更新
+        private void UpdatePixelGrid()
+        {
+            // 拡大率30倍以上＋チェック有りの時だけ更新
+            if (MyImageScale >= 30 && MyIsPixelGridVisible)
+            {
+                var hOffset = MyScroll.HorizontalOffset;
+                var vOffset = MyScroll.VerticalOffset;
+                MyGridXOffset = hOffset - (hOffset % MyImageScale);
+                MyGridYOffset = vOffset - (vOffset % MyImageScale);
+
+                int width = (int)(MyScroll.ViewportWidth / MyImageScale) + 1;
+                int height = (int)(MyScroll.ViewportHeight / MyImageScale) + 1;
+                var gridbmp = CreatePixelGridBitmap((int)MyImageScale, width, height);
+                MyGridBitmap = gridbmp;
+            }
+            else
+            {
+                MyGridBitmap = null;
+            }
+
         }
 
         private void NaviWaku()
