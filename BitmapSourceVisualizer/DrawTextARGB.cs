@@ -46,7 +46,8 @@ namespace BitmapSourceVisualizer
             if (Visibility == Visibility.Collapsed || Visibility == Visibility.Hidden) { return false; }
             if (MyScroll is null || MyScroll.ViewportWidth == 0 || MyScroll.ViewportHeight == 0) { return false; }
             if (MyBitmapSource is null) { return false; }
-            if (MyIsStopDraw) {  return false; }
+            if (MyIsStopDraw) { return false; }
+
             return true;
         }
 
@@ -56,7 +57,7 @@ namespace BitmapSourceVisualizer
 
             MyTestIsDraw = false;
 
-            if(CanOnRenderARGB() == false) { return; }
+            if (CanOnRenderARGB() == false) { return; }
 
             MyTestIsDraw = true;
 

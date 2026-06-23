@@ -23,6 +23,7 @@ namespace BitmapSourceVisualizer
     /// </summary>
     public partial class BitmapSourceVisualizerWindow : Window
     {
+        //private double MyPixelGridVisibleMinScale = 10.0;
         private bool IsMouseDraged; // 枠Rectのドラッグ移動フラグ
         private Point MyClickedPoint; // MiniMapをクリックした場所
         private double MyRateMoveX; // スクロール可動範囲の比率
@@ -30,13 +31,28 @@ namespace BitmapSourceVisualizer
         private double MyClickedScrollXOffset; // スクロール位置の記録
         private double MyClickedScrollYOffset;
 
-        private bool IsImageDrag; //
         private Point MyPoint; // マウスドラッグ移動処理で使う
-        //private bool? IsBeforeDragTextARGBView; // ドラッグ移動前のARGBの表示状態記録用
         private readonly double ImageScaleMin = 0.01; // 拡大率下限
         private readonly double ImageScaleMax = 100.0; // 拡大率上限
 
 
+
+
+        public double MyPixelGridVisibleMinScale
+        {
+            get { return (double)GetValue(MyPixelGridVisibleMinScaleProperty); }
+            set { SetValue(MyPixelGridVisibleMinScaleProperty, value); }
+        }
+        public static readonly DependencyProperty MyPixelGridVisibleMinScaleProperty =
+            DependencyProperty.Register(nameof(MyPixelGridVisibleMinScale), typeof(double), typeof(BitmapSourceVisualizerWindow), new PropertyMetadata(10.0));
+
+        public double MyPixelGridWidth
+        {
+            get { return (double)GetValue(MyPixelGridWidthProperty); }
+            set { SetValue(MyPixelGridWidthProperty, value); }
+        }
+        public static readonly DependencyProperty MyPixelGridWidthProperty =
+            DependencyProperty.Register(nameof(MyPixelGridWidth), typeof(double), typeof(BitmapSourceVisualizerWindow), new PropertyMetadata(0.0));
 
 
         public BitmapSourceVisualizerWindow()
@@ -77,14 +93,14 @@ namespace BitmapSourceVisualizer
 
         #region 依存関係プロパティ
 
-        //// 描画の一時停止フラグ
-        //public bool MyIsStopDraw
-        //{
-        //    get { return (bool)GetValue(MyIsStopDrawProperty); }
-        //    set { SetValue(MyIsStopDrawProperty, value); }
-        //}
-        //public static readonly DependencyProperty MyIsStopDrawProperty =
-        //    DependencyProperty.Register(nameof(MyIsStopDraw), typeof(bool), typeof(BitmapSourceVisualizerWindow), new PropertyMetadata(false));
+        // 画像のドラッグ移動確認フラグ
+        public bool IsImageDrag
+        {
+            get { return (bool)GetValue(IsImageDragProperty); }
+            set { SetValue(IsImageDragProperty, value); }
+        }
+        public static readonly DependencyProperty IsImageDragProperty =
+            DependencyProperty.Register(nameof(IsImageDrag), typeof(bool), typeof(BitmapSourceVisualizerWindow), new PropertyMetadata(false));
 
 
         // メイン画像
@@ -194,6 +210,7 @@ namespace BitmapSourceVisualizer
         public static readonly DependencyProperty MyImageScaleProperty =
             DependencyProperty.Register(nameof(MyImageScale), typeof(double), typeof(BitmapSourceVisualizerWindow), new PropertyMetadata(1.0, OnMyImageScale));
 
+        // スケール変更時
         private static void OnMyImageScale(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             // 倍率変更時、スクロールの位置調整
@@ -203,8 +220,15 @@ namespace BitmapSourceVisualizer
                 double newScale = (double)e.NewValue;
                 AdjustOffset2(main.MyScroll, main.MyBitmapSource, oldScale, newScale);
 
-                //main.MyPanel.Width = newScale * main.MyBitmapSource.PixelWidth;
-                //main.MyPanel.Height = newScale * main.MyBitmapSource.PixelHeight;
+                // ピクセルグリッド
+                if(newScale >= main.MyPixelGridVisibleMinScale)
+                {
+                    main.MyPixelGridWidth = 1.0 / newScale;
+                }
+                else
+                {
+                    main.MyPixelGridWidth = 0.0;
+                }
             }
         }
 
@@ -626,6 +650,11 @@ namespace BitmapSourceVisualizer
             if (py >= MyBitmapSource.PixelHeight) { py = MyBitmapSource.PixelHeight - 1; }
             MyClickedPixelX = px; MyClickedPixelY = py;
             MyClickedColor = GetPixelColor(MyBitmapSource, px, py);
+
+            //IsImageDrag = false;
+
+            ////描画更新、OnRenderが実行される
+            //MyDraw.InvalidateVisual();
         }
 
 
@@ -642,7 +671,10 @@ namespace BitmapSourceVisualizer
         {
             ImageControl.Cursor = Cursors.Arrow;
             ImageControl.ReleaseMouseCapture();
+
             IsImageDrag = false;
+            //描画更新、OnRenderが実行される
+            MyDraw.InvalidateVisual();
         }
 
         #endregion クリック系
@@ -666,7 +698,7 @@ namespace BitmapSourceVisualizer
             if (e.LeftButton == MouseButtonState.Pressed)
             {
                 // 一時的にテキストARGBを非表示することで、向こうのフラグで描画を停止させる
-                //IsImageDrag = true;
+                IsImageDrag = true;
 
                 ImageControl.Cursor = Cursors.ScrollAll;//カーソル形状を変更
                 //今のマウスの座標
@@ -816,8 +848,6 @@ namespace BitmapSourceVisualizer
         {
             if (ImageControl.ActualHeight == 0 || ImageControl.ActualWidth == 0) { return; }
 
-            IsImageDrag = true;
-
             // ナビ枠更新
             NaviWaku();
 
@@ -883,6 +913,7 @@ namespace BitmapSourceVisualizer
         // クリック位置に枠が来るようにスクロール位置を調整する
         private void MiniMapCanvas_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
+            IsImageDrag = true;
             IsMouseDraged = true;
             MyClickedPoint = e.GetPosition(MiniMapCanvas);
             // CuptureMouseは実行するとMouseMoveイベントが発行されるのでGetPositionより後にする
@@ -952,6 +983,9 @@ namespace BitmapSourceVisualizer
         private void MiniMapCanvas_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
             // ドラッグ移動フラグ解除
+            IsImageDrag = false;
+            MyDraw.InvalidateVisual();
+
             IsMouseDraged = false;
             MiniMapCanvas.ReleaseMouseCapture();
         }

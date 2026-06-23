@@ -81,10 +81,10 @@ https://seizu.dev/2013/06/11/post2437.html-->
                PreviewMouseDown="ImageControl_PreviewMouseDown"
                  
              >
-            
+
           </Image>
           <!--IsHitTestVisible="False" クリックとかのイベントを透過-->
-          
+          <!--ピクセルグリッド-->
           <Rectangle IsHitTestVisible="False"
                      Visibility="{Binding ElementName=IsPixelGrid, Path=IsChecked, Converter={StaticResource boolVisible}}">
             <Rectangle.Fill>
@@ -92,7 +92,7 @@ https://seizu.dev/2013/06/11/post2437.html-->
                 <DrawingBrush.Drawing>
                   <GeometryDrawing>
                     <GeometryDrawing.Pen>
-                      <Pen Brush="LightGray" Thickness="0.01"/>
+                      <Pen Brush="LightGray" Thickness="{Binding MyPixelGridWidth}"/>
                     </GeometryDrawing.Pen>
                     <GeometryDrawing.Geometry>
                       <GeometryGroup>
@@ -139,7 +139,7 @@ https://seizu.dev/2013/06/11/post2437.html-->
         </Style>
       </StackPanel.Resources>
 
-      <TextBlock Text="{Binding IsBeforeDragTextARGBView}"/>
+      <TextBlock Text="{Binding IsImageDrag}"/>
       <UniformGrid Columns="2" Rows="2">
         <UniformGrid.Resources>
           <Style TargetType="CheckBox">
