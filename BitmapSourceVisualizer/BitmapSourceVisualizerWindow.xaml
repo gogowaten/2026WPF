@@ -57,14 +57,19 @@ https://seizu.dev/2013/06/11/post2437.html-->
             </Setter.Value>
           </Setter>
           <Style.Triggers>
-            <DataTrigger Binding="{Binding ElementName=IsBackground, Path=IsChecked}" Value="false">
+            <DataTrigger Binding="{Binding ElementName=IsBackgroundItimat, Path=IsChecked}" Value="false">
               <Setter Property="Background" Value="Transparent"/>
             </DataTrigger>
           </Style.Triggers>
         </Style>
       </ScrollViewer.Style>
-      <Grid UseLayoutRounding="True">
-        <Image x:Name="ImageControl"
+      <Grid>
+        <Grid UseLayoutRounding="True"
+            RenderOptions.BitmapScalingMode="NearestNeighbor">
+          <Grid.LayoutTransform>
+            <ScaleTransform ScaleX="{Binding MyImageScale}" ScaleY="{Binding MyImageScale}"/>
+          </Grid.LayoutTransform>
+          <Image x:Name="ImageControl"
                Stretch="None"
                SnapsToDevicePixels="True"
                RenderOptions.BitmapScalingMode="NearestNeighbor"
@@ -74,36 +79,48 @@ https://seizu.dev/2013/06/11/post2437.html-->
                MouseLeftButtonUp="ImageControl_MouseLeftButtonUp"
                MouseMove="ImageControl_MouseMove"
                PreviewMouseDown="ImageControl_PreviewMouseDown"
+                 
              >
-          <Image.LayoutTransform>
-            <ScaleTransform ScaleX="{Binding MyImageScale}"
-                          ScaleY="{Binding MyImageScale}"/>
-          </Image.LayoutTransform>
-        </Image>
-        <!--IsHitTestVisible="False" クリックとかのイベントを透過-->
-        <local:DrawTextARGB x:Name="MyDraw"
-                            IsHitTestVisible="False"
-                            SnapsToDevicePixels="True"
-                            MyBitmapSource="{Binding MyBitmapSource}"
-                            MyScroll="{Binding ElementName=MyScroll}"
-                            MyPixelSize="{Binding MyImageScale}"
-                            HorizontalAlignment="Left"
-                            VerticalAlignment="Top"
-/>
-        <Image x:Name="MyGridImage"
-               Source="{Binding MyGridBitmap}"
-               HorizontalAlignment="Left"
-               VerticalAlignment="Top"
-               IsHitTestVisible="False"
-               SnapsToDevicePixels="True">
-          <Image.RenderTransform>
-            <TranslateTransform X="{Binding MyGridXOffset}" Y="{Binding MyGridYOffset}"/>
-          </Image.RenderTransform>
-        </Image>
+            
+          </Image>
+          <!--IsHitTestVisible="False" クリックとかのイベントを透過-->
+          
+          <Rectangle IsHitTestVisible="False"
+                     Visibility="{Binding ElementName=IsPixelGrid, Path=IsChecked, Converter={StaticResource boolVisible}}">
+            <Rectangle.Fill>
+              <DrawingBrush TileMode="Tile" Viewport="0,0,1,1" ViewportUnits="Absolute">
+                <DrawingBrush.Drawing>
+                  <GeometryDrawing>
+                    <GeometryDrawing.Pen>
+                      <Pen Brush="LightGray" Thickness="0.01"/>
+                    </GeometryDrawing.Pen>
+                    <GeometryDrawing.Geometry>
+                      <GeometryGroup>
+                        <LineGeometry StartPoint="0,0" EndPoint="1,0" />
+                        <LineGeometry StartPoint="0,0" EndPoint="0,1" />
+                      </GeometryGroup>
+                    </GeometryDrawing.Geometry>
+                  </GeometryDrawing>
+                </DrawingBrush.Drawing>
+              </DrawingBrush>
+            </Rectangle.Fill>
+          </Rectangle>
+        </Grid>
+
+        <local:DrawTextARGB
+          x:Name="MyDraw"
+          IsHitTestVisible="False"
+          SnapsToDevicePixels="True"
+          MyBitmapSource="{Binding MyBitmapSource}"
+          MyScroll="{Binding ElementName=MyScroll}"
+          MyPixelSize="{Binding MyImageScale}"
+          HorizontalAlignment="Left"
+          VerticalAlignment="Top"
+          Visibility="{Binding ElementName=IsDrawTextARGB, Path=IsChecked, Converter={StaticResource boolVisible}}"
+          MyIsStopDraw="{Binding IsImageDrag}"/>
 
       </Grid>
     </ScrollViewer>
-
     <StackPanel Grid.Column="1">
       <StackPanel.Resources>
         <Style TargetType="TextBlock">
@@ -122,17 +139,18 @@ https://seizu.dev/2013/06/11/post2437.html-->
         </Style>
       </StackPanel.Resources>
 
-      <Button Content="ARGB表示切り替え" Click="Button_ClickChangeDrawARGB"/>
-      
+      <TextBlock Text="{Binding IsBeforeDragTextARGBView}"/>
       <UniformGrid Columns="2" Rows="2">
         <UniformGrid.Resources>
           <Style TargetType="CheckBox">
             <Setter Property="HorizontalAlignment" Value="Left"/>
           </Style>
         </UniformGrid.Resources>
-        <CheckBox x:Name="IsBackground" Content="市松模様" IsChecked="True"/>
+        <CheckBox x:Name="IsBackgroundItimatu" Content="市松模様" IsChecked="True"/>
         <CheckBox x:Name="IsVisibleNaviWaku" Content="ナビ枠" IsChecked="True" />
-        <CheckBox x:Name="IsPixelGrid" Content="ピクセル枠" IsChecked="{Binding MyIsPixelGridVisible}"/>
+        <CheckBox x:Name="IsDrawTextARGB" Content="ARGB値" IsChecked="True"
+                  ToolTip="拡大率50倍以上で表示"/>
+        <CheckBox x:Name="IsPixelGrid" Content="ピクセル枠" IsChecked="True"/>
       </UniformGrid>
 
       <Canvas x:Name="MiniMapCanvas" Width="200" Height="150"

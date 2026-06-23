@@ -46,6 +46,7 @@ namespace BitmapSourceVisualizer
             if (Visibility == Visibility.Collapsed || Visibility == Visibility.Hidden) { return false; }
             if (MyScroll is null || MyScroll.ViewportWidth == 0 || MyScroll.ViewportHeight == 0) { return false; }
             if (MyBitmapSource is null) { return false; }
+            if (MyIsStopDraw) {  return false; }
             return true;
         }
 
@@ -53,13 +54,11 @@ namespace BitmapSourceVisualizer
         {
             base.OnRender(drawingContext);
 
+            MyTestIsDraw = false;
+
             if(CanOnRenderARGB() == false) { return; }
-            //if (MyLimitDrawScale > MyPixelSize) { return; }
-            //if (Visibility == Visibility.Collapsed || Visibility == Visibility.Hidden) { return; }
-            //if (MyScroll is null || MyScroll.ViewportWidth == 0 || MyScroll.ViewportHeight == 0) { return; }
-            //if (MyBitmapSource is null) { return; }
 
-
+            MyTestIsDraw = true;
 
             // 1. Imageコントロールの現在の拡大サイズと位置を取得
             // 2. スクロール領域から「今見えているピクセル範囲」を計算
@@ -106,6 +105,23 @@ namespace BitmapSourceVisualizer
         }
 
         #region 依存関係プロパティ
+
+
+        public bool MyIsStopDraw
+        {
+            get { return (bool)GetValue(MyIsStopDrawProperty); }
+            set { SetValue(MyIsStopDrawProperty, value); }
+        }
+        public static readonly DependencyProperty MyIsStopDrawProperty =
+            DependencyProperty.Register(nameof(MyIsStopDraw), typeof(bool), typeof(DrawTextARGB), new PropertyMetadata(false));
+
+        public bool MyTestIsDraw
+        {
+            get { return (bool)GetValue(MyTestIsDrawProperty); }
+            set { SetValue(MyTestIsDrawProperty, value); }
+        }
+        public static readonly DependencyProperty MyTestIsDrawProperty =
+            DependencyProperty.Register(nameof(MyTestIsDraw), typeof(bool), typeof(DrawTextARGB), new PropertyMetadata(false));
 
         // 表示するために必要最低限のピクセルの拡大率
         // 目安は50にした、あまり小さくすると文字が読めないし、
