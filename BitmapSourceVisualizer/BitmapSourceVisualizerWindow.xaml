@@ -74,8 +74,6 @@ https://seizu.dev/2013/06/11/post2437.html-->
                MouseLeftButtonUp="ImageControl_MouseLeftButtonUp"
                MouseMove="ImageControl_MouseMove"
                PreviewMouseDown="ImageControl_PreviewMouseDown"
-               HorizontalAlignment="Left"
-               VerticalAlignment="Top"
              >
           <Image.LayoutTransform>
             <ScaleTransform ScaleX="{Binding MyImageScale}"
@@ -90,7 +88,8 @@ https://seizu.dev/2013/06/11/post2437.html-->
                             MyScroll="{Binding ElementName=MyScroll}"
                             MyPixelSize="{Binding MyImageScale}"
                             HorizontalAlignment="Left"
-                            VerticalAlignment="Top"/>
+                            VerticalAlignment="Top"
+/>
         <Image x:Name="MyGridImage"
                Source="{Binding MyGridBitmap}"
                HorizontalAlignment="Left"

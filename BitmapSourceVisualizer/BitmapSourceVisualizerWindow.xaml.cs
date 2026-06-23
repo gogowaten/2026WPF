@@ -403,6 +403,43 @@ namespace BitmapSourceVisualizer
             return wbitmap;
         }
 
+        // 縦横まとめて描画するときはこれ
+        private WriteableBitmap CreatePixelGrid(int width, int height)
+        {
+            // 1ピクセルを少し大きめのセル（例: 10x10ピクセル）として扱うグリッドを作ると綺麗に見えます
+            // もしくは、1x1マスの右と下に線を引いた1ピクセル単位のBitmapを作成します
+            int cellSize = 16; // 1セルのサイズ
+            int bmpWidth = width * cellSize;
+            int bmpHeight = height * cellSize;
+
+            WriteableBitmap wbitmap = new(bmpWidth, bmpHeight, 96, 96, PixelFormats.Bgra32, null);
+            int stride = bmpWidth * 4;
+            byte[] pixels = new byte[stride * bmpHeight];
+
+            // グリッド線の色（例：薄いグレー #33FFFFFF）
+            byte r = 200, g = 200, b = 200, a = 100;
+
+            for (int y = 0; y < bmpHeight; y++)
+            {
+                for (int x = 0; x < bmpWidth; x++)
+                {
+                    // セルの境界（右端または下端）に線を引く
+                    if (x % cellSize == 0 || y % cellSize == 0)
+                    {
+                        int index = (y * stride) + (x * 4);
+                        pixels[index] = b;     // Blue
+                        pixels[index + 1] = g; // Green
+                        pixels[index + 2] = r; // Red
+                        pixels[index + 3] = a; // Alpha
+                    }
+                }
+            }
+
+            wbitmap.WritePixels(new Int32Rect(0, 0, bmpWidth, bmpHeight), pixels, stride, 0);
+            return wbitmap;
+        }
+
+
 
         private void SaveBitmapSource(BitmapSource bitmap)
         {
@@ -436,16 +473,16 @@ namespace BitmapSourceVisualizer
             Clipboard.SetData("PNG", ms);
         }
 
-        // 要素からBitmap作成
-        public static RenderTargetBitmap MakeBitmapFromElement(double width, double height, FrameworkElement item)
-        {
-            int w = (int)width;
-            int h = (int)height;
-            double dpi = 96.0 * PresentationSource.FromVisual(item).CompositionTarget.TransformFromDevice.M11;
-            RenderTargetBitmap bmp = new(w, h, dpi, dpi, PixelFormats.Pbgra32);
-            bmp.Render(item);
-            return bmp;
-        }
+        //// 要素からBitmap作成
+        //public static RenderTargetBitmap MakeBitmapFromElement(double width, double height, FrameworkElement item)
+        //{
+        //    int w = (int)width;
+        //    int h = (int)height;
+        //    double dpi = 96.0 * PresentationSource.FromVisual(item).CompositionTarget.TransformFromDevice.M11;
+        //    RenderTargetBitmap bmp = new(w, h, dpi, dpi, PixelFormats.Pbgra32);
+        //    bmp.Render(item);
+        //    return bmp;
+        //}
 
         // 完成版：要素からBitmap作成、LayoutTransformによる回転拡大対応
         public static RenderTargetBitmap MakeBitmapFromLayoutTransformElement(FrameworkElement element)
@@ -892,6 +929,7 @@ namespace BitmapSourceVisualizer
         private void MyScroll_ScrollChanged(object sender, ScrollChangedEventArgs e)
         {
             if (ImageControl.ActualHeight == 0 || ImageControl.ActualWidth == 0) { return; }
+            // ナビ枠更新
             NaviWaku();
 
             // ピクセルグリッドの更新
@@ -914,7 +952,7 @@ namespace BitmapSourceVisualizer
 
                 int width = (int)(MyScroll.ViewportWidth / MyImageScale) + 1;
                 int height = (int)(MyScroll.ViewportHeight / MyImageScale) + 1;
-                var gridbmp = CreatePixelGridBitmap((int)MyImageScale, width, height);
+                WriteableBitmap gridbmp = CreatePixelGridBitmap((int)MyImageScale, width, height);
                 MyGridBitmap = gridbmp;
             }
             else

@@ -52,55 +52,8 @@ namespace _20260622
         /// - パラメーターの妥当性検査（0以下の値など）は行っていないため、呼び出し側で正の整数を渡してください。
         /// - 大きなサイズを指定するとメモリ使用量が増加します（bmpWidth * bmpHeight * 4 バイト）。
         /// </remarks>
-        private WriteableBitmap CreatePixelGrid(int cellSize, int width, int height)
-        {
-            int bmpWidth = width * cellSize;
-            int bmpHeight = height * cellSize;
-
-            WriteableBitmap wbitmap = new(bmpWidth, bmpHeight, 96, 96, PixelFormats.Bgra32, null);
-            int stride = bmpWidth * 4;
-            byte[] pixels = new byte[stride * bmpHeight];
-
-            // グリッド線の色
-            byte r = 200, g = 200, b = 200, a = 200;
-
-            // セルの境界（右端または下端）に線を引く
-            // 縦線描画
-            for (int x = cellSize; x < bmpWidth; x += cellSize)
-            {
-                for (int y = 0; y < bmpHeight; y++)
-                {
-                    int index = (y * stride) + (x * 4);
-                    pixels[index] = b;     // Blue
-                    pixels[index + 1] = g; // Green
-                    pixels[index + 2] = r; // Red
-                    pixels[index + 3] = a; // Alpha
-                }
-            }
-
-            // 横線
-            for (int y = cellSize; y < bmpHeight; y += cellSize)
-            {
-                for (int x = 0; x < bmpWidth; x++)
-                {
-                    int index = (y * stride) + (x * 4);
-                    pixels[index] = b;     // Blue
-                    pixels[index + 1] = g; // Green
-                    pixels[index + 2] = r; // Red
-                    pixels[index + 3] = a; // Alpha
-                }
-            }
-
-            wbitmap.WritePixels(new Int32Rect(0, 0, bmpWidth, bmpHeight), pixels, stride, 0);
-            return wbitmap;
-        }
-
-        // 縦横まとめて描画するときはこれ
-        //private WriteableBitmap CreatePixelGrid(int width , int height)
+        //private WriteableBitmap CreatePixelGrid(int cellSize, int width, int height)
         //{
-        //    // 1ピクセルを少し大きめのセル（例: 10x10ピクセル）として扱うグリッドを作ると綺麗に見えます
-        //    // もしくは、1x1マスの右と下に線を引いた1ピクセル単位のBitmapを作成します
-        //    int cellSize = 16; // 1セルのサイズ
         //    int bmpWidth = width * cellSize;
         //    int bmpHeight = height * cellSize;
 
@@ -108,28 +61,75 @@ namespace _20260622
         //    int stride = bmpWidth * 4;
         //    byte[] pixels = new byte[stride * bmpHeight];
 
-        //    // グリッド線の色（例：薄いグレー #33FFFFFF）
-        //    byte r = 200, g = 200, b = 200, a = 100;
+        //    // グリッド線の色
+        //    byte r = 200, g = 200, b = 200, a = 200;
 
-        //    for (int y = 0; y < bmpHeight; y++)
+        //    // セルの境界（右端または下端）に線を引く
+        //    // 縦線描画
+        //    for (int x = cellSize; x < bmpWidth; x += cellSize)
+        //    {
+        //        for (int y = 0; y < bmpHeight; y++)
+        //        {
+        //            int index = (y * stride) + (x * 4);
+        //            pixels[index] = b;     // Blue
+        //            pixels[index + 1] = g; // Green
+        //            pixels[index + 2] = r; // Red
+        //            pixels[index + 3] = a; // Alpha
+        //        }
+        //    }
+
+        //    // 横線
+        //    for (int y = cellSize; y < bmpHeight; y += cellSize)
         //    {
         //        for (int x = 0; x < bmpWidth; x++)
         //        {
-        //            // セルの境界（右端または下端）に線を引く
-        //            if (x % cellSize == 0 || y % cellSize == 0)
-        //            {
-        //                int index = (y * stride) + (x * 4);
-        //                pixels[index] = b;     // Blue
-        //                pixels[index + 1] = g; // Green
-        //                pixels[index + 2] = r; // Red
-        //                pixels[index + 3] = a; // Alpha
-        //            }
+        //            int index = (y * stride) + (x * 4);
+        //            pixels[index] = b;     // Blue
+        //            pixels[index + 1] = g; // Green
+        //            pixels[index + 2] = r; // Red
+        //            pixels[index + 3] = a; // Alpha
         //        }
         //    }
 
         //    wbitmap.WritePixels(new Int32Rect(0, 0, bmpWidth, bmpHeight), pixels, stride, 0);
         //    return wbitmap;
         //}
+
+        //// 縦横まとめて描画するときはこれ
+        private WriteableBitmap CreatePixelGrid(int width, int height)
+        {
+            // 1ピクセルを少し大きめのセル（例: 10x10ピクセル）として扱うグリッドを作ると綺麗に見えます
+            // もしくは、1x1マスの右と下に線を引いた1ピクセル単位のBitmapを作成します
+            int cellSize = 16; // 1セルのサイズ
+            int bmpWidth = width * cellSize;
+            int bmpHeight = height * cellSize;
+
+            WriteableBitmap wbitmap = new(bmpWidth, bmpHeight, 96, 96, PixelFormats.Bgra32, null);
+            int stride = bmpWidth * 4;
+            byte[] pixels = new byte[stride * bmpHeight];
+
+            // グリッド線の色（例：薄いグレー #33FFFFFF）
+            byte r = 200, g = 200, b = 200, a = 100;
+
+            for (int y = 0; y < bmpHeight; y++)
+            {
+                for (int x = 0; x < bmpWidth; x++)
+                {
+                    // セルの境界（右端または下端）に線を引く
+                    if (x % cellSize == 0 || y % cellSize == 0)
+                    {
+                        int index = (y * stride) + (x * 4);
+                        pixels[index] = b;     // Blue
+                        pixels[index + 1] = g; // Green
+                        pixels[index + 2] = r; // Red
+                        pixels[index + 3] = a; // Alpha
+                    }
+                }
+            }
+
+            wbitmap.WritePixels(new Int32Rect(0, 0, bmpWidth, bmpHeight), pixels, stride, 0);
+            return wbitmap;
+        }
 
 
         public double MyScale
@@ -174,7 +174,8 @@ namespace _20260622
 
             int width = (int)(MyScroll.ViewportWidth / MyScale) + 1;
             int height = (int)(MyScroll.ViewportHeight / MyScale) + 1;
-            var gridbmp = CreatePixelGrid((int)MyScale, width, height);
+            var gridbmp = CreatePixelGrid(width, height);
+            //var gridbmp = CreatePixelGrid((int)MyScale, width, height);
             MyGridBitmap = gridbmp;
 
         }
