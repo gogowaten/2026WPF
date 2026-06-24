@@ -59,10 +59,6 @@ namespace BitmapSourceVisualizer
         {
             InitializeComponent();
             ImageControl.ContextMenu = CreateContextMenu();
-            //ImageControl.ContextMenu.ContextMenuOpening += (s, e) =>
-            //{
-            //    IsBeforeDragTextARGBView = IsDrawTextARGB.IsChecked;
-            //};
             DataContext = this;
             MyTextBlockScale.FontSize = this.FontSize * 1.5;
             Loaded += BitmapSourceVisualizerWindow_Loaded;
@@ -77,8 +73,6 @@ namespace BitmapSourceVisualizer
         {
             SetBinding(MyClickedSolidColorBrushProperty, new Binding() { Source = this, Path = new PropertyPath(MyClickedColorProperty), Converter = new MyConvColorToSolidBrush() });
             SetBinding(MyClickedHsvProperty, new Binding() { Source = this, Path = new PropertyPath(MyClickedColorProperty), Converter = new MyConvColorToHsv() });
-            Rect r = new();
-            var te = r.ToString();
         }
 
         public void SetImage(BitmapSource bitmap)
@@ -220,7 +214,8 @@ namespace BitmapSourceVisualizer
                 double newScale = (double)e.NewValue;
                 AdjustOffset2(main.MyScroll, main.MyBitmapSource, oldScale, newScale);
 
-                // ピクセルグリッド
+                // ピクセルグリッドの線の幅の更新、
+                // 常に1.0になるように調整、最低倍率以下のときは0にして非表示
                 if(newScale >= main.MyPixelGridVisibleMinScale)
                 {
                     main.MyPixelGridWidth = 1.0 / newScale;
@@ -643,18 +638,15 @@ namespace BitmapSourceVisualizer
         // マウスクリック時
         private void ImageControl_PreviewMouseDown(object sender, MouseButtonEventArgs e)
         {
-            // クリック位置の色
+            // クリック位置と色を記録
             int px = (int)MyImageClickPoint.X;
             int py = (int)MyImageClickPoint.Y;
             if (px >= MyBitmapSource.PixelWidth) { px = MyBitmapSource.PixelWidth - 1; }
             if (py >= MyBitmapSource.PixelHeight) { py = MyBitmapSource.PixelHeight - 1; }
-            MyClickedPixelX = px; MyClickedPixelY = py;
+            MyClickedPixelX = px;
+            MyClickedPixelY = py;
             MyClickedColor = GetPixelColor(MyBitmapSource, px, py);
 
-            //IsImageDrag = false;
-
-            ////描画更新、OnRenderが実行される
-            //MyDraw.InvalidateVisual();
         }
 
 
@@ -748,6 +740,7 @@ namespace BitmapSourceVisualizer
             }
         }
 
+        // 指定したピクセル座標の色を返す
         private static Color GetPixelColor(BitmapSource bmp, int x, int y)
         {
             CroppedBitmap cropBmp = new(bmp, new Int32Rect(x, y, 1, 1));
@@ -1006,6 +999,21 @@ namespace BitmapSourceVisualizer
             if (ChangeScaleWithMouseWheel(e.Delta)) { e.Handled = true; }
         }
 
-        
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            var type = MyDraw.MyDrawTextType;
+            if(type == DrawTextType.None)
+            {
+                MyDraw.MyDrawTextType = DrawTextType.RGBA;
+            }
+            else if(type == DrawTextType.RGBA)
+            {
+                MyDraw.MyDrawTextType = DrawTextType.HSVA;
+            }
+            else if(type == DrawTextType.HSVA)
+            {
+                MyDraw.MyDrawTextType = DrawTextType.None;
+            }
+        }
     }
 }
