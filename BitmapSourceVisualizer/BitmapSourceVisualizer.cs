@@ -37,16 +37,16 @@ namespace BitmapSourceVisualizer
                 throw new ArgumentNullException(nameof(objectProvider));
 
             // ここで PNG バイト列が入った Stream を受け取る
-            using var stream = objectProvider.GetData();
+            using Stream stream = objectProvider.GetData();
 
-            var bmp = new BitmapImage();
+            BitmapImage bmp = new();
             bmp.BeginInit();
             bmp.CacheOption = BitmapCacheOption.OnLoad;
             bmp.StreamSource = stream;   // ← ここはそのまま Stream を渡す
             bmp.EndInit();
             bmp.Freeze();
 
-            var win = new BitmapSourceVisualizerWindow();
+            BitmapSourceVisualizerWindow win = new();
             win.SetImage(bmp);
             win.ShowDialog();
         }

@@ -23,6 +23,7 @@ namespace BitmapSourceVisualizer
     /// </summary>
     public partial class BitmapSourceVisualizerWindow : Window
     {
+        //private double MyPixelGridVisibleMinScale = 10.0;
         private bool IsMouseDraged; // 枠Rectのドラッグ移動フラグ
         private Point MyClickedPoint; // MiniMapをクリックした場所
         private double MyRateMoveX; // スクロール可動範囲の比率
@@ -30,11 +31,10 @@ namespace BitmapSourceVisualizer
         private double MyClickedScrollXOffset; // スクロール位置の記録
         private double MyClickedScrollYOffset;
 
-
         private Point MyPoint; // マウスドラッグ移動処理で使う
-        //public BitmapSource MyBitmapSource { get; set; }
         private readonly double ImageScaleMin = 0.01; // 拡大率下限
         private readonly double ImageScaleMax = 100.0; // 拡大率上限
+
 
 
 
@@ -45,7 +45,7 @@ namespace BitmapSourceVisualizer
             DataContext = this;
             MyTextBlockScale.FontSize = this.FontSize * 1.5;
             Loaded += BitmapSourceVisualizerWindow_Loaded;
-
+            
         }
 
         private void BitmapSourceVisualizerWindow_Loaded(object sender, RoutedEventArgs e)
@@ -56,8 +56,6 @@ namespace BitmapSourceVisualizer
         {
             SetBinding(MyClickedSolidColorBrushProperty, new Binding() { Source = this, Path = new PropertyPath(MyClickedColorProperty), Converter = new MyConvColorToSolidBrush() });
             SetBinding(MyClickedHsvProperty, new Binding() { Source = this, Path = new PropertyPath(MyClickedColorProperty), Converter = new MyConvColorToHsv() });
-            Rect r = new();
-            var te = r.ToString();
         }
 
         public void SetImage(BitmapSource bitmap)
@@ -72,46 +70,32 @@ namespace BitmapSourceVisualizer
 
         #region 依存関係プロパティ
 
-        // ピクセルグリッド表示の有無
-        public bool MyIsPixelGridVisible
+        // ピクセルグリッドを表示するために必要な最低倍率
+        public double MyPixelGridVisibleMinScale
         {
-            get { return (bool)GetValue(MyIsPixelGridVisibleProperty); }
-            set { SetValue(MyIsPixelGridVisibleProperty, value); }
+            get { return (double)GetValue(MyPixelGridVisibleMinScaleProperty); }
+            set { SetValue(MyPixelGridVisibleMinScaleProperty, value); }
         }
-        public static readonly DependencyProperty MyIsPixelGridVisibleProperty =
-            DependencyProperty.Register(nameof(MyIsPixelGridVisible), typeof(bool), typeof(BitmapSourceVisualizerWindow), new PropertyMetadata(true, OnMyIsPixelGridVisible));
-        private static void OnMyIsPixelGridVisible(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            if (d is BitmapSourceVisualizerWindow win)
-            {
-                win.UpdatePixelGrid();
-            }
-        }
+        public static readonly DependencyProperty MyPixelGridVisibleMinScaleProperty =
+            DependencyProperty.Register(nameof(MyPixelGridVisibleMinScale), typeof(double), typeof(BitmapSourceVisualizerWindow), new PropertyMetadata(10.0));
 
-        // ピクセルグリッド表示用画像のオフセット値
-        public double MyGridXOffset
+        // ピクセルグリッドの線の幅
+        public double MyPixelGridWidth
         {
-            get { return (double)GetValue(MyGridXOffsetProperty); }
-            set { SetValue(MyGridXOffsetProperty, value); }
+            get { return (double)GetValue(MyPixelGridWidthProperty); }
+            set { SetValue(MyPixelGridWidthProperty, value); }
         }
-        public static readonly DependencyProperty MyGridXOffsetProperty =
-            DependencyProperty.Register(nameof(MyGridXOffset), typeof(double), typeof(BitmapSourceVisualizerWindow), new PropertyMetadata(0.0));
+        public static readonly DependencyProperty MyPixelGridWidthProperty =
+            DependencyProperty.Register(nameof(MyPixelGridWidth), typeof(double), typeof(BitmapSourceVisualizerWindow), new PropertyMetadata(0.0));
 
-        public double MyGridYOffset
+        // 画像のドラッグ移動確認フラグ
+        public bool IsImageDrag
         {
-            get { return (double)GetValue(MyGridYOffsetProperty); }
-            set { SetValue(MyGridYOffsetProperty, value); }
+            get { return (bool)GetValue(IsImageDragProperty); }
+            set { SetValue(IsImageDragProperty, value); }
         }
-        public static readonly DependencyProperty MyGridYOffsetProperty =
-            DependencyProperty.Register(nameof(MyGridYOffset), typeof(double), typeof(BitmapSourceVisualizerWindow), new PropertyMetadata(0.0));
-
-        public WriteableBitmap MyGridBitmap
-        {
-            get { return (WriteableBitmap)GetValue(MyGridBitmapProperty); }
-            set { SetValue(MyGridBitmapProperty, value); }
-        }
-        public static readonly DependencyProperty MyGridBitmapProperty =
-            DependencyProperty.Register(nameof(MyGridBitmap), typeof(WriteableBitmap), typeof(BitmapSourceVisualizerWindow), new PropertyMetadata(null));
+        public static readonly DependencyProperty IsImageDragProperty =
+            DependencyProperty.Register(nameof(IsImageDrag), typeof(bool), typeof(BitmapSourceVisualizerWindow), new PropertyMetadata(false));
 
 
         // メイン画像
@@ -221,6 +205,7 @@ namespace BitmapSourceVisualizer
         public static readonly DependencyProperty MyImageScaleProperty =
             DependencyProperty.Register(nameof(MyImageScale), typeof(double), typeof(BitmapSourceVisualizerWindow), new PropertyMetadata(1.0, OnMyImageScale));
 
+        // スケール変更時
         private static void OnMyImageScale(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             // 倍率変更時、スクロールの位置調整
@@ -230,8 +215,16 @@ namespace BitmapSourceVisualizer
                 double newScale = (double)e.NewValue;
                 AdjustOffset2(main.MyScroll, main.MyBitmapSource, oldScale, newScale);
 
-                //main.MyPanel.Width = newScale * main.MyBitmapSource.PixelWidth;
-                //main.MyPanel.Height = newScale * main.MyBitmapSource.PixelHeight;
+                // ピクセルグリッドの線の幅の更新、
+                // 常に1.0になるように調整、最低倍率以下のときは0にして非表示
+                if(newScale >= main.MyPixelGridVisibleMinScale)
+                {
+                    main.MyPixelGridWidth = 1.0 / newScale;
+                }
+                else
+                {
+                    main.MyPixelGridWidth = 0.0;
+                }
             }
         }
 
@@ -342,104 +335,6 @@ namespace BitmapSourceVisualizer
 
         #region 画像処理
 
-        // グリッド線画像作成
-        /// <summary>
-        /// 指定されたセルサイズとセル数から、グリッド線を描画した <see cref="WriteableBitmap"/> を生成します。
-        /// </summary>
-        /// <param name="cellSize">1セルあたりのピクセル数。正の整数を想定します。</param>
-        /// <param name="width">横方向のセル数。</param>
-        /// <param name="height">縦方向のセル数。</param>
-        /// <returns>
-        /// 横幅が <c>width * cellSize</c>、高さが <c>height * cellSize</c> の
-        /// <see cref="WriteableBitmap"/> を返します。ピクセル形式は BGRA32、DPI は 96x96 です。
-        /// グリッド線はセルの境界（セルサイズの倍数の位置）に描画されます。
-        /// </returns>
-        /// <remarks>
-        /// - 線の色は半透明の薄い灰色（A=100, R=200, G=200, B=200）で固定されています。
-        /// - 内部では (bmpWidth * bmpHeight * 4) バイトのピクセルバッファを確保し、<see cref="WriteableBitmap.WritePixels"/> で書き込んでいます。
-        /// - パラメーターの妥当性検査（0以下の値など）は行っていないため、呼び出し側で正の整数を渡してください。
-        /// - 大きなサイズを指定するとメモリ使用量が増加します（bmpWidth * bmpHeight * 4 バイト）。
-        /// </remarks>
-        private WriteableBitmap CreatePixelGridBitmap(int cellSize, int width, int height)
-        {
-            int bmpWidth = width * cellSize;
-            int bmpHeight = height * cellSize;
-
-            WriteableBitmap wbitmap = new(bmpWidth, bmpHeight, 96, 96, PixelFormats.Bgra32, null);
-            int stride = bmpWidth * 4;
-            byte[] pixels = new byte[stride * bmpHeight];
-
-            // グリッド線の色
-            byte r = 200, g = 200, b = 200, a = 100;
-
-            // セルの境界（右端または下端）に線を引く
-            // 縦線描画
-            for (int x = cellSize; x < bmpWidth; x += cellSize)
-            {
-                for (int y = 0; y < bmpHeight; y++)
-                {
-                    int index = (y * stride) + (x * 4);
-                    pixels[index] = b;     // Blue
-                    pixels[index + 1] = g; // Green
-                    pixels[index + 2] = r; // Red
-                    pixels[index + 3] = a; // Alpha
-                }
-            }
-
-            // 横線
-            for (int y = cellSize; y < bmpHeight; y += cellSize)
-            {
-                for (int x = 0; x < bmpWidth; x++)
-                {
-                    int index = (y * stride) + (x * 4);
-                    pixels[index] = b;     // Blue
-                    pixels[index + 1] = g; // Green
-                    pixels[index + 2] = r; // Red
-                    pixels[index + 3] = a; // Alpha
-                }
-            }
-
-            wbitmap.WritePixels(new Int32Rect(0, 0, bmpWidth, bmpHeight), pixels, stride, 0);
-            return wbitmap;
-        }
-
-        // 縦横まとめて描画するときはこれ
-        private WriteableBitmap CreatePixelGrid(int width, int height)
-        {
-            // 1ピクセルを少し大きめのセル（例: 10x10ピクセル）として扱うグリッドを作ると綺麗に見えます
-            // もしくは、1x1マスの右と下に線を引いた1ピクセル単位のBitmapを作成します
-            int cellSize = 16; // 1セルのサイズ
-            int bmpWidth = width * cellSize;
-            int bmpHeight = height * cellSize;
-
-            WriteableBitmap wbitmap = new(bmpWidth, bmpHeight, 96, 96, PixelFormats.Bgra32, null);
-            int stride = bmpWidth * 4;
-            byte[] pixels = new byte[stride * bmpHeight];
-
-            // グリッド線の色（例：薄いグレー #33FFFFFF）
-            byte r = 200, g = 200, b = 200, a = 100;
-
-            for (int y = 0; y < bmpHeight; y++)
-            {
-                for (int x = 0; x < bmpWidth; x++)
-                {
-                    // セルの境界（右端または下端）に線を引く
-                    if (x % cellSize == 0 || y % cellSize == 0)
-                    {
-                        int index = (y * stride) + (x * 4);
-                        pixels[index] = b;     // Blue
-                        pixels[index + 1] = g; // Green
-                        pixels[index + 2] = r; // Red
-                        pixels[index + 3] = a; // Alpha
-                    }
-                }
-            }
-
-            wbitmap.WritePixels(new Int32Rect(0, 0, bmpWidth, bmpHeight), pixels, stride, 0);
-            return wbitmap;
-        }
-
-
 
         private void SaveBitmapSource(BitmapSource bitmap)
         {
@@ -543,9 +438,16 @@ namespace BitmapSourceVisualizer
 
         private void ButtonSetMathScale_Click(object sender, RoutedEventArgs e)
         {
-            if (sender is Button button && double.TryParse(button.Tag.ToString(), out double scale))
+            if (sender is Button button && double.TryParse(button.Tag.ToString(), out double value))
             {
-                MyImageScale = GetClampedImageScale(MyImageScale * scale);
+                if (MyImageScale <= 1.0)
+                {
+                    MyImageScale = GetClampedImageScale(MyImageScale * value);
+                }
+                else
+                {
+                    MyImageScale = GetClampedImageScale(MyCeiling(MyImageScale * value));
+                }
             }
         }
 
@@ -737,29 +639,35 @@ namespace BitmapSourceVisualizer
         // マウスクリック時
         private void ImageControl_PreviewMouseDown(object sender, MouseButtonEventArgs e)
         {
-            // クリック位置の色
+            // クリック位置と色を記録
             int px = (int)MyImageClickPoint.X;
             int py = (int)MyImageClickPoint.Y;
             if (px >= MyBitmapSource.PixelWidth) { px = MyBitmapSource.PixelWidth - 1; }
             if (py >= MyBitmapSource.PixelHeight) { py = MyBitmapSource.PixelHeight - 1; }
-            MyClickedPixelX = px; MyClickedPixelY = py;
+            MyClickedPixelX = px;
+            MyClickedPixelY = py;
             MyClickedColor = GetPixelColor(MyBitmapSource, px, py);
+
         }
 
-        // 左クリック時
+
+        // 左クリックダウン時
         // 通常のMouseDownでは反応しないので、Preview版でクリック座標を記録
         private void ImageControl_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             MyPoint = e.GetPosition(this);
             ImageControl.CaptureMouse();
-
         }
 
-        // ボタンを離した時
+        // 左クリックアップ時
         private void ImageControl_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
             ImageControl.Cursor = Cursors.Arrow;
             ImageControl.ReleaseMouseCapture();
+
+            IsImageDrag = false;
+            //描画更新、OnRenderが実行される
+            MyDraw.InvalidateVisual();
         }
 
         #endregion クリック系
@@ -782,6 +690,9 @@ namespace BitmapSourceVisualizer
             //この値をSetOffsetする
             if (e.LeftButton == MouseButtonState.Pressed)
             {
+                // 一時的にテキストARGBを非表示することで、向こうのフラグで描画を停止させる
+                IsImageDrag = true;
+
                 ImageControl.Cursor = Cursors.ScrollAll;//カーソル形状を変更
                 //今のマウスの座標
                 var nowPoint = e.GetPosition(this);
@@ -830,6 +741,7 @@ namespace BitmapSourceVisualizer
             }
         }
 
+        // 指定したピクセル座標の色を返す
         private static Color GetPixelColor(BitmapSource bmp, int x, int y)
         {
             CroppedBitmap cropBmp = new(bmp, new Int32Rect(x, y, 1, 1));
@@ -929,38 +841,15 @@ namespace BitmapSourceVisualizer
         private void MyScroll_ScrollChanged(object sender, ScrollChangedEventArgs e)
         {
             if (ImageControl.ActualHeight == 0 || ImageControl.ActualWidth == 0) { return; }
+
             // ナビ枠更新
             NaviWaku();
-
-            // ピクセルグリッドの更新
-            UpdatePixelGrid();
 
             //描画更新、OnRenderが実行される
             MyDraw.InvalidateVisual();
         }
 
-        // ピクセルグリッドの更新
-        private void UpdatePixelGrid()
-        {
-            // 拡大率30倍以上＋チェック有りの時だけ更新
-            if (MyImageScale >= 30 && MyIsPixelGridVisible)
-            {
-                var hOffset = MyScroll.HorizontalOffset;
-                var vOffset = MyScroll.VerticalOffset;
-                MyGridXOffset = hOffset - (hOffset % MyImageScale);
-                MyGridYOffset = vOffset - (vOffset % MyImageScale);
 
-                int width = (int)(MyScroll.ViewportWidth / MyImageScale) + 1;
-                int height = (int)(MyScroll.ViewportHeight / MyImageScale) + 1;
-                WriteableBitmap gridbmp = CreatePixelGridBitmap((int)MyImageScale, width, height);
-                MyGridBitmap = gridbmp;
-            }
-            else
-            {
-                MyGridBitmap = null;
-            }
-
-        }
 
         private void NaviWaku()
         {
@@ -1018,6 +907,7 @@ namespace BitmapSourceVisualizer
         // クリック位置に枠が来るようにスクロール位置を調整する
         private void MiniMapCanvas_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
+            IsImageDrag = true;
             IsMouseDraged = true;
             MyClickedPoint = e.GetPosition(MiniMapCanvas);
             // CuptureMouseは実行するとMouseMoveイベントが発行されるのでGetPositionより後にする
@@ -1087,6 +977,9 @@ namespace BitmapSourceVisualizer
         private void MiniMapCanvas_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
             // ドラッグ移動フラグ解除
+            IsImageDrag = false;
+            MyDraw.InvalidateVisual();
+
             IsMouseDraged = false;
             MiniMapCanvas.ReleaseMouseCapture();
         }
@@ -1107,21 +1000,21 @@ namespace BitmapSourceVisualizer
             if (ChangeScaleWithMouseWheel(e.Delta)) { e.Handled = true; }
         }
 
-        // ARGB表示の切り替え
-        private void Button_ClickChangeDrawARGB(object sender, RoutedEventArgs e)
+        private void Button_Click(object sender, RoutedEventArgs e)
         {
-            if (MyDraw.Visibility == Visibility.Visible)
+            var type = MyDraw.MyDrawTextType;
+            if(type == DrawTextType.None)
             {
-                MyDraw.Visibility = Visibility.Collapsed;
+                MyDraw.MyDrawTextType = DrawTextType.RGBA;
             }
-            else
+            else if(type == DrawTextType.RGBA)
             {
-                MyDraw.Visibility = Visibility.Visible;
+                MyDraw.MyDrawTextType = DrawTextType.HSVA;
             }
-
+            else if(type == DrawTextType.HSVA)
+            {
+                MyDraw.MyDrawTextType = DrawTextType.None;
+            }
         }
-
-
-
     }
 }
