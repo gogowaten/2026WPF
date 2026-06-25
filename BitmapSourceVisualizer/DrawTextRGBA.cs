@@ -244,12 +244,14 @@ namespace BitmapSourceVisualizer
                         emSize,
                         MyBackColorBrush,
                         pixelsPerDip);
-                    Point textPos = new(x * MyPixelSize + 2, y * MyPixelSize + 2);
+                    Point textPos = new(x * MyPixelSize + 5, y * MyPixelSize + 5);
+                    //Point textPos = new(x * MyPixelSize + 2, y * MyPixelSize + 2);
                     drawingContext.DrawText(formattedText, textPos);
 
                     // 同じ文字列を違う色で1ドットずらして描画
                     formattedText.SetForegroundBrush(MyForeColorBrush);
-                    textPos = new(x * MyPixelSize + 1, y * MyPixelSize + 1);
+                    textPos = new(x * MyPixelSize + 4, y * MyPixelSize + 4);
+                    //textPos = new(x * MyPixelSize + 1, y * MyPixelSize + 1);
                     drawingContext.DrawText(formattedText, textPos);
                 }
             }

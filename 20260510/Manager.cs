@@ -166,12 +166,12 @@ namespace _20260510
         }
 
 
-        private static BitmapSource BitmapToBitmapSource(System.Drawing.Bitmap bitmap)
-        {
-            BitmapSource bmp = Imaging.CreateBitmapSourceFromHBitmap(bitmap.GetHbitmap(), IntPtr.Zero, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
+        //private static BitmapSource BitmapToBitmapSource(System.Drawing.Bitmap bitmap)
+        //{
+        //    BitmapSource bmp = Imaging.CreateBitmapSourceFromHBitmap(bitmap.GetHbitmap(), IntPtr.Zero, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
             
-            return bmp;
-        }
+        //    return bmp;
+        //}
 
 
         public static BitmapSource SaveAsAccuratePng(RenderTargetBitmap rtb)

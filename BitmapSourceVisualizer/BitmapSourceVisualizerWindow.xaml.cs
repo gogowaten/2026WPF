@@ -38,23 +38,6 @@ namespace BitmapSourceVisualizer
 
 
 
-        public double MyPixelGridVisibleMinScale
-        {
-            get { return (double)GetValue(MyPixelGridVisibleMinScaleProperty); }
-            set { SetValue(MyPixelGridVisibleMinScaleProperty, value); }
-        }
-        public static readonly DependencyProperty MyPixelGridVisibleMinScaleProperty =
-            DependencyProperty.Register(nameof(MyPixelGridVisibleMinScale), typeof(double), typeof(BitmapSourceVisualizerWindow), new PropertyMetadata(10.0));
-
-        public double MyPixelGridWidth
-        {
-            get { return (double)GetValue(MyPixelGridWidthProperty); }
-            set { SetValue(MyPixelGridWidthProperty, value); }
-        }
-        public static readonly DependencyProperty MyPixelGridWidthProperty =
-            DependencyProperty.Register(nameof(MyPixelGridWidth), typeof(double), typeof(BitmapSourceVisualizerWindow), new PropertyMetadata(0.0));
-
-
         public BitmapSourceVisualizerWindow()
         {
             InitializeComponent();
@@ -62,7 +45,7 @@ namespace BitmapSourceVisualizer
             DataContext = this;
             MyTextBlockScale.FontSize = this.FontSize * 1.5;
             Loaded += BitmapSourceVisualizerWindow_Loaded;
-
+            
         }
 
         private void BitmapSourceVisualizerWindow_Loaded(object sender, RoutedEventArgs e)
@@ -86,6 +69,24 @@ namespace BitmapSourceVisualizer
 
 
         #region 依存関係プロパティ
+
+        // ピクセルグリッドを表示するために必要な最低倍率
+        public double MyPixelGridVisibleMinScale
+        {
+            get { return (double)GetValue(MyPixelGridVisibleMinScaleProperty); }
+            set { SetValue(MyPixelGridVisibleMinScaleProperty, value); }
+        }
+        public static readonly DependencyProperty MyPixelGridVisibleMinScaleProperty =
+            DependencyProperty.Register(nameof(MyPixelGridVisibleMinScale), typeof(double), typeof(BitmapSourceVisualizerWindow), new PropertyMetadata(10.0));
+
+        // ピクセルグリッドの線の幅
+        public double MyPixelGridWidth
+        {
+            get { return (double)GetValue(MyPixelGridWidthProperty); }
+            set { SetValue(MyPixelGridWidthProperty, value); }
+        }
+        public static readonly DependencyProperty MyPixelGridWidthProperty =
+            DependencyProperty.Register(nameof(MyPixelGridWidth), typeof(double), typeof(BitmapSourceVisualizerWindow), new PropertyMetadata(0.0));
 
         // 画像のドラッグ移動確認フラグ
         public bool IsImageDrag

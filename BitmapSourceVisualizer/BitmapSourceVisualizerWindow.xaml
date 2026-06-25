@@ -111,6 +111,7 @@ https://seizu.dev/2013/06/11/post2437.html-->
           x:Name="MyDraw"
           IsHitTestVisible="False"
           SnapsToDevicePixels="True"
+          UseLayoutRounding="True"
           MyBitmapSource="{Binding MyBitmapSource}"
           MyScroll="{Binding ElementName=MyScroll}"
           MyPixelSize="{Binding MyImageScale}"
