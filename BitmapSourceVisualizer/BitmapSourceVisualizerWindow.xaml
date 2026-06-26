@@ -12,7 +12,7 @@
     <local:MyConvBoolToVisible x:Key="boolVisible"/>
     <local:MyConvHsvToText x:Key="textHsv"/>
   </Window.Resources>
-  <Grid>
+  <Grid UseLayoutRounding="True">
     <Grid.ColumnDefinitions>
       <ColumnDefinition/>
       <ColumnDefinition Width="200"/>
@@ -22,6 +22,7 @@
                   VerticalScrollBarVisibility="Auto"
                   PreviewMouseWheel="MyScroll_PreviewMouseWheel"
                   ScrollChanged="MyScroll_ScrollChanged"
+                  UseLayoutRounding="True"
                   >
       <ScrollViewer.Style>
         <Style TargetType="ScrollViewer">
@@ -64,12 +65,7 @@ https://seizu.dev/2013/06/11/post2437.html-->
         </Style>
       </ScrollViewer.Style>
       <Grid>
-        <Grid UseLayoutRounding="True"
-            RenderOptions.BitmapScalingMode="NearestNeighbor">
-          <Grid.LayoutTransform>
-            <ScaleTransform ScaleX="{Binding MyImageScale}" ScaleY="{Binding MyImageScale}"/>
-          </Grid.LayoutTransform>
-          <Image x:Name="ImageControl"
+        <Image x:Name="ImageControl"
                Stretch="None"
                SnapsToDevicePixels="True"
                RenderOptions.BitmapScalingMode="NearestNeighbor"
@@ -81,11 +77,26 @@ https://seizu.dev/2013/06/11/post2437.html-->
                PreviewMouseDown="ImageControl_PreviewMouseDown"
                  
              >
-
-          </Image>
+          <Image.LayoutTransform>
+            <ScaleTransform ScaleX="{Binding MyImageScale}" ScaleY="{Binding MyImageScale}"/>
+          </Image.LayoutTransform>
+        </Image>
+        <Grid x:Name="MyMainGrid"
+              UseLayoutRounding="True"
+              SnapsToDevicePixels="True"
+              RenderOptions.EdgeMode="Aliased"
+              RenderOptions.BitmapScalingMode="NearestNeighbor">
+          <Grid.LayoutTransform>
+            <ScaleTransform ScaleX="{Binding MyImageScale}" ScaleY="{Binding MyImageScale}"/>
+          </Grid.LayoutTransform>
           <!--IsHitTestVisible="False" クリックとかのイベントを透過-->
           <!--ピクセルグリッド-->
           <Rectangle IsHitTestVisible="False"
+                     UseLayoutRounding="True"
+                     RenderOptions.BitmapScalingMode="NearestNeighbor"
+                     RenderOptions.EdgeMode="Aliased"
+                     SnapsToDevicePixels="True"
+                     
                      Visibility="{Binding ElementName=IsPixelGrid, Path=IsChecked, Converter={StaticResource boolVisible}}">
             <Rectangle.Fill>
               <DrawingBrush TileMode="Tile" Viewport="0,0,1,1" ViewportUnits="Absolute">
@@ -112,13 +123,15 @@ https://seizu.dev/2013/06/11/post2437.html-->
           IsHitTestVisible="False"
           SnapsToDevicePixels="True"
           UseLayoutRounding="True"
+          RenderOptions.EdgeMode="Aliased"
+          
           MyBitmapSource="{Binding MyBitmapSource}"
           MyScroll="{Binding ElementName=MyScroll}"
           MyPixelSize="{Binding MyImageScale}"
           HorizontalAlignment="Left"
           VerticalAlignment="Top"
           MyIsStopDraw="{Binding IsImageDrag}"/>
-          <!--Visibility="{Binding ElementName=IsDrawTextARGB, Path=IsChecked, Converter={StaticResource boolVisible}}"-->
+        <!--Visibility="{Binding ElementName=IsDrawTextARGB, Path=IsChecked, Converter={StaticResource boolVisible}}"-->
 
       </Grid>
     </ScrollViewer>
@@ -140,6 +153,9 @@ https://seizu.dev/2013/06/11/post2437.html-->
         </Style>
       </StackPanel.Resources>
 
+
+
+      <TextBlock Text="{Binding MyDpi}"/>
       <UniformGrid Columns="2" Rows="2">
         <UniformGrid.Resources>
           <Style TargetType="CheckBox">

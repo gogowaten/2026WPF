@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+//using System.Drawing;
 using System.IO;
 using System.Text;
 using System.Windows;
@@ -45,7 +46,7 @@ namespace BitmapSourceVisualizer
             DataContext = this;
             MyTextBlockScale.FontSize = this.FontSize * 1.5;
             Loaded += BitmapSourceVisualizerWindow_Loaded;
-            
+
         }
 
         private void BitmapSourceVisualizerWindow_Loaded(object sender, RoutedEventArgs e)
@@ -69,6 +70,15 @@ namespace BitmapSourceVisualizer
 
 
         #region 依存関係プロパティ
+
+        public double MyDpi
+        {
+            get { return (double)GetValue(MyDpiProperty); }
+            set { SetValue(MyDpiProperty, value); }
+        }
+        public static readonly DependencyProperty MyDpiProperty =
+            DependencyProperty.Register(nameof(MyDpi), typeof(double), typeof(BitmapSourceVisualizerWindow), new PropertyMetadata(96.0));
+
 
         // ピクセルグリッドを表示するために必要な最低倍率
         public double MyPixelGridVisibleMinScale
@@ -217,7 +227,7 @@ namespace BitmapSourceVisualizer
 
                 // ピクセルグリッドの線の幅の更新、
                 // 常に1.0になるように調整、最低倍率以下のときは0にして非表示
-                if(newScale >= main.MyPixelGridVisibleMinScale)
+                if (newScale >= main.MyPixelGridVisibleMinScale)
                 {
                     main.MyPixelGridWidth = 1.0 / newScale;
                 }
@@ -267,7 +277,7 @@ namespace BitmapSourceVisualizer
             {
                 if (MyBitmapSource is not null)
                 {
-                    CopyToClipboardExterior(ImageControl);
+                    CopyToClipboardMyBitmapSource();
                 }
             };
 
@@ -304,6 +314,27 @@ namespace BitmapSourceVisualizer
                 }
             };
 
+
+            item = new() { Header = "画像コピー(見えている部分そのまま)" };
+            menu.Items.Add(item);
+            item.Click += (s, e) =>
+            {
+                if (MyBitmapSource is not null)
+                {
+                    CopyToClipboardExterior(MyScroll);
+                }
+            };
+
+
+            item = new() { Header = "画像コピー(this)" };
+            menu.Items.Add(item);
+            item.Click += (s, e) =>
+            {
+                if (MyBitmapSource is not null)
+                {
+                    CopyToClipboardExterior(this);
+                }
+            };
 
 
             return menu;
@@ -380,24 +411,104 @@ namespace BitmapSourceVisualizer
         //}
 
         // 完成版：要素からBitmap作成、LayoutTransformによる回転拡大対応
-        public static RenderTargetBitmap MakeBitmapFromLayoutTransformElement(FrameworkElement element)
+        public RenderTargetBitmap MakeBitmapFromLayoutTransformElement(FrameworkElement element)
         {
             double dpi = 96.0 * PresentationSource.FromVisual(element).CompositionTarget.TransformFromDevice.M11;
             Rect bounds = new(0, 0, element.ActualWidth, element.ActualHeight); // 元のBounds
             Rect ltBounds = element.LayoutTransform.TransformBounds(bounds); // 変形後のBounds
             DrawingVisual dv = new();
             dv.Offset = new Vector(-ltBounds.X, -ltBounds.Y);
+            RenderOptions.SetBitmapScalingMode(dv, BitmapScalingMode.NearestNeighbor);// 無意味
+            RenderOptions.SetEdgeMode(dv, EdgeMode.Aliased);// 無意味
+            MyDpi = ltBounds.Width;
+
+            VisualBrush brush = new(element)
+            {
+                Stretch = Stretch.None,
+                //ViewportUnits = BrushMappingMode.Absolute,// 完全透明画像になる
+                //ViewboxUnits = BrushMappingMode.Absolute,// 描画位置が違う
+            };
+            RenderOptions.SetBitmapScalingMode(brush, BitmapScalingMode.NearestNeighbor);// 無意味
+            RenderOptions.SetEdgeMode(brush, EdgeMode.Aliased);// 無意味
 
             using (DrawingContext context = dv.RenderOpen())
             {
-                VisualBrush brush = new(element) { Stretch = Stretch.None };
                 context.DrawRectangle(brush, null, ltBounds);
+                context.PushTransform(element.LayoutTransform);
             }
             RenderTargetBitmap bmp =
                 new(MyCeiling(ltBounds.Width), MyCeiling(ltBounds.Height), dpi, dpi, PixelFormats.Pbgra32);
             bmp.Render(dv);
             return bmp;
         }
+
+        // 最近傍補間でBitmapSourceを拡大したBitmapを返す
+        public RenderTargetBitmap MakeScaleBitmap(BitmapSource originalBitmap, double scale)
+        {
+            // 1. 拡大後のサイズを計算
+            int newWidth = (int)(originalBitmap.PixelWidth * scale);
+            int newHeight = (int)(originalBitmap.PixelHeight * scale);
+            MyDpi = newWidth * newHeight * 4;
+
+            DrawingGroup drawingGroup = new();
+            // 最近傍補間を設定
+            RenderOptions.SetBitmapScalingMode(drawingGroup, BitmapScalingMode.NearestNeighbor);
+            using (DrawingContext drawingContext = drawingGroup.Open())
+            {
+                // 2倍のサイズに引き伸ばして描画
+                drawingContext.DrawImage(originalBitmap, new Rect(0, 0, newWidth, newHeight));
+            }
+
+            // 2. 描き込み用の Visual を作成
+            DrawingVisual drawingVisual = new();
+            using (DrawingContext context = drawingVisual.RenderOpen())
+            {
+                context.DrawDrawing(drawingGroup);
+            }
+
+            // 3. RenderTargetBitmap に焼き付ける
+            RenderTargetBitmap renderTargetBitmap = new(
+                newWidth,
+                newHeight,
+                originalBitmap.DpiX,
+                originalBitmap.DpiY,
+                PixelFormats.Pbgra32);
+
+            renderTargetBitmap.Render(drawingVisual);
+            return renderTargetBitmap;
+        }
+
+
+        //public RenderTargetBitmap MakeBitmapFromLayoutTransformElement2(FrameworkElement element)
+        //{
+        //    double dpi = 96.0 * PresentationSource.FromVisual(element).CompositionTarget.TransformFromDevice.M11;
+        //    Rect bounds = new(0, 0, element.ActualWidth, element.ActualHeight); // 元のBounds
+        //    Rect ltBounds = element.LayoutTransform.TransformBounds(bounds); // 変形後のBounds
+        //    DrawingVisual dv = new();
+        //    dv.Offset = new Vector(-ltBounds.X, -ltBounds.Y);
+
+        //    RenderOptions.SetBitmapScalingMode(dv, BitmapScalingMode.NearestNeighbor);// 無意味
+        //    RenderOptions.SetEdgeMode(dv, EdgeMode.Aliased);// 無意味
+        //    MyDpi = ltBounds.Width;
+
+        //    using (DrawingContext context = dv.RenderOpen())
+        //    {
+        //        BitmapCacheBrush bcBrush = new(element)
+        //        {
+        //            BitmapCache = new() { EnableClearType = false, SnapsToDevicePixels = true },// 無意味
+        //            AutoLayoutContent = true,// 無意味
+
+        //        };
+
+        //        RenderOptions.SetBitmapScalingMode(bcBrush, BitmapScalingMode.NearestNeighbor);// 無意味
+        //        RenderOptions.SetEdgeMode(bcBrush, EdgeMode.Aliased);// 無意味
+        //        context.DrawRectangle(bcBrush, null, ltBounds);
+        //    }
+        //    RenderTargetBitmap bmp =
+        //        new(MyCeiling(ltBounds.Width), MyCeiling(ltBounds.Height), dpi, dpi, PixelFormats.Pbgra32);
+        //    bmp.Render(dv);
+        //    return bmp;
+        //}
 
 
         // doubleを切り上げてintに変換
@@ -454,7 +565,8 @@ namespace BitmapSourceVisualizer
         // LayoutTransformによる変形後の要素からBitmap作成して、クリップボードにコピー
         private void ButtonCopyToClipboardExterior_Click(object sender, RoutedEventArgs e)
         {
-            CopyToClipboardExterior(ImageControl);
+            //CopyToClipboardExterior(ImageControl);
+            CopyToClipboardMyBitmapSource();
         }
 
         // 変形後の要素を画像としてファイルに保存
@@ -506,14 +618,27 @@ namespace BitmapSourceVisualizer
 
 
         // LayoutTransformによる変形後の要素からBitmap作成して、クリップボードにコピー
-        public static void CopyToClipboardExterior(FrameworkElement element)
+        public void CopyToClipboardExterior(FrameworkElement element)
         {
             // 処理に伴うメモリ量と処理続行の確認してから
             if (CheckMemoryAndConfirmConsent(element))
             {
+                //BitmapToPngImageToClipboard(MakeBitmapFromLayoutTransformElement2(element));
                 BitmapToPngImageToClipboard(MakeBitmapFromLayoutTransformElement(element));
+                //BitmapToPngImageToClipboard(MakeScaleImageBitmap());
+                //BitmapToPngImageToClipboard(MakeScaleBitmap(MyBitmapSource, MyImageScale));
             }
         }
+
+        public void CopyToClipboardMyBitmapSource()
+        {
+            // 処理に伴うメモリ量と処理続行の確認してから
+            if (CheckMemoryAndConfirmConsent(ImageControl))
+            {
+                BitmapToPngImageToClipboard(MakeScaleBitmap(MyBitmapSource, MyImageScale));
+            }
+        }
+
 
 
         private void SaveExteriorToImageFile()
@@ -521,9 +646,13 @@ namespace BitmapSourceVisualizer
             // 処理に伴うメモリ量と処理続行の確認してから
             if (CheckMemoryAndConfirmConsent(ImageControl))
             {
-                SaveBitmapSource(MakeBitmapFromLayoutTransformElement(ImageControl));
+                SaveBitmapSource(MakeScaleBitmap(MyBitmapSource, MyImageScale));
+                //SaveBitmapSource(MakeBitmapFromLayoutTransformElement(MyMainGrid));
+                //SaveBitmapSource(MakeBitmapFromLayoutTransformElement(ImageControl));
             }
         }
+
+
 
         #region チェック系
 
@@ -539,7 +668,7 @@ namespace BitmapSourceVisualizer
             Rect bounds = new(0, 0, element.ActualWidth, element.ActualHeight); // 元のBounds
             var ltBounds = element.LayoutTransform.TransformBounds(bounds); // 変形後のBounds
 
-            if (ltBounds.Width * ltBounds.Height > 1000 * 1000 * 1000)
+            if (ltBounds.Width * ltBounds.Height * 4 > 1000 * 1000 * 1000)
             {
                 return true;
             }
@@ -1003,15 +1132,15 @@ namespace BitmapSourceVisualizer
         private void Button_Click(object sender, RoutedEventArgs e)
         {
             var type = MyDraw.MyDrawTextType;
-            if(type == DrawTextType.None)
+            if (type == DrawTextType.None)
             {
                 MyDraw.MyDrawTextType = DrawTextType.RGBA;
             }
-            else if(type == DrawTextType.RGBA)
+            else if (type == DrawTextType.RGBA)
             {
                 MyDraw.MyDrawTextType = DrawTextType.HSVA;
             }
-            else if(type == DrawTextType.HSVA)
+            else if (type == DrawTextType.HSVA)
             {
                 MyDraw.MyDrawTextType = DrawTextType.None;
             }

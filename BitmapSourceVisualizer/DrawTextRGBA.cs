@@ -227,13 +227,13 @@ namespace BitmapSourceVisualizer
                     string text = "";
                     if(MyDrawTextType == DrawTextType.RGBA)
                     {
-                        text = $"R {pixels[2]}\nG {pixels[1]}\nB {pixels[0]}\nA {pixels[3]}";
+                        text = $"A {pixels[3]}\nR {pixels[2]}\nG {pixels[1]}\nB {pixels[0]}";
                     }
                     else if(MyDrawTextType == DrawTextType.HSVA)
                     {
                         double a = pixels[3] / 255.0;
                         (double h, double s, double v) = MathHSV.Rgb2hsv(pixels[2], pixels[1], pixels[0]);
-                        text = $"H {h:F0}\nS {s:P0}\nV {v:P0}\nA {a:P0}";
+                        text = $"A {a:P0}\nH {h:F0}\nS {s:P0}\nV {v:P0}";
                     }
                     
                     FormattedText formattedText = new(
