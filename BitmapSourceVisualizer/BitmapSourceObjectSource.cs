@@ -36,7 +36,6 @@ namespace BitmapSourceVisualizer
                 return;
             }
 
-            //var encoder = new BmpBitmapEncoder();
             var encoder = new PngBitmapEncoder();
             encoder.Frames.Add(BitmapFrame.Create(bmp));
 
