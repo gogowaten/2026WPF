@@ -259,18 +259,6 @@ namespace BitmapSourceVisualizer
                 }
             };
 
-            item = new() { Header = "画像保存(png)" };
-            menu.Items.Add(item);
-            item.Click += (s, e) =>
-            {
-                if (MyBitmapSource is not null)
-                {
-                    SaveBitmapSource(MyBitmapSource);
-                }
-            };
-
-            menu.Items.Add(new Separator());
-
             item = new() { Header = "画像コピー(拡大後)" };
             menu.Items.Add(item);
             item.Click += (s, e) =>
@@ -278,6 +266,30 @@ namespace BitmapSourceVisualizer
                 if (MyBitmapSource is not null)
                 {
                     CopyToClipboardMyBitmapSource();
+                }
+            };
+
+            item = new() { Header = "画像コピー(見えている部分そのまま)" };
+            menu.Items.Add(item);
+            item.Click += (s, e) =>
+            {
+                if (MyBitmapSource is not null)
+                {
+                    CopyToClipboardExterior(MyScroll);
+                }
+            };
+
+
+            menu.Items.Add(new Separator());
+
+
+            item = new() { Header = "画像保存(png)" };
+            menu.Items.Add(item);
+            item.Click += (s, e) =>
+            {
+                if (MyBitmapSource is not null)
+                {
+                    SaveBitmapSource(MyBitmapSource);
                 }
             };
 
@@ -291,7 +303,13 @@ namespace BitmapSourceVisualizer
                 }
             };
 
+            item = new() { Header = "画像保存(見えている部分そのまま)(png)" };
+            menu.Items.Add(item);
+            item.Click += (s, e) => { SaveMyScrollToImageFile(); };
+
+
             menu.Items.Add(new Separator());
+
 
             item = new() { Header = $"色コピー（#ARGB）" };
             menu.Items.Add(item);
@@ -315,26 +333,17 @@ namespace BitmapSourceVisualizer
             };
 
 
-            item = new() { Header = "画像コピー(見えている部分そのまま)" };
-            menu.Items.Add(item);
-            item.Click += (s, e) =>
-            {
-                if (MyBitmapSource is not null)
-                {
-                    CopyToClipboardExterior(MyScroll);
-                }
-            };
 
 
-            item = new() { Header = "画像コピー(this)" };
-            menu.Items.Add(item);
-            item.Click += (s, e) =>
-            {
-                if (MyBitmapSource is not null)
-                {
-                    CopyToClipboardExterior(this);
-                }
-            };
+            //item = new() { Header = "画像コピー(this)" };
+            //menu.Items.Add(item);
+            //item.Click += (s, e) =>
+            //{
+            //    if (MyBitmapSource is not null)
+            //    {
+            //        CopyToClipboardExterior(this);
+            //    }
+            //};
 
 
             return menu;
@@ -551,14 +560,24 @@ namespace BitmapSourceVisualizer
         {
             if (sender is Button button && double.TryParse(button.Tag.ToString(), out double value))
             {
-                if (MyImageScale <= 1.0)
+                var scale = MyImageScale * value;
+                if (scale <= 1.0)
                 {
-                    MyImageScale = GetClampedImageScale(MyImageScale * value);
+                    MyImageScale = GetClampedImageScale(scale);
                 }
                 else
                 {
-                    MyImageScale = GetClampedImageScale(MyCeiling(MyImageScale * value));
+                    MyImageScale = GetClampedImageScale(MyCeiling(scale));
                 }
+
+                //if (MyImageScale <= 1.0)
+                //{
+                //    MyImageScale = GetClampedImageScale(MyImageScale * value);
+                //}
+                //else
+                //{
+                //    MyImageScale = GetClampedImageScale(MyCeiling(MyImageScale * value));
+                //}
             }
         }
 
@@ -604,14 +623,20 @@ namespace BitmapSourceVisualizer
         }
 
         // クランプ。値を上限下限内に収めて返す
+        // パターン1：NaN があれば NaN を返す（標準的な挙動）
         private static double Clamp(double value, double min, double max)
         {
+            // いずれかの引数が NaN の場合は NaN を返す
+            if (double.IsNaN(value) || double.IsNaN(min) || double.IsNaN(max))
+            {
+                return double.NaN;
+            }
+
             if (min > max) { (max, min) = (min, max); }
 
             double result = value;
             if (value < min) { result = min; }
             else if (value > max) { result = max; }
-
             return result;
         }
 
@@ -650,6 +675,11 @@ namespace BitmapSourceVisualizer
                 //SaveBitmapSource(MakeBitmapFromLayoutTransformElement(MyMainGrid));
                 //SaveBitmapSource(MakeBitmapFromLayoutTransformElement(ImageControl));
             }
+        }
+
+        private void SaveMyScrollToImageFile()
+        {
+            SaveBitmapSource(MakeBitmapFromLayoutTransformElement(MyScroll));
         }
 
 
@@ -1042,41 +1072,64 @@ namespace BitmapSourceVisualizer
             // CuptureMouseは実行するとMouseMoveイベントが発行されるのでGetPositionより後にする
             MiniMapCanvas.CaptureMouse();
 
-            // 枠内クリックの場合は調整しない
-            // スクロール位置だけ記録する
-            if (MiniMapCanvas.InputHitTest(MyClickedPoint) is Rectangle)
+            // 横スクロールバーの位置調整
+            if (MyScroll.ScrollableWidth > 0)
             {
-                MyClickedScrollXOffset = MyScroll.HorizontalOffset;
-                MyClickedScrollYOffset = MyScroll.VerticalOffset;
-                return;
+                // 枠内クリックの場合は調整しない
+                // スクロール位置だけ記録する
+                if (MiniMapCanvas.InputHitTest(MyClickedPoint) is Rectangle)
+                {
+                    MyClickedScrollXOffset = MyScroll.HorizontalOffset;
+                    return;
+                }
+
+                // ここからスクロール位置調整処理
+                // クリック位置と枠の位置の差
+                var xDiff = MyClickedPoint.X - Canvas.GetLeft(ViewBoundsRect);
+
+                // スクロール位置 = 今のスクロール位置 + （位置の差 * ScrollViewerと枠サイズの率）
+                double xOffset = MyScroll.HorizontalOffset + (xDiff * MyRateMoveX);
+                // クリック位置に枠の中心を合わせる
+                xOffset -= ViewBoundsRect.Width * MyRateMoveX / 2.0;
+                //xOffset -= ViewBoundsRect.ActualWidth * MyRateMoveX / 2.0;
+
+                // スクロール位置（値）をクランプしてセット
+                xOffset = Clamp(xOffset, 0, MyScroll.ScrollableWidth);
+                MyScroll.ScrollToHorizontalOffset(xOffset);
+
+                // スクロール位置を記録しておく
+                MyClickedScrollXOffset = xOffset;
             }
 
-            // ここからスクロール位置調整処理
-            // クリック位置と枠の位置の差
-            var xDiff = MyClickedPoint.X - Canvas.GetLeft(ViewBoundsRect);
-            var yDiff = MyClickedPoint.Y - Canvas.GetTop(ViewBoundsRect);
+            if (MyScroll.ScrollableHeight > 0)
+            {
+                if (MiniMapCanvas.InputHitTest(MyClickedPoint) is Rectangle)
+                {
+                    MyClickedScrollYOffset = MyScroll.VerticalOffset;
+                    return;
+                }
 
-            // スクロール位置 = 今のスクロール位置 + （位置の差 * ScrollViewerと枠サイズの率）
-            double xOffset = MyScroll.HorizontalOffset + (xDiff * MyRateMoveX);
-            double yOffset = MyScroll.VerticalOffset + (yDiff * MyRateMoveY);
-            // クリック位置に枠の中心を合わせる
-            xOffset -= ViewBoundsRect.ActualWidth * MyRateMoveX / 2.0;
-            yOffset -= ViewBoundsRect.ActualHeight * MyRateMoveY / 2.0;
+                var yDiff = MyClickedPoint.Y - Canvas.GetTop(ViewBoundsRect);
 
-            // スクロール位置（値）をクランプしてセット
-            xOffset = Clamp(xOffset, 0, MyScroll.ScrollableWidth);
-            yOffset = Clamp(yOffset, 0, MyScroll.ScrollableHeight);
-            MyScroll.ScrollToHorizontalOffset(xOffset);
-            MyScroll.ScrollToVerticalOffset(yOffset);
+                double yOffset = MyScroll.VerticalOffset + (yDiff * MyRateMoveY);
+                yOffset -= ViewBoundsRect.Height * MyRateMoveY / 2.0;
+                //yOffset -= ViewBoundsRect.ActualHeight * MyRateMoveY / 2.0;
 
-            // スクロール位置を記録しておく
-            MyClickedScrollXOffset = xOffset;
-            MyClickedScrollYOffset = yOffset;
+                yOffset = Clamp(yOffset, 0, MyScroll.ScrollableHeight);
+                MyScroll.ScrollToVerticalOffset(yOffset);
+
+                MyClickedScrollYOffset = yOffset;
+            }
+
+
         }
 
-        // マウス移動時
+        // ナビ上でのマウス移動時のスクロールバー位置調整
         private void MiniMapCanvas_MouseMove(object sender, MouseEventArgs e)
         {
+            // スクロールバーなしなら何もしない
+            if (MyScroll.ScrollableHeight == 0 || MyScroll.ScrollableWidth == 0) { return; }
+
             // ドラッグ移動フラグ確認、無ければ何もしない
             if (IsMouseDraged == false) { return; }
 
@@ -1129,7 +1182,7 @@ namespace BitmapSourceVisualizer
             if (ChangeScaleWithMouseWheel(e.Delta)) { e.Handled = true; }
         }
 
-        private void Button_Click(object sender, RoutedEventArgs e)
+        private void Button_ClickChangeDrawText(object sender, RoutedEventArgs e)
         {
             var type = MyDraw.MyDrawTextType;
             if (type == DrawTextType.None)
@@ -1144,6 +1197,17 @@ namespace BitmapSourceVisualizer
             {
                 MyDraw.MyDrawTextType = DrawTextType.None;
             }
+        }
+
+        private void Button_ClickChangeWindowSize(object sender, RoutedEventArgs e)
+        {
+            // 854x640 default  4:3
+            // 654x367 min      16:9 min
+            // 1140x640 large   16:9
+            if (Width == 654 && Height == 367) { Width = 854; Height = 640; }
+            else if (Width == 854 && Height == 640) { Width = 1140; Height = 640; }
+            else if (Width == 1140 && Height == 640) { Width = 654; Height = 367; }
+            else { Width = 854; Height = 640; }
         }
     }
 }

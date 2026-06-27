@@ -60,8 +60,8 @@ namespace _20260510
         {
             GeoLineData geo = new()
             {
-                X = 100,
-                Y = 100,
+                X = 10,
+                Y = 10,
                 Points = [new Point(50, 0), new Point(100, 00), new Point(50, 100)],
                 //Points = [new Point(50, 0), new Point(100, 00)],
                 //Points = [new Point(-50, 0), new Point(100, 00)],
