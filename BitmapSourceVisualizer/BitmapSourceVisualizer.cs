@@ -64,6 +64,7 @@ namespace BitmapSourceVisualizer
 
             BitmapSourceVisualizerWindow win = new();
             win.SetImage(bmp);
+            // タイトルバーに色々表示
             win.Title = $" BitmapSource Visualizer {{ PixelSize {bmp.PixelWidth} x {bmp.PixelHeight} }} , {{ PixelFormat {format} }} , {{ DpiX, DpiY {dpiX}, {dpiY} }}";
             win.ShowDialog();
         }
