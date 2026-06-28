@@ -63,7 +63,7 @@ namespace BitmapSourceVisualizer
         {
             MyBitmapSource = bitmap;
             ImageControl.Source = bitmap;
-            Title = $"BitmapSource Visualizer - {bitmap.PixelWidth} x {bitmap.PixelHeight} , PixelFormat {bitmap.Format} , DPI {bitmap.DpiX}";
+            //Title = $"BitmapSource Visualizer - {bitmap.PixelWidth} x {bitmap.PixelHeight} , PixelFormat {bitmap.Format} , DPI {bitmap.DpiX}";
             MiniMapImage.Source = bitmap;
         }
 
