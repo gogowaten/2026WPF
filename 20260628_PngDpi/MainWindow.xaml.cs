@@ -2,6 +2,8 @@
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+// WPF PngBitmapEncoderを使ってpng形式で画像保存するとdpiが変化してしまう - 午後わてんのブログ
+//https://gogowaten.hatenablog.com/entry/2026/06/28/191410
 
 namespace _20260628_PngDpi
 {
