@@ -1,0 +1,44 @@
+﻿<Window x:Class="_20260629.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:_20260629"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="367" Width="654"
+        DataContext="{Binding RelativeSource={RelativeSource Mode=Self}}">
+  <Grid x:Name="MainContainer">
+    <DockPanel>
+      <StatusBar x:Name="MyStatusBar" DockPanel.Dock="Bottom" Height="30"
+                 Visibility="Collapsed">
+        <StatusBarItem>
+          <ProgressBar IsIndeterminate="True" Width="100" Height="15"/>
+        </StatusBarItem>
+        <StatusBarItem>
+          <TextBlock x:Name="StatusTextBlock" Text="" Margin="5,0,0,0"/>
+        </StatusBarItem>
+      </StatusBar>
+      <Grid>
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition/>
+          <ColumnDefinition Width="200"/>
+        </Grid.ColumnDefinitions>
+
+        <Canvas x:Name="MyCanvas">
+
+        </Canvas>
+
+        <StackPanel Grid.Column="1">
+          <ProgressBar x:Name="MyProgressBar" Height="20"/>
+          <TextBlock x:Name="MyTextBlock" Text="表示用1" TextAlignment="Center"/>
+          <TextBlock x:Name="MyStatasText" Text="表示用2" TextAlignment="Center"/>
+          <Button x:Name="MyButton実行" Content="実行" Click="MyButton実行_Click"/>
+          <Button x:Name="MyButtonキャンセル" Content="Cancel" Click="MyButtonキャンセル_Click"/>
+          <Button x:Name="MyExe" Content="処理実行" Click="MyExe_Click"/>
+          <!--<Button Content="visibletest" Click="Button_Click"/>
+          <TextBlock Text="{Binding MyIsLoading}"/>-->
+        </StackPanel>
+      </Grid>
+    </DockPanel>
+  </Grid>
+</Window>
