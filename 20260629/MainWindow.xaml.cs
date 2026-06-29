@@ -234,7 +234,7 @@ namespace _20260629
 
             //// 2. 【ここが重要】UIスレッドの順番を一度システムに譲り、画面を描画させる
             //// 1ミリ秒だけ待つことで、WPFが「ステータスバーを表示する」という描画処理を完了できます
-            //await Task.Delay(100);
+            //await Task.Delay(1); // 実際には1ミリ秒では足りなくて100ミリ秒なら描画更新された。でも最適な待機時間は測れないので、この方法は使わない
 
             //DispatcherPriority 列挙型 (System.Windows.Threading) | Microsoft Learn
         //https://learn.microsoft.com/ja-jp/dotnet/api/system.windows.threading.dispatcherpriority?view=windowsdesktop-10.0
