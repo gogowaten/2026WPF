@@ -294,3 +294,12 @@ using (var reader = new BinaryReader(stream, System.Text.Encoding.UTF8))
 
 
 この方法であれば外部ライブラリのシリアライズ制限に引っかかることもなく、元の正確な `DpiX` や `PixelFormat`（文字列）を安全にビジュアライザー側へ持ち込めます。用途に合わせて試してみてください！
+
+---
+<br><br><br>
+
+
+
+# 参照したところ
+[C#] バイナリファイルの読み込み方まとめ | ヤスノログ<br>
+https://yaspage.com/cs-file-binary/<br>
