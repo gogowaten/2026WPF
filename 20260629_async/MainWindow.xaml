@@ -23,6 +23,8 @@
         <StackPanel Grid.Column="1">
           
           <Button x:Name="MyExe" Content="コピー処理実行" Click="MyExe_Click"/>
+          <Button Content="保存処理実行" Click="Button_ClickSaveTest"/>
+          <Button Content="AAA" Click="Button_Click"/>
 
         </StackPanel>
       </Grid>
