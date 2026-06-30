@@ -107,7 +107,7 @@ namespace _20260630
                     }
                 });
 
-                thread.SetApartmentState(System.Threading.ApartmentState.STA); // 必須設定
+                thread.SetApartmentState(ApartmentState.STA); // 必須設定
                 thread.Start();
                 thread.Join(); // スレッドの完了を待つ
             });
