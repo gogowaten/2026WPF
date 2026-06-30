@@ -13,6 +13,11 @@
     <local:MyConvBoolToVisibleHidden x:Key="boolVisibleHidden"/>
     <local:MyConvHsvToText x:Key="textHsv"/>
   </Window.Resources>
+  <DockPanel>
+    <StatusBar x:Name="MyStatusBar" DockPanel.Dock="Bottom">
+      <ProgressBar IsIndeterminate="True" Width="100"/>
+      <TextBlock x:Name="MyStatusText" Text="test"/>
+    </StatusBar>
   <Grid UseLayoutRounding="True">
     <Grid.ColumnDefinitions>
       <ColumnDefinition/>
@@ -295,5 +300,6 @@ https://seizu.dev/2013/06/11/post2437.html-->
       </GroupBox>
 
     </StackPanel>
-  </Grid>
+    </Grid>
+  </DockPanel>
 </Window>

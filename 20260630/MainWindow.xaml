@@ -1,0 +1,33 @@
+﻿<Window x:Class="_20260630.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:_20260630"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="367" Width="654">
+
+  <Grid x:Name="MainContainer">
+    <DockPanel>
+      <StatusBar x:Name="MyStatusBar" DockPanel.Dock="Bottom" Visibility="Visible">
+        <ProgressBar x:Name="MyProgressBar" IsIndeterminate="False" Width="100" Height="15"/>
+        <TextBlock x:Name="MyStatusTextBlock" Text="" Margin="5,0,0,0"/>
+      </StatusBar>
+
+      <Grid>
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition/>
+          <ColumnDefinition Width="200"/>
+        </Grid.ColumnDefinitions>
+
+        <StackPanel Grid.Column="1">
+
+          <Button x:Name="MyExe" Content="コピー処理実行" Click="MyExe_Click"/>
+          <!--<Button Content="保存処理実行" Click="Button_ClickSaveTest"/>
+          <Button Content="AAA" Click="Button_Click"/>-->
+
+        </StackPanel>
+      </Grid>
+    </DockPanel>
+  </Grid>
+</Window>
