@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:local="clr-namespace:BitmapSourceVisualizer"
         Title="BitmapSource Visualizer"
-        Width="854" Height="640"
+        Width="854" Height="647"
         WindowStartupLocation="CenterOwner"
         ResizeMode="CanResizeWithGrip"
         DataContext="{Binding RelativeSource={RelativeSource Mode=Self}}">
@@ -13,65 +13,88 @@
     <local:MyConvBoolToVisibleHidden x:Key="boolVisibleHidden"/>
     <local:MyConvHsvToText x:Key="textHsv"/>
   </Window.Resources>
-  <DockPanel>
+  <DockPanel x:Name="MyMainGrid">
     <StatusBar x:Name="MyStatusBar" DockPanel.Dock="Bottom">
-      <ProgressBar IsIndeterminate="True" Width="100"/>
+      <ProgressBar x:Name="MyProgressBar" IsIndeterminate="False" Width="100"/>
       <TextBlock x:Name="MyStatusText" Text="test"/>
+      <Separator/>
+      <TextBlock Text="Size"/>
+      <TextBlock x:Name="MyStatusPixelSize" Text="000 x 000"/>
+      <Separator/>
+      <TextBlock Text="🔍️ x"/>
+      <TextBlock x:Name="MyStatusScale" Text="{Binding MyImageScale}"/>
+      <Separator/>
+      <TextBlock Text="表示"/>
+      <TextBlock x:Name="MyStatusScaledSize" Text="0000 x 0000"/>
+      <Separator/>
+
+      <StatusBarItem DockPanel.Dock="Right" x:Name="MyStatusDipY" Content="96" Margin="0,0,10,0"/>
+      <StatusBarItem DockPanel.Dock="Right" Content="dpiY"/>
+      <Separator  DockPanel.Dock="Right"/>
+      <StatusBarItem DockPanel.Dock="Right" x:Name="MyStatusDipX" Content="96"/>
+      <StatusBarItem DockPanel.Dock="Right" Content="dpiX"/>
+      <Separator  DockPanel.Dock="Right"/>
+      <StatusBarItem DockPanel.Dock="Right" x:Name="MyStatusPixelFormat" Content="pixelFormat"/>
+      <StatusBarItem DockPanel.Dock="Right" Content="Format"/>
+      <Separator DockPanel.Dock="Right"/>
+      <Separator Background="Transparent"/>
+
+
     </StatusBar>
-  <Grid UseLayoutRounding="True">
-    <Grid.ColumnDefinitions>
-      <ColumnDefinition/>
-      <ColumnDefinition Width="200"/>
-    </Grid.ColumnDefinitions>
-    <ScrollViewer x:Name="MyScroll"
+    <Grid UseLayoutRounding="True">
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition/>
+        <ColumnDefinition Width="200"/>
+      </Grid.ColumnDefinitions>
+      <ScrollViewer x:Name="MyScroll"
                   HorizontalScrollBarVisibility="Auto"
                   VerticalScrollBarVisibility="Auto"
                   PreviewMouseWheel="MyScroll_PreviewMouseWheel"
                   ScrollChanged="MyScroll_ScrollChanged"
                   UseLayoutRounding="True"
                   >
-      <ScrollViewer.Style>
-        <Style TargetType="ScrollViewer">
-          <Setter Property="Background">
-            <Setter.Value>
+        <ScrollViewer.Style>
+          <Style TargetType="ScrollViewer">
+            <Setter Property="Background">
+              <Setter.Value>
 
-              <!--市松模様をXAMLだけで描く方法 | Seizu Development Forge
+                <!--市松模様をXAMLだけで描く方法 | Seizu Development Forge
 https://seizu.dev/2013/06/11/post2437.html-->
 
-              <DrawingBrush Viewport="0,0,32,32" TileMode="Tile" ViewportUnits="Absolute">
-                <DrawingBrush.Drawing>
-                  <DrawingGroup>
+                <DrawingBrush Viewport="0,0,32,32" TileMode="Tile" ViewportUnits="Absolute">
+                  <DrawingBrush.Drawing>
+                    <DrawingGroup>
 
-                    <GeometryDrawing Brush="#eee">
-                      <GeometryDrawing.Geometry>
-                        <RectangleGeometry Rect="0,0,64,64"/>
-                      </GeometryDrawing.Geometry>
-                    </GeometryDrawing>
+                      <GeometryDrawing Brush="#eee">
+                        <GeometryDrawing.Geometry>
+                          <RectangleGeometry Rect="0,0,64,64"/>
+                        </GeometryDrawing.Geometry>
+                      </GeometryDrawing>
 
-                    <GeometryDrawing Brush="#fafafa">
-                      <GeometryDrawing.Geometry>
-                        <GeometryGroup>
-                          <RectangleGeometry Rect="0,0,32,32"/>
-                          <RectangleGeometry Rect="32,32,32,32"/>
-                        </GeometryGroup>
-                      </GeometryDrawing.Geometry>
-                    </GeometryDrawing>
+                      <GeometryDrawing Brush="#fafafa">
+                        <GeometryDrawing.Geometry>
+                          <GeometryGroup>
+                            <RectangleGeometry Rect="0,0,32,32"/>
+                            <RectangleGeometry Rect="32,32,32,32"/>
+                          </GeometryGroup>
+                        </GeometryDrawing.Geometry>
+                      </GeometryDrawing>
 
-                  </DrawingGroup>
-                </DrawingBrush.Drawing>
-              </DrawingBrush>
+                    </DrawingGroup>
+                  </DrawingBrush.Drawing>
+                </DrawingBrush>
 
-            </Setter.Value>
-          </Setter>
-          <Style.Triggers>
-            <DataTrigger Binding="{Binding ElementName=IsBackgroundItimatu, Path=IsChecked}" Value="false">
-              <Setter Property="Background" Value="Transparent"/>
-            </DataTrigger>
-          </Style.Triggers>
-        </Style>
-      </ScrollViewer.Style>
-      <Grid>
-        <Image x:Name="ImageControl"
+              </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+              <DataTrigger Binding="{Binding ElementName=IsBackgroundItimatu, Path=IsChecked}" Value="false">
+                <Setter Property="Background" Value="Transparent"/>
+              </DataTrigger>
+            </Style.Triggers>
+          </Style>
+        </ScrollViewer.Style>
+        <Grid>
+          <Image x:Name="ImageControl"
                Stretch="None"
                SnapsToDevicePixels="True"
                RenderOptions.BitmapScalingMode="NearestNeighbor"
@@ -83,48 +106,48 @@ https://seizu.dev/2013/06/11/post2437.html-->
                PreviewMouseDown="ImageControl_PreviewMouseDown"
                  
              >
-          <Image.LayoutTransform>
-            <ScaleTransform ScaleX="{Binding MyImageScale}" ScaleY="{Binding MyImageScale}"/>
-          </Image.LayoutTransform>
-        </Image>
-        <Grid x:Name="MyMainGrid"
+            <Image.LayoutTransform>
+              <ScaleTransform ScaleX="{Binding MyImageScale}" ScaleY="{Binding MyImageScale}"/>
+            </Image.LayoutTransform>
+          </Image>
+          <Grid
               UseLayoutRounding="True"
               SnapsToDevicePixels="True"
               RenderOptions.EdgeMode="Aliased"
               RenderOptions.BitmapScalingMode="NearestNeighbor">
-          <Grid.LayoutTransform>
-            <ScaleTransform ScaleX="{Binding MyImageScale}" ScaleY="{Binding MyImageScale}"/>
-          </Grid.LayoutTransform>
-          <!--IsHitTestVisible="False" クリックとかのイベントを透過-->
-          <!--ピクセルグリッド-->
-          <Rectangle IsHitTestVisible="False"
+            <Grid.LayoutTransform>
+              <ScaleTransform ScaleX="{Binding MyImageScale}" ScaleY="{Binding MyImageScale}"/>
+            </Grid.LayoutTransform>
+            <!--IsHitTestVisible="False" クリックとかのイベントを透過-->
+            <!--ピクセルグリッド-->
+            <Rectangle IsHitTestVisible="False"
                      UseLayoutRounding="True"
                      RenderOptions.BitmapScalingMode="NearestNeighbor"
                      RenderOptions.EdgeMode="Aliased"
                      SnapsToDevicePixels="True"
                      
                      Visibility="{Binding ElementName=IsPixelGrid, Path=IsChecked, Converter={StaticResource boolVisible}}">
-            <Rectangle.Fill>
-              <DrawingBrush TileMode="Tile" Viewport="0,0,1,1" ViewportUnits="Absolute">
-                <DrawingBrush.Drawing>
-                  <GeometryDrawing>
-                    <GeometryDrawing.Pen>
-                      <Pen Brush="LightGray" Thickness="{Binding MyPixelGridWidth}"/>
-                    </GeometryDrawing.Pen>
-                    <GeometryDrawing.Geometry>
-                      <GeometryGroup>
-                        <LineGeometry StartPoint="0,0" EndPoint="1,0" />
-                        <LineGeometry StartPoint="0,0" EndPoint="0,1" />
-                      </GeometryGroup>
-                    </GeometryDrawing.Geometry>
-                  </GeometryDrawing>
-                </DrawingBrush.Drawing>
-              </DrawingBrush>
-            </Rectangle.Fill>
-          </Rectangle>
-        </Grid>
+              <Rectangle.Fill>
+                <DrawingBrush TileMode="Tile" Viewport="0,0,1,1" ViewportUnits="Absolute">
+                  <DrawingBrush.Drawing>
+                    <GeometryDrawing>
+                      <GeometryDrawing.Pen>
+                        <Pen Brush="LightGray" Thickness="{Binding MyPixelGridWidth}"/>
+                      </GeometryDrawing.Pen>
+                      <GeometryDrawing.Geometry>
+                        <GeometryGroup>
+                          <LineGeometry StartPoint="0,0" EndPoint="1,0" />
+                          <LineGeometry StartPoint="0,0" EndPoint="0,1" />
+                        </GeometryGroup>
+                      </GeometryDrawing.Geometry>
+                    </GeometryDrawing>
+                  </DrawingBrush.Drawing>
+                </DrawingBrush>
+              </Rectangle.Fill>
+            </Rectangle>
+          </Grid>
 
-        <local:DrawTextPixelColorValue
+          <local:DrawTextPixelColorValue
           x:Name="MyDraw"
           IsHitTestVisible="False"
           SnapsToDevicePixels="True"
@@ -137,55 +160,54 @@ https://seizu.dev/2013/06/11/post2437.html-->
           HorizontalAlignment="Left"
           VerticalAlignment="Top"
           MyIsStopDraw="{Binding IsImageDrag}"/>
-        <!--Visibility="{Binding ElementName=IsDrawTextARGB, Path=IsChecked, Converter={StaticResource boolVisible}}"-->
+          <!--Visibility="{Binding ElementName=IsDrawTextARGB, Path=IsChecked, Converter={StaticResource boolVisible}}"-->
 
-      </Grid>
-    </ScrollViewer>
-    <StackPanel Grid.Column="1">
-      <StackPanel.Resources>
-        <Style TargetType="TextBlock">
-          <Setter Property="Margin" Value="2,2"/>
-          <Setter Property="VerticalAlignment" Value="Center"/>
-        </Style>
-        <Style TargetType="Button">
-          <Setter Property="Margin" Value="5,4"/>
-          <Setter Property="VerticalAlignment" Value="Center"/>
-        </Style>
-        <Style TargetType="CheckBox">
-          <Setter Property="HorizontalAlignment" Value="Center"/>
-          <Setter Property="VerticalAlignment" Value="Center"/>
-          <Setter Property="Margin" Value="4"/>
-          <Setter Property="VerticalContentAlignment" Value="Center"/>
-        </Style>
-      </StackPanel.Resources>
-
-
-      <Button Content="ウィンドウサイズ切り替え" Click="Button_ClickChangeWindowSize"
-              ToolTip="小 -> 中 -> 大 -> 小 の繰り返し"/>
-      <TextBlock Text="{Binding MyDpi}"/>
-      <UniformGrid Columns="2" Rows="2">
-        <UniformGrid.Resources>
-          <Style TargetType="CheckBox">
-            <Setter Property="HorizontalAlignment" Value="Left"/>
+        </Grid>
+      </ScrollViewer>
+      <StackPanel Grid.Column="1">
+        <StackPanel.Resources>
+          <Style TargetType="TextBlock">
+            <Setter Property="Margin" Value="2,2"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
           </Style>
-        </UniformGrid.Resources>
-        <CheckBox x:Name="IsBackgroundItimatu" Content="市松模様" IsChecked="True"/>
-        <CheckBox x:Name="IsVisibleNaviWaku" Content="ナビ枠" IsChecked="True" />
-        <Button Content="値表示切り替え" Click="Button_ClickChangeDrawText"
+          <Style TargetType="Button">
+            <Setter Property="Margin" Value="5,2"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+          </Style>
+          <Style TargetType="CheckBox">
+            <Setter Property="HorizontalAlignment" Value="Center"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="Margin" Value="4"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+          </Style>
+        </StackPanel.Resources>
+
+
+        <Button Content="ウィンドウサイズ切り替え" Click="Button_ClickChangeWindowSize"
+              ToolTip="小 -> 中 -> 大 -> 小 の繰り返し"/>
+        <UniformGrid Columns="2" Rows="2">
+          <UniformGrid.Resources>
+            <Style TargetType="CheckBox">
+              <Setter Property="HorizontalAlignment" Value="Left"/>
+            </Style>
+          </UniformGrid.Resources>
+          <CheckBox x:Name="IsBackgroundItimatu" Content="市松模様" IsChecked="True"/>
+          <CheckBox x:Name="IsVisibleNaviWaku" Content="ナビ枠" IsChecked="True" />
+          <Button Content="値表示切り替え" Click="Button_ClickChangeDrawText"
                 Margin="2,0"
                 ToolTip="切り替え順は、非表示 -> RGBA -> HSV。拡大率50倍未満では常に非表示"/>
-        <!--<CheckBox x:Name="IsDrawTextARGB" Content="ARGB値" IsChecked="True"
+          <!--<CheckBox x:Name="IsDrawTextARGB" Content="ARGB値" IsChecked="True"
                   ToolTip="拡大率50倍以上で表示"/>-->
-        <CheckBox x:Name="IsPixelGrid" Content="ピクセル枠" IsChecked="True" VerticalAlignment="Center"/>
-      </UniformGrid>
+          <CheckBox x:Name="IsPixelGrid" Content="ピクセル枠" IsChecked="True" VerticalAlignment="Center"/>
+        </UniformGrid>
 
-      <Canvas x:Name="MiniMapCanvas" Width="200" Height="150"
+        <Canvas x:Name="MiniMapCanvas" Width="200" Height="150"
               PreviewMouseLeftButtonDown="MiniMapCanvas_PreviewMouseLeftButtonDown"
               PreviewMouseLeftButtonUp="MiniMapCanvas_PreviewMouseLeftButtonUp"
               MouseMove="MiniMapCanvas_MouseMove">
-        <Image x:Name="MiniMapImage" Width="200" Height="150" Stretch="Uniform"
+          <Image x:Name="MiniMapImage" Width="200" Height="150" Stretch="Uniform"
                PreviewMouseWheel="MiniMapImage_PreviewMouseWheel"/>
-        <Rectangle
+          <Rectangle
           x:Name="ViewBoundsRect"
           Canvas.Left="0" Canvas.Top="0"
           Stroke="Red"
@@ -194,112 +216,112 @@ https://seizu.dev/2013/06/11/post2437.html-->
           Visibility="{Binding ElementName=IsVisibleNaviWaku, Path=IsChecked, Converter={StaticResource boolVisibleHidden}}"
           PreviewMouseWheel="ViewBoundsRect_PreviewMouseWheel"
                    />
-      </Canvas>
+        </Canvas>
 
-      <Separator/>
+        <Separator/>
 
 
-      <UniformGrid Columns="2" Rows="2">
-        <Button Content="コピー(等倍)" Click="ButtonCopyToClipboard_Click"/>
-        <Button Content="保存" Click="ButtonSave_Click"/>
-        <Button Content="コピー(拡大後)" Click="ButtonCopyToClipboardExterior_Click"/>
-        <Button Content="保存(拡大後)" Click="ButtonSaveExterior_Click"/>
-      </UniformGrid>
+        <UniformGrid Columns="2" Rows="2">
+          <Button Content="コピー(等倍)" Click="ButtonCopyToClipboard_Click"/>
+          <Button Content="保存" Click="ButtonSave_Click"/>
+          <Button Content="コピー(拡大後)" Click="ButtonCopyToClipboardExterior_Click"/>
+          <Button Content="保存(拡大後)" Click="ButtonSaveExterior_Click"/>
+        </UniformGrid>
 
-      <Separator Margin="2"/>
+        <Separator Margin="2"/>
 
-      <TextBlock x:Name="MyTextBlockScale" Text="{Binding MyImageScale, StringFormat='表示倍率 = {0:0.00}'}" HorizontalAlignment="Center"/>
+        <TextBlock x:Name="MyTextBlockScale" Text="{Binding MyImageScale, StringFormat='表示倍率 = {0:0.00}'}" HorizontalAlignment="Center"/>
 
-      <UniformGrid Columns="3" Rows="2" Margin="2">
-        <UniformGrid.Resources>
-          <Style TargetType="Button">
-            <Setter Property="Margin" Value="2"/>
-          </Style>
-        </UniformGrid.Resources>
-        <Button Content="x 0.5倍" Tag="0.5" Click="ButtonSetMathScale_Click"/>
-        <Button Content="x 0.1倍" Tag="0.1" Click="ButtonSetMathScale_Click"/>
-        <Button Content="等倍" Tag="1" Click="ButtonSetScale_Click"/>
-        <Button Content="x 2倍" Tag="2" Click="ButtonSetMathScale_Click"/>
-        <Button Content="x 10倍" Tag="10" Click="ButtonSetMathScale_Click"/>
-        <Button Content="50倍" Tag="50" Click="ButtonSetScale_Click"/>
-      </UniformGrid>
+        <UniformGrid Columns="3" Rows="2" Margin="2">
+          <UniformGrid.Resources>
+            <Style TargetType="Button">
+              <Setter Property="Margin" Value="2"/>
+            </Style>
+          </UniformGrid.Resources>
+          <Button Content="x 0.5倍" Tag="0.5" Click="ButtonSetMathScale_Click"/>
+          <Button Content="x 0.1倍" Tag="0.1" Click="ButtonSetMathScale_Click"/>
+          <Button Content="等倍" Tag="1" Click="ButtonSetScale_Click"/>
+          <Button Content="x 2倍" Tag="2" Click="ButtonSetMathScale_Click"/>
+          <Button Content="x 10倍" Tag="10" Click="ButtonSetMathScale_Click"/>
+          <Button Content="50倍" Tag="50" Click="ButtonSetScale_Click"/>
+        </UniformGrid>
 
-      <DockPanel >
-        <Button Content="等倍" Tag="1" Click="ButtonSetScale_Click"/>
-        <RepeatButton Content="&lt;" Click="RepeatButton_ClickDown"/>
-        <Button DockPanel.Dock="Right" Content="最大" Tag="100" Click="ButtonSetScale_Click"/>
-        <RepeatButton DockPanel.Dock="Right" Content="&gt;" Click="RepeatButton_ClickUp"/>
-        <Slider x:Name="ImageScale" Minimum="1" Maximum="100" Value="{Binding MyImageScale}"
+        <DockPanel >
+          <Button Content="等倍" Tag="1" Click="ButtonSetScale_Click"/>
+          <RepeatButton Content="&lt;" Click="RepeatButton_ClickDown"/>
+          <Button DockPanel.Dock="Right" Content="最大" Tag="100" Click="ButtonSetScale_Click"/>
+          <RepeatButton DockPanel.Dock="Right" Content="&gt;" Click="RepeatButton_ClickUp"/>
+          <Slider x:Name="ImageScale" Minimum="1" Maximum="100" Value="{Binding MyImageScale}"
               SmallChange="1.0" LargeChange="1.0" IsSnapToTickEnabled="True"
               Margin="4,5" TickFrequency="1.0" PreviewMouseWheel="MyScroll_PreviewMouseWheel"/>
-      </DockPanel>
+        </DockPanel>
 
 
-      <!--<UniformGrid Columns="2">
+        <!--<UniformGrid Columns="2">
         <Button Content="コピー(拡大後)" Click="ButtonCopyToClipboardExterior_Click"/>
         <Button Content="保存(拡大後)" Click="ButtonSaveExterior_Click"/>
       </UniformGrid>-->
 
-      <Separator/>
+        <Separator/>
 
-      <GroupBox Header="カーソル位置のピクセル">
-        <StackPanel>
-          <UniformGrid Columns="3">
-            <Border Background="{Binding MySolidColorBrush}" Margin="2,0"
+        <GroupBox Header="カーソル位置のピクセル">
+          <StackPanel>
+            <UniformGrid Columns="3">
+              <Border Background="{Binding MySolidColorBrush}" Margin="2,0"
                       Height="{Binding RelativeSource={RelativeSource AncestorType=UniformGrid}, Path=DesiredSize.Height}"/>
-            <TextBlock Text="{Binding MyPixelX, StringFormat='X = {0}'}" HorizontalAlignment="Center"/>
-            <TextBlock Text="{Binding MyPixelY, StringFormat='Y = {0}'}" HorizontalAlignment="Center"/>
-          </UniformGrid>
+              <TextBlock Text="{Binding MyPixelX, StringFormat='X = {0}'}" HorizontalAlignment="Center"/>
+              <TextBlock Text="{Binding MyPixelY, StringFormat='Y = {0}'}" HorizontalAlignment="Center"/>
+            </UniformGrid>
 
-          <StackPanel>
-            <StackPanel Orientation="Horizontal">
-              <TextBlock Text="{Binding MyColor, StringFormat='Hex = {0}'}"/>
+            <StackPanel>
+              <StackPanel Orientation="Horizontal">
+                <TextBlock Text="{Binding MyColor, StringFormat='Hex = {0}'}"/>
+              </StackPanel>
+              <StackPanel Orientation="Horizontal">
+                <TextBlock Text="{Binding MyColor, StringFormat='ARGB = {0}', Converter={StaticResource textARGB}}"/>
+              </StackPanel>
             </StackPanel>
-            <StackPanel Orientation="Horizontal">
-              <TextBlock Text="{Binding MyColor, StringFormat='ARGB = {0}', Converter={StaticResource textARGB}}"/>
-            </StackPanel>
+
           </StackPanel>
-
-        </StackPanel>
-      </GroupBox>
-      <GroupBox Header="クリック位置のピクセル">
-        <StackPanel>
-          <UniformGrid Columns="3">
-            <Border Background="{Binding MyClickedSolidColorBrush}" Margin="2,0"
-                    Height="{Binding RelativeSource={RelativeSource AncestorType=UniformGrid}, Path=DesiredSize.Height}"/>
-            <TextBlock Text="{Binding MyClickedPixelX, StringFormat='X = {0}'}" HorizontalAlignment="Center"/>
-            <TextBlock Text="{Binding MyClickedPixelY, StringFormat='Y = {0}'}" HorizontalAlignment="Center"
-                       x:Name="MyClickedPixelTextBlock"/>
-          </UniformGrid>
+        </GroupBox>
+        <GroupBox Header="クリック位置のピクセル">
           <StackPanel>
-            <StackPanel Orientation="Horizontal">
-              <Button Content="copy" Click="Button_ClickCopyClickedPixelHex"/>
-              <TextBlock Text="{Binding MyClickedColor, StringFormat='Hex = {0}'}"/>
-            </StackPanel>
-            <StackPanel Orientation="Horizontal">
-              <Button Content="copy" Click="Button_ClickCopyClickedPixelARGB"/>
-              <TextBlock Text="{Binding MyClickedColor, StringFormat='ARGB = {0}', Converter={StaticResource textARGB}}"/>
-            </StackPanel>
+            <UniformGrid Columns="3">
+              <Border Background="{Binding MyClickedSolidColorBrush}" Margin="2,0"
+                    Height="{Binding RelativeSource={RelativeSource AncestorType=UniformGrid}, Path=DesiredSize.Height}"/>
+              <TextBlock Text="{Binding MyClickedPixelX, StringFormat='X = {0}'}" HorizontalAlignment="Center"/>
+              <TextBlock Text="{Binding MyClickedPixelY, StringFormat='Y = {0}'}" HorizontalAlignment="Center"
+                       x:Name="MyClickedPixelTextBlock"/>
+            </UniformGrid>
+            <StackPanel>
+              <StackPanel Orientation="Horizontal">
+                <Button Content="copy" Click="Button_ClickCopyClickedPixelHex"/>
+                <TextBlock Text="{Binding MyClickedColor, StringFormat='Hex = {0}'}"/>
+              </StackPanel>
+              <StackPanel Orientation="Horizontal">
+                <Button Content="copy" Click="Button_ClickCopyClickedPixelARGB"/>
+                <TextBlock Text="{Binding MyClickedColor, StringFormat='ARGB = {0}', Converter={StaticResource textARGB}}"/>
+              </StackPanel>
 
-            <StackPanel Orientation="Horizontal">
-              <!--<TextBlock Text="{Binding MyClickedHsv}"/>-->
-            </StackPanel>
-            <!--<TextBlock Text="{Binding MyClickedHsv, StringFormat='HSV = {0.00}'}"/>-->
-            <TextBlock Text="{Binding MyClickedHsv, StringFormat='HSV = {0}', Converter={StaticResource textHsv}}"/>
-            <!--<TextBlock Text="{Binding MyClickedHsv.Hue}"/>-->
-            <!--<StackPanel Orientation="Horizontal">
+              <StackPanel Orientation="Horizontal">
+                <!--<TextBlock Text="{Binding MyClickedHsv}"/>-->
+              </StackPanel>
+              <!--<TextBlock Text="{Binding MyClickedHsv, StringFormat='HSV = {0.00}'}"/>-->
+              <TextBlock Text="{Binding MyClickedHsv, StringFormat='HSV = {0}', Converter={StaticResource textHsv}}"/>
+              <!--<TextBlock Text="{Binding MyClickedHsv.Hue}"/>-->
+              <!--<StackPanel Orientation="Horizontal">
               <TextBlock Text="{Binding MyClickedHsv.Hue, StringFormat='H = {0.00}'}"/>
               <TextBlock Text="{Binding MyClickedHsv.Saturation, StringFormat='S = {0.00}'}"/>
               <TextBlock Text="{Binding MyClickedHsv.Value, StringFormat='V = {0.00}'}"/>
             </StackPanel>-->
 
+            </StackPanel>
+
+
           </StackPanel>
+        </GroupBox>
 
-
-        </StackPanel>
-      </GroupBox>
-
-    </StackPanel>
+      </StackPanel>
     </Grid>
   </DockPanel>
 </Window>

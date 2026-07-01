@@ -59,13 +59,24 @@ namespace BitmapSourceVisualizer
                 using (var imageStream = new MemoryStream(imageBytes))
                 {
                     bmp = BitmapFrame.Create(imageStream, BitmapCreateOptions.None, BitmapCacheOption.OnLoad);
+                    if (bmp.CanFreeze)
+                    {
+                        bmp.Freeze();
+                    }
                 }
             }
 
             BitmapSourceVisualizerWindow win = new();
             win.SetImage(bmp);
-            // タイトルバーに色々表示
-            win.Title = $" BitmapSource Visualizer {{ PixelSize {bmp.PixelWidth} x {bmp.PixelHeight} }} , {{ PixelFormat {format} }} , {{ DpiX, DpiY {dpiX}, {dpiY} }}";
+
+            win.Title = $" BitmapSource Visualizer ";
+
+            // ステータスバーに色々表示
+            win.MyStatusPixelFormat.Content = $"{format}";
+            win.MyStatusDipX.Content = $"{dpiX}";
+            win.MyStatusDipY.Content = $"{dpiY}";
+            win.MyStatusPixelSize.Text = $"{bmp.PixelWidth} x {bmp.PixelHeight}";
+            win.MyStatusScaledSize.Text = $"{bmp.PixelWidth} x {bmp.PixelHeight}";
             win.ShowDialog();
         }
     }

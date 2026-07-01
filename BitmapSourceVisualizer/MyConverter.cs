@@ -10,7 +10,21 @@ using System.Windows.Media;
 
 namespace BitmapSourceVisualizer
 {
- 
+    //public class MyConvScaledSize : IMultiValueConverter
+    //{
+    //    public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
+    //    {
+    //        double scale = (double)values[0];
+    //        int size = (int)values[1];
+    //        return (int)(size * scale);
+    //    }
+
+    //    public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
+    //    {
+    //        throw new NotImplementedException();
+    //    }
+    //}
+
     public class MyConvHsvToText : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)

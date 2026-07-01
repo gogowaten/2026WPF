@@ -4,6 +4,8 @@ using System.Diagnostics;
 //using System.Drawing;
 using System.IO;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -13,6 +15,7 @@ using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using System.Windows.Threading;
 
 // Visual Studio用、BitmapSourceVisualizerに「ファイルに保存」と「コピー」を追加した - 午後わてんのブログ
 // https://gogowaten.hatenablog.com/entry/2026/05/20/233726
@@ -44,7 +47,7 @@ namespace BitmapSourceVisualizer
             InitializeComponent();
             ImageControl.ContextMenu = CreateContextMenu();
             DataContext = this;
-            MyTextBlockScale.FontSize = this.FontSize * 1.5;
+            MyTextBlockScale.FontSize = this.FontSize * 1.2;
             Loaded += BitmapSourceVisualizerWindow_Loaded;
 
         }
@@ -57,6 +60,20 @@ namespace BitmapSourceVisualizer
         {
             SetBinding(MyClickedSolidColorBrushProperty, new Binding() { Source = this, Path = new PropertyPath(MyClickedColorProperty), Converter = new MyConvColorToSolidBrush() });
             SetBinding(MyClickedHsvProperty, new Binding() { Source = this, Path = new PropertyPath(MyClickedColorProperty), Converter = new MyConvColorToHsv() });
+
+            //// 拡大後のサイズ
+            //MultiBinding mb;
+            //mb = new() { Converter = new MyConvScaledSize(), Mode = BindingMode.OneWay };
+            //Binding scaleBind = new() { Source = this, Path = new PropertyPath(MyImageScaleProperty) };
+            //mb.Bindings.Add(scaleBind);
+            //mb.Bindings.Add(new Binding() { Source = MyBitmapSource, Path = new PropertyPath(WidthProperty) });
+            //SetBinding(MyBitmapScaledWidthProperty, mb);
+
+            //mb = new() { Converter = new MyConvScaledSize(), Mode = BindingMode.OneWay };
+            //mb.Bindings.Add(scaleBind);
+            //mb.Bindings.Add(new Binding() { Source = MyBitmapSource, Path = new PropertyPath(HeightProperty) });
+            //SetBinding(MyBitmapScaledHeightProperty, mb);
+
         }
 
         public void SetImage(BitmapSource bitmap)
@@ -71,13 +88,22 @@ namespace BitmapSourceVisualizer
 
         #region 依存関係プロパティ
 
-        public double MyDpi
+        // 拡大後のサイズ
+        public int MyBitmapScaledWidth
         {
-            get { return (double)GetValue(MyDpiProperty); }
-            set { SetValue(MyDpiProperty, value); }
+            get { return (int)GetValue(MyBitmapScaledWidthProperty); }
+            set { SetValue(MyBitmapScaledWidthProperty, value); }
         }
-        public static readonly DependencyProperty MyDpiProperty =
-            DependencyProperty.Register(nameof(MyDpi), typeof(double), typeof(BitmapSourceVisualizerWindow), new PropertyMetadata(96.0));
+        public static readonly DependencyProperty MyBitmapScaledWidthProperty =
+            DependencyProperty.Register(nameof(MyBitmapScaledWidth), typeof(int), typeof(BitmapSourceVisualizerWindow), new PropertyMetadata(0));
+
+        public int MyBitmapScaledHeight
+        {
+            get { return (int)GetValue(MyBitmapScaledHeightProperty); }
+            set { SetValue(MyBitmapScaledHeightProperty, value); }
+        }
+        public static readonly DependencyProperty MyBitmapScaledHeightProperty =
+            DependencyProperty.Register(nameof(MyBitmapScaledHeight), typeof(int), typeof(BitmapSourceVisualizerWindow), new PropertyMetadata(0));
 
 
         // ピクセルグリッドを表示するために必要な最低倍率
@@ -235,6 +261,12 @@ namespace BitmapSourceVisualizer
                 {
                     main.MyPixelGridWidth = 0.0;
                 }
+
+                // スケール後のサイズプロパティ更新
+                int scaleW = (int)(main.MyBitmapSource.PixelWidth * newScale);
+                int scaleH = (int)(main.MyBitmapSource.PixelHeight * newScale);
+                string sizeText = $"{scaleW} x {scaleH}";
+                main.MyStatusScaledSize.Text = sizeText;
             }
         }
 
@@ -265,7 +297,8 @@ namespace BitmapSourceVisualizer
             {
                 if (MyBitmapSource is not null)
                 {
-                    CopyToClipboardMyBitmapSource();
+                    CopyToClipboardTransfomedImage();
+                    //CopyToClipboardMyBitmapSource();
                 }
             };
 
@@ -289,7 +322,7 @@ namespace BitmapSourceVisualizer
             {
                 if (MyBitmapSource is not null)
                 {
-                    SaveBitmapSource(MyBitmapSource);
+                    MyStatusText.Text = SaveBitmapSource(MyBitmapSource) ? "保存処理完了" : "保存処理はキャンセルされた";
                 }
             };
 
@@ -299,7 +332,8 @@ namespace BitmapSourceVisualizer
             {
                 if (MyBitmapSource is not null)
                 {
-                    SaveExteriorToImageFile();
+                    SaveTransformedImage(); // 非同期処理バージョン
+                    //SaveExteriorToImageFile();
                 }
             };
 
@@ -376,7 +410,7 @@ namespace BitmapSourceVisualizer
         #region 画像処理
 
 
-        private void SaveBitmapSource(BitmapSource bitmap)
+        private bool SaveBitmapSource(BitmapSource bitmap)
         {
             Microsoft.Win32.SaveFileDialog dialog = new()
             {
@@ -390,23 +424,80 @@ namespace BitmapSourceVisualizer
                 encoder.Frames.Add(BitmapFrame.Create(bitmap));
                 using FileStream stream = new(dialog.FileName, FileMode.Create, FileAccess.Write);
                 encoder.Save(stream);
+                return true;
             }
+            else { return false; }
         }
 
         //アルファ値を失わずに画像のコピペできた、.NET WPFのClipboard - 午後わてんのブログ
         //        https://gogowaten.hatenablog.com/entry/2021/02/10/134406
         //より
-        private static void BitmapToPngImageToClipboard(BitmapSource source)
+        private async void BitmapToPngImageToClipboard(BitmapSource source)
         {
+            MyStatusText.Text = "コピー処理中";
+            MyProgressBar.IsIndeterminate = true;
+            Mouse.OverrideCursor = Cursors.Wait;
+
             //画像をPNGにエンコード
             PngBitmapEncoder pngEnc = new();
             pngEnc.Frames.Add(BitmapFrame.Create(source));
             //エンコードした画像をMemoryStreamにSava
             using var ms = new System.IO.MemoryStream();
             pngEnc.Save(ms);
-            //MemoryStreamをクリップボードにコピー
-            Clipboard.SetData("PNG", ms);
+
+            // 2. 新しいSTAスレッドを作成して、バックグラウンドでクリップボード処理を実行
+            bool isSuccess = false;
+            Exception exception = null;
+            await Task.Run(() =>
+            {
+                Thread thread = new(() =>
+                {
+                    try
+                    {
+                        //MemoryStreamをクリップボードにコピー
+                        Clipboard.SetData("PNG", ms);
+                        isSuccess = true;
+                    }
+                    catch (Exception ex)
+                    {
+                        exception = ex;
+                    }
+                });
+
+                thread.SetApartmentState(ApartmentState.STA);
+                thread.Start();
+                thread.Join();
+            });
+
+            if (!isSuccess && exception != null)
+            {
+                MessageBox.Show($"エラーが発生しました: {exception.Message}", "エラー", MessageBoxButton.OK, MessageBoxImage.Error);
+                MyStatusText.Text = "コピー処理中にエラー発生";
+            }
+            else
+            {
+                MyStatusText.Text = "コピー完了";
+            }
+
+            MyMainGrid.IsEnabled = true;
+            MyProgressBar.IsIndeterminate = false;
+            Mouse.OverrideCursor = null;
         }
+
+        //private static void BitmapToPngImageToClipboard(BitmapSource source)
+        //{   
+        //    //画像をPNGにエンコード
+        //    PngBitmapEncoder pngEnc = new();
+        //    pngEnc.Frames.Add(BitmapFrame.Create(source));
+        //    //エンコードした画像をMemoryStreamにSava
+        //    using var ms = new System.IO.MemoryStream();
+        //    pngEnc.Save(ms);
+        //    //MemoryStreamをクリップボードにコピー
+        //    Clipboard.SetData("PNG", ms);
+        //}
+
+
+
 
         //// 要素からBitmap作成
         //public static RenderTargetBitmap MakeBitmapFromElement(double width, double height, FrameworkElement item)
@@ -429,7 +520,6 @@ namespace BitmapSourceVisualizer
             dv.Offset = new Vector(-ltBounds.X, -ltBounds.Y);
             RenderOptions.SetBitmapScalingMode(dv, BitmapScalingMode.NearestNeighbor);// 無意味
             RenderOptions.SetEdgeMode(dv, EdgeMode.Aliased);// 無意味
-            MyDpi = ltBounds.Width;
 
             VisualBrush brush = new(element)
             {
@@ -452,12 +542,14 @@ namespace BitmapSourceVisualizer
         }
 
         // 最近傍補間でBitmapSourceを拡大したBitmapを返す
+        // DrawingGroupを使う、これに最近傍補間でスケールしてBitmapSourceを描画したものを
+        // DrawingVisualのDrawDrawingで描画、これで最近傍補間になる
+        // もしDrawingGroupを使わずにDrawingVisual最近傍補間でDrawVisualでびょうがしても最近傍補間にはならない
         public RenderTargetBitmap MakeScaleBitmap(BitmapSource originalBitmap, double scale)
         {
             // 1. 拡大後のサイズを計算
             int newWidth = (int)(originalBitmap.PixelWidth * scale);
             int newHeight = (int)(originalBitmap.PixelHeight * scale);
-            MyDpi = newWidth * newHeight * 4;
 
             DrawingGroup drawingGroup = new();
             // 最近傍補間を設定
@@ -484,6 +576,7 @@ namespace BitmapSourceVisualizer
                 PixelFormats.Pbgra32);
 
             renderTargetBitmap.Render(drawingVisual);
+            renderTargetBitmap.Freeze();
             return renderTargetBitmap;
         }
 
@@ -498,7 +591,6 @@ namespace BitmapSourceVisualizer
 
         //    RenderOptions.SetBitmapScalingMode(dv, BitmapScalingMode.NearestNeighbor);// 無意味
         //    RenderOptions.SetEdgeMode(dv, EdgeMode.Aliased);// 無意味
-        //    MyDpi = ltBounds.Width;
 
         //    using (DrawingContext context = dv.RenderOpen())
         //    {
@@ -542,7 +634,7 @@ namespace BitmapSourceVisualizer
 
         private void ButtonSave_Click(object sender, RoutedEventArgs e)
         {
-            SaveBitmapSource(MyBitmapSource);
+            MyStatusText.Text = SaveBitmapSource(MyBitmapSource) ? "保存処理完了" : "保存処理はキャンセルされた";
         }
 
 
@@ -569,29 +661,319 @@ namespace BitmapSourceVisualizer
                 {
                     MyImageScale = GetClampedImageScale(MyCeiling(scale));
                 }
-
-                //if (MyImageScale <= 1.0)
-                //{
-                //    MyImageScale = GetClampedImageScale(MyImageScale * value);
-                //}
-                //else
-                //{
-                //    MyImageScale = GetClampedImageScale(MyCeiling(MyImageScale * value));
-                //}
             }
         }
 
-        // LayoutTransformによる変形後の要素からBitmap作成して、クリップボードにコピー
+        // 処理中のUI状態をセットするヘルパーメソッド
+
+        private void SetUiState(string statusText)
+        {
+            MyStatusText.Text = statusText; // 処理中表示メッセージ
+            MyProgressBar.IsIndeterminate = true;
+            Mouse.OverrideCursor = Cursors.Wait;
+            MyMainGrid.IsEnabled = false; // 二重クリック防止など
+        }
+
+        /// <summary>
+        /// LayoutTransformによる変形後の要素からBitmap作成して、非同期処理でクリップボードにコピー
+        /// </summary>
+        private async void CopyToClipboardTransfomedImage()
+        {
+            // 1. 最初にUIスレッド側でプログレスバーやカーソルを設定
+            SetUiState("コピー処理中");
+
+            try
+            {
+                // 2. メモリチェックや確認（UI要素が絡むためUIスレッドで行う）
+                if (!CheckMemoryAndConfirmConsent(ImageControl))
+                {
+                    // キャンセルされた場合は元に戻す
+                    ResetUiState();
+                    return;
+                }
+
+                // 1. 【非常に重要】UIスレッド側にいる時点で、Dispatcherをローカル変数に保持しておく
+                // Visualizerとして使う場合はApplication.Current.Dispatcherだと
+                // 取得されるDispatcherはVisual StudioのDispatcherになってしまうので、
+                // ここで自身のDispatcherを取得しておく必要がある
+                Dispatcher dispatcher = this.Dispatcher;
+
+                // 現在のスケール値をローカル変数にコピー（スレッド間安全のため）
+                double scale = MyImageScale;
+
+                // sourceToProcess や scale の準備
+                BitmapSource sourceToProcess = MyBitmapSource;
+                if (sourceToProcess != null && !sourceToProcess.IsFrozen && sourceToProcess.CanFreeze)
+                {
+                    sourceToProcess = sourceToProcess.Clone();
+                    sourceToProcess.Freeze();
+                }
+
+
+                // 2. バックグラウンド処理を開始
+                await Task.Run(async () =>
+                {
+                    // sourceToProcess が null の場合はエラーを回避する
+                    if (sourceToProcess == null)
+                    {
+                        throw new InvalidOperationException("コピー元の画像データがありません。");
+                    }
+
+                    BitmapSource scaledSource = null;
+
+                    // 3. 事前に取得しておいた dispatcher を使ってUIスレッドを呼び出すのは、
+                    // BitmapSource系の処理はバックグラウンドスレッドでは扱えないため
+                    await dispatcher.InvokeAsync(() =>
+                    {
+                        // 最近傍補間の効いた拡大ビットマップをUIスレッド側で作成
+                        scaledSource = MakeScaleBitmap(sourceToProcess, scale);
+                    });
+
+
+                    // 念のため、生成されたビットマップが null でないかチェック
+                    if (scaledSource == null)
+                    {
+                        throw new InvalidOperationException("画像の拡大処理に失敗しました。");
+                    }
+
+                    // 4. PNGエンコード（ここからはバックグラウンドなのでプログレスバーは止まらない）
+                    PngBitmapEncoder pngEnc = new();
+                    pngEnc.Frames.Add(BitmapFrame.Create(scaledSource));
+
+                    using var ms = new System.IO.MemoryStream();
+                    pngEnc.Save(ms);
+
+                    // 5. クリップボードへの書き込み（STAスレッド）
+                    TaskCompletionSource<bool> tcs = new();
+                    //Exception threadException = null;
+
+                    Thread thread = new(() =>
+                    {
+                        try
+                        {
+                            ms.Position = 0;
+                            Clipboard.SetData("PNG", ms);
+                            tcs.SetResult(true);// タスクを成功として完了する
+                        }
+                        catch (Exception ex)
+                        {
+                            //threadException = ex;
+                            tcs.SetException(ex);// タスクを失敗として完了する
+                        }
+                    });
+
+                    thread.SetApartmentState(ApartmentState.STA);
+                    thread.Start();
+
+                    // thread.Join() の代わりに TaskCompletionSource を await すると
+                    // バックグラウンドスレッドの効率が良くなり、フリーズのリスクを減らせます
+                    await tcs.Task;
+                });
+
+                MyStatusText.Text = "コピー完了";
+            }
+            catch (Exception ex)
+            {
+                _ = MessageBox.Show($"エラーが発生しました: {ex.Message}", "エラー", MessageBoxButton.OK, MessageBoxImage.Error);
+                MyStatusText.Text = "コピー処理中にエラー発生";
+            }
+            finally
+            {
+                // 5. 成功・失敗に関わらずUIの状態を元に戻す
+                ResetUiState();
+            }
+        }
+
         private void ButtonCopyToClipboardExterior_Click(object sender, RoutedEventArgs e)
         {
-            //CopyToClipboardExterior(ImageControl);
-            CopyToClipboardMyBitmapSource();
+            CopyToClipboardTransfomedImage();
+        }
+
+        #region 非同期コピー処理過去
+        //private async void ButtonCopyToClipboardExterior_Click(object sender, RoutedEventArgs e)
+        //{
+        //    //CopyToClipboardMyBitmapSource();
+        //    // 1. 最初にUIスレッド側でプログレスバーやカーソルを設定
+        //    MyStatusText.Text = "コピー処理中";
+        //    MyProgressBar.IsIndeterminate = true;
+        //    Mouse.OverrideCursor = Cursors.Wait;
+        //    MyMainGrid.IsEnabled = false; // 二重クリック防止など
+
+        //    try
+        //    {
+        //        // 2. メモリチェックや確認（UI要素が絡むためUIスレッドで行う）
+        //        if (!CheckMemoryAndConfirmConsent(ImageControl))
+        //        {
+        //            // キャンセルされた場合は元に戻す
+        //            ResetUiState();
+        //            return;
+        //        }
+
+        //        // 3. 元の画像データを取得し、別スレッドで扱えるようにフリーズする
+        //        // ※MyBitmapSourceがUIスレッド依存の場合、ここでFreezeしておきます
+        //        BitmapSource sourceToProcess = MyBitmapSource;
+        //        if (!sourceToProcess.IsFrozen && sourceToProcess.CanFreeze)
+        //        {
+        //            sourceToProcess = sourceToProcess.Clone();
+        //            sourceToProcess.Freeze();
+        //        }
+
+        //        // 現在のスケール値をローカル変数にコピー（スレッド間安全のため）
+        //        double scale = MyImageScale;
+
+        //        // 4. 重い処理（リサイズ、エンコード、クリップボード転送）を丸ごと非同期(Task.Run)で実行
+        //        await Task.Run(async () =>
+        //        {
+        //            // A. 画像のスケール・エンコード処理
+        //            // ※MakeScaleBitmap内で新しいBitmapを作成する場合、
+        //            //   そのメソッド内で新しいBitmapをFreeze()するか、スレッド依存に注意してください
+        //            //BitmapSource scaledSource = MakeScaleBitmap(sourceToProcess, scale);
+        //            BitmapSource scaledSource = null;
+
+        //            // 拡大処理(MakeScaleBitmap)だけをUIスレッドに一時的に投げる
+        //            await Application.Current.Dispatcher.InvokeAsync(() =>
+        //            {
+        //                scaledSource = MakeScaleBitmap(sourceToProcess, scale);
+        //                // MakeScaleBitmapの最後で.Freeze()しているので、ここで別スレッドに渡せるようになります
+        //            });
+
+        //            PngBitmapEncoder pngEnc = new();
+        //            pngEnc.Frames.Add(BitmapFrame.Create(scaledSource));
+
+        //            using var ms = new System.IO.MemoryStream();
+        //            pngEnc.Save(ms);
+
+        //            // B. クリップボードへの書き込み（STAスレッドが必要）
+        //            Thread thread = new(() =>
+        //            {
+        //                // MemoryStreamは position 0 から読み込める状態にする
+        //                ms.Position = 0;
+        //                Clipboard.SetData("PNG", ms);
+        //            });
+
+        //            thread.SetApartmentState(ApartmentState.STA);
+        //            thread.Start();
+        //            thread.Join(); // STAスレッドの完了を待つ
+        //        });
+
+        //        MyStatusText.Text = "コピー完了";
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        MessageBox.Show($"エラーが発生しました: {ex.Message}", "エラー", MessageBoxButton.OK, MessageBoxImage.Error);
+        //        MyStatusText.Text = "コピー処理中にエラー発生";
+        //    }
+        //    finally
+        //    {
+        //        // 5. 成功・失敗に関わらずUIの状態を元に戻す
+        //        ResetUiState();
+        //    }
+
+        //}
+
+        #endregion 過去
+
+
+
+        // UI状態をリセットするヘルパーメソッド
+        private void ResetUiState()
+        {
+            MyMainGrid.IsEnabled = true;
+            MyProgressBar.IsIndeterminate = false;
+            Mouse.OverrideCursor = null;
+        }
+
+        /// <summary>
+        /// 非同期処理で拡大画像を保存
+        /// </summary>
+        private async void SaveTransformedImage()
+        {
+            SetUiState("ファイルに保存中…");
+
+            try
+            {
+                if (!CheckMemoryAndConfirmConsent(ImageControl))
+                {
+                    ResetUiState();
+                    return;
+                }
+
+                Dispatcher dispatcher = this.Dispatcher;
+                double scale = MyImageScale;
+                bool saveResult = false;
+
+                BitmapSource sourceToProcess = MyBitmapSource;
+                if (sourceToProcess != null && !sourceToProcess.IsFrozen && sourceToProcess.CanFreeze)
+                {
+                    sourceToProcess = sourceToProcess.Clone();
+                    sourceToProcess.Freeze();
+                }
+
+                await Task.Run(async () =>
+                {
+                    if (sourceToProcess is null)
+                    {
+                        throw new InvalidOperationException("元の画像がない！");
+                    }
+
+                    BitmapSource scaledSource = null;
+
+                    await dispatcher.InvokeAsync(() =>
+                    {
+                        scaledSource = MakeScaleBitmap(sourceToProcess, scale);
+                    });
+
+                    if (scaledSource is null)
+                    {
+                        throw new InvalidOperationException("画像の拡大処理に失敗した");
+                    }
+
+                    // 保存処理はバックグラウンドスレッド
+                    TaskCompletionSource<bool> tcs = new();
+                    //Exception threadException = null;
+                    Thread thread = new(() =>
+                    {
+                        try
+                        {
+                            saveResult = SaveBitmapSource(scaledSource);
+                            tcs.SetResult(true);
+                        }
+                        catch (Exception ex)
+                        {
+                            //threadException = ex;
+                            tcs.SetException(ex);
+                        }
+                    });
+
+                    thread.SetApartmentState(ApartmentState.STA);
+                    thread.Start();
+                    await tcs.Task;
+                });
+                if (saveResult)
+                {
+                    MyStatusText.Text = "保存処理完了";
+                }
+                else
+                {
+                    MyStatusText.Text = "保存処理はキャンセルされた";
+                }
+            }
+            catch (Exception ex)
+            {
+                _ = MessageBox.Show($"エラーが発生しました: {ex.Message}", "エラー", MessageBoxButton.OK, MessageBoxImage.Error);
+                MyStatusText.Text = "保存処理中にエラー発生";
+            }
+            finally
+            {
+                ResetUiState();
+            }
         }
 
         // 変形後の要素を画像としてファイルに保存
         private void ButtonSaveExterior_Click(object sender, RoutedEventArgs e)
         {
-            SaveExteriorToImageFile();
+            //SaveExteriorToImageFile();
+            SaveTransformedImage();
         }
 
         private void Button_ClickCopyClickedPixelARGB(object sender, RoutedEventArgs e)
@@ -655,31 +1037,23 @@ namespace BitmapSourceVisualizer
             }
         }
 
-        public void CopyToClipboardMyBitmapSource()
-        {
-            // 処理に伴うメモリ量と処理続行の確認してから
-            if (CheckMemoryAndConfirmConsent(ImageControl))
-            {
-                BitmapToPngImageToClipboard(MakeScaleBitmap(MyBitmapSource, MyImageScale));
-            }
-        }
 
-
-
-        private void SaveExteriorToImageFile()
-        {
-            // 処理に伴うメモリ量と処理続行の確認してから
-            if (CheckMemoryAndConfirmConsent(ImageControl))
-            {
-                SaveBitmapSource(MakeScaleBitmap(MyBitmapSource, MyImageScale));
-                //SaveBitmapSource(MakeBitmapFromLayoutTransformElement(MyMainGrid));
-                //SaveBitmapSource(MakeBitmapFromLayoutTransformElement(ImageControl));
-            }
-        }
+        //private void SaveExteriorToImageFile()
+        //{
+        //    // 処理に伴うメモリ量と処理続行の確認してから
+        //    if (CheckMemoryAndConfirmConsent(ImageControl))
+        //    {
+        //        SaveBitmapSource(MakeScaleBitmap(MyBitmapSource, MyImageScale));
+        //        //SaveBitmapSource(MakeBitmapFromLayoutTransformElement(MyMainGrid));
+        //        //SaveBitmapSource(MakeBitmapFromLayoutTransformElement(ImageControl));
+        //    }
+        //}
 
         private void SaveMyScrollToImageFile()
         {
-            SaveBitmapSource(MakeBitmapFromLayoutTransformElement(MyScroll));
+            //SaveBitmapSource(MakeBitmapFromLayoutTransformElement(MyScroll));
+            MyStatusText.Text = SaveBitmapSource(MakeBitmapFromLayoutTransformElement(MyScroll))
+                ? "保存処理完了" : "保存処理はキャンセルされた";
         }
 
 
@@ -1201,13 +1575,13 @@ namespace BitmapSourceVisualizer
 
         private void Button_ClickChangeWindowSize(object sender, RoutedEventArgs e)
         {
-            // 854x640 default  4:3
+            // 854x647 default  4:3
             // 654x367 min      16:9 min
-            // 1140x640 large   16:9
-            if (Width == 654 && Height == 367) { Width = 854; Height = 640; }
-            else if (Width == 854 && Height == 640) { Width = 1140; Height = 640; }
-            else if (Width == 1140 && Height == 640) { Width = 654; Height = 367; }
-            else { Width = 854; Height = 640; }
+            // 1140x647 large   16:9
+            if (Width == 654 && Height == 367) { Width = 854; Height = 647; }
+            else if (Width == 854 && Height == 647) { Width = 1140; Height = 647; }
+            else if (Width == 1140 && Height == 647) { Width = 654; Height = 367; }
+            else { Width = 854; Height = 647; }
         }
     }
 }
