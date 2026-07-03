@@ -47,7 +47,7 @@ namespace BitmapSourceVisualizer
             InitializeComponent();
             ImageControl.ContextMenu = CreateContextMenu();
             DataContext = this;
-            MyTextBlockScale.FontSize = this.FontSize * 1.2;
+            //MyTextBlockScale.FontSize = this.FontSize * 1.2;
             Loaded += BitmapSourceVisualizerWindow_Loaded;
 
         }
@@ -281,7 +281,7 @@ namespace BitmapSourceVisualizer
         private ContextMenu CreateContextMenu()
         {
             ContextMenu menu = new();
-            MenuItem item = new() { Header = "画像コピー(等倍)" };
+            MenuItem item = new() { Header = "📃 原寸コピー"};
             menu.Items.Add(item);
             item.Click += (s, e) =>
             {
@@ -291,7 +291,7 @@ namespace BitmapSourceVisualizer
                 }
             };
 
-            item = new() { Header = "画像コピー(拡大後)" };
+            item = new() { Header = "📃 表示コピー", ToolTip = "表示倍率のサイズでコピー" };
             menu.Items.Add(item);
             item.Click += (s, e) =>
             {
@@ -302,7 +302,7 @@ namespace BitmapSourceVisualizer
                 }
             };
 
-            item = new() { Header = "画像コピー(見えている部分そのまま)" };
+            item = new() { Header = "📃 コピー(見えている部分そのまま)" };
             menu.Items.Add(item);
             item.Click += (s, e) =>
             {
@@ -316,7 +316,7 @@ namespace BitmapSourceVisualizer
             menu.Items.Add(new Separator());
 
 
-            item = new() { Header = "画像保存(png)" };
+            item = new() { Header = "💾 原寸保存(png)" };
             menu.Items.Add(item);
             item.Click += (s, e) =>
             {
@@ -326,7 +326,7 @@ namespace BitmapSourceVisualizer
                 }
             };
 
-            item = new() { Header = "画像保存(拡大後)(png)" };
+            item = new() { Header = "💾 表示保存(png)" , ToolTip = "表示倍率のサイズで保存" };
             menu.Items.Add(item);
             item.Click += (s, e) =>
             {
@@ -337,7 +337,7 @@ namespace BitmapSourceVisualizer
                 }
             };
 
-            item = new() { Header = "画像保存(見えている部分そのまま)(png)" };
+            item = new() { Header = "💾 保存(見えている部分そのまま)(png)" };
             menu.Items.Add(item);
             item.Click += (s, e) => { SaveMyScrollToImageFile(); };
 
@@ -345,7 +345,7 @@ namespace BitmapSourceVisualizer
             menu.Items.Add(new Separator());
 
 
-            item = new() { Header = $"色コピー（#ARGB）" };
+            item = new() { Header = $"📃 色値コピー（#ARGB）" };
             menu.Items.Add(item);
             item.Click += (s, e) =>
             {
@@ -355,7 +355,7 @@ namespace BitmapSourceVisualizer
                 }
             };
 
-            item = new() { Header = $"色コピー（A, R, G, B）" };
+            item = new() { Header = $"📃 色値コピー（A, R, G, B）" };
             menu.Items.Add(item);
             item.Click += (s, e) =>
             {
@@ -364,6 +364,29 @@ namespace BitmapSourceVisualizer
                     string argb = $"{MyClickedColor.A}, {MyClickedColor.R}, {MyClickedColor.G}, {MyClickedColor.B}";
                     SetTextToClipboard(argb);
                 }
+            };
+
+            menu.Items.Add(new Separator());
+
+            item = new() { Header = $"ウィンドウサイズ小（654 x 367）" };
+            menu.Items.Add(item);
+            item.Click += (s, e) =>
+            {
+                Width = 654;Height = 367;
+            };
+
+            item = new() { Header = $"ウィンドウサイズ中（854 x 647）" };
+            menu.Items.Add(item);
+            item.Click += (s, e) =>
+            {
+                Width = 854;Height = 647;
+            };
+
+            item = new() { Header = $"ウィンドウサイズ大（1140 x 647）" };
+            menu.Items.Add(item);
+            item.Click += (s, e) =>
+            {
+                Width = 1140;Height = 647;
             };
 
 
@@ -1573,15 +1596,30 @@ namespace BitmapSourceVisualizer
             }
         }
 
-        private void Button_ClickChangeWindowSize(object sender, RoutedEventArgs e)
-        {
-            // 854x647 default  4:3
-            // 654x367 min      16:9 min
-            // 1140x647 large   16:9
-            if (Width == 654 && Height == 367) { Width = 854; Height = 647; }
-            else if (Width == 854 && Height == 647) { Width = 1140; Height = 647; }
-            else if (Width == 1140 && Height == 647) { Width = 654; Height = 367; }
-            else { Width = 854; Height = 647; }
-        }
+        //private void Button_ClickChangeWindowSize(object sender, RoutedEventArgs e)
+        //{
+        //    // 854x647 default  4:3
+        //    // 654x367 min      16:9 min
+        //    // 1140x647 large   16:9
+        //    if (Width == 654 && Height == 367) { Width = 854; Height = 647; }
+        //    else if (Width == 854 && Height == 647) { Width = 1140; Height = 647; }
+        //    else if (Width == 1140 && Height == 647) { Width = 654; Height = 367; }
+        //    else { Width = 854; Height = 647; }
+        //}
+
+        //private void Button_ClickWindowSmall(object sender, RoutedEventArgs e)
+        //{
+        //    Width = 654; Height = 367;
+        //}
+
+        //private void Button_ClickWindowMiddle(object sender, RoutedEventArgs e)
+        //{
+        //    Width = 854;Height = 647;
+        //}
+
+        //private void Button_ClickWindowLarge(object sender, RoutedEventArgs e)
+        //{
+        //    Width = 1140;Height = 647;
+        //}
     }
 }

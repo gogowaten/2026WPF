@@ -39,7 +39,9 @@ namespace _20260612
             MyImage = new();
             MyImage.BeginInit();
             MyImage.UriSource = new Uri(MyImagePath);
+            MyImage.CacheOption = BitmapCacheOption.OnLoad;
             MyImage.EndInit();
+
             MainImage.Source = MyImage;
             MiniMapImage.Source = MyImage;
 

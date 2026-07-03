@@ -5,8 +5,8 @@
 		<UseWPF>true</UseWPF>
 		<LangVersion>latest</LangVersion>
 		<Copyright>午後わてん</Copyright>
-		<AssemblyVersion>1.4</AssemblyVersion>
-		<FileVersion>1.4</FileVersion>
+		<AssemblyVersion>1.5</AssemblyVersion>
+		<FileVersion>1.5</FileVersion>
 	</PropertyGroup>
 
 	<ItemGroup>

@@ -15,6 +15,9 @@
   </Window.Resources>
   <DockPanel x:Name="MyMainGrid">
     <StatusBar x:Name="MyStatusBar" DockPanel.Dock="Bottom">
+      <!--<Button Content="小" Click="Button_ClickWindowSmall"/>
+      <Button Content="中" Click="Button_ClickWindowMiddle"/>
+      <Button Content="大" Click="Button_ClickWindowLarge"/>-->
       <ProgressBar x:Name="MyProgressBar" IsIndeterminate="False" Width="100"/>
       <TextBlock x:Name="MyStatusText" Text="test"/>
       <Separator/>
@@ -171,7 +174,7 @@ https://seizu.dev/2013/06/11/post2437.html-->
             <Setter Property="VerticalAlignment" Value="Center"/>
           </Style>
           <Style TargetType="Button">
-            <Setter Property="Margin" Value="5,2"/>
+            <Setter Property="Margin" Value="2,2"/>
             <Setter Property="VerticalAlignment" Value="Center"/>
           </Style>
           <Style TargetType="CheckBox">
@@ -183,8 +186,8 @@ https://seizu.dev/2013/06/11/post2437.html-->
         </StackPanel.Resources>
 
 
-        <Button Content="ウィンドウサイズ切り替え" Click="Button_ClickChangeWindowSize"
-              ToolTip="小 -> 中 -> 大 -> 小 の繰り返し"/>
+        <!--<Button Content="ウィンドウサイズ切り替え" Click="Button_ClickChangeWindowSize"
+              ToolTip="小 -> 中 -> 大 -> 小 の繰り返し"/>-->
         <UniformGrid Columns="2" Rows="2">
           <UniformGrid.Resources>
             <Style TargetType="CheckBox">
@@ -218,31 +221,21 @@ https://seizu.dev/2013/06/11/post2437.html-->
                    />
         </Canvas>
 
-        <Separator/>
-
-
-        <UniformGrid Columns="2" Rows="2">
-          <Button Content="コピー(等倍)" Click="ButtonCopyToClipboard_Click"/>
-          <Button Content="保存" Click="ButtonSave_Click"/>
-          <Button Content="コピー(拡大後)" Click="ButtonCopyToClipboardExterior_Click"/>
-          <Button Content="保存(拡大後)" Click="ButtonSaveExterior_Click"/>
-        </UniformGrid>
-
         <Separator Margin="2"/>
 
         <TextBlock x:Name="MyTextBlockScale" Text="{Binding MyImageScale, StringFormat='表示倍率 = {0:0.00}'}" HorizontalAlignment="Center"/>
 
-        <UniformGrid Columns="3" Rows="2" Margin="2">
+        <UniformGrid Columns="4" Rows="1" Margin="2">
           <UniformGrid.Resources>
             <Style TargetType="Button">
               <Setter Property="Margin" Value="2"/>
             </Style>
           </UniformGrid.Resources>
-          <Button Content="x 0.5倍" Tag="0.5" Click="ButtonSetMathScale_Click"/>
-          <Button Content="x 0.1倍" Tag="0.1" Click="ButtonSetMathScale_Click"/>
+          <Button Content="半減" Tag="0.5" Click="ButtonSetMathScale_Click"/>
+          <!--<Button Content="x 0.1倍" Tag="0.1" Click="ButtonSetMathScale_Click"/>-->
+          <Button Content="倍々" Tag="2" Click="ButtonSetMathScale_Click"/>
           <Button Content="等倍" Tag="1" Click="ButtonSetScale_Click"/>
-          <Button Content="x 2倍" Tag="2" Click="ButtonSetMathScale_Click"/>
-          <Button Content="x 10倍" Tag="10" Click="ButtonSetMathScale_Click"/>
+          <!--<Button Content="x 10倍" Tag="10" Click="ButtonSetMathScale_Click"/>-->
           <Button Content="50倍" Tag="50" Click="ButtonSetScale_Click"/>
         </UniformGrid>
 
@@ -255,6 +248,35 @@ https://seizu.dev/2013/06/11/post2437.html-->
               SmallChange="1.0" LargeChange="1.0" IsSnapToTickEnabled="True"
               Margin="4,5" TickFrequency="1.0" PreviewMouseWheel="MyScroll_PreviewMouseWheel"/>
         </DockPanel>
+
+        <Separator/>
+
+
+        <UniformGrid Columns="2" Rows="1">
+          <UniformGrid.Resources>
+            <Style TargetType="Button">
+              <Setter Property="Padding" Value="4,0"/>
+              <Setter Property="Margin" Value="2"/>
+            </Style>
+          </UniformGrid.Resources>
+          <StackPanel Orientation="Horizontal">
+            <TextBlock Text="📃"/>
+            <Button Content="原寸" Click="ButtonCopyToClipboard_Click"/>
+            <Button Content="表示" Click="ButtonCopyToClipboardExterior_Click" ToolTip="表示倍率のサイズでコピー"/>
+          </StackPanel>
+          <StackPanel Orientation="Horizontal">
+            <TextBlock Text="💾"/>
+            <Button Content="原寸" Click="ButtonSave_Click"/>
+            <Button Content="表示" Click="ButtonSaveExterior_Click" ToolTip="表示倍率のサイズで保存"/>
+          </StackPanel>
+        </UniformGrid>
+
+        <!--<UniformGrid Columns="4" Rows="2">
+          <Button Content="📃原寸" Click="ButtonCopyToClipboard_Click"/>
+          <Button Content="📃拡大" Click="ButtonCopyToClipboardExterior_Click"/>
+          <Button Content="💾原寸" Click="ButtonSave_Click"/>
+          <Button Content="💾拡大" Click="ButtonSaveExterior_Click"/>
+        </UniformGrid>-->
 
 
         <!--<UniformGrid Columns="2">
