@@ -20,7 +20,7 @@
     </Canvas>
 
     <StackPanel Grid.Column="1">
-      <Button Content="test" Click="Button_Click"/>
+      <Button x:Name="MyButton" Content="test" Click="Button_Click"/>
     </StackPanel>
   </Grid>
 </Window>

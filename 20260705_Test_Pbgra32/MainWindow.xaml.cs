@@ -21,15 +21,15 @@ namespace _20260705_Test_Pbgra32
             InitializeComponent();
         }
 
-        private void Test()
+        private void Test(FrameworkElement element)
         {
-            var width = MyElement.ActualWidth;
-            var height = MyElement.ActualHeight;
+            var width = element.ActualWidth;
+            var height = element.ActualHeight;
             int pw = (int)Math.Ceiling(width);
             int ph = (int)Math.Ceiling(height);
             Rect drawRect = new(0, 0, pw, ph);
 
-            VisualBrush brush = new(MyElement);
+            VisualBrush brush = new(element);
             brush.Stretch = Stretch.None;
             DrawingVisual dv = new();
             using (var context = dv.RenderOpen())
@@ -41,12 +41,13 @@ namespace _20260705_Test_Pbgra32
             bmp.Render(dv);
 
             RenderTargetBitmap visualBmp = new(pw, ph, 96, 96, PixelFormats.Pbgra32);
-            visualBmp.Render(MyElement);
+            visualBmp.Render(element);
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            Test();
+            //Test(MyElement);
+            Test(MyButton);
         }
     }
 }
