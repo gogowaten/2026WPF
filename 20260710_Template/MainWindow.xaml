@@ -6,6 +6,11 @@
         xmlns:local="clr-namespace:_20260710_Template"
         mc:Ignorable="d"
         Title="MainWindow" Height="367" Width="654">
+  <!--Title="MainWindow" Height="{Binding WindowHeight}" Width="{Binding WindowWidth}">-->
+  <Window.DataContext>
+    <local:Data/>
+    <!--<local:MainViewModel/>-->
+  </Window.DataContext>
   <Grid>
     <Grid.ColumnDefinitions>
       <ColumnDefinition/>
@@ -17,7 +22,17 @@
     </Canvas>
 
     <StackPanel Grid.Column="1">
-
+      <GroupBox>
+        <GroupBox.DataContext>
+          <local:MainWindow/>
+        </GroupBox.DataContext>
+        <StackPanel>
+          <!--<TextBlock Text="{Binding Width, StringFormat='width = {0}'}"/>-->
+          <!--<TextBlock Text="{Binding ActualWidth, StringFormat='actwidth = {0}'}"/>-->
+          <!--<TextBlock Text="{Binding RestoreBounds.Width, StringFormat='actwidth = {0}'}"/>
+          <TextBlock Text="{Binding RestoreBounds.Width}"/>-->
+        </StackPanel>
+      </GroupBox>
     </StackPanel>
   </Grid>
 </Window>
