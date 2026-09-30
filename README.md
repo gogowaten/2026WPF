@@ -1,3 +1,9 @@
+
+<img width="630" height="595" alt="20260930_214403_" src="https://github.com/user-attachments/assets/d9cb4800-df14-47d6-9b7d-cfc1214ccaef" />
+<br><br><br>
+
+
+
 # 20260216_02
 https://github.com/gogowaten/2026WPF/tree/master/20260216_02<br>
 AIに書いてもらった、よくわからん<br>
