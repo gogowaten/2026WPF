@@ -1,7 +1,85 @@
+# 20260226_DataTemplate_CustomControl
+https://github.com/gogowaten/2026WPF/tree/master/20260226_DataTemplate_CustomControl<br>
+<img width="640" height="360" alt="20260930_223435" src="https://github.com/user-attachments/assets/0f3dcd3e-28d0-4d84-b821-0c1640fb5194" /><br>
+リーソスディクショナリファイルItemTemplates.xamlはApp.xamlでマージする設定を記述することで有効になるとかをテストしている<br>
+<br><br><br>
+
+
+# 20260224_DataTemplate_Behavior_CustomCtrl
+https://github.com/gogowaten/2026WPF/tree/master/20260224_DataTemplate_Behavior_CustomCtrl<br>
+<img width="832" height="968" alt="20260930_222727_" src="https://github.com/user-attachments/assets/e42e74f9-4fa8-42b7-93b1-d3dc22f700a5" />
+<br><br><br>
+
+
+
+# 20260224_DataTemplate3_Behavior
+https://github.com/gogowaten/2026WPF/tree/master/20260224_DataTemplate3_Behavior<br>
+<img width="640" height="616" alt="20260930_222912_" src="https://github.com/user-attachments/assets/42904d3a-d241-46af-9bb0-2b9867edc829" />
+<br><br><br>
+
+# 20260224_Json
+<img width="973" height="1102" alt="20260930_223233" src="https://github.com/user-attachments/assets/944b1271-b01d-467d-a489-693207cd8443" />
+<br><br><br>
+
+
+
+# 20260224
+<img width="640" height="360" alt="20260930_222532" src="https://github.com/user-attachments/assets/71657396-3381-411d-8fc3-9e08e0b38aea" />
+<br><br><br>
+
+
+
+# 20260223
+<img width="640" height="360" alt="20260930_222246" src="https://github.com/user-attachments/assets/2d0e4f8f-9de1-4cf6-8f0e-b61faba19250" />
+<br><br><br>
+
+
+
+# 20260223_DataTemplate2
+https://github.com/gogowaten/2026WPF/tree/master/20260223_DataTemplate2<br>
+<img width="640" height="360" alt="20260930_221340" src="https://github.com/user-attachments/assets/c1ef0b3b-cc0b-4bfd-9d8e-909dec10da9b" />
+<br><br><br>
+
+
+# 20260223_DataTemplate
+https://github.com/gogowaten/2026WPF/tree/master/20260223_DataTemplate<br>
+<img width="640" height="360" alt="20260930_221141" src="https://github.com/user-attachments/assets/f753f69b-2a44-4f9f-96c3-3448ca8d40f7" />
+<br><br><br>
+
+
+# 20260222_ResizePanel
+https://github.com/gogowaten/2026WPF/tree/master/20260222_ResizePanel<br>
+<img width="640" height="1608" alt="20260930_220541_" src="https://github.com/user-attachments/assets/d1600204-48d1-4583-b803-ab65515e1f43" /><br>
+子要素が収まるサイズに、手動で合わせるパネル<br>
+<br><br><br>
+
+
+
+# 20260221_AutoSizePanel
+https://github.com/gogowaten/2026WPF/tree/master/20260221_AutoSizePanel<br>
+<img width="640" height="360" alt="20260930_220412" src="https://github.com/user-attachments/assets/7e98e3fe-8b93-4ad8-91e3-c4113ca01c4c" />
+<br><br><br>
+
+
+
+# 20260220
+https://github.com/gogowaten/2026WPF/tree/master/20260220<br>
+<img width="704" height="648" alt="20260930_220218_" src="https://github.com/user-attachments/assets/846f807a-6839-417e-a358-25e1671bf63e" />
+<br><br><br>
+
+
+# 20260219
+https://github.com/gogowaten/2026WPF/tree/master/20260219<br>
+<img width="928" height="648" alt="20260930_215906_" src="https://github.com/user-attachments/assets/870b1970-8fc2-4a31-b7c9-c13f2be75811" />
+<br><br><br>
+
+
+
+
 # 20260218_HeaderedItemsControl
 https://github.com/gogowaten/2026WPF/tree/master/20260218_HeaderedItemsControl<br>
 <img width="786" height="443" alt="20260930_214945" src="https://github.com/user-attachments/assets/79fc9b4a-5944-4e8e-ab92-37aab4b9f9b1" />
-
+<br><br><br>
 
 # 20260218_Mvvm
 https://github.com/gogowaten/2026WPF/tree/master/20260218_Mvvm<br>
