@@ -1,3 +1,23 @@
+# 20260218_HeaderedItemsControl
+https://github.com/gogowaten/2026WPF/tree/master/20260218_HeaderedItemsControl<br>
+<img width="786" height="443" alt="20260930_214945" src="https://github.com/user-attachments/assets/79fc9b4a-5944-4e8e-ab92-37aab4b9f9b1" />
+
+
+# 20260218_Mvvm
+https://github.com/gogowaten/2026WPF/tree/master/20260218_Mvvm<br>
+<img width="386" height="499" alt="20260930_215310_" src="https://github.com/user-attachments/assets/49138cf9-963e-4b89-b685-9fd7ee3b0a21" />
+MVVMでの簡易NumericUpDown<br>
+<br><br><br>
+
+
+
+# 20260218_HeaderItemControl2 at master · gogowaten/2026WPF
+https://github.com/gogowaten/2026WPF/tree/master/20260218_HeaderItemControl2<br>
+<img width="786" height="443" alt="20260930_214945" src="https://github.com/user-attachments/assets/38dc1be0-ab6b-40f6-b524-a881ee0e2da4" />
+<br><br><br>
+
+
+
 # 20260217
 https://github.com/gogowaten/2026WPF/tree/master/20260217<br>
 <img width="630" height="595" alt="20260930_214403_" src="https://github.com/user-attachments/assets/d9cb4800-df14-47d6-9b7d-cfc1214ccaef" />
